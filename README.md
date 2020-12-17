@@ -8,4 +8,4 @@ The code is a modified version of
 sources.  
   
 **The website is at [here](http://zcg-coder.github.io/PyPlusWeb)**  
-**The source release does *not* contain the packages installer, so you must go to the website to download it.  
+**The source release does *not* contain the packages installer, so you must go to the website to download it.**  

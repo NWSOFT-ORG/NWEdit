@@ -7,4 +7,5 @@ The code is a modified version of
 , mixed with some [thonny](https://www.github.com/thonny/thonny)  
 sources.  
   
-**The website is at [here](http://zcg-coder.github.io/PyPlusWeb)**
+**The website is at [here](http://zcg-coder.github.io/PyPlusWeb)**  
+**The source release does *not* contain the packages installer, so you must go to the website to download it.  

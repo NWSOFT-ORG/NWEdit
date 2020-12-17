@@ -1,0 +1,5 @@
+font: Consolas
+size: 13
+tabs: 4
+path: C:\Python37\python.exe
+exts: (('Python Files', '*.py, *.pyw'), ('all files', '*.*'))

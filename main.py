@@ -1,2 +1,0 @@
-import pyplus
-pyplus.main()

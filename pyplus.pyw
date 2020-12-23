@@ -266,11 +266,19 @@ class Document:
 
 class Editor:
     def __init__(self, master):
-        # TODO: Add a tab click event!
+        '''The editor object, the entire thing that goes in the
+        window.
+        Lacks these MacOS support:
+        * Command key support
+        * Some <Ctrl-x> shortcuts won't work
+        (ie: ctrl-o is expected to open files, but won't work!)
+        * <Button-3> (right click support)
+        * The file selector cannot change file type.
+        '''
         self.master = master
-        style = ThemedStyle(self.master)
+        style = ThemedStyle(self.master)  # Apply ttkthemes to master window.
         style.set_theme("black")
-        self.count = 0
+        self.count = 0  # Variable for syntax highlighter
         self.master.geometry("600x400")
         self.master.title('PyEdit +')
         self.master.iconphoto(True, tk.PhotoImage(data='''iVBORw0KGgoAAAANSUhEU
@@ -279,6 +287,7 @@ class Editor:
         UeJyNktENgCAMROsGog7ACqbpvzs07L+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D
         QGsRhw9B3SMwNSSj1glNEDqhUpUGw/gMuUd+d2Csny6xgAZB4A1IDwG1SxAc/95t7DAPPIm
         4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC'''))
+        # Base64 image, this probably decreases the repo size.
 
         with open('settings.txt') as f:
             self.settings = f.read()
@@ -351,15 +360,17 @@ class Editor:
         self.tab_right_click_menu.add_command(
             label='Close Tab', command=self.close_tab)
         self.nb.bind('<Button-3>', self.right_click_tab)
+        # Mouse bindings
         first_tab = ttk.Frame(self.nb)
         self.tabs[first_tab] = Document(
             first_tab, self.create_text_widget(first_tab))
         self.nb.add(first_tab, text='Untitled.py   ')
 
         def tab(event):
-            self.tabs[self.get_tab()].textbox.insert('insert', ' ' * 4)
-            return 'break'
+            self.tabs[self.get_tab()].textbox.insert('insert', ' ' * 4)  # Convert tabs to spaces
+            return 'break'  # Quit quickly, before a char is being inserted.
 
+        # Keyboard bindings
         self.master.bind('<Control-s>', self.save_file)
         self.master.bind('<Control-w>', self.close_tab)
         self.master.bind('<Button-3>', self.right_click)
@@ -372,15 +383,16 @@ class Editor:
             self.master.bind(x, self.autoinsert)
 
     def settitle(self, event=None):
-        print('hi')
-        self.master.title(f'PyEdit+ - {self.nb.tab(self.nb.select(), "text")}')
+        print('Testing')  # Debug
+        self.master.title(f'PyEdit+ - {self.nb.tab(self.nb.select(), "text")}')  # Set the title
 
     def create_text_widget(self, frame):
-        textframe = EnhancedTextFrame(frame)
+        '''Creates a text widget in a frame.'''
+        textframe = EnhancedTextFrame(frame)  # The one with line numbers.
         textframe.pack(fill='both', expand=1)
 
-        textbox = textframe.text
-        textbox.frame = frame
+        textbox = textframe.text  # text widget
+        textbox.frame = frame  # The text will be packed into the frame.
         textbox.tag_configure('Token.Keyword', foreground='#8cc4ff')
         textbox.tag_configure('Token.Name.Builtin.Pseudo',
                               foreground='#ad7fa8')
@@ -395,6 +407,7 @@ class Editor:
         textbox.tag_configure('Token.Literal.String.Doc', foreground='#b77600')
         textbox.tag_configure('Token.Comment.Single', foreground='#73d216')
         textbox.tag_configure('Token.Comment.Hashbang', foreground='#73d216')
+        # ^ Highlight using tags
         textbox.bind('<Return>', self.autoindent)
         textbox.bind("<<set-line-and-column>>", self.key)
         textbox.event_add("<<set-line-and-column>>", "<KeyRelease>",
@@ -403,21 +416,23 @@ class Editor:
             frame, text='PyEdit +', justify='right', anchor='e')
         textbox.statusbar.pack(side='bottom', fill='x', anchor='e')
 
-        self.master.geometry('1000x600')
+        self.master.geometry('1000x600')  # Configure window size
 
         textbox.edited = False
         textbox.focus_set()
         return textbox
 
     def key(self, event=None, ismouse=False):
+        '''Event when a key is pressed.'''
         currtext = self.tabs[self.get_tab()].textbox
         try:
             self._highlight_text()
             currtext.edited = True
             self._highlight_text()
             currtext.statusbar.config(text=f"PyEdit+ | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} | col {str(int(currtext.index('insert').split('.')[1:][0]))}")
+            # Update statusbar
         except:
-            currtext.statusbar.config(text='PyEdit +')
+            currtext.statusbar.config(text='PyEdit +')  # When error occurs
 
     def _highlight_text(self):
         '''Highlight the text in the text box.'''
@@ -450,7 +465,10 @@ class Editor:
                 'range_start', 'range_end')
 
     def open_file(self, file=''):
-
+        '''Opens a file
+        If a file is not provided, a messagebox'll
+        pop up to ask the user to select the path.
+        '''
         if not file:
             file_dir = (tkinter.filedialog.askopenfilename(
                 master=self.master, initialdir='/', title='Select file', filetypes=self.filetypes))
@@ -470,6 +488,7 @@ class Editor:
                 # Puts the contents of the file into the text widget.
                 self.tabs[new_tab].textbox.insert('end',
                                                   file.read().replace('\t', ' ' * 4))
+                # Inserts file content, replacing tabs with four spaces
                 self.tabs[new_tab].textbox.focus_set()
                 self.tabs[new_tab].textbox.edited = True
                 self.key()
@@ -477,6 +496,7 @@ class Editor:
                 return
 
     def save_as(self):
+        '''Saves a *new* file'''
         if len(self.tabs) > 0:
             curr_tab = self.get_tab()
             file_dir = (tkinter.filedialog.asksaveasfilename(
@@ -496,6 +516,7 @@ class Editor:
             file.close()
 
     def save_file(self, *args):
+        '''Saves an *exsisting* file'''
         try:
             curr_tab = self.get_tab()
             if not self.tabs[curr_tab].file_dir:
@@ -507,6 +528,7 @@ class Editor:
             pass
 
     def new_file(self, *args):
+        '''Creates a new tab(file).'''
         new_tab = ttk.Frame(self.nb)
         self.tabs[new_tab] = Document(
             new_tab, self.create_text_widget(new_tab))
@@ -557,8 +579,13 @@ class Editor:
             pass
 
     def build(self, *args):
+        '''Builds the file
+        Steps:
+        1) Writes build code into the batch file.
+        2) Linux only: uses chmod to make the sh execuable
+        3) Runs the build file'''
         try:
-            if _PLTFRM:
+            if _PLTFRM:  # Windows
                 with open('./.temp/build.bat') as f:
                     f.write((_BATCH_BUILD % self.file_dir))
                     os.system('./.temp/build.bat')
@@ -570,6 +597,12 @@ class Editor:
             pass
 
     def autoinsert(self, event=None):
+        '''Auto-inserts a symbol
+        * ' -> ''
+        * " -> ""
+        * ( -> ()
+        * [ -> []
+        * { -> {}'''
         currtext = self.tabs[self.get_tab()].textbox
         # Strings
         if event.char not in ['(', '[', '{']:
@@ -606,6 +639,7 @@ class Editor:
             return 'break'
 
     def autoindent(self, event=None):
+        '''Auto-indents the next line'''
         currtext = self.tabs[self.get_tab()].textbox
         indentation = ""
         lineindex = currtext.index("insert").split(".")[0]
@@ -626,6 +660,7 @@ class Editor:
         return "break"
 
     def search(self, event=None):
+        '''Searches through the file'''
         searchWin = ttk.Frame(self.tabs[self.get_tab()].textbox.frame)
         style = ThemedStyle(searchWin)
         style.set_theme("black")
@@ -774,4 +809,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

@@ -560,11 +560,11 @@ class Editor:
         try:
             if _PLTFRM:
                 with open('./.temp/build.bat') as f:
-                    f.write(_BATCH_BUILD % self.file_dir)
+                    f.write((_BATCH_BUILD % self.file_dir))
                     os.system('./.temp/build.bat')
             else:
                 with open('./.temp/build.sh') as f:
-                    f.write(_BATCH_BUILD % self.file_dir)
+                    f.write((_BATCH_BUILD % self.file_dir))
                     os.system('chmod 700 ./.temp/build.sh && ./.temp/build.sh')
         except:
             pass

@@ -1,19 +1,32 @@
+#!python3
+# coding: utf-8
+"""
+pyplus.pyw -- the editor's ONLY file
+The somehow-professional editor
+It's extremely small!!!
+You can visit my site for more details!
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+> http://ZCG-coder.github.io/PyPlusWeb <
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Some parts are adapted from stack overflow.
+"""
+import json
 import os
-import tkinter as tk
-import tkinter.ttk as ttk
-from ttkthemes import ThemedStyle
-from hashlib import md5
-import tkinter.filedialog
-import tkinter.messagebox
-import ttkthemes
 import sys
-from tkinter import TclError
-from tkinter import font as tkfont
+import tkinter as tk
+import tkinter.filedialog
+import tkinter.font as tkFont
+import tkinter.ttk as ttk
+from tkinter import messagebox as messagebox
 from tkinter import scrolledtext
+
 import pygments
+import ttkthemes
 from pygments.lexers import PythonLexer
+from ttkthemes import ThemedStyle
 
 _PLTFRM = (True if sys.platform.startswith('win') else False)
+_OSX = (True if sys.platform.startswith('darwin') else False)
 _BATCH_BUILD = ('''
 @echo off
 
@@ -66,6 +79,46 @@ echo Exit in 10 secs...
 sleep 10s
 ''')
 
+_MAIN_KEY = 'Command' if _OSX else 'Control'
+
+
+class Settings:
+    """A class to read and write data to/from settings.json"""
+    def __init__(self):
+        self.lexer = 'PythonLexer'
+        self.font = 'Menlo'
+        self.size = 13
+        self.settings = {"lexer": self.lexer,
+                         "font": f'{self.font} {self.size}'}
+
+    def config_lexer(self):
+        config = tk.Toplevel()
+        config.title("Lexer (Syntax highlighting)")
+        tk.Label(config, text='Select the lexer below').pack()
+        config.protocol("WM_DELETE_WINDOW", save)
+        def save():
+            self.save_settings()
+        config.mainloop()
+
+    def config_font(self):
+        config = tk.Toplevel()
+        config.title('Font')
+        tk.Label(config, text=f'Enter the font below\nCurrent font is {self.font} {self.size}').pack()
+        e = tk.Entry(config)
+        e.pack()
+        config.protocol('WM_DELETE_WINDOW', self.save_settings)
+        config.mainloop()
+
+    def save_settings(self):
+        self.settings = {"lexer": self.lexer,
+                         "font": f'{self.font} {self.size}'}
+        with open('settings.json', 'w') as f:
+            json.dump(self.settings, f)
+
+
+s = Settings()
+s.config_font()
+
 
 class TextLineNumbers(tk.Canvas):
     def __init__(self, *args, **kwargs):
@@ -75,7 +128,7 @@ class TextLineNumbers(tk.Canvas):
     def attach(self, text_widget):
         self.textwidget = text_widget
 
-    def redraw(self, *args):
+    def redraw(self, line):
         '''redraw line numbers'''
         self.delete("all")
 
@@ -88,12 +141,17 @@ class TextLineNumbers(tk.Canvas):
                 break
             y = dline[1]
             linenum = str(i).split(".")[0]
-            self.create_text(2, y, anchor="nw", text=linenum,
-                             fill='black', font=self.textwidget['font'])
+            if str(int(float(i))) == str(line):
+                bold_font = tkFont.Font(family=self.textwidget['font'], weight="bold")
+                self.create_text(2, y, anchor="nw", text=linenum,
+                                 fill='black', font=bold_font)
+            else:
+                self.create_text(2, y, anchor="nw", text=linenum,
+                                 fill='black', font=self.textwidget['font'])
             i = self.textwidget.index("%s+1line" % i)
 
 
-class CustomText(tk.Text):
+class CustomText(tk.scrolledtext.ScrolledText):
     def __init__(self, *args, **kwargs):
         tk.scrolledtext.ScrolledText.__init__(self, *args, **kwargs)
 
@@ -117,7 +175,7 @@ class CustomText(tk.Text):
                     args[0:2] == ("xview", "scroll") or
                     args[0:2] == ("yview", "moveto") or
                     args[0:2] == ("yview", "scroll")
-                    ):
+            ):
                 self.event_generate("<<Change>>", when="tail")
 
             # return what the actual widget returned
@@ -127,11 +185,14 @@ class CustomText(tk.Text):
 
 
 class EnhancedTextFrame(ttk.Frame):
+    '''An enhanced text frame to put the
+    text widget with linenumbers in.'''
+
     def __init__(self, *args, **kwargs):
         ttk.Frame.__init__(self, *args, **kwargs)
         self.text = CustomText(self, bg='black', fg='white', insertbackground='white',
                                selectforeground='black', selectbackground='white', highlightthickness=0,
-                               font='Menlo 13')
+                               font='Menlo 13', wrap='none')
         self.linenumbers = TextLineNumbers(
             self, width=30, bg='darkgray', bd=0, highlightthickness=0)
         self.linenumbers.attach(self.text)
@@ -141,12 +202,14 @@ class EnhancedTextFrame(ttk.Frame):
         self.text.bind("<<Change>>", self._on_change)
         self.text.bind("<Configure>", self._on_change)
 
-    def _on_change(self, event):
-        self.linenumbers.redraw()
+    def _on_change(self, event=None):
+        currline = int(float(self.text.index('insert linestart')))
+        self.linenumbers.redraw(currline)
 
 
 class CustomNotebook(ttk.Notebook):
-    """A ttk Notebook with close buttons on each tab"""
+    """A ttk Notebook with close buttons on each tab
+        images drawn by me using the mspaint app (the rubbish in many people's opinion)"""
 
     __initialized = False
 
@@ -171,6 +234,8 @@ class CustomNotebook(ttk.Notebook):
             index = self.index("@%d,%d" % (event.x, event.y))
             self.state(['pressed'])
             self._active = index
+        else:
+            self.event_generate("<<Notebook_B1-Down>>", when="tail")
 
     def on_close_release(self, event):
         try:
@@ -229,17 +294,17 @@ class CustomNotebook(ttk.Notebook):
         })])
         style.layout("CustomNotebook.Tab", [("CustomNotebook.tab", {
             "sticky":
-            "nswe",
+                "nswe",
             "children": [("CustomNotebook.padding", {
                 "side":
-                "top",
+                    "top",
                 "sticky":
-                "nswe",
+                    "nswe",
                 "children": [("CustomNotebook.focus", {
                     "side":
-                    "top",
+                        "top",
                     "sticky":
-                    "nswe",
+                        "nswe",
                     "children": [
                         ("CustomNotebook.label", {
                             "side": "left",
@@ -255,30 +320,29 @@ class CustomNotebook(ttk.Notebook):
         })])
 
 
-class Document:
-    def __init__(self, Frame, TextWidget, FileDir=''):
+class Document():
+    '''Helper class, for the editor'''
+
+    def __init__(self, Frame, TextWidget, FileDir='', FullDir=''):
         self.file_dir = FileDir
-        self.fulldir = FileDir
-        self.file_name = 'Untitled.py' if not FileDir else os.path.basename(
-            FileDir)
+        self.fulldir = FullDir if FullDir else FileDir
         self.textbox = TextWidget
 
 
-class Editor:
-    def __init__(self, master):
+class Editor():
+    def __init__(self):
         '''The editor object, the entire thing that goes in the
         window.
         Lacks these MacOS support:
-        * Command key support
         * Some <Ctrl-x> shortcuts won't work
         (ie: ctrl-o is expected to open files, but won't work!)
         * <Button-3> (right click support)
         * The file selector cannot change file type.
         '''
-        self.master = master
-        style = ThemedStyle(self.master)  # Apply ttkthemes to master window.
-        style.set_theme("black")
-        self.count = 0  # Variable for syntax highlighter
+        self.master = ttkthemes.ThemedTk()
+        self.master.minsize(900, 600)
+        style = ThemedStyle(self.master)
+        style.set_theme("black")  # Apply ttkthemes to master window.
         self.master.geometry("600x400")
         self.master.title('PyEdit +')
         self.master.iconphoto(True, tk.PhotoImage(data='''iVBORw0KGgoAAAANSUhEU
@@ -289,49 +353,42 @@ class Editor:
         4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC'''))
         # Base64 image, this probably decreases the repo size.
 
-        with open('settings.txt') as f:
-            self.settings = f.read()
-
-        self.filetypes = eval(self.settings.split('\n')[4][6:])
+        self.filetypes = None
 
         self.tabs = {}
 
-        self.nb = CustomNotebook(master, self.close_tab)
+        self.nb = CustomNotebook(self.master, self.close_tab)
         self.nb.bind('<B1-Motion>', self.move_tab)
-        self.nb.event_add("<<TabClick>>", "<Button-1>")
-        self.nb.bind("<<TabClick>>", self.settitle)
+        self.nb.bind("<<Notebook_B1-Down>>", self.settitle)
         self.nb.pack(expand=1, fill='both')
         self.nb.enable_traversal()
 
         self.master.protocol('WM_DELETE_WINDOW', self.exit)
 
-        self.master.bind('<Command-o>', self.open_file)
-        self.master.bind('<Control-n>', self.new_file)
-
         menubar = tk.Menu(self.master)
 
         filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label='New Tab', command=self.new_file)
-        filemenu.add_command(label='Open File', command=self.open_file)
-        filemenu.add_command(label='Save File', command=self.save_file)
-        filemenu.add_command(label='Save As...', command=self.save_as)
-        filemenu.add_command(label='Close Tab', command=self.close_tab)
+        filemenu.add_command(label='New Tab', command=self.new_file, accelerator=f'{_MAIN_KEY}-n')
+        filemenu.add_command(label='Open File', command=self.open_file, accelerator=f'{_MAIN_KEY}-o')
+        filemenu.add_command(label='Save File', command=self.save_file, accelerator=f'{_MAIN_KEY}-s')
+        filemenu.add_command(label='Save As...', command=self.save_as, accelerator=f'{_MAIN_KEY}-S')
+        filemenu.add_command(label='Close Tab', command=self.close_tab, accelerator=f'{_MAIN_KEY}-w')
         filemenu.add_separator()
-        filemenu.add_command(label='Exit Editor', command=self.exit)
+        filemenu.add_command(label='Exit Editor', command=self.exit, accelerator=f'{_MAIN_KEY}-q')
 
         editmenu = tk.Menu(menubar, tearoff=0)
-        editmenu.add_command(label='Undo', command=self.undo)
-        editmenu.add_command(label='Redo', command=self.redo)
+        editmenu.add_command(label='Undo', command=self.undo, accelerator=f'{_MAIN_KEY}-o')
+        editmenu.add_command(label='Redo', command=self.redo, accelerator=f'{_MAIN_KEY}-o')
         editmenu.add_separator()
-        editmenu.add_command(label='Cut', command=self.cut)
-        editmenu.add_command(label='Copy', command=self.copy)
-        editmenu.add_command(label='Paste', command=self.paste)
-        editmenu.add_command(label='Delete', command=self.delete)
-        editmenu.add_command(label='Select All', command=self.select_all)
+        editmenu.add_command(label='Cut', command=self.cut, accelerator=f'{_MAIN_KEY}-o')
+        editmenu.add_command(label='Copy', command=self.copy, accelerator=f'{_MAIN_KEY}-o')
+        editmenu.add_command(label='Paste', command=self.paste, accelerator=f'{_MAIN_KEY}-o')
+        editmenu.add_command(label='Delete Selected', command=self.delete, accelerator='del')
+        editmenu.add_command(label='Select All', command=self.select_all, accelerator=f'{_MAIN_KEY}-a')
 
         codemenu = tk.Menu(menubar, tearoff=0)
-        codemenu.add_command(label='Build', command=self.build)
-        codemenu.add_command(label='Search', command=self.search)
+        codemenu.add_command(label='Build', command=self.build, accelerator=f'{_MAIN_KEY}-b')
+        codemenu.add_command(label='Search', command=self.search, accelerator=f'{_MAIN_KEY}-f')
 
         helpmenu = tk.Menu(menubar, tearoff=0)
         helpmenu.add_command(label='Version', command=self.version)
@@ -359,40 +416,75 @@ class Editor:
             label='New Tab', command=self.new_file)
         self.tab_right_click_menu.add_command(
             label='Close Tab', command=self.close_tab)
-        self.nb.bind('<Button-3>', self.right_click_tab)
+        self.nb.bind(('<Button-2>' if _OSX else '<Button-3>'), self.right_click_tab)
         # Mouse bindings
         first_tab = ttk.Frame(self.nb)
         self.tabs[first_tab] = Document(
             first_tab, self.create_text_widget(first_tab))
         self.nb.add(first_tab, text='Untitled.py   ')
+        self.mouse()
 
         def tab(event):
             self.tabs[self.get_tab()].textbox.insert('insert', ' ' * 4)  # Convert tabs to spaces
             return 'break'  # Quit quickly, before a char is being inserted.
 
         # Keyboard bindings
-        self.master.bind('<Control-s>', self.save_file)
-        self.master.bind('<Control-w>', self.close_tab)
-        self.master.bind('<Button-3>', self.right_click)
-        self.master.bind('<Control-z>', self.undo)
-        self.master.bind('<Control-Z>', self.redo)
-        self.master.bind('<Control-b>', self.build)
-        self.master.bind('<Control-f>', self.search)
+        self.master.bind(f'<{_MAIN_KEY}-s>', self.save_file)
+        self.master.bind(f'<{_MAIN_KEY}-w>', self.close_tab)
+        self.master.bind(('<Button-2>' if _OSX else '<Button-3>'), self.right_click)
+        self.master.bind(f'<{_MAIN_KEY}-z>', self.undo)
+        self.master.bind(f'<{_MAIN_KEY}-Z>', self.redo)
+        self.master.bind(f'<{_MAIN_KEY}-b>', self.build)
+        self.master.bind(f'<{_MAIN_KEY}-f>', self.search)
+        self.master.bind(f'<{_MAIN_KEY}-n>', self.new_file)
         self.master.bind('<Tab>', tab)
         for x in ['"', "'", '(', '[', '{']:
             self.master.bind(x, self.autoinsert)
+        self.open_file('pyplus.pyw')
+        self.master.mainloop()  # This line can be here only
 
     def settitle(self, event=None):
-        print('Testing')  # Debug
-        self.master.title(f'PyEdit+ - {self.nb.tab(self.nb.select(), "text")}')  # Set the title
+        try:
+            text = (self.tabs[self.get_tab()].file_dir
+                    if self.tabs[self.get_tab()].file_dir
+                    else 'None')
+            if self.tabs[self.get_tab()].textbox.edited: text += '*'
+            self.master.title(f'PyEdit+ - {text}')  # Set the title
+            # PyEdit+ - filename[*]
+        except:
+            self.master.title('PyEdit +')
 
     def create_text_widget(self, frame):
         '''Creates a text widget in a frame.'''
-        textframe = EnhancedTextFrame(frame)  # The one with line numbers.
+        textframe = EnhancedTextFrame(frame)  # The one with line numbers and a nice dark theme
         textframe.pack(fill='both', expand=1)
 
         textbox = textframe.text  # text widget
         textbox.frame = frame  # The text will be packed into the frame.
+        # TODO: Make a better color scheme
+        textbox.tag_configure("Token.Keyword", foreground="#CC7A00")
+        textbox.tag_configure("Token.Keyword.Constant", foreground="#CC7A00")
+        textbox.tag_configure("Token.Keyword.Declaration", foreground="#CC7A00")
+        textbox.tag_configure("Token.Keyword.Namespace", foreground="#CC7A00")
+        textbox.tag_configure("Token.Keyword.Pseudo", foreground="#CC7A00")
+        textbox.tag_configure("Token.Keyword.Reserved", foreground="#CC7A00")
+        textbox.tag_configure("Token.Keyword.Type", foreground="#CC7A00")
+        textbox.tag_configure("Token.Name.Class", foreground="#ddd313")
+        textbox.tag_configure("Token.Name.Exception", foreground="#ddd313")
+        textbox.tag_configure("Token.Name.Function", foreground="#298fb5")
+        textbox.tag_configure("Token.Name.Function.Magic", foreground="#298fb5")
+        textbox.tag_configure("Token.Name.Decorator", foreground="#298fb5")
+        textbox.tag_configure("Token.Name.Builtin", foreground="#CC7A00")
+        textbox.tag_configure("Token.Name.Builtin.Pseudo", foreground="#CC7A00")
+        textbox.tag_configure("Token.Operator.Word", foreground="#CC7A00")
+        textbox.tag_configure("Token.Operator", foreground="#FF0000")
+        textbox.tag_configure("Token.Comment", foreground="#767d87")
+        textbox.tag_configure("Token.Comment.Single", foreground="#767d87")
+        textbox.tag_configure("Token.Comment.Double", foreground="#767d87")
+        textbox.tag_configure("Token.Literal.Number.Integer", foreground="#88daea")
+        textbox.tag_configure("Token.Literal.Number.Float", foreground="#88daea")
+        textbox.tag_configure("Token.Literal.String.Single", foreground="#35c666")
+        textbox.tag_configure("Token.Literal.String.Double", foreground="#35c666")
         textbox.tag_configure('Token.Keyword', foreground='#8cc4ff')
         textbox.tag_configure('Token.Name.Builtin.Pseudo',
                               foreground='#ad7fa8')
@@ -409,9 +501,10 @@ class Editor:
         textbox.tag_configure('Token.Comment.Hashbang', foreground='#73d216')
         # ^ Highlight using tags
         textbox.bind('<Return>', self.autoindent)
-        textbox.bind("<<set-line-and-column>>", self.key)
-        textbox.event_add("<<set-line-and-column>>", "<KeyRelease>",
-                          "<ButtonRelease>")
+        textbox.bind("<<KeyEvent>>", self.key)
+        textbox.bind("<<MouseEvent>>", self.mouse)
+        textbox.event_add("<<KeyEvent>>", "<KeyRelease>")
+        textbox.event_add("<<MouseEvent>>", "<ButtonRelease>")
         textbox.statusbar = ttk.Label(
             frame, text='PyEdit +', justify='right', anchor='e')
         textbox.statusbar.pack(side='bottom', fill='x', anchor='e')
@@ -422,47 +515,62 @@ class Editor:
         textbox.focus_set()
         return textbox
 
-    def key(self, event=None, ismouse=False):
-        '''Event when a key is pressed.'''
+    def key(self, event=None):
+        """Event when a key is pressed."""
         currtext = self.tabs[self.get_tab()].textbox
         try:
-            self._highlight_text()
+            self._highlight_all()
             currtext.edited = True
-            self._highlight_text()
-            currtext.statusbar.config(text=f"PyEdit+ | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} | col {str(int(currtext.index('insert').split('.')[1:][0]))}")
-            # Update statusbar
-        except:
-            currtext.statusbar.config(text='PyEdit +')  # When error occurs
+            currtext.statusbar.config(
+                text=f"PyEdit+ | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} | col {str(int(currtext.index('insert').split('.')[1:][0]))}")
+            # Update statusbar and titlebar
+            self.settitle()
+        except Exception as e:
+            currtext.statusbar.config(text=f'PyEdit +')  # When error occurs
 
-    def _highlight_text(self):
+    def mouse(self, event=None):
+        """The action done when the mouse is clicked"""
+        currtext = self.tabs[self.get_tab()].textbox
+        try:
+            currtext.statusbar.config(
+                text=f"PyEdit+ | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} | col {str(int(currtext.index('insert').split('.')[1:][0]))}")
+            # Update statusbar and titlebar
+            self.settitle()
+        except Exception as e:
+            currtext.statusbar.config(text=f'PyEdit +')  # When error occurs
+
+    def _highlight_all(self):
         '''Highlight the text in the text box.'''
+        currtext = self.tabs[self.get_tab()].textbox
 
-        start_index = self.tabs[self.get_tab()].textbox.index('@0,0')
-        end_index = self.tabs[self.get_tab()].textbox.index(tk.END)
+        start_index = currtext.index('1.0')
+        end_index = currtext.index(tk.END)
 
-        for tag in self.tabs[self.get_tab()].textbox.tag_names():
+        for tag in currtext.tag_names():
             if tag == 'sel':
                 continue
-            self.tabs[self.get_tab()].textbox.tag_remove(
-                tag, self.tabs[self.get_tab()].textbox.index('@0,0'), end_index)
+            currtext.tag_remove(
+                tag, currtext.index('1.0'), end_index)
 
-        code = self.tabs[self.get_tab()].textbox.get(start_index, end_index)
+        code = currtext.get(start_index, end_index)
 
         for index, line in enumerate(code):
             if index == 0 and line != '\n':
                 break
             elif line == '\n':
-                start_index = self.tabs[self.get_tab()].textbox.index(f'{start_index}+1line')
+                start_index = currtext.index(f'{start_index}+1line')
             else:
                 break
 
-        self.tabs[self.get_tab()].textbox.mark_set('range_start', start_index)
+        currtext.mark_set('range_start', start_index)
         for token, content in pygments.lex(code, PythonLexer()):
-            self.tabs[self.get_tab()].textbox.mark_set('range_end', f'range_start + {len(content)}c')
-            self.tabs[self.get_tab()].textbox.tag_add(
+            currtext.mark_set('range_end', f'range_start + {len(content)}c')
+            currtext.tag_add(
                 str(token), 'range_start', 'range_end')
-            self.tabs[self.get_tab()].textbox.mark_set(
+            currtext.mark_set(
                 'range_start', 'range_end')
+        self.master.update()
+        self.master.update_idletasks()
 
     def open_file(self, file=''):
         '''Opens a file
@@ -490,8 +598,8 @@ class Editor:
                                                   file.read().replace('\t', ' ' * 4))
                 # Inserts file content, replacing tabs with four spaces
                 self.tabs[new_tab].textbox.focus_set()
-                self.tabs[new_tab].textbox.edited = True
-                self.key()
+                self.mouse()
+                self._highlight_all()
             except:
                 return
 
@@ -521,9 +629,13 @@ class Editor:
             curr_tab = self.get_tab()
             if not self.tabs[curr_tab].file_dir:
                 self.save_as()
+                self.tabs[curr_tab].textbox.edited = False
+                self.settitle()
             else:
-                with open(self.tabs[curr_tab].file_dir) as file:
+                with open(self.tabs[curr_tab].file_dir, 'w') as file:
                     file.write(self.tabs[curr_tab].textbox.get(1.0, 'end'))
+                self.tabs[curr_tab].textbox.edited = False
+                self.settitle()
         except:
             pass
 
@@ -539,8 +651,8 @@ class Editor:
         try:
             sel = self.tabs[self.get_tab()].textbox.get(
                 tk.SEL_FIRST, tk.SEL_LAST)
-            textbox.clipboard_clear()
-            textbox.clipboard_append(sel)
+            self.tabs[self.get_tab()].textbox.clipboard_clear()
+            self.tabs[self.get_tab()].textbox.clipboard_append(sel)
         except:
             pass
 
@@ -551,7 +663,7 @@ class Editor:
         except:
             pass
 
-    def cut(self):
+    def cut(self, textbox=None):
         try:
             sel = self.tabs[self.get_tab()].textbox.get(
                 tk.SEL_FIRST, tk.SEL_LAST)
@@ -565,7 +677,7 @@ class Editor:
     def paste(self):
         try:
             self.tabs[self.get_tab()].textbox.insert(tk.INSERT,
-                                                     textbox.clipboard_get())
+                                            self.tabs[self.get_tab()].textbox.clipboard_get())
         except:
             pass
 
@@ -586,13 +698,13 @@ class Editor:
         3) Runs the build file'''
         try:
             if _PLTFRM:  # Windows
-                with open('./.temp/build.bat') as f:
-                    f.write((_BATCH_BUILD % self.file_dir))
-                    os.system('./.temp/build.bat')
+                with open('build.bat') as f:
+                    f.write((_BATCH_BUILD % self.tabs[self.get_tab()].file_dir))
+                    os.system('build.bat')
             else:
-                with open('./.temp/build.sh') as f:
-                    f.write((_BATCH_BUILD % self.file_dir))
-                    os.system('chmod 700 ./.temp/build.sh && ./.temp/build.sh')
+                with open('build.sh') as f:
+                    f.write((_BATCH_BUILD % self.tabs[self.get_tab()].file_dir))
+                    os.system('chmod 700 build.sh && build.sh')
         except:
             pass
 
@@ -611,10 +723,9 @@ class Editor:
                 'insert',
                 '%d.%s' % (int(float(currtext.index('insert'))),
                            str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
-            self.key(event=None)
+            self.key()
         # Others
         elif event.char == '(':
-            currtext.insert('insert', event.char)
             currtext.insert('insert', ')')
             currtext.mark_set(
                 'insert',
@@ -622,7 +733,6 @@ class Editor:
                            str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
             return 'break'
         elif event.char == '[':
-            currtext.insert('insert', event.char)
             currtext.insert('insert', ']')
             currtext.mark_set(
                 'insert',
@@ -630,7 +740,6 @@ class Editor:
                            str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
             return 'break'
         elif event.char == '{':
-            currtext.insert('insert', event.char)
             currtext.insert('insert', '}')
             currtext.mark_set(
                 'insert',
@@ -660,11 +769,16 @@ class Editor:
         return "break"
 
     def search(self, event=None):
-        '''Searches through the file'''
+        """Searches through the file"""
         searchWin = ttk.Frame(self.tabs[self.get_tab()].textbox.frame)
         style = ThemedStyle(searchWin)
         style.set_theme("black")
-        searchWin.pack(side='bottom', fill='x')
+        try:
+            if not searchenabled:
+                searchWin.pack(side='bottom', fill='x')
+        except:
+            pass
+
         searchWin.focus_set()
         ttk.Label(searchWin, text='Search: ').pack(
             side='left', anchor='nw', fill='y')
@@ -696,6 +810,7 @@ class Editor:
         def clear():
             text = self.tabs[self.get_tab()].textbox
             text.tag_remove('found', '1.0', 'end')
+
         butt.config(command=find)
         butt2.config(command=clear)
 
@@ -727,7 +842,7 @@ class Editor:
 
     def close_tab(self, event=None):
         try:
-            if self.nb.index("end") > 1:
+            if self.nb.index("end") and self.save_changes():
                 # Close the current tab if close is selected from file menu, or keyboard shortcut.
                 if event is None or event.type == str(2):
                     selected_tab = self.get_tab()
@@ -748,7 +863,7 @@ class Editor:
 
     def exit(self):
         if self.save_changes():
-            self.master.destroy()
+            sys.exit(0)
         else:
             return
 
@@ -758,7 +873,7 @@ class Editor:
             file_dir = self.tabs[curr_tab].file_dir
 
             # Check if any changes have been made, returns False if user chooses to cancel rather than select to save or not.
-            if self.tabs[curr_tab].edited:
+            if self.tabs[curr_tab].textbox.edited:
                 # If changes were made since last save, ask if user wants to save.
                 m = messagebox.askyesnocancel('Editor', 'Do you want to save changes to ' +
                                               ('Untitled' if not file_dir else file_dir) + '?')
@@ -772,7 +887,7 @@ class Editor:
                 # else don't save.
                 else:
                     pass
-        except:
+        except Exception as e:
             return True
 
         return True
@@ -791,7 +906,10 @@ class Editor:
                 return
 
     def version(self):
+        '''Shows the version and related info of the editor.'''
         ver = tk.Toplevel()
+        style = ThemedStyle(ver)
+        style.set_theme('black')
         ver.geometry('480x190')
         ver.resizable(0, 0)
         cv = tk.Canvas(ver)
@@ -801,11 +919,5 @@ class Editor:
         ver.mainloop()
 
 
-def main():
-    root = ttkthemes.ThemedTk(theme='black')
-    app = Editor(root)
-    root.mainloop()
-
-
 if __name__ == '__main__':
-    main()
+    app = Editor()  # Execs the main class

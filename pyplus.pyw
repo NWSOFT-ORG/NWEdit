@@ -1,15 +1,16 @@
 #!python3
 # coding: utf-8
 """
-pyplus.pyw -- the editor's ONLY file
-The somehow-professional editor
-It's extremely small!!!
-You can visit my site for more details!
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-> http://ZCG-coder.github.io/PyPlusWeb <
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Some parts are adapted from stack overflow.
-"""
++ =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=  +
+| pyplus.pyw -- the editor's ONLY file                |
+| The somehow-professional editor                     |
+| It's extremely small!!!                             |
+| You can visit my site for more details!             |
+| vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv            |
+| > http://ZCG-coder.github.io/PyPlusWeb <            |
+| ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^            |
+| Some parts are adapted from stack overflow.         |
++ =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +"""
 import json
 import os
 import sys
@@ -78,7 +79,6 @@ echo Exit in 10 secs...
 
 sleep 10s
 ''')
-
 _MAIN_KEY = 'Command' if _OSX else 'Control'
 
 
@@ -141,9 +141,6 @@ class Settings:
             return self.lexer
         else:
             raise EditorErr
-
-
-s = Settings()
 
 
 class TextLineNumbers(tk.Canvas):

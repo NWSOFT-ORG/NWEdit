@@ -1,4 +1,1 @@
-{
-  "font": "Arial 15",
-  "lexer": "PythonLexer"
-}
+{"lexer": "PythonLexer", "font": "Menlo 13"}

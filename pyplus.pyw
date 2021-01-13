@@ -418,9 +418,13 @@ class Editor():
         helpmenu = tk.Menu(menubar, tearoff=0)
         helpmenu.add_command(label='Version', command=self.version)
 
+        configmenu = tk.Menu(menubar, tearoff=0)
+        configmenu.add_command(label='Configure font', command=self.config_font)
+
         menubar.add_cascade(label='File', menu=filemenu)
         menubar.add_cascade(label='Edit', menu=editmenu)
         menubar.add_cascade(label='Code', menu=codemenu)
+        menubar.add_cascade(label='Settings', menu=configmenu)
         menubar.add_cascade(label='Help', menu=helpmenu)
         self.master.config(menu=menubar)
 
@@ -944,6 +948,10 @@ class Editor():
         cv.create_image(0, 0, anchor='nw', image=img)
         ver.mainloop()
 
+    def config_font(self, event=None):
+        config = Settings()
+        config.config_font()
+
 
 if __name__ == '__main__':
-    app = Editor()  # Execs the main class
+    Editor()  # Execs the main class

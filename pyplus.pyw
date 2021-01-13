@@ -82,22 +82,32 @@ sleep 10s
 _MAIN_KEY = 'Command' if _OSX else 'Control'
 
 
+class EditorErr(Exception):
+    """A nice exception class for debugging"""
+    def __init__(self):
+        super().__init__('An editor error is occurred.')
+
+
 class Settings:
     """A class to read and write data to/from settings.json"""
+
     def __init__(self):
-        self.lexer = 'PythonLexer'
-        self.font = 'Menlo'
-        self.size = 13
-        self.settings = {"lexer": self.lexer,
-                         "font": f'{self.font} {self.size}'}
+        with open('settings.json') as f:
+            self.settings = json.load(f)
+        self.lexer = self.settings['lexer']
+        self.font = self.settings['font'].split()[0]
+        self.size = self.settings['font'].split()[1]
 
     def config_lexer(self):
         config = tk.Toplevel()
         config.title("Lexer (Syntax highlighting)")
         tk.Label(config, text='Select the lexer below').pack()
-        config.protocol("WM_DELETE_WINDOW", save)
+
         def save():
             self.save_settings()
+            config.destroy()
+
+        config.protocol("WM_DELETE_WINDOW", save)
         config.mainloop()
 
     def config_font(self):
@@ -106,7 +116,16 @@ class Settings:
         tk.Label(config, text=f'Enter the font below\nCurrent font is {self.font} {self.size}').pack()
         e = tk.Entry(config)
         e.pack()
-        config.protocol('WM_DELETE_WINDOW', self.save_settings)
+
+        def save():
+            font = e.get()
+            font = font.split()
+            self.font = font[0]
+            self.size = font[1]
+            self.save_settings()
+            config.destroy()
+
+        config.protocol('WM_DELETE_WINDOW', save)
         config.mainloop()
 
     def save_settings(self):
@@ -115,9 +134,16 @@ class Settings:
         with open('settings.json', 'w') as f:
             json.dump(self.settings, f)
 
+    def getsettings(self, setting):
+        if setting == 'font':
+            return f'{self.font} {self.size}'
+        elif setting == 'lexer':
+            return self.lexer
+        else:
+            raise EditorErr
+
 
 s = Settings()
-s.config_font()
 
 
 class TextLineNumbers(tk.Canvas):
@@ -129,7 +155,7 @@ class TextLineNumbers(tk.Canvas):
         self.textwidget = text_widget
 
     def redraw(self, line):
-        '''redraw line numbers'''
+        """redraw line numbers"""
         self.delete("all")
 
         i = self.textwidget.index("@0,0")
@@ -185,14 +211,16 @@ class CustomText(tk.scrolledtext.ScrolledText):
 
 
 class EnhancedTextFrame(ttk.Frame):
-    '''An enhanced text frame to put the
-    text widget with linenumbers in.'''
+    """An enhanced text frame to put the
+    text widget with linenumbers in."""
 
     def __init__(self, *args, **kwargs):
         ttk.Frame.__init__(self, *args, **kwargs)
+        settings_class = Settings()
+        font = settings_class.getsettings('font')
         self.text = CustomText(self, bg='black', fg='white', insertbackground='white',
                                selectforeground='black', selectbackground='white', highlightthickness=0,
-                               font='Menlo 13', wrap='none')
+                               font=font, wrap='none')
         self.linenumbers = TextLineNumbers(
             self, width=30, bg='darkgray', bd=0, highlightthickness=0)
         self.linenumbers.attach(self.text)
@@ -677,7 +705,7 @@ class Editor():
     def paste(self):
         try:
             self.tabs[self.get_tab()].textbox.insert(tk.INSERT,
-                                            self.tabs[self.get_tab()].textbox.clipboard_get())
+                                                     self.tabs[self.get_tab()].textbox.clipboard_get())
         except:
             pass
 
@@ -768,13 +796,14 @@ class Editor():
         self.key()
         return "break"
 
-    def search(self, event=None):
+    def search(self):
         """Searches through the file"""
+        searchenabled = False
         searchWin = ttk.Frame(self.tabs[self.get_tab()].textbox.frame)
         style = ThemedStyle(searchWin)
         style.set_theme("black")
         try:
-            if not searchenabled:
+            if searchenabled:
                 searchWin.pack(side='bottom', fill='x')
         except:
             pass

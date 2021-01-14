@@ -1,7 +1,7 @@
 #!python3
 # coding: utf-8
 """
-+ =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=  +
++ =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 | pyplus.pyw -- the editor's ONLY file                |
 | The somehow-professional editor                     |
 | It's extremely small!!!                             |
@@ -9,7 +9,7 @@
 | vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv            |
 | > http://ZCG-coder.github.io/PyPlusWeb <            |
 | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^            |
-| Some parts are adapted from stack overflow.         |
+| Note: Some parts are adapted from stack overflow.   |
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +"""
 import json
 import os
@@ -29,6 +29,32 @@ from ttkthemes import ThemedStyle
 _PLTFRM = (True if sys.platform.startswith('win') else False)
 _OSX = (True if sys.platform.startswith('darwin') else False)
 _BATCH_BUILD = ('''
+#!/bin/bash
+
+set +v
+
+mytitle="Build Results"
+
+# Require ANSI Escape Code support
+
+python3 ./measure.py start
+
+echo -e '\033k'$mytitle'\033\\'
+
+echo ===================================================
+
+python3 %s
+
+echo Program Finished With Exit Code $?
+
+python3 ./measure.py stop
+
+echo ===================================================
+
+echo Exit in 10 secs...
+
+sleep 10s
+''' if not _PLTFRM else '''
 @echo off
 
 title Build Results
@@ -52,38 +78,13 @@ echo ----------------------------------------------------
 echo.
 
 pause
-''' if _PLTFRM else '''
-#!/bin/bash
-
-set +v
-
-mytitle="Build Results"
-
-# Require ASNI Escape Code support
-
-python3 ./measure.py start
-
-echo -e '\033k'$mytitle'\033\\'
-
-echo ===================================================
-
-python3 %s
-
-echo Program Finished With Exit Code $?
-
-python3 ./measure.py stop
-
-echo ===================================================
-
-echo Exit in 10 secs...
-
-sleep 10s
 ''')
 _MAIN_KEY = 'Command' if _OSX else 'Control'
 
 
 class EditorErr(Exception):
     """A nice exception class for debugging"""
+
     def __init__(self):
         super().__init__('An editor error is occurred.')
 
@@ -102,8 +103,14 @@ class Settings:
         config = tk.Toplevel()
         config.title("Lexer (Syntax highlighting)")
         tk.Label(config, text='Select the lexer below').pack()
+        lexer_cb = ttk.Combobox(config, state="readonly")
+        lexer_cb.pack()
+        lexers = ['Python3Lexer', 'PythonLexer', 'None (Plain text)']
+
+        lexer_cb['value'] = lexers
 
         def save():
+            self.lexer = lexer_cb.get()
             self.save_settings()
             config.destroy()
 
@@ -134,7 +141,7 @@ class Settings:
         with open('settings.json', 'w') as f:
             json.dump(self.settings, f)
 
-    def getsettings(self, setting):
+    def get_settings(self, setting):
         if setting == 'font':
             return f'{self.font} {self.size}'
         elif setting == 'lexer':
@@ -142,6 +149,8 @@ class Settings:
         else:
             raise EditorErr
 
+s = Settings()
+s.config_lexer()
 
 class TextLineNumbers(tk.Canvas):
     def __init__(self, *args, **kwargs):
@@ -214,7 +223,7 @@ class EnhancedTextFrame(ttk.Frame):
     def __init__(self, *args, **kwargs):
         ttk.Frame.__init__(self, *args, **kwargs)
         settings_class = Settings()
-        font = settings_class.getsettings('font')
+        font = settings_class.get_settings('font')
         self.text = CustomText(self, bg='black', fg='white', insertbackground='white',
                                selectforeground='black', selectbackground='white', highlightthickness=0,
                                font=font, wrap='none')
@@ -346,7 +355,7 @@ class CustomNotebook(ttk.Notebook):
 
 
 class Document():
-    '''Helper class, for the editor'''
+    """Helper class, for the editor"""
 
     def __init__(self, Frame, TextWidget, FileDir='', FullDir=''):
         self.file_dir = FileDir
@@ -355,15 +364,18 @@ class Document():
 
 
 class Editor():
+    """The editor class."""
+
     def __init__(self):
-        '''The editor object, the entire thing that goes in the
+        """The editor object, the entire thing that goes in the
         window.
         Lacks these MacOS support:
-        * Some <Ctrl-x> shortcuts won't work
-        (ie: ctrl-o is expected to open files, but won't work!)
-        * <Button-3> (right click support)
         * The file selector cannot change file type.
-        '''
+        """
+        settings_class = Settings()
+        self.lexer = settings_class.get_settings('lexer')
+        if self.lexer == "None (Plain text)":
+            print(True)
         self.master = ttkthemes.ThemedTk()
         self.master.minsize(900, 600)
         style = ThemedStyle(self.master)
@@ -484,7 +496,7 @@ class Editor():
             self.master.title('PyEdit +')
 
     def create_text_widget(self, frame):
-        '''Creates a text widget in a frame.'''
+        """Creates a text widget in a frame."""
         textframe = EnhancedTextFrame(frame)  # The one with line numbers and a nice dark theme
         textframe.pack(fill='both', expand=1)
 
@@ -569,7 +581,7 @@ class Editor():
             currtext.statusbar.config(text=f'PyEdit +')  # When error occurs
 
     def _highlight_all(self):
-        '''Highlight the text in the text box.'''
+        """Highlight the text in the text box."""
         currtext = self.tabs[self.get_tab()].textbox
 
         start_index = currtext.index('1.0')
@@ -602,10 +614,10 @@ class Editor():
         self.master.update_idletasks()
 
     def open_file(self, file=''):
-        '''Opens a file
+        """Opens a file
         If a file is not provided, a messagebox'll
         pop up to ask the user to select the path.
-        '''
+        """
         if not file:
             file_dir = (tkinter.filedialog.askopenfilename(
                 master=self.master, initialdir='/', title='Select file', filetypes=self.filetypes))
@@ -633,7 +645,7 @@ class Editor():
                 return
 
     def save_as(self):
-        '''Saves a *new* file'''
+        """Saves a *new* file"""
         if len(self.tabs) > 0:
             curr_tab = self.get_tab()
             file_dir = (tkinter.filedialog.asksaveasfilename(
@@ -653,7 +665,7 @@ class Editor():
             file.close()
 
     def save_file(self, *args):
-        '''Saves an *exsisting* file'''
+        """Saves an *existing* file"""
         try:
             curr_tab = self.get_tab()
             if not self.tabs[curr_tab].file_dir:
@@ -669,7 +681,7 @@ class Editor():
             pass
 
     def new_file(self, *args):
-        '''Creates a new tab(file).'''
+        """Creates a new tab(file)."""
         new_tab = ttk.Frame(self.nb)
         self.tabs[new_tab] = Document(
             new_tab, self.create_text_widget(new_tab))
@@ -720,11 +732,11 @@ class Editor():
             pass
 
     def build(self, *args):
-        '''Builds the file
+        """Builds the file
         Steps:
         1) Writes build code into the batch file.
         2) Linux only: uses chmod to make the sh execuable
-        3) Runs the build file'''
+        3) Runs the build file"""
         try:
             if _PLTFRM:  # Windows
                 with open('build.bat') as f:
@@ -738,12 +750,12 @@ class Editor():
             pass
 
     def autoinsert(self, event=None):
-        '''Auto-inserts a symbol
+        """Auto-inserts a symbol
         * ' -> ''
         * " -> ""
         * ( -> ()
         * [ -> []
-        * { -> {}'''
+        * { -> {}"""
         currtext = self.tabs[self.get_tab()].textbox
         # Strings
         if event.char not in ['(', '[', '{']:
@@ -777,7 +789,7 @@ class Editor():
             return 'break'
 
     def autoindent(self, event=None):
-        '''Auto-indents the next line'''
+        """Auto-indents the next line"""
         currtext = self.tabs[self.get_tab()].textbox
         indentation = ""
         lineindex = currtext.index("insert").split(".")[0]
@@ -936,7 +948,7 @@ class Editor():
                 return
 
     def version(self):
-        '''Shows the version and related info of the editor.'''
+        """Shows the version and related info of the editor."""
         ver = tk.Toplevel()
         style = ThemedStyle(ver)
         style.set_theme('black')

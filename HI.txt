@@ -1,0 +1,16 @@
+ ███████████           ██████████     █████ ███  █████
+░░███░░░░░███         ░░███░░░░░█    ░░███ ░░░  ░░███            ███
+ ░███    ░████████ ████░███  █ ░   ███████ ████ ███████         ░███
+ ░██████████░░███ ░███ ░██████    ███░░███░░███░░░███░       ███████████
+ ░███░░░░░░  ░███ ░███ ░███░░█   ░███ ░███ ░███  ░███       ░░░░░███░░░
+ ░███        ░███ ░███ ░███ ░   █░███ ░███ ░███  ░███ ███       ░███
+ █████       ░░███████ ██████████░░█████████████ ░░█████        ░░░
+░░░░░         ░░░░░███░░░░░░░░░░  ░░░░░░░░░░░░░   ░░░░░
+              ███ ░███
+             ░░██████
+              ░░░░░░
+THIS TEXT EDITOR IS EASY TO USE, SO I DID NOT SPEND A
+LOT OF TIME TO WRITE THE DOCS. IN FACT, I ADDED THE INSTRUCTIONS
+IN THE DESCRIPTION INSIDE THE EDITOR!
+YOU CAN CONTRIBUTE IT, IF YOU LIKE. REMEMBER TO SEND IT TO ME
+WHEN YOU FINISHED!

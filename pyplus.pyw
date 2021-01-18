@@ -10,7 +10,8 @@
 | > http://ZCG-coder.github.io/PyPlusWeb <            |
 | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^            |
 | Note: Some parts are adapted from stack overflow.   |
-+ =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +"""
++ =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
+"""
 import json
 import os
 import sys
@@ -18,7 +19,6 @@ import tkinter as tk
 import tkinter.filedialog
 import tkinter.font as tkFont
 import tkinter.ttk as ttk
-from tkinter import messagebox as messagebox
 from tkinter import scrolledtext
 
 import pygments
@@ -85,8 +85,8 @@ _MAIN_KEY = 'Command' if _OSX else 'Control'
 class EditorErr(Exception):
     """A nice exception class for debugging"""
 
-    def __init__(self):
-        super().__init__('An editor error is occurred.')
+    def __init__(self, message):
+        super().__init__('An editor error is occurred.'if not message else message)
 
 
 class Settings:
@@ -149,8 +149,6 @@ class Settings:
         else:
             raise EditorErr
 
-s = Settings()
-s.config_lexer()
 
 class TextLineNumbers(tk.Canvas):
     def __init__(self, *args, **kwargs):
@@ -191,6 +189,7 @@ class CustomText(tk.scrolledtext.ScrolledText):
         self._orig = self._w + "_orig"
         self.tk.call("rename", self._w, self._orig)
         self.tk.createcommand(self._w, self._proxy)
+        self.vbar = ttk.Scrollbar()
 
     def _proxy(self, *args):
         try:
@@ -223,10 +222,10 @@ class EnhancedTextFrame(ttk.Frame):
     def __init__(self, *args, **kwargs):
         ttk.Frame.__init__(self, *args, **kwargs)
         settings_class = Settings()
-        font = settings_class.get_settings('font')
+        self.font = settings_class.get_settings('font')
         self.text = CustomText(self, bg='black', fg='white', insertbackground='white',
                                selectforeground='black', selectbackground='white', highlightthickness=0,
-                               font=font, wrap='none')
+                               font=self.font, wrap='none')
         self.linenumbers = TextLineNumbers(
             self, width=30, bg='darkgray', bd=0, highlightthickness=0)
         self.linenumbers.attach(self.text)
@@ -239,6 +238,7 @@ class EnhancedTextFrame(ttk.Frame):
     def _on_change(self, event=None):
         currline = int(float(self.text.index('insert linestart')))
         self.linenumbers.redraw(currline)
+        self.text.config(font=self.font)
 
 
 class CustomNotebook(ttk.Notebook):
@@ -396,7 +396,6 @@ class Editor():
 
         self.nb = CustomNotebook(self.master, self.close_tab)
         self.nb.bind('<B1-Motion>', self.move_tab)
-        self.nb.bind("<<Notebook_B1-Down>>", self.settitle)
         self.nb.pack(expand=1, fill='both')
         self.nb.enable_traversal()
 
@@ -432,6 +431,7 @@ class Editor():
 
         configmenu = tk.Menu(menubar, tearoff=0)
         configmenu.add_command(label='Configure font', command=self.config_font)
+        configmenu.add_command(label='Configure lexer', command=self.config_lexer)
 
         menubar.add_cascade(label='File', menu=filemenu)
         menubar.add_cascade(label='Edit', menu=editmenu)
@@ -484,17 +484,6 @@ class Editor():
         self.open_file('pyplus.pyw')
         self.master.mainloop()  # This line can be here only
 
-    def settitle(self, event=None):
-        try:
-            text = (self.tabs[self.get_tab()].file_dir
-                    if self.tabs[self.get_tab()].file_dir
-                    else 'None')
-            if self.tabs[self.get_tab()].textbox.edited: text += '*'
-            self.master.title(f'PyEdit+ - {text}')  # Set the title
-            # PyEdit+ - filename[*]
-        except:
-            self.master.title('PyEdit +')
-
     def create_text_widget(self, frame):
         """Creates a text widget in a frame."""
         textframe = EnhancedTextFrame(frame)  # The one with line numbers and a nice dark theme
@@ -517,8 +506,6 @@ class Editor():
         textbox.tag_configure("Token.Name.Decorator", foreground="#298fb5")
         textbox.tag_configure("Token.Name.Builtin", foreground="#CC7A00")
         textbox.tag_configure("Token.Name.Builtin.Pseudo", foreground="#CC7A00")
-        textbox.tag_configure("Token.Operator.Word", foreground="#CC7A00")
-        textbox.tag_configure("Token.Operator", foreground="#FF0000")
         textbox.tag_configure("Token.Comment", foreground="#767d87")
         textbox.tag_configure("Token.Comment.Single", foreground="#767d87")
         textbox.tag_configure("Token.Comment.Double", foreground="#767d87")
@@ -551,8 +538,6 @@ class Editor():
         textbox.statusbar.pack(side='bottom', fill='x', anchor='e')
 
         self.master.geometry('1000x600')  # Configure window size
-
-        textbox.edited = False
         textbox.focus_set()
         return textbox
 
@@ -561,13 +546,13 @@ class Editor():
         currtext = self.tabs[self.get_tab()].textbox
         try:
             self._highlight_all()
-            currtext.edited = True
             currtext.statusbar.config(
                 text=f"PyEdit+ | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} | col {str(int(currtext.index('insert').split('.')[1:][0]))}")
-            # Update statusbar and titlebar
-            self.settitle()
+            # Update statusbar
+            # Auto-save
+            self.save_file()
         except Exception as e:
-            currtext.statusbar.config(text=f'PyEdit +')  # When error occurs
+            currtext.statusbar.config(text=f'PyEdit + {e}')  # When error occurs
 
     def mouse(self, event=None):
         """The action done when the mouse is clicked"""
@@ -576,9 +561,8 @@ class Editor():
             currtext.statusbar.config(
                 text=f"PyEdit+ | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} | col {str(int(currtext.index('insert').split('.')[1:][0]))}")
             # Update statusbar and titlebar
-            self.settitle()
         except Exception as e:
-            currtext.statusbar.config(text=f'PyEdit +')  # When error occurs
+            currtext.statusbar.config(text=f'PyEdit + {str(e)}')  # When error occurs
 
     def _highlight_all(self):
         """Highlight the text in the text box."""
@@ -586,12 +570,14 @@ class Editor():
 
         start_index = currtext.index('1.0')
         end_index = currtext.index(tk.END)
+        for x in currtext.tag_ranges('Token.Literal.String.Doc'):
+            print(str(x))
 
         for tag in currtext.tag_names():
             if tag == 'sel':
                 continue
             currtext.tag_remove(
-                tag, currtext.index('1.0'), end_index)
+                tag, start_index, end_index)
 
         code = currtext.get(start_index, end_index)
 
@@ -610,6 +596,7 @@ class Editor():
                 str(token), 'range_start', 'range_end')
             currtext.mark_set(
                 'range_start', 'range_end')
+        currtext.tag_configure('hi', foreground='white')
         self.master.update()
         self.master.update_idletasks()
 
@@ -670,13 +657,9 @@ class Editor():
             curr_tab = self.get_tab()
             if not self.tabs[curr_tab].file_dir:
                 self.save_as()
-                self.tabs[curr_tab].textbox.edited = False
-                self.settitle()
             else:
                 with open(self.tabs[curr_tab].file_dir, 'w') as file:
-                    file.write(self.tabs[curr_tab].textbox.get(1.0, 'end'))
-                self.tabs[curr_tab].textbox.edited = False
-                self.settitle()
+                    file.write(self.tabs[curr_tab].textbox.get(1.0, 'end').strip())
         except:
             pass
 
@@ -884,7 +867,7 @@ class Editor():
 
     def close_tab(self, event=None):
         try:
-            if self.nb.index("end") and self.save_changes():
+            if self.nb.index("end"):
                 # Close the current tab if close is selected from file menu, or keyboard shortcut.
                 if event is None or event.type == str(2):
                     selected_tab = self.get_tab()
@@ -900,39 +883,13 @@ class Editor():
 
             self.nb.forget(selected_tab)
             self.tabs.pop(selected_tab)
+            if len(self.tabs) == 0:
+                self.open_file('HI.txt')
         except:
             pass
 
     def exit(self):
-        if self.save_changes():
-            sys.exit(0)
-        else:
-            return
-
-    def save_changes(self):
-        try:
-            curr_tab = self.get_tab()
-            file_dir = self.tabs[curr_tab].file_dir
-
-            # Check if any changes have been made, returns False if user chooses to cancel rather than select to save or not.
-            if self.tabs[curr_tab].textbox.edited:
-                # If changes were made since last save, ask if user wants to save.
-                m = messagebox.askyesnocancel('Editor', 'Do you want to save changes to ' +
-                                              ('Untitled' if not file_dir else file_dir) + '?')
-
-                # If None, cancel.
-                if m is None:
-                    return False
-                # else if True, save.
-                elif m is True:
-                    self.save_file()
-                # else don't save.
-                else:
-                    pass
-        except Exception as e:
-            return True
-
-        return True
+        sys.exit(0)
 
     def get_tab(self):
         return self.nb._nametowidget(self.nb.select())
@@ -951,7 +908,7 @@ class Editor():
         """Shows the version and related info of the editor."""
         ver = tk.Toplevel()
         style = ThemedStyle(ver)
-        style.set_theme('black')
+        style.set_theme('black')  # Applies the ttk theme
         ver.geometry('480x190')
         ver.resizable(0, 0)
         cv = tk.Canvas(ver)
@@ -963,6 +920,11 @@ class Editor():
     def config_font(self, event=None):
         config = Settings()
         config.config_font()
+
+    def config_lexer(self, event=None):
+        config = Settings()
+        config.config_lexer()
+        self._highlight_all()
 
 
 if __name__ == '__main__':

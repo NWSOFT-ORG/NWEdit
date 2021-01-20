@@ -9,6 +9,7 @@
 | vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv            |
 | > http://ZCG-coder.github.io/PyPlusWeb <            |
 | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^            |
+| You can also contribute it on github!               |
 | Note: Some parts are adapted from stack overflow.   |
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 """
@@ -86,7 +87,7 @@ class EditorErr(Exception):
     """A nice exception class for debugging"""
 
     def __init__(self, message):
-        super().__init__('An editor error is occurred.'if not message else message)
+        super().__init__('An editor error is occurred.' if not message else message)
 
 
 class Settings:
@@ -541,20 +542,20 @@ class Editor():
         textbox.focus_set()
         return textbox
 
-    def key(self, event=None):
+    def key(self, _=None):
         """Event when a key is pressed."""
         currtext = self.tabs[self.get_tab()].textbox
         try:
             self._highlight_all()
             currtext.statusbar.config(
-                text=f"PyEdit+ | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} | col {str(int(currtext.index('insert').split('.')[1:][0]))}")
+                text=f'PyEdit+ | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))} | col {str(int(currtext.index("insert").split(".")[1:][0]))}')
             # Update statusbar
             # Auto-save
             self.save_file()
         except Exception as e:
             currtext.statusbar.config(text=f'PyEdit + {e}')  # When error occurs
 
-    def mouse(self, event=None):
+    def mouse(self, _=None):
         """The action done when the mouse is clicked"""
         currtext = self.tabs[self.get_tab()].textbox
         try:
@@ -570,8 +571,17 @@ class Editor():
 
         start_index = currtext.index('1.0')
         end_index = currtext.index(tk.END)
-        for x in currtext.tag_ranges('Token.Literal.String.Doc'):
-            print(str(x))
+        tri_str_start = []
+        tri_str_end = []
+        cursor_pos = float(currtext.index('insert-1c linestart')) * 10
+        for index, linenum in enumerate(currtext.tag_ranges('Token.Literal.String.Doc')):
+            if index % 2 == 1:
+                tri_str_end.append(int(float(str(linenum)) * 10))
+            else:
+                tri_str_start.append(int(float(str(linenum)) * 10))
+
+        for x in tri_str_start:
+            pass
 
         for tag in currtext.tag_names():
             if tag == 'sel':

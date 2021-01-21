@@ -26,6 +26,7 @@ import pygments
 import ttkthemes
 from pygments.lexers import PythonLexer
 from ttkthemes import ThemedStyle
+import PyTouchBar
 
 _PLTFRM = (True if sys.platform.startswith('win') else False)
 _OSX = (True if sys.platform.startswith('darwin') else False)
@@ -480,6 +481,7 @@ class Editor():
         for x in ['"', "'", '(', '[', '{']:
             self.master.bind(x, self.autoinsert)
         self.open_file('pyplus.pyw')
+        PyTouchBar.prepare_tk_windows(self.master)
         self.master.mainloop()  # This line can be here only
 
     def create_text_widget(self, frame):

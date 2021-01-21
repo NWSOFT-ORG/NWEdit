@@ -93,7 +93,7 @@ class TextLineNumbers(tk.Canvas):
             i = self.textwidget.index("%s+1line" % i)
 
 
-class CustomText(tk.Text):
+class EnhancedText(tk.Text):
     def __init__(self, *args, **kwargs):
         tk.scrolledtext.ScrolledText.__init__(self, *args, **kwargs)
 
@@ -129,7 +129,7 @@ class CustomText(tk.Text):
 class EnhancedTextFrame(ttk.Frame):
     def __init__(self, *args, **kwargs):
         ttk.Frame.__init__(self, *args, **kwargs)
-        self.text = CustomText(self, bg='black', fg='white', insertbackground='white',
+        self.text = EnhancedText(self, bg='black', fg='white', insertbackground='white',
                                selectforeground='black', selectbackground='white', highlightthickness=0,
                                font='Menlo 13')
         self.linenumbers = TextLineNumbers(

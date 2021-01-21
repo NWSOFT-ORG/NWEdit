@@ -182,7 +182,7 @@ class TextLineNumbers(tk.Canvas):
             i = self.textwidget.index("%s+1line" % i)
 
 
-class CustomText(tk.scrolledtext.ScrolledText):
+class EnhancedText(tk.scrolledtext.ScrolledText):
     def __init__(self, *args, **kwargs):
         tk.scrolledtext.ScrolledText.__init__(self, *args, **kwargs)
 
@@ -224,9 +224,9 @@ class EnhancedTextFrame(ttk.Frame):
         ttk.Frame.__init__(self, *args, **kwargs)
         settings_class = Settings()
         self.font = settings_class.get_settings('font')
-        self.text = CustomText(self, bg='black', fg='white', insertbackground='white',
-                               selectforeground='black', selectbackground='white', highlightthickness=0,
-                               font=self.font, wrap='none')
+        self.text = EnhancedText(self, bg='black', fg='white', insertbackground='white',
+                                 selectforeground='black', selectbackground='white', highlightthickness=0,
+                                 font=self.font, wrap='none')
         self.linenumbers = TextLineNumbers(
             self, width=30, bg='darkgray', bd=0, highlightthickness=0)
         self.linenumbers.attach(self.text)
@@ -546,14 +546,14 @@ class Editor():
         """Event when a key is pressed."""
         currtext = self.tabs[self.get_tab()].textbox
         try:
-            self._highlight_all()
+            self._highlight_line()
             currtext.statusbar.config(
                 text=f'PyEdit+ | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))} | col {str(int(currtext.index("insert").split(".")[1:][0]))}')
             # Update statusbar
             # Auto-save
             self.save_file()
         except Exception as e:
-            currtext.statusbar.config(text=f'PyEdit + {e}')  # When error occurs
+            currtext.statusbar.config(text=f'PyEdit +')  # When error occurs
 
     def mouse(self, _=None):
         """The action done when the mouse is clicked"""
@@ -563,7 +563,7 @@ class Editor():
                 text=f"PyEdit+ | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} | col {str(int(currtext.index('insert').split('.')[1:][0]))}")
             # Update statusbar and titlebar
         except Exception as e:
-            currtext.statusbar.config(text=f'PyEdit + {str(e)}')  # When error occurs
+            currtext.statusbar.config(text=f'PyEdit +')  # When error occurs
 
     def _highlight_all(self):
         """Highlight the text in the text box."""
@@ -571,17 +571,59 @@ class Editor():
 
         start_index = currtext.index('1.0')
         end_index = currtext.index(tk.END)
+
+        for tag in currtext.tag_names():
+            if tag == 'sel':
+                continue
+            currtext.tag_remove(
+                tag, start_index, end_index)
+
+        code = currtext.get(start_index, end_index)
+
+        for index, line in enumerate(code):
+            if index == 0 and line != '\n':
+                break
+            elif line == '\n':
+                start_index = currtext.index(f'{start_index}+1line')
+            else:
+                break
+
+        currtext.mark_set('range_start', start_index)
+        for token, content in pygments.lex(code, PythonLexer()):
+            currtext.mark_set('range_end', f'range_start + {len(content)}c')
+            currtext.tag_add(
+                str(token), 'range_start', 'range_end')
+            currtext.mark_set(
+                'range_start', 'range_end')
+        currtext.tag_configure('hi', foreground='white')
+        self.master.update()
+        self.master.update_idletasks()
+
+    def _highlight_line(self):
+        """Highlight the text in the text box."""
+        currtext = self.tabs[self.get_tab()].textbox
+
+        start_index = currtext.index('insert-1c linestart')
+        end_index = currtext.index('insert-1c lineend')
+
         tri_str_start = []
         tri_str_end = []
-        cursor_pos = float(currtext.index('insert-1c linestart')) * 10
+        tri_str = []
+        cursor_pos = float(currtext.index('insert'))
         for index, linenum in enumerate(currtext.tag_ranges('Token.Literal.String.Doc')):
             if index % 2 == 1:
-                tri_str_end.append(int(float(str(linenum)) * 10))
+                tri_str_end.append(float(str(linenum)))
             else:
-                tri_str_start.append(int(float(str(linenum)) * 10))
+                tri_str_start.append(float(str(linenum)))
 
-        for x in tri_str_start:
-            pass
+        for index, value in enumerate(tri_str_start):
+            tri_str.append((value, tri_str_end[index]))
+
+        for x in tri_str:
+            print(type(x[0]))
+            if x[0] <= cursor_pos and x[1] >= cursor_pos:
+                start_index = str(x[0])
+                end_index = str(x[1])
 
         for tag in currtext.tag_names():
             if tag == 'sel':

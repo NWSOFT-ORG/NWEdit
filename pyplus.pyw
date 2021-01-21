@@ -29,8 +29,7 @@ from ttkthemes import ThemedStyle
 
 _PLTFRM = (True if sys.platform.startswith('win') else False)
 _OSX = (True if sys.platform.startswith('darwin') else False)
-_BATCH_BUILD = ('''
-#!/bin/bash
+_BATCH_BUILD = ('''#!/bin/bash
 
 set +v
 
@@ -40,23 +39,21 @@ mytitle="Build Results"
 
 python3 ./measure.py start
 
-echo -e '\033k'$mytitle'\033\\'
+echo -e 'k'$mytitle'\'
 
-echo ===================================================
-
-python3 %s
+python3 -c 'print("===================================================")'
+python3 pyplus.pyw
 
 echo Program Finished With Exit Code $?
 
 python3 ./measure.py stop
 
-echo ===================================================
+python3 -c 'print("===================================================")'
 
 echo Exit in 10 secs...
 
 sleep 10s
-''' if not _PLTFRM else '''
-@echo off
+''' if not _PLTFRM else '''@echo off
 
 title Build Results
 
@@ -620,10 +617,10 @@ class Editor():
             tri_str.append((value, tri_str_end[index]))
 
         for x in tri_str:
-            print(type(x[0]))
             if x[0] <= cursor_pos and x[1] >= cursor_pos:
-                start_index = str(x[0])
-                end_index = str(x[1])
+                break
+        start_index = str(x[0])
+        end_index = str(x[1])
 
         for tag in currtext.tag_names():
             if tag == 'sel':
@@ -774,13 +771,14 @@ class Editor():
         3) Runs the build file"""
         try:
             if _PLTFRM:  # Windows
-                with open('build.bat') as f:
+                with open('build.bat', 'w') as f:
                     f.write((_BATCH_BUILD % self.tabs[self.get_tab()].file_dir))
                     os.system('build.bat')
             else:
-                with open('build.sh') as f:
+                with open('build.sh', 'w') as f:
                     f.write((_BATCH_BUILD % self.tabs[self.get_tab()].file_dir))
-                    os.system('chmod 700 build.sh && build.sh')
+                    os.system('chmod 700 build.sh')
+                    os.system('./build.sh')
         except:
             pass
 

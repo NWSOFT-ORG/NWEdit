@@ -4,7 +4,7 @@
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 | pyplus.pyw -- the editor's ONLY file                |
 | The somehow-professional editor                     |
-| It's extremely small!!!                             |
+| It's extremely small! (around 40 kB)                |
 | You can visit my site for more details!             |
 | vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv            |
 | > http://ZCG-coder.github.io/PyPlusWeb <            |
@@ -26,58 +26,32 @@ import pygments
 import ttkthemes
 from pygments.lexers import PythonLexer
 from ttkthemes import ThemedStyle
-import PyTouchBar
 
 _PLTFRM = (True if sys.platform.startswith('win') else False)
 _OSX = (True if sys.platform.startswith('darwin') else False)
 _BATCH_BUILD = ('''#!/bin/bash
-
 set +v
-
-mytitle="Build Results"
-
-# Require ANSI Escape Code support
-
 python3 ./measure.py start
-
-echo -e 'k'$mytitle'\'
-
 python3 -c 'print("===================================================")'
 python3 pyplus.pyw
-
 echo Program Finished With Exit Code $?
-
 python3 ./measure.py stop
-
 python3 -c 'print("===================================================")'
-
 echo Exit in 10 secs...
-
 sleep 10s
 ''' if not _PLTFRM else '''@echo off
-
 title Build Results
-
 measure.py start
-
 echo.
-
 echo.
-
 echo ----------------------------------------------------
-
 python3 %s
-
 echo Program Finished With Exit Code %ERRORLEVEL%
-
 measure.py stop
-
 echo ----------------------------------------------------
-
 echo.
-
 pause
-''')
+''')  # The batch files for building.
 _MAIN_KEY = 'Command' if _OSX else 'Control'
 
 
@@ -145,6 +119,8 @@ class Settings:
             return f'{self.font} {self.size}'
         elif setting == 'lexer':
             return self.lexer
+        elif setting == 'file_type':
+            pass
         else:
             raise EditorErr
 
@@ -374,19 +350,19 @@ class Editor():
         settings_class = Settings()
         self.lexer = settings_class.get_settings('lexer')
         if self.lexer == "None (Plain text)":
-            print(True)
+            self.lexer = None
         self.master = ttkthemes.ThemedTk()
         self.master.minsize(900, 600)
         style = ThemedStyle(self.master)
         style.set_theme("black")  # Apply ttkthemes to master window.
         self.master.geometry("600x400")
         self.master.title('PyEdit +')
-        self.master.iconphoto(True, tk.PhotoImage(data='''iVBORw0KGgoAAAANSUhEU
-        gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA
-        ABJQTFRFAAAAAAAA////TWyK////////WaqEwgAAAAZ0Uk5TAP8U/yr/h0gXnQAAAHpJREF
-        UeJyNktENgCAMROsGog7ACqbpvzs07L+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D
-        QGsRhw9B3SMwNSSj1glNEDqhUpUGw/gMuUd+d2Csny6xgAZB4A1IDwG1SxAc/95t7DAPPIm
-        4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC'''))
+        self.master.iconphoto(True, tk.PhotoImage(data=('iVBORw0KGgoAAAANSUhEU\n'
+                                                        '        gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA\n'
+                                                        '        ABJQTFRFAAAAAAAA////TWyK////////WaqEwgAAAAZ0Uk5TAP8U/yr/h0gXnQAAAHpJREF\n'
+                                                        '        UeJyNktENgCAMROsGog7ACqbpvzs07L+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D\n'
+                                                        '        QGsRhw9B3SMwNSSj1glNEDqhUpUGw/gMuUd+d2Csny6xgAZB4A1IDwG1SxAc/95t7DAPPIm\n'
+                                                        '        4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC')))
         # Base64 image, this probably decreases the repo size.
 
         self.filetypes = None
@@ -481,7 +457,6 @@ class Editor():
         for x in ['"', "'", '(', '[', '{']:
             self.master.bind(x, self.autoinsert)
         self.open_file('pyplus.pyw')
-        PyTouchBar.prepare_tk_windows(self.master)
         self.master.mainloop()  # This line can be here only
 
     def create_text_widget(self, frame):
@@ -499,6 +474,8 @@ class Editor():
         textbox.tag_configure("Token.Keyword.Pseudo", foreground="#CC7A00")
         textbox.tag_configure("Token.Keyword.Reserved", foreground="#CC7A00")
         textbox.tag_configure("Token.Keyword.Type", foreground="#CC7A00")
+        textbox.tag_configure('Token.Comment.Hashbang', foreground='#73d216')
+
         textbox.tag_configure("Token.Name.Class", foreground="#ddd313")
         textbox.tag_configure("Token.Name.Exception", foreground="#ddd313")
         textbox.tag_configure("Token.Name.Function", foreground="#298fb5")
@@ -506,27 +483,17 @@ class Editor():
         textbox.tag_configure("Token.Name.Decorator", foreground="#298fb5")
         textbox.tag_configure("Token.Name.Builtin", foreground="#CC7A00")
         textbox.tag_configure("Token.Name.Builtin.Pseudo", foreground="#CC7A00")
+
         textbox.tag_configure("Token.Comment", foreground="#767d87")
         textbox.tag_configure("Token.Comment.Single", foreground="#767d87")
         textbox.tag_configure("Token.Comment.Double", foreground="#767d87")
+
         textbox.tag_configure("Token.Literal.Number.Integer", foreground="#88daea")
         textbox.tag_configure("Token.Literal.Number.Float", foreground="#88daea")
+
         textbox.tag_configure("Token.Literal.String.Single", foreground="#35c666")
         textbox.tag_configure("Token.Literal.String.Double", foreground="#35c666")
-        textbox.tag_configure('Token.Keyword', foreground='#8cc4ff')
-        textbox.tag_configure('Token.Name.Builtin.Pseudo',
-                              foreground='#ad7fa8')
-        textbox.tag_configure(
-            'Token.Literal.Number.Integer', foreground='#008000')
-        textbox.tag_configure(
-            'Token.Literal.Number.Float', foreground='#008000')
-        textbox.tag_configure(
-            'Token.Literal.String.Single', foreground='#b77600')
-        textbox.tag_configure(
-            'Token.Literal.String.Double', foreground='#b77600')
         textbox.tag_configure('Token.Literal.String.Doc', foreground='#b77600')
-        textbox.tag_configure('Token.Comment.Single', foreground='#73d216')
-        textbox.tag_configure('Token.Comment.Hashbang', foreground='#73d216')
         # ^ Highlight using tags
         textbox.bind('<Return>', self.autoindent)
         textbox.bind("<<KeyEvent>>", self.key)
@@ -609,7 +576,7 @@ class Editor():
         tri_str_end = []
         tri_str = []
         cursor_pos = float(currtext.index('insert'))
-        for index, linenum in enumerate(currtext.tag_ranges('Token.Literal.String.Doc')):
+        for index, linenum in enumerate(currtext.tag_ranges('Token.Literal.String.Doc') + currtext.tag_ranges('Token.Literal.String.Single')):
             if index % 2 == 1:
                 tri_str_end.append(float(str(linenum)))
             else:
@@ -619,10 +586,10 @@ class Editor():
             tri_str.append((value, tri_str_end[index]))
 
         for x in tri_str:
-            if x[0] <= cursor_pos and x[1] >= cursor_pos:
+            if x[0] <= cursor_pos <= x[1]:
+                start_index = str(x[0])
+                end_index = str(x[1])
                 break
-        start_index = str(x[0])
-        end_index = str(x[1])
 
         for tag in currtext.tag_names():
             if tag == 'sel':

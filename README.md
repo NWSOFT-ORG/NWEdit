@@ -4,13 +4,14 @@ The source code of the PyPlus editor.
 
 # The code
 
-The code is a modified version of  
+The code is a modified(*enhanced*) version of  
 [dh7qc/python-text-editor](https://www.github.com/dh7qc/python-text-editor).
 
 **The website is at [here](http://zcg-coder.github.io/PyPlusWeb)**  
 **The website may be outdated, so please go to source release to download it.**  
 Some of the code is from pyro written by James Stalings. Thanks him for the source  
-`simple elegant text editor built on python/tkinter
+```
+simple elegant text editor built on Python/Tkinter
     by James Stallings, June 2015
     Adapted from:
     
@@ -71,4 +72,4 @@ Some of the code is from pyro written by James Stalings. Thanks him for the sour
            *(text) find text in file.
            /(delim)(text)(delim)(text) search and replace
         
-        Pyro requires Tkinter and Pygment external libraries.`
+        Pyro requires Tkinter and Pygment external libraries.

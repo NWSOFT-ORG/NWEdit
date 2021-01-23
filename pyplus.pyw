@@ -37,8 +37,8 @@ python3 pyplus.pyw
 echo Program Finished With Exit Code $?
 python3 ./measure.py stop
 python3 -c 'print("===================================================")'
-echo Exit in 10 secs...
-sleep 10s
+echo Press enter to continue...
+read -s
 ''' if not _PLTFRM else '''@echo off
 title Build Results
 measure.py start
@@ -65,7 +65,7 @@ class EditorErr(Exception):
 
 
 class Settings:
-    """A class to read and write data to/from settings.json"""
+    """A class to read data to/from settings.json"""
 
     def __init__(self):
         with open('settings.json') as f:
@@ -465,6 +465,7 @@ class Editor():
         textbox.statusbar = ttk.Label(
             frame, text='PyEdit +', justify='right', anchor='e')
         textbox.statusbar.pack(side='bottom', fill='x', anchor='e')
+        textbox.lexer = 'Python'
 
         self.master.geometry('1000x600')  # Configure window size
         textbox.focus_set()

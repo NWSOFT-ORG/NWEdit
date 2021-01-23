@@ -1,1 +1,5 @@
-{"lexer": "PythonLexer", "font": "Menlo 13", "file_types": "all"}
+{
+  "file_types": "all",
+  "font": "Menlo 13",
+  "lexer": "PythonLexer"
+}

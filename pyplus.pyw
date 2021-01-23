@@ -52,13 +52,14 @@ echo ----------------------------------------------------
 echo.
 pause
 ''')  # The batch files for building.
-_MAIN_KEY = 'Command' if _OSX else 'Control'
+_MAIN_KEY = 'Command' if _OSX else 'Control'  # MacOS uses Cmd, but others uses Ctrl
 
 
 class EditorErr(Exception):
     """A nice exception class for debugging"""
 
     def __init__(self, message):
+        # The error (e+m)
         super().__init__('An editor error is occurred.' if not message else message)
 
 
@@ -288,7 +289,7 @@ class CustomNotebook(ttk.Notebook):
             lU+O5ggKE3HTaRIgBGkk3AUKQ0AE4wAO+IOrDwDBiKCg7dNKGZFPCCFepWyfg1Vx2pyt
             kCvbIprinDq4QwV5hSS/yhNc4ecI+8l7DW8gDYFaqpCCFJsQAAAABJRU5ErkJggg==
             ''')
-        )
+        )  # The images, 32x32-sized
 
         style.element_create(
             "close",
@@ -345,7 +346,7 @@ class Editor():
         """The editor object, the entire thing that goes in the
         window.
         Lacks these MacOS support:
-        * The file selector cannot change file type.
+        * The file selector does not work.
         """
         settings_class = Settings()
         self.lexer = settings_class.get_settings('lexer')

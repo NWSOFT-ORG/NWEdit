@@ -53,7 +53,7 @@ echo.
 pause
 ''')  # The batch files for building.
 _MAIN_KEY = 'Command' if _OSX else 'Control'  # MacOS uses Cmd, but others uses Ctrl
-_TK_VERSION = 85
+_TK_VERSION = 85  # Fix this
 
 
 class EditorErr(Exception):
@@ -342,10 +342,10 @@ class Editor():
 
         app_menu.add_command(label='About PyEdit +', command=self.version)
 
-        if _TK_VERSION < 85:
+        if _TK_VERSION < 85 or not _OSX:
             app_menu.add_command(label="Preferences...", command=self.config)
         else:
-            self.master.createcommand('tk::mac::ShowPreferences', self.config)
+            self.master.createcommand('tk::mac::ShowPreferences', self.config)  # OS X
 
         filemenu = tk.Menu(menubar, tearoff=0)
         filemenu.add_command(label='New Tab', command=self.new_file, accelerator=f'{_MAIN_KEY}-n')

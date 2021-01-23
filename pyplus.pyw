@@ -53,6 +53,7 @@ echo.
 pause
 ''')  # The batch files for building.
 _MAIN_KEY = 'Command' if _OSX else 'Control'  # MacOS uses Cmd, but others uses Ctrl
+_TK_VERSION = 85
 
 
 class EditorErr(Exception):
@@ -72,48 +73,6 @@ class Settings:
         self.lexer = self.settings['lexer']
         self.font = self.settings['font'].split()[0]
         self.size = self.settings['font'].split()[1]
-
-    def config_lexer(self):
-        config = tk.Toplevel()
-        config.title("Lexer (Syntax highlighting)")
-        tk.Label(config, text='Select the lexer below').pack()
-        lexer_cb = ttk.Combobox(config, state="readonly")
-        lexer_cb.pack()
-        lexers = ['Python3Lexer', 'PythonLexer', 'None (Plain text)']
-
-        lexer_cb['value'] = lexers
-
-        def save():
-            self.lexer = lexer_cb.get()
-            self.save_settings()
-            config.destroy()
-
-        config.protocol("WM_DELETE_WINDOW", save)
-        config.mainloop()
-
-    def config_font(self):
-        config = tk.Toplevel()
-        config.title('Font')
-        tk.Label(config, text=f'Enter the font below\nCurrent font is {self.font} {self.size}').pack()
-        e = tk.Entry(config)
-        e.pack()
-
-        def save():
-            font = e.get()
-            font = font.split()
-            self.font = font[0]
-            self.size = font[1]
-            self.save_settings()
-            config.destroy()
-
-        config.protocol('WM_DELETE_WINDOW', save)
-        config.mainloop()
-
-    def save_settings(self):
-        self.settings = {"lexer": self.lexer,
-                         "font": f'{self.font} {self.size}'}
-        with open('settings.json', 'w') as f:
-            json.dump(self.settings, f)
 
     def get_settings(self, setting):
         if setting == 'font':
@@ -182,10 +141,11 @@ class EnhancedText(tk.scrolledtext.ScrolledText):
                     args[0:2] == ("xview", "scroll") or
                     args[0:2] == ("yview", "moveto") or
                     args[0:2] == ("yview", "scroll")
-            ):
+                ):
                 self.event_generate("<<Change>>", when="tail")
 
             # return what the actual widget returned
+
             return result
         except:
             pass
@@ -378,6 +338,14 @@ class Editor():
         self.master.protocol('WM_DELETE_WINDOW', self.exit)
 
         menubar = tk.Menu(self.master)
+        app_menu = tk.Menu(menubar, name='apple')
+
+        app_menu.add_command(label='About PyEdit +', command=self.version)
+
+        if _TK_VERSION < 85:
+            app_menu.add_command(label="Preferences...", command=self.config)
+        else:
+            self.master.createcommand('tk::mac::ShowPreferences', self.config)
 
         filemenu = tk.Menu(menubar, tearoff=0)
         filemenu.add_command(label='New Tab', command=self.new_file, accelerator=f'{_MAIN_KEY}-n')
@@ -402,18 +370,11 @@ class Editor():
         codemenu.add_command(label='Build', command=self.build, accelerator=f'{_MAIN_KEY}-b')
         codemenu.add_command(label='Search', command=self.search, accelerator=f'{_MAIN_KEY}-f')
 
-        helpmenu = tk.Menu(menubar, tearoff=0)
-        helpmenu.add_command(label='Version', command=self.version)
 
-        configmenu = tk.Menu(menubar, tearoff=0)
-        configmenu.add_command(label='Configure font', command=self.config_font)
-        configmenu.add_command(label='Configure lexer', command=self.config_lexer)
-
+        menubar.add_cascade(label='App', menu=app_menu)  # App menu
         menubar.add_cascade(label='File', menu=filemenu)
         menubar.add_cascade(label='Edit', menu=editmenu)
         menubar.add_cascade(label='Code', menu=codemenu)
-        menubar.add_cascade(label='Settings', menu=configmenu)
-        menubar.add_cascade(label='Help', menu=helpmenu)
         self.master.config(menu=menubar)
 
         self.right_click_menu = tk.Menu(self.master, tearoff=0)
@@ -577,7 +538,8 @@ class Editor():
         tri_str_end = []
         tri_str = []
         cursor_pos = float(currtext.index('insert'))
-        for index, linenum in enumerate(currtext.tag_ranges('Token.Literal.String.Doc') + currtext.tag_ranges('Token.Literal.String.Single')):
+        for index, linenum in enumerate(
+                currtext.tag_ranges('Token.Literal.String.Doc') + currtext.tag_ranges('Token.Literal.String.Single')):
             if index % 2 == 1:
                 tri_str_end.append(float(str(linenum)))
             else:
@@ -937,15 +899,8 @@ class Editor():
         cv.create_image(0, 0, anchor='nw', image=img)
         ver.mainloop()
 
-    def config_font(self, event=None):
-        config = Settings()
-        config.config_font()
-
-    def config_lexer(self, event=None):
-        config = Settings()
-        config.config_lexer()
-        self._highlight_all()
-
+    def config(self, event=None):
+        self.open_file('settings.json')
 
 if __name__ == '__main__':
     Editor()  # Execs the main class

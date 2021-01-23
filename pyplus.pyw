@@ -73,6 +73,7 @@ class Settings:
         self.lexer = self.settings['lexer']
         self.font = self.settings['font'].split()[0]
         self.size = self.settings['font'].split()[1]
+        self.filetype = self.settings['file_type']
 
     def get_settings(self, setting):
         if setting == 'font':
@@ -80,12 +81,25 @@ class Settings:
         elif setting == 'lexer':
             return self.lexer
         elif setting == 'file_type':
-            pass
+            # Always starts with ('All files', '*.*')
+            if self.filetype == 'all':
+                return (('All files', '*.*'))
+            elif self.filetype == 'py':
+                # Extend this list, since Python has a lot of file tyeps
+                return (('All files', '*.*'), ('Python Files', '*.py *.pyw *.pyx *.py3 *.pyi'))
+            elif self.filetype == 'txt':
+                return (('All files', '*.*'), ('Text documents', '*.txt *.rst'))
+            elif self.filetype == 'xml':
+                # Extend this, since xml has a lot of usage formats
+                return (('All files', '*.*'), ('XML', '*.xml *.plist'))
+            else:
+                raise EditorErr('The file type is not supported by this editor (yet)')
         else:
-            raise EditorErr
+            raise EditorErr('The setting is not defined')
 
 
 class TextLineNumbers(tk.Canvas):
+    """Line numbers class for tkinter text widgets. From stackoverflow."""
     def __init__(self, *args, **kwargs):
         tk.Canvas.__init__(self, *args, **kwargs)
         self.textwidget = None
@@ -117,6 +131,9 @@ class TextLineNumbers(tk.Canvas):
 
 
 class EnhancedText(tk.scrolledtext.ScrolledText):
+    """Text widget, but 'records' your key actions
+    If you hit a key, or the text widget's content has changed,
+    it generats an event, to redraw the line numbers."""
     def __init__(self, *args, **kwargs):
         tk.scrolledtext.ScrolledText.__init__(self, *args, **kwargs)
 
@@ -288,6 +305,10 @@ class CustomNotebook(ttk.Notebook):
                 })]
             })]
         })])
+        # Change the layout, makes it look like this:
+        # +------------+
+        # | title   [X]|
+        # +-------------------------
 
 
 class Document():
@@ -335,10 +356,10 @@ class Editor():
         self.nb.pack(expand=1, fill='both')
         self.nb.enable_traversal()
 
-        self.master.protocol('WM_DELETE_WINDOW', self.exit)
+        self.master.protocol('WM_DELETE_WINDOW', self.exit)  # When the window is closed, or quit from Mac, do exit action
 
         menubar = tk.Menu(self.master)
-        app_menu = tk.Menu(menubar, name='apple')
+        app_menu = tk.Menu(menubar, name='apple', tearoff=0)  # Name can be apple only, don't really know why!
 
         app_menu.add_command(label='About PyEdit +', command=self.version)
 

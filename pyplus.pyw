@@ -73,7 +73,7 @@ class Settings:
         self.lexer = self.settings['lexer']
         self.font = self.settings['font'].split()[0]
         self.size = self.settings['font'].split()[1]
-        self.filetype = self.settings['file_type']
+        self.filetype = self.settings['file_types']
 
     def get_settings(self, setting):
         if setting == 'font':
@@ -83,15 +83,15 @@ class Settings:
         elif setting == 'file_type':
             # Always starts with ('All files', '*.*')
             if self.filetype == 'all':
-                return (('All files', '*.*'))
+                return (('All files', '*.*'),)
             elif self.filetype == 'py':
                 # Extend this list, since Python has a lot of file tyeps
-                return (('All files', '*.*'), ('Python Files', '*.py *.pyw *.pyx *.py3 *.pyi'))
+                return (('All files', '*.*'), ('Python Files', '*.py *.pyw *.pyx *.py3 *.pyi'),)
             elif self.filetype == 'txt':
-                return (('All files', '*.*'), ('Text documents', '*.txt *.rst'))
+                return (('All files', '*.*'), ('Text documents', '*.txt *.rst'),)
             elif self.filetype == 'xml':
                 # Extend this, since xml has a lot of usage formats
-                return (('All files', '*.*'), ('XML', '*.xml *.plist'))
+                return (('All files', '*.*'), ('XML', '*.xml *.plist *.iml'),)
             else:
                 raise EditorErr('The file type is not supported by this editor (yet)')
         else:
@@ -329,8 +329,8 @@ class Editor():
         Lacks these MacOS support:
         * The file selector does not work.
         """
-        settings_class = Settings()
-        self.lexer = settings_class.get_settings('lexer')
+        self.settings_class = Settings()
+        self.lexer = self.settings_class.get_settings('lexer')
         if self.lexer == "None (Plain text)":
             self.lexer = None
         self.master = ttkthemes.ThemedTk()
@@ -347,7 +347,7 @@ class Editor():
                                                         '        4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC')))
         # Base64 image, this probably decreases the repo size.
 
-        self.filetypes = settings_class.get_settings('file_type')
+        self.filetypes = self.settings_class.get_settings('file_type')
 
         self.tabs = {}
 
@@ -355,6 +355,7 @@ class Editor():
         self.nb.bind('<B1-Motion>', self.move_tab)
         self.nb.pack(expand=1, fill='both')
         self.nb.enable_traversal()
+        
 
         self.master.protocol('WM_DELETE_WINDOW', self.exit)  # When the window is closed, or quit from Mac, do exit action
 
@@ -422,6 +423,7 @@ class Editor():
             first_tab, self.create_text_widget(first_tab))
         self.nb.add(first_tab, text='Untitled.py   ')
         self.mouse()
+        self.master.after(0, self.update_settings)
 
         def tab(event):
             self.tabs[self.get_tab()].textbox.insert('insert', ' ' * 4)  # Convert tabs to spaces
@@ -923,6 +925,10 @@ class Editor():
 
     def config(self, event=None):
         self.open_file('settings.json')
+    
+    def update_settings(self):
+        self.lexer = self.settings_class.get_settings('lexer')
+        self.filetypes = self.settings_class.get_settings('file_type')
 
 if __name__ == '__main__':
     Editor()  # Execs the main class

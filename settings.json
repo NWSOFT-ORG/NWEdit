@@ -1,5 +1,5 @@
 {
-  "file_types": "all",
+  "file_types": "py",
   "font": "Menlo 13",
   "lexer": "PythonLexer"
 }

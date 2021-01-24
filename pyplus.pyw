@@ -727,15 +727,15 @@ class Editor():
         try:
             if _PLTFRM:  # Windows
                 with open('build.bat', 'w') as f:
-                    f.write((_BATCH_BUILD % self.tabs[self.get_tab()].file_dir))
-                    os.system('build.bat')
+                    f.write((_BATCH_BUILD.format(self.tabs[self.get_tab()].file_dir)))
+                os.system('build.bat')
             else:
                 with open('build.sh', 'w') as f:
-                    f.write((_BATCH_BUILD % self.tabs[self.get_tab()].file_dir))
-                    os.system('chmod 700 build.sh')
-                    os.system('./build.sh')
-        except:
-            pass
+                    f.write((_BATCH_BUILD.format(self.tabs[self.get_tab()].file_dir)))
+                os.system('chmod 700 build.sh')
+                os.system('./build.sh')
+        except Exception as e:
+            print(str(e))
 
     def autoinsert(self, event=None):
         """Auto-inserts a symbol

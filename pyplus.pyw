@@ -378,12 +378,12 @@ class Editor():
         filemenu.add_command(label='Exit Editor', command=self.exit, accelerator=f'{_MAIN_KEY}-q')
 
         editmenu = tk.Menu(menubar, tearoff=0)
-        editmenu.add_command(label='Undo', command=self.undo, accelerator=f'{_MAIN_KEY}-o')
-        editmenu.add_command(label='Redo', command=self.redo, accelerator=f'{_MAIN_KEY}-o')
+        editmenu.add_command(label='Undo', command=self.undo, accelerator=f'{_MAIN_KEY}-z')
+        editmenu.add_command(label='Redo', command=self.redo, accelerator=f'{_MAIN_KEY}-Shift-z')
         editmenu.add_separator()
-        editmenu.add_command(label='Cut', command=self.cut, accelerator=f'{_MAIN_KEY}-o')
-        editmenu.add_command(label='Copy', command=self.copy, accelerator=f'{_MAIN_KEY}-o')
-        editmenu.add_command(label='Paste', command=self.paste, accelerator=f'{_MAIN_KEY}-o')
+        editmenu.add_command(label='Cut', command=self.cut, accelerator=f'{_MAIN_KEY}-x')
+        editmenu.add_command(label='Copy', command=self.copy, accelerator=f'{_MAIN_KEY}-c')
+        editmenu.add_command(label='Paste', command=self.paste, accelerator=f'{_MAIN_KEY}-v')
         editmenu.add_command(label='Delete Selected', command=self.delete, accelerator='del')
         editmenu.add_command(label='Select All', command=self.select_all, accelerator=f'{_MAIN_KEY}-a')
 

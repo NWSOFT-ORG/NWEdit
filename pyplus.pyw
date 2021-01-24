@@ -101,6 +101,7 @@ class Settings:
 
 class TextLineNumbers(tk.Canvas):
     """Line numbers class for tkinter text widgets. From stackoverflow."""
+
     def __init__(self, *args, **kwargs):
         tk.Canvas.__init__(self, *args, **kwargs)
         self.textwidget = None
@@ -135,6 +136,7 @@ class EnhancedText(tk.scrolledtext.ScrolledText):
     """Text widget, but 'records' your key actions
     If you hit a key, or the text widget's content has changed,
     it generats an event, to redraw the line numbers."""
+
     def __init__(self, *args, **kwargs):
         tk.scrolledtext.ScrolledText.__init__(self, *args, **kwargs)
 
@@ -159,7 +161,7 @@ class EnhancedText(tk.scrolledtext.ScrolledText):
                     args[0:2] == ("xview", "scroll") or
                     args[0:2] == ("yview", "moveto") or
                     args[0:2] == ("yview", "scroll")
-                ):
+            ):
                 self.event_generate("<<Change>>", when="tail")
 
             # return what the actual widget returned
@@ -356,9 +358,9 @@ class Editor():
         self.nb.bind('<B1-Motion>', self.move_tab)
         self.nb.pack(expand=1, fill='both')
         self.nb.enable_traversal()
-        
 
-        self.master.protocol('WM_DELETE_WINDOW', self.exit)  # When the window is closed, or quit from Mac, do exit action
+        self.master.protocol('WM_DELETE_WINDOW',
+                             self.exit)  # When the window is closed, or quit from Mac, do exit action
 
         menubar = tk.Menu(self.master)
         app_menu = tk.Menu(menubar, name='apple', tearoff=0)  # Name can be apple only, don't really know why!
@@ -390,7 +392,6 @@ class Editor():
         codemenu = tk.Menu(menubar, tearoff=0)
         codemenu.add_command(label='Build', command=self.build, accelerator=f'{_MAIN_KEY}-b')
         codemenu.add_command(label='Search', command=self.search, accelerator=f'{_MAIN_KEY}-f')
-
 
         menubar.add_cascade(label='App', menu=app_menu)  # App menu
         menubar.add_cascade(label='File', menu=filemenu)
@@ -429,7 +430,6 @@ class Editor():
             return 'break'  # Quit quickly, before a char is being inserted.
 
         # Keyboard bindings
-        self.master.bind(f'<{_MAIN_KEY}-s>', self.save_file)
         self.master.bind(f'<{_MAIN_KEY}-w>', self.close_tab)
         self.master.bind(('<Button-2>' if _OSX else '<Button-3>'), self.right_click)
         self.master.bind(f'<{_MAIN_KEY}-z>', self.undo)
@@ -924,10 +924,11 @@ class Editor():
 
     def config(self, event=None):
         self.open_file('settings.json')
-    
+
     def update_settings(self):
         self.lexer = self.settings_class.get_settings('lexer')
         self.filetypes = self.settings_class.get_settings('file_type')
+
 
 if __name__ == '__main__':
     Editor()  # Execs the main class

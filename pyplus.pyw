@@ -12,6 +12,7 @@
 | You can also contribute it on github!               |
 | Note: Some parts are adapted from stack overflow.   |
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
+Also, it's cross-compatable!
 """
 import json
 import os
@@ -372,8 +373,6 @@ class Editor():
         filemenu = tk.Menu(menubar, tearoff=0)
         filemenu.add_command(label='New Tab', command=self.new_file, accelerator=f'{_MAIN_KEY}-n')
         filemenu.add_command(label='Open File', command=self.open_file, accelerator=f'{_MAIN_KEY}-o')
-        filemenu.add_command(label='Save File', command=self.save_file, accelerator=f'{_MAIN_KEY}-s')
-        filemenu.add_command(label='Save As...', command=self.save_as, accelerator=f'{_MAIN_KEY}-S')
         filemenu.add_command(label='Close Tab', command=self.close_tab, accelerator=f'{_MAIN_KEY}-w')
         filemenu.add_separator()
         filemenu.add_command(label='Exit Editor', command=self.exit, accelerator=f'{_MAIN_KEY}-q')

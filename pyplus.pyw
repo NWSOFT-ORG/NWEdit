@@ -347,7 +347,7 @@ class Editor():
                                                         '        4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC')))
         # Base64 image, this probably decreases the repo size.
 
-        self.filetypes = None
+        self.filetypes = settings_class.get_settings('file_type')
 
         self.tabs = {}
 

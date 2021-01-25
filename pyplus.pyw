@@ -34,7 +34,7 @@ _BATCH_BUILD = ('''#!/bin/bash
 set +v
 python3 ./measure.py start
 python3 -c 'print("===================================================")'
-python3 pyplus.pyw
+python3 {}
 echo Program Finished With Exit Code $?
 python3 ./measure.py stop
 python3 -c 'print("===================================================")'
@@ -46,7 +46,7 @@ measure.py start
 echo.
 echo.
 echo ----------------------------------------------------
-python3 %s
+python3 {}
 echo Program Finished With Exit Code %ERRORLEVEL%
 measure.py stop
 echo ----------------------------------------------------
@@ -340,7 +340,7 @@ class Editor():
         self.master.minsize(900, 600)
         style = ThemedStyle(self.master)
         style.set_theme("black")  # Apply ttkthemes to master window.
-        self.master.geometry("600x400")
+        # self.master.geometry("600x400")
         self.master.title('PyEdit +')
         self.master.iconphoto(True, tk.PhotoImage(data=('iVBORw0KGgoAAAANSUhEU\n'
                                                         '        gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA\n'
@@ -380,12 +380,12 @@ class Editor():
         filemenu.add_command(label='Exit Editor', command=self.exit, accelerator=f'{_MAIN_KEY}-q')
 
         editmenu = tk.Menu(menubar, tearoff=0)
-        editmenu.add_command(label='Undo', command=self.undo, accelerator=f'{_MAIN_KEY}-o')
-        editmenu.add_command(label='Redo', command=self.redo, accelerator=f'{_MAIN_KEY}-o')
+        editmenu.add_command(label='Undo', command=self.undo, accelerator=f'{_MAIN_KEY}-z')
+        editmenu.add_command(label='Redo', command=self.redo, accelerator=f'{_MAIN_KEY}-Shift-z')
         editmenu.add_separator()
-        editmenu.add_command(label='Cut', command=self.cut, accelerator=f'{_MAIN_KEY}-o')
-        editmenu.add_command(label='Copy', command=self.copy, accelerator=f'{_MAIN_KEY}-o')
-        editmenu.add_command(label='Paste', command=self.paste, accelerator=f'{_MAIN_KEY}-o')
+        editmenu.add_command(label='Cut', command=self.cut, accelerator=f'{_MAIN_KEY}-x')
+        editmenu.add_command(label='Copy', command=self.copy, accelerator=f'{_MAIN_KEY}-c')
+        editmenu.add_command(label='Paste', command=self.paste, accelerator=f'{_MAIN_KEY}-v')
         editmenu.add_command(label='Delete Selected', command=self.delete, accelerator='del')
         editmenu.add_command(label='Select All', command=self.select_all, accelerator=f'{_MAIN_KEY}-a')
 
@@ -727,15 +727,15 @@ class Editor():
         try:
             if _PLTFRM:  # Windows
                 with open('build.bat', 'w') as f:
-                    f.write((_BATCH_BUILD % self.tabs[self.get_tab()].file_dir))
-                    os.system('build.bat')
+                    f.write((_BATCH_BUILD.format(self.tabs[self.get_tab()].file_dir)))
+                os.system('build.bat')
             else:
                 with open('build.sh', 'w') as f:
-                    f.write((_BATCH_BUILD % self.tabs[self.get_tab()].file_dir))
-                    os.system('chmod 700 build.sh')
-                    os.system('./build.sh')
-        except:
-            pass
+                    f.write((_BATCH_BUILD.format(self.tabs[self.get_tab()].file_dir)))
+                os.system('chmod 700 build.sh')
+                os.system('./build.sh')
+        except Exception as e:
+            print(str(e))
 
     def autoinsert(self, event=None):
         """Auto-inserts a symbol

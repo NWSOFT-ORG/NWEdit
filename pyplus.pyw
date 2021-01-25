@@ -16,6 +16,10 @@ Also, it's cross-compatable!
 """
 import json
 import os
+import os.path
+import platform
+import shlex
+import subprocess
 import sys
 import tkinter as tk
 import tkinter.filedialog
@@ -25,7 +29,9 @@ from tkinter import scrolledtext
 
 import pygments
 import ttkthemes
-from pygments.lexers import PythonLexer
+from pygments.lexers.html import XmlLexer
+from pygments.lexers.python import PythonLexer
+from pygments.lexers.special import TextLexer
 from ttkthemes import ThemedStyle
 
 _PLTFRM = (True if sys.platform.startswith('win') else False)
@@ -33,13 +39,13 @@ _OSX = (True if sys.platform.startswith('darwin') else False)
 _BATCH_BUILD = ('''#!/bin/bash
 set +v
 python3 ./measure.py start
-python3 -c 'print("===================================================")'
+python3 -c 'print("==================== OUTPUT ====================")'
 python3 {}
+python3 -c 'print("================================================")'
 echo Program Finished With Exit Code $?
 python3 ./measure.py stop
-python3 -c 'print("===================================================")'
 echo Press enter to continue...
-read -s
+read -s  # This will pause the script
 ''' if not _PLTFRM else '''@echo off
 title Build Results
 measure.py start
@@ -54,7 +60,245 @@ echo.
 pause
 ''')  # The batch files for building.
 _MAIN_KEY = 'Command' if _OSX else 'Control'  # MacOS uses Cmd, but others uses Ctrl
-_TK_VERSION = 85  # Fix this
+_TK_VERSION = int(float(tk.TkVersion) * 10)  # Gets tk's version
+
+
+# From thonny
+def update_system_path(env, value):
+    # in Windows, env keys are not case sensitive
+    # this is important if env is a dict (not os.environ)
+    if platform.system() == "Windows":
+        found = False
+        for key in env:
+            if key.upper() == "PATH":
+                found = True
+                env[key] = value
+
+        if not found:
+            env["PATH"] = value
+    else:
+        env["PATH"] = value
+
+
+def get_environment_with_overrides(overrides):
+    env = os.environ.copy()
+    for key in overrides:
+        if overrides[key] is None and key in env:
+            del env[key]
+        else:
+            assert isinstance(overrides[key], str)
+            if key.upper() == "PATH":
+                update_system_path(env, overrides[key])
+            else:
+                env[key] = overrides[key]
+    return env
+
+
+def run_in_terminal(cmd, cwd=os.getcwd(), env_overrides={}, keep_open=True, title=None):
+    env = get_environment_with_overrides(env_overrides)
+
+    if not cwd or not os.path.exists(cwd):
+        cwd = os.getcwd()
+
+    if platform.system() == "Windows":
+        _run_in_terminal_in_windows(cmd, cwd, env, keep_open, title)
+    elif platform.system() == "Linux":
+        _run_in_terminal_in_linux(cmd, cwd, env, keep_open)
+    elif platform.system() == "Darwin":
+        _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open)
+    else:
+        raise RuntimeError("Can't launch terminal in " + platform.system())
+
+
+def open_system_shell(cwd, env_overrides={}):
+    env = get_environment_with_overrides(env_overrides)
+
+    if platform.system() == "Darwin":
+        _run_in_terminal_in_macos([], cwd, env_overrides, True)
+    elif platform.system() == "Windows":
+        cmd = "start cmd"
+        subprocess.Popen(cmd, cwd=cwd, env=env, shell=True)
+    elif platform.system() == "Linux":
+        cmd = _get_linux_terminal_command()
+        subprocess.Popen(cmd, cwd=cwd, env=env, shell=True)
+    else:
+        raise RuntimeError("Can't launch terminal in " + platform.system())
+
+
+def _add_to_path(directory, path):
+    # Always prepending to path may seem better, but this could mess up other things.
+    # If the directory contains only one Python distribution executables, then
+    # it probably won't be in path yet and therefore will be prepended.
+    if (
+            directory in path.split(os.pathsep)
+            or platform.system() == "Windows"
+            and directory.lower() in path.lower().split(os.pathsep)
+    ):
+        return path
+    else:
+        return directory + os.pathsep + path
+
+
+def _run_in_terminal_in_windows(cmd, cwd, env, keep_open, title=None):
+    if keep_open:
+        # Yes, the /K argument has weird quoting. Can't explain this, but it works
+        quoted_args = " ".join(map(lambda s: s if s == "&" else '"' + s + '"', cmd))
+        cmd_line = """start {title} /D "{cwd}" /W cmd /K "{quoted_args}" """.format(
+            cwd=cwd, quoted_args=quoted_args, title='"' + title + '"' if title else ""
+        )
+
+        subprocess.Popen(cmd_line, cwd=cwd, env=env, shell=True)
+    else:
+        subprocess.Popen(cmd, creationflags=subprocess.CREATE_NEW_CONSOLE, cwd=cwd, env=env)
+
+
+def _run_in_terminal_in_linux(cmd, cwd, env, keep_open):
+    def _shellquote(s):
+        return subprocess.list2cmdline([s])
+
+    term_cmd = _get_linux_terminal_command()
+
+    if isinstance(cmd, list):
+        cmd = " ".join(map(_shellquote, cmd))
+
+    if keep_open:
+        # http://stackoverflow.com/a/4466566/261181
+        core_cmd = "{cmd}; exec bash -i".format(cmd=cmd)
+        in_term_cmd = "bash -c {core_cmd}".format(core_cmd=_shellquote(core_cmd))
+    else:
+        in_term_cmd = cmd
+
+    if term_cmd == "lxterminal":
+        # https://www.raspberrypi.org/forums/viewtopic.php?t=221490
+        whole_cmd = "{term_cmd} --command={in_term_cmd}".format(
+            term_cmd=term_cmd, in_term_cmd=_shellquote(in_term_cmd)
+        )
+    else:
+        whole_cmd = "{term_cmd} -e {in_term_cmd}".format(
+            term_cmd=term_cmd, in_term_cmd=_shellquote(in_term_cmd)
+        )
+
+    if term_cmd == "terminator" and "PYTHONPATH" in env:
+        # it is written in Python 2 and the PYTHONPATH of Python 3 will confuse it
+        # https://github.com/thonny/thonny/issues/1129
+        del env["PYTHONPATH"]
+
+    subprocess.Popen(whole_cmd, cwd=cwd, env=env, shell=True)
+
+
+def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
+    _shellquote = shlex.quote
+
+    cmds = "clear; cd " + _shellquote(cwd)
+    # osascript "tell application" won't change Terminal's env
+    # (at least when Terminal is already active)
+    # At the moment I just explicitly set some important variables
+    for key in env_overrides:
+        if env_overrides[key] is None:
+            cmds += "; unset " + key
+        else:
+            value = env_overrides[key]
+            if key == "PATH":
+                value = _normalize_path(value)
+
+            cmds += "; export {key}={value}".format(key=key, value=_shellquote(value))
+
+    if cmd:
+        if isinstance(cmd, list):
+            cmd = " ".join(map(_shellquote, cmd))
+        cmds += "; " + cmd
+
+    if not keep_open:
+        cmds += "; exit"
+
+    # try to shorten to avoid too long line https://github.com/thonny/thonny/issues/1529
+
+    common_prefix = os.path.normpath(sys.prefix).rstrip("/")
+    cmds = (
+            "export THOPR=" + common_prefix + " ; " + cmds.replace(common_prefix + "/", "$THOPR" + "/")
+    )
+    print(cmds)
+
+    # The script will be sent to Terminal with 'do script' command, which takes a string.
+    # We'll prepare an AppleScript string literal for this
+    # (http://stackoverflow.com/questions/10667800/using-quotes-in-a-applescript-string):
+    cmd_as_apple_script_string_literal = (
+            '"' + cmds.replace("\\", "\\\\").replace('"', '\\"').replace("$", "\\$") + '"'
+    )
+
+    # When Terminal is not open, then do script opens two windows.
+    # do script ... in window 1 would solve this, but if Terminal is already
+    # open, this could run the script in existing terminal (in undesirable env on situation)
+    # That's why I need to prepare two variations of the 'do script' command
+    doScriptCmd1 = """        do script %s """ % cmd_as_apple_script_string_literal
+    doScriptCmd2 = """        do script %s in window 1 """ % cmd_as_apple_script_string_literal
+
+    # The whole AppleScript will be executed with osascript by giving script
+    # lines as arguments. The lines containing our script need to be shell-quoted:
+    quotedCmd1 = subprocess.list2cmdline([doScriptCmd1])
+    quotedCmd2 = subprocess.list2cmdline([doScriptCmd2])
+
+    # Now we can finally assemble the osascript command line
+    cmd_line = (
+            "osascript"
+            + """ -e 'if application "Terminal" is running then ' """
+            + """ -e '    tell application "Terminal"           ' """
+            + """ -e """
+            + quotedCmd1
+            + """ -e '        activate                          ' """
+            + """ -e '    end tell                              ' """
+            + """ -e 'else                                      ' """
+            + """ -e '    tell application "Terminal"           ' """
+            + """ -e """
+            + quotedCmd2
+            + """ -e '        activate                          ' """
+            + """ -e '    end tell                              ' """
+            + """ -e 'end if                                    ' """
+    )
+
+    subprocess.Popen(cmd_line, cwd=cwd, shell=True)
+
+
+def _get_linux_terminal_command():
+    import shutil
+
+    xte = shutil.which("x-terminal-emulator")
+    if xte:
+        if os.path.realpath(xte).endswith("/lxterminal") and shutil.which("lxterminal"):
+            # need to know exact program, because it needs special treatment
+            return "lxterminal"
+        elif os.path.realpath(xte).endswith("/terminator") and shutil.which("terminator"):
+            # https://github.com/thonny/thonny/issues/1129
+            return "terminator"
+        else:
+            return "x-terminal-emulator"
+    # Older konsole didn't pass on the environment
+    elif shutil.which("konsole"):
+        if (
+                shutil.which("gnome-terminal")
+                and "gnome" in os.environ.get("DESKTOP_SESSION", "").lower()
+        ):
+            return "gnome-terminal"
+        else:
+            return "konsole"
+    elif shutil.which("gnome-terminal"):
+        return "gnome-terminal"
+    elif shutil.which("xfce4-terminal"):
+        return "xfce4-terminal"
+    elif shutil.which("lxterminal"):
+        return "lxterminal"
+    elif shutil.which("xterm"):
+        return "xterm"
+    else:
+        raise RuntimeError("Don't know how to open terminal emulator")
+
+
+def _normalize_path(s):
+    parts = s.split(os.pathsep)
+    return os.pathsep.join([os.path.normpath(part) for part in parts])
+
+
+# End
 
 
 class EditorErr(Exception):
@@ -80,19 +324,26 @@ class Settings:
         if setting == 'font':
             return f'{self.font} {self.size}'
         elif setting == 'lexer':
-            return self.lexer
+            if self.lexer == 'txt':
+                return TextLexer
+            elif self.lexer == 'py':
+                return PythonLexer
+            elif self.lexer == 'xml':
+                return XmlLexer
+            else:
+                raise EditorErr('The lexer is invalid.')
         elif setting == 'file_type':
             # Always starts with ('All files', '*.*')
             if self.filetype == 'all':
                 return (('All files', '*.*'),)
             elif self.filetype == 'py':
                 # Extend this list, since Python has a lot of file tyeps
-                return (('All files', '*.*'), ('Python Files', '*.py *.pyw *.pyx *.py3 *.pyi'),)
+                return ('All files', '*.*'), ('Python Files', '*.py *.pyw *.pyx *.py3 *.pyi'),
             elif self.filetype == 'txt':
-                return (('All files', '*.*'), ('Text documents', '*.txt *.rst'),)
+                return ('All files', '*.*'), ('Text documents', '*.txt *.rst'),
             elif self.filetype == 'xml':
                 # Extend this, since xml has a lot of usage formats
-                return (('All files', '*.*'), ('XML', '*.xml *.plist *.iml'),)
+                return ('All files', '*.*'), ('XML', '*.xml *.plist *.iml *.rss'),
             else:
                 raise EditorErr('The file type is not supported by this editor (yet)')
         else:
@@ -123,7 +374,7 @@ class TextLineNumbers(tk.Canvas):
             y = dline[1]
             linenum = str(i).split(".")[0]
             if str(int(float(i))) == str(line):
-                bold_font = tkFont.Font(family=self.textwidget['font'], weight="bold")
+                bold_font = tkFont.Font(family=Settings().get_settings('font'), weight="bold")
                 self.create_text(2, y, anchor="nw", text=linenum,
                                  fill='black', font=bold_font)
             else:
@@ -317,7 +568,7 @@ class CustomNotebook(ttk.Notebook):
 class Document():
     """Helper class, for the editor"""
 
-    def __init__(self, Frame, TextWidget, FileDir='', FullDir=''):
+    def __init__(self, TextWidget, FileDir='', FullDir=''):
         self.file_dir = FileDir
         self.fulldir = FullDir if FullDir else FileDir
         self.textbox = TextWidget
@@ -334,18 +585,17 @@ class Editor():
         """
         self.settings_class = Settings()
         self.lexer = self.settings_class.get_settings('lexer')
-        if self.lexer == "None (Plain text)":
-            self.lexer = None
         self.master = ttkthemes.ThemedTk()
         self.master.minsize(900, 600)
         style = ThemedStyle(self.master)
         style.set_theme("black")  # Apply ttkthemes to master window.
-        # self.master.geometry("600x400")
+        self.master.geometry("600x400")
         self.master.title('PyEdit +')
         self.master.iconphoto(True, tk.PhotoImage(data=('iVBORw0KGgoAAAANSUhEU\n'
                                                         '        gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA\n'
                                                         '        ABJQTFRFAAAAAAAA////TWyK////////WaqEwgAAAAZ0Uk5TAP8U/yr/h0gXnQAAAHpJREF\n'
-                                                        '        UeJyNktENgCAMROsGog7ACqbpvzs07L+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D\n'
+                                                        'UeJyNktENgCAMROsGog7ACqbpvzs07L'
+                                                        '+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D\n '
                                                         '        QGsRhw9B3SMwNSSj1glNEDqhUpUGw/gMuUd+d2Csny6xgAZB4A1IDwG1SxAc/95t7DAPPIm\n'
                                                         '        4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC')))
         # Base64 image, this probably decreases the repo size.
@@ -380,17 +630,18 @@ class Editor():
         filemenu.add_command(label='Exit Editor', command=self.exit, accelerator=f'{_MAIN_KEY}-q')
 
         editmenu = tk.Menu(menubar, tearoff=0)
-        editmenu.add_command(label='Undo', command=self.undo, accelerator=f'{_MAIN_KEY}-z')
-        editmenu.add_command(label='Redo', command=self.redo, accelerator=f'{_MAIN_KEY}-Shift-z')
+        editmenu.add_command(label='Undo', command=self.undo, accelerator=f'{_MAIN_KEY}-o')
+        editmenu.add_command(label='Redo', command=self.redo, accelerator=f'{_MAIN_KEY}-o')
         editmenu.add_separator()
-        editmenu.add_command(label='Cut', command=self.cut, accelerator=f'{_MAIN_KEY}-x')
-        editmenu.add_command(label='Copy', command=self.copy, accelerator=f'{_MAIN_KEY}-c')
-        editmenu.add_command(label='Paste', command=self.paste, accelerator=f'{_MAIN_KEY}-v')
+        editmenu.add_command(label='Cut', command=self.cut, accelerator=f'{_MAIN_KEY}-o')
+        editmenu.add_command(label='Copy', command=self.copy, accelerator=f'{_MAIN_KEY}-o')
+        editmenu.add_command(label='Paste', command=self.paste, accelerator=f'{_MAIN_KEY}-o')
         editmenu.add_command(label='Delete Selected', command=self.delete, accelerator='del')
         editmenu.add_command(label='Select All', command=self.select_all, accelerator=f'{_MAIN_KEY}-a')
 
         codemenu = tk.Menu(menubar, tearoff=0)
         codemenu.add_command(label='Build', command=self.build, accelerator=f'{_MAIN_KEY}-b')
+        codemenu.add_command(label='Lint', command=self.lint_source)
         codemenu.add_command(label='Search', command=self.search, accelerator=f'{_MAIN_KEY}-f')
 
         menubar.add_cascade(label='App', menu=app_menu)  # App menu
@@ -420,12 +671,12 @@ class Editor():
         # Mouse bindings
         first_tab = ttk.Frame(self.nb)
         self.tabs[first_tab] = Document(
-            first_tab, self.create_text_widget(first_tab))
+            first_tab, self.create_text_widget(first_tab), FileDir='None')
         self.nb.add(first_tab, text='Untitled.py   ')
         self.mouse()
         self.master.after(0, self.update_settings)
 
-        def tab(event):
+        def tab(_):
             self.tabs[self.get_tab()].textbox.insert('insert', ' ' * 4)  # Convert tabs to spaces
             return 'break'  # Quit quickly, before a char is being inserted.
 
@@ -451,7 +702,7 @@ class Editor():
         textbox = textframe.text  # text widget
         textbox.frame = frame  # The text will be packed into the frame.
         # TODO: Make a better color scheme
-        textbox.tag_configure("Token.Keyword", foreground="#CC7A00")
+        textbox.tag_configure("Token.Keyword", foreground="#61EBFF")
         textbox.tag_configure("Token.Keyword.Constant", foreground="#CC7A00")
         textbox.tag_configure("Token.Keyword.Declaration", foreground="#CC7A00")
         textbox.tag_configure("Token.Keyword.Namespace", foreground="#CC7A00")
@@ -471,13 +722,14 @@ class Editor():
         textbox.tag_configure("Token.Comment", foreground="#767d87")
         textbox.tag_configure("Token.Comment.Single", foreground="#767d87")
         textbox.tag_configure("Token.Comment.Double", foreground="#767d87")
+        textbox.tag_configure("Token.Comment.Shebang", foreground="#00ff00")
 
         textbox.tag_configure("Token.Literal.Number.Integer", foreground="#88daea")
         textbox.tag_configure("Token.Literal.Number.Float", foreground="#88daea")
 
         textbox.tag_configure("Token.Literal.String.Single", foreground="#35c666")
         textbox.tag_configure("Token.Literal.String.Double", foreground="#35c666")
-        textbox.tag_configure('Token.Literal.String.Doc', foreground='#b77600')
+        textbox.tag_configure('Token.Literal.String.Doc', foreground='#ff0000')
         # ^ Highlight using tags
         textbox.bind('<Return>', self.autoindent)
         textbox.bind("<<KeyEvent>>", self.key)
@@ -487,20 +739,23 @@ class Editor():
         textbox.statusbar = ttk.Label(
             frame, text='PyEdit +', justify='right', anchor='e')
         textbox.statusbar.pack(side='bottom', fill='x', anchor='e')
-        textbox.lexer = 'Python'
 
         self.master.geometry('1000x600')  # Configure window size
         textbox.focus_set()
         return textbox
 
-    def key(self, _=None):
+    def settitle(self, _=None):
+        self.master.title(f'PyEdit + -- {self.tabs[self.get_tab()].file_dir}')
+
+    def key(self, event=None):
         """Event when a key is pressed."""
         currtext = self.tabs[self.get_tab()].textbox
         try:
             self._highlight_line()
             currtext.statusbar.config(
                 text=f'PyEdit+ | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))} | col {str(int(currtext.index("insert").split(".")[1:][0]))}')
-            # Update statusbar
+            # Update statusbar and titlebar
+            self.settitle()
             # Auto-save
             self.save_file()
         except Exception as e:
@@ -513,6 +768,7 @@ class Editor():
             currtext.statusbar.config(
                 text=f"PyEdit+ | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} | col {str(int(currtext.index('insert').split('.')[1:][0]))}")
             # Update statusbar and titlebar
+            self.settitle()
         except Exception as e:
             currtext.statusbar.config(text=f'PyEdit +')  # When error occurs
 
@@ -540,7 +796,7 @@ class Editor():
                 break
 
         currtext.mark_set('range_start', start_index)
-        for token, content in pygments.lex(code, PythonLexer()):
+        for token, content in pygments.lex(code, self.lexer()):
             currtext.mark_set('range_end', f'range_start + {len(content)}c')
             currtext.tag_add(
                 str(token), 'range_start', 'range_end')
@@ -594,7 +850,7 @@ class Editor():
                 break
 
         currtext.mark_set('range_start', start_index)
-        for token, content in pygments.lex(code, PythonLexer()):
+        for token, content in pygments.lex(code, self.lexer()):
             currtext.mark_set('range_end', f'range_start + {len(content)}c')
             currtext.tag_add(
                 str(token), 'range_start', 'range_end')
@@ -671,7 +927,7 @@ class Editor():
         """Creates a new tab(file)."""
         new_tab = ttk.Frame(self.nb)
         self.tabs[new_tab] = Document(
-            new_tab, self.create_text_widget(new_tab))
+            new_tab, self.create_text_widget(new_tab), 'None')
         self.nb.add(new_tab, text='Untitled.py   ')
         self.nb.select(new_tab)
 
@@ -728,14 +984,14 @@ class Editor():
             if _PLTFRM:  # Windows
                 with open('build.bat', 'w') as f:
                     f.write((_BATCH_BUILD.format(self.tabs[self.get_tab()].file_dir)))
-                os.system('build.bat')
+                run_in_terminal('build.bat && exit')
             else:
                 with open('build.sh', 'w') as f:
                     f.write((_BATCH_BUILD.format(self.tabs[self.get_tab()].file_dir)))
                 os.system('chmod 700 build.sh')
-                os.system('./build.sh')
-        except Exception as e:
-            print(str(e))
+                run_in_terminal('./build.sh && exit')
+        except:
+            pass
 
     def autoinsert(self, event=None):
         """Auto-inserts a symbol
@@ -881,7 +1137,7 @@ class Editor():
                     try:
                         index = event.widget.index(
                             '@%d,%d' % (event.x, event.y))
-                        selected_tab = self.nb._nametowidget(
+                        selected_tab = self.nb.nametowidget(
                             self.nb.tabs()[index])
                     except tk.TclError:
                         return
@@ -928,6 +1184,11 @@ class Editor():
     def update_settings(self):
         self.lexer = self.settings_class.get_settings('lexer')
         self.filetypes = self.settings_class.get_settings('file_type')
+        self._highlight_all()
+
+    def lint_source(self):
+        currdir = self.tabs[self.get_tab()].file_dir
+        run_in_terminal(f'chmod 700 lint.sh && ./lint.sh {currdir} && exit')
 
 
 if __name__ == '__main__':

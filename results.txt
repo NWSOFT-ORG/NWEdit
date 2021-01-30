@@ -1,0 +1,8 @@
+************* Module None
+None:1:0: C0304: Final newline missing (missing-final-newline)
+None:1:0: C0103: Module name "None" doesn't conform to snake_case naming style (invalid-name)
+None:1:0: C0114: Missing module docstring (missing-module-docstring)
+None:1:0: W0104: Statement seems to have no effect (pointless-statement)
+
+-------------------------------------
+Your code has been rated at -30.00/10

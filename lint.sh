@@ -1,3 +1,3 @@
 #!/bin/bash
-pylint $1
+pylint $1 > results.txt
 exit

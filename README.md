@@ -9,7 +9,7 @@ The code is a modified(*enhanced*) version of
 
 **The website is at [here](http://zcg-coder.github.io/PyPlusWeb)**  
 **The website may be outdated, so please go to source release to download it.**  
-Some of the code is from pyro written by James Stalings, licensed after the GPL v4.0 License. Thanks him for the source  
+Some of the code is from pyro written by James Stalings, licensed after the GPL v3.0 License. Thanks him for the source  
 ```
 simple elegant text editor built on Python/Tkinter
     by James Stallings, June 2015

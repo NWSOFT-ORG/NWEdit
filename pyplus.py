@@ -597,7 +597,7 @@ class Editor:
         style = ThemedStyle(self.master)
         style.set_theme("black")  # Apply ttkthemes to master window.
         self.master.geometry("600x400")
-        self.master.title('PyEdit +')
+        self.master.title('PyPlus')
         self.master.iconphoto(True, tk.PhotoImage(data=('iVBORw0KGgoAAAANSUhEU\n'
                                                         '        gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA\n'
                                                         '        ABJQTFRFAAAAAAAA////TWyK////////WaqEwgAAAAZ0Uk5TAP8U/yr/h0gXnQAAAHpJREF\n'
@@ -624,7 +624,7 @@ class Editor:
         # Name can be apple only, don't really know why!
         app_menu = tk.Menu(menubar, name='apple', tearoff=0)
 
-        app_menu.add_command(label='About PyEdit +', command=self.version)
+        app_menu.add_command(label='About PyPlus', command=self.version)
 
         if _TK_VERSION < 85 or not _OSX:
             app_menu.add_command(label="Preferences...", command=self.config)
@@ -774,7 +774,7 @@ class Editor:
         textbox.event_add("<<KeyEvent>>", "<KeyRelease>")
         textbox.event_add("<<MouseEvent>>", "<ButtonRelease>")
         textbox.statusbar = ttk.Label(
-            frame, text='PyEdit +', justify='right', anchor='e')
+            frame, text='PyPlus', justify='right', anchor='e')
         textbox.statusbar.pack(side='bottom', fill='x', anchor='e')
         textbox.bind(('<Button-2>' if _OSX else '<Button-3>'),
                      self.right_click)
@@ -784,7 +784,7 @@ class Editor:
         return textbox
 
     def settitle(self, _=None):
-        self.master.title(f'PyEdit + -- {self.tabs[self.get_tab()].file_dir}')
+        self.master.title(f'PyPlus -- {self.tabs[self.get_tab()].file_dir}')
 
     def key(self, _=None):
         """Event when a key is pressed."""
@@ -799,7 +799,7 @@ class Editor:
             self.save_file()
         except Exception as e:
             print(str(e))
-            currtext.statusbar.config(text=f'PyEdit +')  # When error occurs
+            currtext.statusbar.config(text=f'PyPlus')  # When error occurs
 
     def mouse(self, _=None):
         """The action done when the mouse is clicked"""
@@ -810,7 +810,7 @@ class Editor:
             # Update statusbar and titlebar
             self.settitle()
         except Exception:
-            currtext.statusbar.config(text=f'PyEdit +')  # When error occurs
+            currtext.statusbar.config(text=f'PyPlus')  # When error occurs
 
     def _highlight_all(self):
         """Highlight the text in the text box."""

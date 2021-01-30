@@ -2,7 +2,7 @@
 # coding: utf-8
 """
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
-| pyplus.pyw -- the editor's ONLY file                |
+| pyplus.py -- the editor's ONLY file                |
 | The somehow-professional editor                     |
 | It's extremely small! (around 40 kB)                |
 | You can visit my site for more details!             |

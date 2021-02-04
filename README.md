@@ -4,12 +4,12 @@ The source code of the PyPlus editor.
 
 # The code
 
-The code is a modified(*enhanced*) version of  
+The code is a modified(*enhanced*) _version of  
 [dh7qc/python-text-editor](https://www.github.com/dh7qc/python-text-editor), licensed after the GPL v3.0 license  
 
 **The website is at [here](http://zcg-coder.github.io/PyPlusWeb)**  
 **The website may be outdated, so please go to source release to download it.**  
-Some of the code is from pyro written by James Stalings, licensed after the GPL v3.0 License. Thanks him for the source  
+Some code is from pyro written by James Stalings, licensed after the GPL v3.0 License. Thanks him for the source  
 ```
 simple elegant text editor built on Python/Tkinter
     by James Stallings, June 2015
@@ -73,3 +73,4 @@ simple elegant text editor built on Python/Tkinter
            /(delim)(text)(delim)(text) search and replace
         
         Pyro requires Tkinter and Pygment external libraries.
+```

@@ -26,12 +26,23 @@ import tkinter.filedialog
 import tkinter.font as tkFont
 import tkinter.ttk as ttk
 from tkinter import scrolledtext
-
-import pygments
-import ttkthemes
-from pygments.lexers.html import XmlLexer
 from pygments.lexers.python import PythonLexer
 from pygments.lexers.special import TextLexer
+from pygments.lexers.html import HtmlLexer
+from pygments.lexers.html import XmlLexer
+from pygments.lexers.templates import HtmlPhpLexer
+from pygments.lexers.perl import Perl6Lexer
+from pygments.lexers.ruby import RubyLexer
+from pygments.lexers.configs import IniLexer
+from pygments.lexers.configs import ApacheConfLexer
+from pygments.lexers.shell import BashLexer
+from pygments.lexers.diff import DiffLexer
+from pygments.lexers.dotnet import CSharpLexer
+from pygments.lexers.sql import MySqlLexer
+
+from pygments.styles import get_style_by_name
+import ttkthemes
+
 from ttkthemes import ThemedStyle
 
 _PLTFRM = (True if sys.platform.startswith('win') else False)
@@ -60,7 +71,7 @@ echo.
 pause
 ''')  # The batch files for building.
 _MAIN_KEY = 'Command' if _OSX else 'Control'  # MacOS uses Cmd, but others uses Ctrl
-_TK_VERSION = int(float(tk.TkVersion) * 10)  # Gets tk's version
+_TK_VERSION = int(float(tk.TkVersion) * 10)  # Gets tk's _version
 
 
 # From thonny
@@ -94,7 +105,9 @@ def get_environment_with_overrides(overrides):
     return env
 
 
-def run_in_terminal(cmd, cwd=os.getcwd(), env_overrides={}, keep_open=True, title=None):
+def run_in_terminal(cmd, cwd=os.getcwd(), env_overrides=None, keep_open=True, title=None):
+    if env_overrides is None:
+        env_overrides = {}
     env = get_environment_with_overrides(env_overrides)
 
     if not cwd or not os.path.exists(cwd):
@@ -110,7 +123,9 @@ def run_in_terminal(cmd, cwd=os.getcwd(), env_overrides={}, keep_open=True, titl
         raise RuntimeError("Can't launch terminal in " + platform.system())
 
 
-def open_system_shell(cwd, env_overrides={}):
+def open_system_shell(cwd, env_overrides=None):
+    if env_overrides is None:
+        env_overrides = {}
     env = get_environment_with_overrides(env_overrides)
 
     if platform.system() == "Darwin":
@@ -219,8 +234,8 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
 
     common_prefix = os.path.normpath(sys.prefix).rstrip("/")
     cmds = (
-        "export THOPR=" + common_prefix + " ; " +
-        cmds.replace(common_prefix + "/", "$THOPR" + "/")
+            "export THOPR=" + common_prefix + " ; " +
+            cmds.replace(common_prefix + "/", "$THOPR" + "/")
     )
     print(cmds)
 
@@ -228,8 +243,8 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
     # We'll prepare an AppleScript string literal for this
     # (http://stackoverflow.com/questions/10667800/using-quotes-in-a-applescript-string):
     cmd_as_apple_script_string_literal = (
-        '"' + cmds.replace("\\", "\\\\").replace('"',
-                                                 '\\"').replace("$", "\\$") + '"'
+            '"' + cmds.replace("\\", "\\\\").replace('"',
+                                                     '\\"').replace("$", "\\$") + '"'
     )
 
     # When Terminal is not open, then do script opens two windows.
@@ -246,20 +261,20 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
 
     # Now we can finally assemble the osascript command line
     cmd_line = (
-        "osascript"
-        + """ -e 'if application "Terminal" is running then ' """
-        + """ -e '    tell application "Terminal"' """
-        + """ -e """
-        + quotedCmd1
-        + """ -e '        activate' """
-        + """ -e '    end tell' """
-        + """ -e 'else' """
-        + """ -e '    tell application "Terminal"' """
-        + """ -e """
-        + quotedCmd2
-        + """ -e '        activate' """
-        + """ -e '    end tell' """
-        + """ -e 'end if' """
+            "osascript"
+            + """ -e 'if application "Terminal" is running then ' """
+            + """ -e '    tell application "Terminal"' """
+            + """ -e """
+            + quotedCmd1
+            + """ -e '        activate' """
+            + """ -e '    end tell' """
+            + """ -e 'else' """
+            + """ -e '    tell application "Terminal"' """
+            + """ -e """
+            + quotedCmd2
+            + """ -e '        activate' """
+            + """ -e '    end tell' """
+            + """ -e 'end if' """
     )
 
     subprocess.Popen(cmd_line, cwd=cwd, shell=True)
@@ -321,7 +336,8 @@ class Settings:
     def __init__(self):
         with open('settings.json') as f:
             self.settings = json.load(f)
-        self.lexer = self.settings['lexer']
+        self.theme = self.settings['theme']
+        self.highlight_theme = self.settings['pygments']
         self.font = self.settings['font'].split()[0]
         self.size = self.settings['font'].split()[1]
         self.filetype = self.settings['file_types']
@@ -329,15 +345,10 @@ class Settings:
     def get_settings(self, setting):
         if setting == 'font':
             return f'{self.font} {self.size}'
-        elif setting == 'lexer':
-            if self.lexer == 'txt':
-                return TextLexer
-            elif self.lexer == 'py':
-                return PythonLexer
-            elif self.lexer == 'xml':
-                return XmlLexer
-            else:
-                raise EditorErr('The lexer is invalid.')
+        elif setting == 'theme':
+            return self.theme
+        elif setting == 'pygments':
+            return self.highlight_theme
         elif setting == 'file_type':
             # Always starts with ('All files', '*.*')
             if self.filetype == 'all':
@@ -415,12 +426,12 @@ class EnhancedText(tk.scrolledtext.ScrolledText):
             # generate an event if something was added or deleted,
             # or the cursor position changed
             if (args[0] in ("insert", "replace", "delete") or
-                        args[0:3] == ("mark", "set", "insert") or
-                        args[0:2] == ("xview", "moveto") or
-                        args[0:2] == ("xview", "scroll") or
-                        args[0:2] == ("yview", "moveto") or
-                        args[0:2] == ("yview", "scroll")
-                    ):
+                    args[0:3] == ("mark", "set", "insert") or
+                    args[0:2] == ("xview", "moveto") or
+                    args[0:2] == ("xview", "scroll") or
+                    args[0:2] == ("yview", "moveto") or
+                    args[0:2] == ("yview", "scroll")
+            ):
                 self.event_generate("<<Change>>", when="tail")
 
             # return what the actual widget returned
@@ -576,7 +587,7 @@ class CustomNotebook(ttk.Notebook):
 class Document:
     """Helper class, for the editor"""
 
-    def __init__(self, Frame, TextWidget, FileDir):
+    def __init__(self, _, TextWidget, FileDir):
         self.file_dir = FileDir
         self.textbox = TextWidget
 
@@ -591,7 +602,6 @@ class Editor:
         * The file selector does not work.
         """
         self.settings_class = Settings()
-        self.lexer = self.settings_class.get_settings('lexer')
         self.master = ttkthemes.ThemedTk()
         self.master.minsize(900, 600)
         style = ThemedStyle(self.master)
@@ -624,7 +634,7 @@ class Editor:
         # Name can be apple only, don't really know why!
         app_menu = tk.Menu(menubar, name='apple', tearoff=0)
 
-        app_menu.add_command(label='About PyPlus', command=self.version)
+        app_menu.add_command(label='About PyPlus', command=self._version)
 
         if _TK_VERSION < 85 or not _OSX:
             app_menu.add_command(label="Preferences...", command=self.config)
@@ -731,43 +741,7 @@ class Editor:
 
         textbox = textframe.text  # text widget
         textbox.frame = frame  # The text will be packed into the frame.
-        # TODO: Make a better color scheme
-        textbox.tag_configure("Token.Keyword", foreground="#61EBFF")
-        textbox.tag_configure("Token.Keyword.Constant", foreground="#CC7A00")
-        textbox.tag_configure("Token.Keyword.Declaration",
-                              foreground="#CC7A00")
-        textbox.tag_configure("Token.Keyword.Namespace", foreground="#CC7A00")
-        textbox.tag_configure("Token.Keyword.Pseudo", foreground="#CC7A00")
-        textbox.tag_configure("Token.Keyword.Reserved", foreground="#CC7A00")
-        textbox.tag_configure("Token.Keyword.Type", foreground="#CC7A00")
-        textbox.tag_configure('Token.Comment.Hashbang', foreground='#73d216')
-
-        textbox.tag_configure("Token.Name.Class", foreground="#ddd313")
-        textbox.tag_configure("Token.Name.Exception", foreground="#ddd313")
-        textbox.tag_configure("Token.Name.Function", foreground="#298fb5")
-        textbox.tag_configure("Token.Name.Function.Magic",
-                              foreground="#298fb5")
-        textbox.tag_configure("Token.Name.Decorator", foreground="#298fb5")
-        textbox.tag_configure("Token.Name.Builtin", foreground="#CC7A00")
-        textbox.tag_configure("Token.Name.Builtin.Pseudo",
-                              foreground="#CC7A00")
-
-        textbox.tag_configure("Token.Comment", foreground="#767d87")
-        textbox.tag_configure("Token.Comment.Single", foreground="#767d87")
-        textbox.tag_configure("Token.Comment.Double", foreground="#767d87")
-        textbox.tag_configure("Token.Comment.Shebang", foreground="#00ff00")
-
-        textbox.tag_configure(
-            "Token.Literal.Number.Integer", foreground="#88daea")
-        textbox.tag_configure(
-            "Token.Literal.Number.Float", foreground="#88daea")
-
-        textbox.tag_configure(
-            "Token.Literal.String.Single", foreground="#35c666")
-        textbox.tag_configure(
-            "Token.Literal.String.Double", foreground="#35c666")
-        textbox.tag_configure('Token.Literal.String.Doc', foreground='#ff0000')
-        # ^ Highlight using tags
+        textbox.lexer = PythonLexer()
         textbox.bind('<Return>', self.autoindent)
         textbox.bind("<<KeyEvent>>", self.key)
         textbox.bind("<<MouseEvent>>", self.mouse)
@@ -786,17 +760,20 @@ class Editor:
     def settitle(self, _=None):
         self.master.title(f'PyPlus -- {self.tabs[self.get_tab()].file_dir}')
 
-    def key(self, _=None):
+    def key(self, event=None):
         """Event when a key is pressed."""
         currtext = self.tabs[self.get_tab()].textbox
         try:
-            self._highlight_line()
+            self.create_tags()
+            self.recolorize()
             currtext.statusbar.config(
                 text=f'PyEdit+ | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))} | col {str(int(currtext.index("insert").split(".")[1:][0]))}')
             # Update statusbar and titlebar
             self.settitle()
             # Auto-save
-            self.save_file()
+            if event.char:
+                if event.keysym not in ['Left', 'Right', 'Up', 'Down']:
+                    self.save_file()
         except Exception as e:
             print(str(e))
             currtext.statusbar.config(text=f'PyPlus')  # When error occurs
@@ -812,93 +789,67 @@ class Editor:
         except Exception:
             currtext.statusbar.config(text=f'PyPlus')  # When error occurs
 
-    def _highlight_all(self):
-        """Highlight the text in the text box."""
+    def create_tags(self):
+        """
+            thmethod creates the tags associated with each distinct style element of the
+            source code 'dressing'
+        """
         currtext = self.tabs[self.get_tab()].textbox
+        bold_font = tkFont.Font(currtext, currtext.cget("font"))
+        bold_font.configure(weight=tkFont.BOLD)
+        italic_font = tkFont.Font(currtext, currtext.cget("font"))
+        italic_font.configure(slant=tkFont.ITALIC)
+        bold_italic_font = tkFont.Font(currtext, currtext.cget("font"))
+        bold_italic_font.configure(weight=tkFont.BOLD, slant=tkFont.ITALIC)
+        style = get_style_by_name('default')
 
-        start_index = currtext.index('1.0')
-        end_index = currtext.index(tk.END)
+        for ttype, ndef in style:
+            tag_font = None
 
-        for tag in currtext.tag_names():
-            if tag == 'sel':
-                continue
-            currtext.tag_remove(
-                tag, start_index, end_index)
+            if ndef['bold'] and ndef['italic']:
+                tag_font = bold_italic_font
+            elif ndef['bold']:
+                tag_font = bold_font
+            elif ndef['italic']:
+                tag_font = italic_font
 
-        code = currtext.get(start_index, end_index)
-
-        for index, line in enumerate(code):
-            if index == 0 and line != '\n':
-                break
-            elif line == '\n':
-                start_index = currtext.index(f'{start_index}+1line')
+            if ndef['color']:
+                foreground = "#%s" % ndef['color']
             else:
-                break
+                foreground = None
 
-        currtext.mark_set('range_start', start_index)
-        for token, content in pygments.lex(code, self.lexer()):
-            currtext.mark_set('range_end', f'range_start + {len(content)}c')
-            currtext.tag_add(
-                str(token), 'range_start', 'range_end')
-            currtext.mark_set(
-                'range_start', 'range_end')
-        currtext.tag_configure('hi', foreground='white')
-        self.master.update()
-        self.master.update_idletasks()
+            currtext.tag_configure(str(ttype), foreground=foreground, font=tag_font)
 
-    def _highlight_line(self):
-        """Highlight the text in the text box."""
+    def recolorize(self):
+        """
+            this method colors and styles the prepared tags
+        """
         currtext = self.tabs[self.get_tab()].textbox
+        code = currtext.get("1.0", "end-1c")
+        tokensource = currtext.lexer.get_tokens(code)
+        start_line = 1
+        start_index = 0
+        end_line = 1
+        end_index = 0
 
-        start_index = currtext.index('insert-1c linestart')
-        end_index = currtext.index('insert-1c lineend')
-
-        tri_str_start = []
-        tri_str_end = []
-        tri_str = []
-        cursor_pos = float(currtext.index('insert'))
-        for index, linenum in enumerate(
-                currtext.tag_ranges('Token.Literal.String.Doc') + currtext.tag_ranges('Token.Literal.String.Single')):
-            if index % 2 == 1:
-                tri_str_end.append(float(str(linenum)))
+        for ttype, value in tokensource:
+            if "\n" in value:
+                end_line += value.count("\n")
+                end_index = len(value.rsplit("\n", 1)[1])
             else:
-                tri_str_start.append(float(str(linenum)))
+                end_index += len(value)
 
-        for index, value in enumerate(tri_str_start):
-            tri_str.append((value, tri_str_end[index]))
+            if value not in (" ", "\n"):
+                index1 = "%s.%s" % (start_line, start_index)
+                index2 = "%s.%s" % (end_line, end_index)
 
-        for x in tri_str:
-            if x[0] <= cursor_pos <= x[1]:
-                start_index = str(x[0])
-                end_index = str(x[1])
-                break
+                for tagname in currtext.tag_names(index1):  # FIXME
+                    currtext.tag_remove(tagname, index1, index2)
 
-        for tag in currtext.tag_names():
-            if tag == 'sel':
-                continue
-            currtext.tag_remove(
-                tag, start_index, end_index)
+                currtext.tag_add(str(ttype), index1, index2)
 
-        code = currtext.get(start_index, end_index)
-
-        for index, line in enumerate(code):
-            if index == 0 and line != '\n':
-                break
-            elif line == '\n':
-                start_index = currtext.index(f'{start_index}+1line')
-            else:
-                break
-
-        currtext.mark_set('range_start', start_index)
-        for token, content in pygments.lex(code, self.lexer()):
-            currtext.mark_set('range_end', f'range_start + {len(content)}c')
-            currtext.tag_add(
-                str(token), 'range_start', 'range_end')
-            currtext.mark_set(
-                'range_start', 'range_end')
-        currtext.tag_configure('hi', foreground='white')
-        self.master.update()
-        self.master.update_idletasks()
+            start_line = end_line
+            start_index = end_index
 
     def open_file(self, file=''):
         """Opens a file
@@ -914,6 +865,7 @@ class Editor:
         if file_dir:
             try:
                 file = open(file_dir)
+                extens = file_dir.split('.')[-1]
 
                 new_tab = ttk.Frame(self.nb)
                 self.tabs[new_tab] = Document(new_tab,
@@ -922,12 +874,42 @@ class Editor:
                 self.nb.select(new_tab)
 
                 # Puts the contents of the file into the text widget.
-                self.tabs[new_tab].textbox.insert('end',
-                                                  file.read().replace('\t', ' ' * 4))
+                currtext = self.tabs[new_tab].textbox
+                currtext.insert('end',
+                                file.read().replace('\t', ' ' * 4))
                 # Inserts file content, replacing tabs with four spaces
-                self.tabs[new_tab].textbox.focus_set()
+                currtext.focus_set()
                 self.mouse()
-                self._highlight_all()
+                if extens == "py" or extens == "pyw" or extens == "sc" or extens == "sage" or extens == "tac":
+                    currtext.lexer = (PythonLexer())
+                elif extens == "txt" or extens == "README" or extens == "text":
+                    currtext.lexer = (TextLexer())
+                elif extens == "htm" or extens == "html" or extens == "css" or extens == "js" or extens == "md":
+                    currtext.lexer = (HtmlLexer())
+                elif extens == "xml" or extens == "xsl" or extens == "rss" or extens == "xslt" or extens == "xsd" or extens == "wsdl" or extens == "wsf":
+                    currtext.lexer = (XmlLexer())
+                elif extens == "php" or extens == "php5":
+                    currtext.lexer = (HtmlPhpLexer())
+                elif extens == "pl" or extens == "pm" or extens == "nqp" or extens == "p6" or extens == "6pl" or extens == "p6l" or extens == "pl6" or extens == "pm" or extens == "p6m" or extens == "pm6" or extens == "t":
+                    currtext.lexer = (Perl6Lexer())
+                elif extens == "rb" or extens == "rbw" or extens == "rake" or extens == "rbx" or extens == "duby" or extens == "gemspec":
+                    currtext.lexer = (RubyLexer())
+                elif extens == "ini" or extens == "init":
+                    currtext.lexer = (IniLexer())
+                elif extens == "conf" or extens == "cnf" or extens == "config":
+                    currtext.lexer = (ApacheConfLexer())
+                elif extens == "sh" or extens == "cmd" or extens == "bashrc" or extens == "bash_profile":
+                    currtext.lexer = (BashLexer())
+                elif extens == "diff" or extens == "patch":
+                    currtext.lexer = (DiffLexer())
+                elif extens == "cs":
+                    currtext.lexer = (CSharpLexer())
+                elif extens == "sql":
+                    currtext.lexer = (MySqlLexer())
+                else:
+                    currtext.lexer = (TextLexer())
+                self.create_tags()
+                self.recolorize()
             except Exception:
                 return
 
@@ -945,8 +927,8 @@ class Editor:
                 return
 
             self.tabs[curr_tab].file_dir = file_dir
-            self.tabs[curr_tab].file_name = os.path.basename(file_dir)
-            self.nb.tab(curr_tab, text=self.tabs[curr_tab].file_name)
+            self.tabs[curr_tab].file_dir = os.path.basename(file_dir)
+            self.nb.tab(curr_tab, text=self.tabs[curr_tab].file_dir)
             file = open(file_dir, 'w')
             file.write(self.tabs[curr_tab].textbox.get(1.0, 'end'))
             file.close()
@@ -990,11 +972,12 @@ class Editor:
 
     def cut(self, textbox=None):
         try:
-            sel = self.tabs[self.get_tab()].textbox.get(
+            currtext = self.tabs[self.get_tab()].textbox
+            sel = currtext.get(
                 tk.SEL_FIRST, tk.SEL_LAST)
             textbox.clipboard_clear()
             textbox.clipboard_append(sel)
-            self.tabs[self.get_tab()].textbox.delete(tk.SEL_FIRST, tk.SEL_LAST)
+            currtext.delete(tk.SEL_FIRST, tk.SEL_LAST)
             self.key()
         except:
             pass
@@ -1006,7 +989,7 @@ class Editor:
         except:
             pass
 
-    def select_all(self, *args):
+    def select_all(self, _=None):
         try:
             curr_tab = self.get_tab()
             self.tabs[curr_tab].textbox.tag_add(tk.SEL, '1.0', tk.END)
@@ -1015,7 +998,7 @@ class Editor:
         except:
             pass
 
-    def build(self, *args):
+    def build(self, _=None):
         """Builds the file
         Steps:
         1) Writes build code into the batch file.
@@ -1240,8 +1223,8 @@ class Editor:
             except tk.TclError:
                 return
 
-    def version(self):
-        """Shows the version and related info of the editor."""
+    def _version(self):
+        """Shows the _version and related info of the editor."""
         ver = tk.Toplevel()
         style = ThemedStyle(ver)
         style.set_theme('black')  # Applies the ttk theme
@@ -1257,9 +1240,9 @@ class Editor:
         self.open_file('settings.json')
 
     def update_settings(self):
-        self.lexer = self.settings_class.get_settings('lexer')
         self.filetypes = self.settings_class.get_settings('file_type')
-        self._highlight_all()
+        self.create_tags()
+        self.recolorize()
 
     def lint_source(self):
         currdir = self.tabs[self.get_tab()].file_dir

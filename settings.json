@@ -1,5 +1,6 @@
 {
-  "file_types": "py",
+  "file_types": "all",
   "font": "Menlo 13",
-  "lexer": "py"
+  "theme": "black",
+  "pygments": "default"
 }

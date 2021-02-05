@@ -2,5 +2,6 @@
   "file_types": "all",
   "font": "Menlo 13",
   "theme": "black",
-  "pygments": "default"
+  "pygments": "default",
+  "mainclr": "black"
 }

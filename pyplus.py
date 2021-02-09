@@ -78,6 +78,7 @@ pause
 _MAIN_KEY = 'Command' if _OSX else 'Control'  # MacOS uses Cmd, but others uses Ctrl
 _TK_VERSION = int(float(tk.TkVersion) * 10)  # Gets tkinter's _version
 
+
 # </editor-fold>
 
 
@@ -156,7 +157,7 @@ def _add_to_path(directory, path):
     # If the directory contains only one Python distribution executables, then
     # it probably won't be in path yet and therefore will be prepended.
     if (directory in path.split(os.pathsep) or platform.system() == "Windows"
-        and directory.lower() in path.lower().split(os.pathsep)):
+            and directory.lower() in path.lower().split(os.pathsep)):
         return path
     else:
         return directory + os.pathsep + path
@@ -282,11 +283,11 @@ def _get_linux_terminal_command():
     xte = shutil.which("x-terminal-emulator")
     if xte:
         if os.path.realpath(xte).endswith("/lxterminal") and shutil.which(
-            "lxterminal"):
+                "lxterminal"):
             # need to know exact program, because it needs special treatment
             return "lxterminal"
         elif os.path.realpath(xte).endswith("/terminator") and shutil.which(
-            "terminator"):
+                "terminator"):
             # https://github.com/thonny/thonny/issues/1129
             return "terminator"
         else:
@@ -294,7 +295,7 @@ def _get_linux_terminal_command():
     # Older konsole didn't pass on the environment
     elif shutil.which("konsole"):
         if (shutil.which("gnome-terminal")
-            and "gnome" in os.environ.get("DESKTOP_SESSION", "").lower()):
+                and "gnome" in os.environ.get("DESKTOP_SESSION", "").lower()):
             return "gnome-terminal"
         else:
             return "konsole"
@@ -322,6 +323,7 @@ def _normalize_path(s):
 # /cfa19387a89fda77d20c01f634dfd044525d5c8b/python_console.py
 class Pipe:
     """mock stdin stdout or stderr"""
+
     def __init__(self):
         self.buffer = queue.Queue()
         self.reading = False
@@ -341,6 +343,7 @@ class Pipe:
 
 class Console(ttk.Frame):
     """A tkinter widget which behaves like an interpreter"""
+
     def __init__(self, parent, _locals=None, exit_callback=None):
         super().__init__(parent)
 
@@ -441,6 +444,7 @@ class ConsoleText(ScrolledText):
     A Text widget which handles some application logic,
     e.g. having a line of input at the end with everything else being un-editable
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -524,8 +528,8 @@ class ConsoleText(ScrolledText):
             self.mark_gravity("committed_text", tk.LEFT)
 
             # re-apply colours
-            for tag_name, start, end in self.console_tags:
-                self.tag_add(tag_name, start, end)
+            for tag_name, _start, _end in self.console_tags:
+                self.tag_add(tag_name, _start, _end)
 
     def read_last_line(self):
         """Read the user input, i.e. everything written after the committed text"""
@@ -540,6 +544,7 @@ class ConsoleText(ScrolledText):
 
 class EditorErr(Exception):
     """A nice exception class for debugging"""
+
     def __init__(self, message):
         # The error (e+m)
         super().__init__(
@@ -548,6 +553,7 @@ class EditorErr(Exception):
 
 class Settings:
     """A class to read data to/from settings.json"""
+
     def __init__(self):
         with open('settings.json') as f:
             self.settings = json.load(f)
@@ -567,7 +573,7 @@ class Settings:
         elif setting == 'file_type':
             # Always starts with ('All files', '*.*')
             if self.filetype == 'all':
-                return (('All files', '*.*'), )
+                return (('All files', '*.*'),)
             elif self.filetype == 'py':
                 # Extend this list, since Python has a lot of file types
                 return ('All files', '*.*'), ('Python Files',
@@ -587,6 +593,7 @@ class Settings:
 
 class TextLineNumbers(tk.Canvas):
     """Line numbers class for tkinter text widgets. From stackoverflow."""
+
     def __init__(self, *args, **kwargs):
         tk.Canvas.__init__(self, *args, **kwargs)
         self.textwidget = None
@@ -595,13 +602,13 @@ class TextLineNumbers(tk.Canvas):
         self.textwidget = text_widget
 
     def cv_return(self, event=None):
-      self.textwidget.tag_remove('sel',
-      '1.0', 'end')
-      self.textwidget.tag_add("sel",
-      f"{event.widget['text']}.0",
-      f"{event.widget['text']}.end")
-      self.textwidget.mark_set('insert',
-      f"{event.widget['text']}.end")
+        self.textwidget.tag_remove('sel',
+                                   '1.0', 'end')
+        self.textwidget.tag_add("sel",
+                                f"{event.widget['text']}.0",
+                                f"{event.widget['text']}.end")
+        self.textwidget.mark_set('insert',
+                                 f"{event.widget['text']}.end")
 
     def redraw(self, line):
         """redraw line numbers"""
@@ -617,8 +624,6 @@ class TextLineNumbers(tk.Canvas):
             y = dline[1]
             linenum = str(i).split(".")[0]
             if str(int(float(i))) == str(line):
-                bold_font = font.Font(family=Settings().get_settings('font'),
-                                      weight="bold")
                 line = tk.Label(self,
                                 fg="black",
                                 bg=self.cget('bg'),
@@ -647,6 +652,7 @@ class EnhancedText(tk.Text):
     """Text widget, but 'records' your key actions
     If you hit a key, or the text widget's content has changed,
     it generats an event, to redraw the line numbers."""
+
     def __init__(self, *args, **kwargs):
         tk.Text.__init__(self, *args, **kwargs)
 
@@ -659,17 +665,17 @@ class EnhancedText(tk.Text):
         try:
             # The text widget might throw an error while pasting text!
             # let the actual widget perform the requested action
-            cmd = (self._orig, ) + args
+            cmd = (self._orig,) + args
             result = self.tk.call(cmd)
 
             # generate an event if something was added or deleted,
             # or the cursor position changed
             if (args[0] in ("insert", "replace", "delete")
-                or args[0:3] == ("mark", "set", "insert")
-                or args[0:2] == ("xview", "moveto")
-                or args[0:2] == ("xview", "scroll")
-                or args[0:2] == ("yview", "moveto")
-                or args[0:2] == ("yview", "scroll")):
+                    or args[0:3] == ("mark", "set", "insert")
+                    or args[0:2] == ("xview", "moveto")
+                    or args[0:2] == ("xview", "scroll")
+                    or args[0:2] == ("yview", "moveto")
+                    or args[0:2] == ("yview", "scroll")):
                 self.event_generate("<<Change>>", when="tail")
 
             # return what the actual widget returned
@@ -688,19 +694,19 @@ class EnhancedTextFrame(ttk.Frame):
         settings_class = Settings()
         self.font = settings_class.get_settings('font')
         self.text = EnhancedText(self,
-                                  bg='black',
-                                  fg='white',
-                                  insertbackground='white',
-                                  selectforeground='black',
-                                  selectbackground='white',
-                                  highlightthickness=0,
-                                  font=self.font,
-                                  wrap='none')
+                                 bg='black',
+                                 fg='white',
+                                 insertbackground='white',
+                                 selectforeground='black',
+                                 selectbackground='white',
+                                 highlightthickness=0,
+                                 font=self.font,
+                                 wrap='none')
         self.linenumbers = TextLineNumbers(self,
-                                            width=30,
-                                            bg='darkgray',
-                                            bd=0,
-                                            highlightthickness=0)
+                                           width=30,
+                                           bg='darkgray',
+                                           bd=0,
+                                           highlightthickness=0)
         self.linenumbers.attach(self.text)
         self.linenumbers.pack(side="left", fill="y")
         yscroll = ttk.Scrollbar(self, command=self.text.yview)
@@ -710,7 +716,6 @@ class EnhancedTextFrame(ttk.Frame):
 
         self.text.bind("<<Change>>", self._on_change)
         self.text.bind("<Configure>", self._on_change)
-
 
     def _on_change(self, _=None):
         currline = int(float(self.text.index('insert linestart')))
@@ -806,17 +811,17 @@ class CustomNotebook(ttk.Notebook):
         })])
         style.layout("CustomNotebook.Tab", [("CustomNotebook.tab", {
             "sticky":
-            "nswe",
+                "nswe",
             "children": [("CustomNotebook.padding", {
                 "side":
-                "top",
+                    "top",
                 "sticky":
-                "nswe",
+                    "nswe",
                 "children": [("CustomNotebook.focus", {
                     "side":
-                    "top",
+                        "top",
                     "sticky":
-                    "nswe",
+                        "nswe",
                     "children": [
                         ("CustomNotebook.label", {
                             "side": "left",
@@ -838,6 +843,7 @@ class CustomNotebook(ttk.Notebook):
 
 class Document:
     """Helper class, for the editor"""
+
     def __init__(self, _, TextWidget, FileDir):
         self.file_dir = FileDir
         self.textbox = TextWidget
@@ -845,6 +851,7 @@ class Document:
 
 class Editor:
     """The editor class."""
+
     def __init__(self):
         """The editor object, the entire thing that goes in the
         window.
@@ -1037,8 +1044,7 @@ class Editor:
             self.create_tags()
             self.recolorize()
             currtext.statusbar.config(
-                text=
-                f'PyEdit+ | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))}'
+                text=f'PyEdit+ | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))}'
                 f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
             )
             # Update statusbar and titlebar
@@ -1055,8 +1061,7 @@ class Editor:
         currtext = self.tabs[self.get_tab()].textbox
         try:
             currtext.statusbar.config(
-                text=
-                f"PyEdit+ | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} "
+                text=f"PyEdit+ | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} "
                 f"| col {str(int(currtext.index('insert').split('.')[1:][0]))}"
             )
             # Update statusbar and titlebar
@@ -1102,8 +1107,8 @@ class Editor:
             this method colors and styles the prepared tags
         """
         currtext = self.tabs[self.get_tab()].textbox
-        code = currtext.get("1.0", "end-1c")
-        tokensource = currtext.lexer.get_tokens(code)
+        _code = currtext.get("1.0", "end-1c")
+        tokensource = currtext.lexer.get_tokens(_code)
         start_line = 1
         start_index = 0
         end_line = 1
@@ -1168,16 +1173,16 @@ class Editor:
                 elif extens == "htm" or extens == "html" or extens == "css" or extens == "js" or extens == "md":
                     currtext.lexer = (HtmlLexer())
                 elif extens == "xml" or extens == "xsl" or extens == "rss" or extens == "xslt" or extens == "xsd" or \
-                                    extens == "wsdl" or extens == "wsf":
+                        extens == "wsdl" or extens == "wsf":
                     currtext.lexer = (XmlLexer())
                 elif extens == "php" or extens == "php5":
                     currtext.lexer = (HtmlPhpLexer())
                 elif extens == "pl" or extens == "pm" or extens == "nqp" or extens == "p6" or extens == "6pl" or \
-                                    extens == "p6l" or extens == "pl6" or extens == "pm" or extens == "p6m" or extens == "pm6" \
-                                    or extens == "t":
+                        extens == "p6l" or extens == "pl6" or extens == "pm" or extens == "p6m" or extens == "pm6" \
+                        or extens == "t":
                     currtext.lexer = (Perl6Lexer())
                 elif extens == "rb" or extens == "rbw" or extens == "rake" or extens == "rbx" or extens == "duby" or \
-                                    extens == "gemspec":
+                        extens == "gemspec":
                     currtext.lexer = (RubyLexer())
                 elif extens == "ini" or extens == "init":
                     currtext.lexer = (IniLexer())
@@ -1324,8 +1329,8 @@ class Editor:
             currtext.mark_set(
                 'insert',
                 '%d.%s' % (int(float(currtext.index('insert'))),
-                           str(int(currtext.index('insert').split('.')[1:][0]) \
-                                        - 1)))
+                           str(int(currtext.index('insert').split('.')[1:][0])
+                               - 1)))
             self.key()
         # Others
         elif event.char == '(':
@@ -1333,24 +1338,24 @@ class Editor:
             currtext.mark_set(
                 'insert',
                 '%d.%s' % (int(float(currtext.index('insert'))),
-                           str(int(currtext.index('insert').split('.')[1:][0]) \
-                                        - 1)))
+                           str(int(currtext.index('insert').split('.')[1:][0])
+                               - 1)))
             return 'break'
         elif event.char == '[':
             currtext.insert('insert', ']')
             currtext.mark_set(
                 'insert',
                 '%d.%s' % (int(float(currtext.index('insert'))),
-                           str(int(currtext.index('insert').split('.')[1:][0]) \
-                                        - 1)))
+                           str(int(currtext.index('insert').split('.')[1:][0])
+                               - 1)))
             return 'break'
         elif event.char == '{':
             currtext.insert('insert', '}')
             currtext.mark_set(
                 'insert',
                 '%d.%s' % (int(float(currtext.index('insert'))),
-                           str(int(currtext.index('insert').split('.')[1:][0]) \
-                                        - 1)))
+                           str(int(currtext.index('insert').split('.')[1:][0])
+                               - 1)))
             return 'break'
 
     def autoindent(self, _=None):

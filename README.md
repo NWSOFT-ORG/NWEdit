@@ -52,7 +52,7 @@ simple elegant text editor built on Python/Tkinter
            
            It does this in an austere text editor framework which is essentially a glue layer
            bringing together the tk text widget with the Pygment library for styling displayed
-           text. Editor status line is in the window title.
+           text. _Editor status line is in the window title.
            
            Pyro comes with one serious warning: it is a user-space editor. It makes no effort
            to monitor state-change events on files and so should not be used in situations

@@ -902,6 +902,7 @@ class Editor:
 		filemenu.add_command(label='Close Tab',
 		                     command=self.close_tab,
 		                     accelerator=f'{_MAIN_KEY}-w')
+		filemenu.add_command(label='Reload from disk', command=self.reload)
 		filemenu.add_separator()
 		filemenu.add_command(label='Exit Editor',
 		                     command=self.exit,
@@ -1165,27 +1166,18 @@ class Editor:
 				elif extens == "htm" or extens == "html" or extens == "css" or extens == "js" or extens == "md":
 					currtext.lexer = (HtmlLexer())
 				elif extens == "xml" or extens == "xsl" or extens == "rss" or extens == "xslt" or extens == "xsd" or \
-                        extens == "wsdl" or extens == "wsf":
+                                    extens == "wsdl" or extens == "wsf":
 					currtext.lexer = (XmlLexer())
 				elif extens == "php" or extens == "php5":
 					currtext.lexer = (HtmlPhpLexer())
-				elif extens == "pl" or extens == "pm" or extens == "nqp" or extens == "p6" or extens == "6pl" or \
-                        extens == "p6l" or extens == "pl6" or extens == "pm" or extens == "p6m" or extens == "pm6" \
-                        or extens == "t":
-					currtext.lexer = (Perl6Lexer())
-				elif extens == "rb" or extens == "rbw" or extens == "rake" or extens == "rbx" or extens == "duby" or \
-                        extens == "gemspec":
-					currtext.lexer = (RubyLexer())
 				elif extens == "ini" or extens == "init":
 					currtext.lexer = (IniLexer())
 				elif extens == "conf" or extens == "cnf" or extens == "config":
 					currtext.lexer = (ApacheConfLexer())
-				elif extens == "sh" or extens == "cmd" or extens == "bashrc" or extens == "bash_profile":
+				elif extens == "sh" or extens == "bashrc" or extens == "bash_profile":
 					currtext.lexer = (BashLexer())
 				elif extens == "diff" or extens == "patch":
 					currtext.lexer = (DiffLexer())
-				elif extens == "cs":
-					currtext.lexer = (CSharpLexer())
 				elif extens == "sql":
 					currtext.lexer = (MySqlLexer())
 				else:
@@ -1497,10 +1489,13 @@ class Editor:
 
 			self.nb.forget(selected_tab)
 			self.tabs.pop(selected_tab)
-			if len(self.tabs) == 0:
-				self.open_file('HI.txt')
-		except Exception:
-			pass
+		except Exception as e:
+			print(str(e))
+
+	def reload(self):
+		file_dir = self.tabs[self.get_tab()].file_dir
+		self.close_tab()
+		self.open_file(file_dir)
 
 	@staticmethod
 	def exit():

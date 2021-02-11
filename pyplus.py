@@ -1048,9 +1048,8 @@ class Editor:
             # Update statusbar and titlebar
             self.settitle()
             # Auto-save
-            if event.char:
-                if event.keysym not in ['Left', 'Right', 'Up', 'Down']:
-                    self.save_file()
+            if event.char and event.keysym not in ('Left', 'Right', 'Up', 'Down'):
+                self.save_file()
         except Exception:
             currtext.statusbar.config(text=f'PyPlus')  # When error occurs
 
@@ -1137,7 +1136,7 @@ class Editor:
         If a file is not provided, a messagebox'll
         pop up to ask the user to select the path.
         """
-        if not file:
+        if type(file) != 'str':
             file_dir = (tkinter.filedialog.askopenfilename(
                 master=self.master,
                 initialdir='/',

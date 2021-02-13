@@ -1,6 +1,6 @@
 {
   "file_types": "all",
-  "font": "Courier 13",
+  "font": "Consolas 13",
   "theme": "black",
   "pygments": "default",
   "mainclr": "black"

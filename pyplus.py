@@ -36,6 +36,8 @@ from tkinter.scrolledtext import ScrolledText
 
 import ttkthemes
 from pygments.lexers.configs import ApacheConfLexer
+from pygments.lexers.javascript import JavascriptLexer
+from pygments.lexers.css import CssLexer
 from pygments.lexers.configs import IniLexer
 from pygments.lexers.html import HtmlLexer
 from pygments.lexers.html import XmlLexer
@@ -43,6 +45,7 @@ from pygments.lexers.python import PythonLexer
 from pygments.lexers.shell import BashLexer
 from pygments.lexers.special import TextLexer
 from pygments.lexers.templates import HtmlPhpLexer
+from pygments.lexers.data import JsonLexer
 from pygments.styles import get_style_by_name
 from ttkthemes import ThemedStyle
 
@@ -162,7 +165,7 @@ def _add_to_path(directory, path):
         return directory + os.pathsep + path
 
 
-def _run_in_terminal_in_windows(cmd, cwd, env, keep_open, title=None):
+def _run_in_terminal_in_windows(cmd, cwd, env, keep_open, title='Command Prompt'):
     if keep_open:
         # Yes, the /K argument has weird quoting. Can't explain this, but it works
         quoted_args = " ".join(
@@ -600,6 +603,7 @@ class TextLineNumbers(tk.Canvas):
     def attach(self, text_widget):
         self.textwidget = text_widget
 
+
     def cv_return(self, event=None):
         self.textwidget.tag_remove('sel', '1.0', 'end')
         self.textwidget.tag_add("sel", f"{event.widget['text']}.0",
@@ -620,28 +624,15 @@ class TextLineNumbers(tk.Canvas):
             y = dline[1]
             linenum = str(i).split(".")[0]
             if str(int(float(i))) == str(line):
-                line = tk.Label(self,
-                                fg="black",
-                                bg=self.cget('bg'),
-                                font=(self.textwidget['font'] + " bold"),
-                                text=linenum,
-                                relief="flat",
-                                bd=0,
-                                justify='left')
-                line.bind('<Button-1>', self.cv_return)
-                self.create_window(2, y, anchor="nw", window=line)
+                bold = font.Font(family=self.textwidget['font'], weight='bold')
+                line = self.create_text(2, y, anchor="nw", text=linenum,
+                                 fill='black', font=bold)
+                self.tag_bind(line, '<Button-1>', self.cv_return)
             else:
-                line = tk.Label(self,
-                                fg="black",
-                                bg=self.cget('bg'),
-                                font=self.textwidget['font'],
-                                text=linenum,
-                                relief="flat",
-                                bd=0,
-                                justify='left')
-                line.bind('<Button-1>', self.cv_return)
-                self.create_window(2, y, anchor="nw", window=line)
+                self.create_text(2, y, anchor="nw", text=linenum,
+                                 fill='black', font=self.textwidget['font'])
             i = self.textwidget.index("%s+1line" % i)
+
 
 
 class EnhancedText(tk.Text):
@@ -700,7 +691,7 @@ class EnhancedTextFrame(ttk.Frame):
                                  wrap='none')
         self.linenumbers = TextLineNumbers(self,
                                            width=30,
-                                           bg='darkgray',
+                                           bg='gray',
                                            bd=0,
                                            highlightthickness=0)
         self.linenumbers.attach(self.text)
@@ -994,7 +985,7 @@ class Editor:
 
         # Keyboard bindings
         self.master.bind(f'<{_MAIN_KEY}-w>', self.close_tab)
-        self.master.bind(f'<{_MAIN_KEY}-o>', self.open_file)
+        self.master.bind(f'<{_MAIN_KEY}-o>', self._open)
         self.master.bind(f'<{_MAIN_KEY}-z>', self.undo)
         self.master.bind(f'<{_MAIN_KEY}-Z>', self.redo)
         self.master.bind(f'<{_MAIN_KEY}-b>', self.build)
@@ -1136,7 +1127,7 @@ class Editor:
         If a file is not provided, a messagebox'll
         pop up to ask the user to select the path.
         """
-        if type(file) != 'str':
+        if not file:
             file_dir = (tkinter.filedialog.askopenfilename(
                 master=self.master,
                 initialdir='/',
@@ -1163,11 +1154,13 @@ class Editor:
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
                 self.mouse()
-                if extens == "py" or extens == "pyw" or extens == "sc" or extens == "sage" or extens == "tac":
+                if extens == 'py' or extens == 'pyw'or  extens == 'jy'or  extens == 'sage'or  extens == 'sc'or  extens == 'SConstruct'\
+                   or extens == 'SConscript'or  extens == 'bzl'or  extens == 'BUCK'or  extens == 'BUILD'or  file_dir =='BUILD.bazel'\
+                   or extens == 'WORKSPACE'or  extens == 'tac':
                     currtext.lexer = (PythonLexer())
-                elif extens == "txt" or extens == "README" or extens == "text":
+                elif extens == "txt" or extens == "text":
                     currtext.lexer = (TextLexer())
-                elif extens == "htm" or extens == "html" or extens == "css" or extens == "js" or extens == "md":
+                elif extens == "htm" or extens == "html" or extens == 'xhtml':
                     currtext.lexer = (HtmlLexer())
                 elif extens == "xml" or extens == "xsl" or extens == "rss" or extens == "xslt" or extens == "xsd" or \
                         extens == "wsdl" or extens == "wsf":
@@ -1178,8 +1171,16 @@ class Editor:
                     currtext.lexer = (IniLexer())
                 elif extens == "conf" or extens == "cnf" or extens == "config":
                     currtext.lexer = (ApacheConfLexer())
-                elif extens == "sh" or extens == "bashrc" or extens == "bash_profile":
+                elif extens == 'sh'  or extens == 'ksh' or  extens == 'bash'  or extens == 'ebuild'  or extens == 'eclass'\
+                     or extens == 'exheres-0'  or extens == 'exlib'  or extens == 'zsh'  or extens == 'bashrc'\
+                     or extens == 'PKGBUILD':
                     currtext.lexer = (BashLexer())
+                elif extens == "json":
+                    currtext.lexer = (JsonLexer())
+                elif extens == 'js' or extens == 'javascript':
+                    currtext.lexer = (JavascriptLexer())
+                elif extens =='css':
+                    currtext.lexer = (CssLexer())
                 else:
                     currtext.lexer = (TextLexer())
                 self.create_tags()
@@ -1187,36 +1188,17 @@ class Editor:
             except Exception:
                 return
 
-    def save_as(self):
-        """Saves a *new* file"""
-        if len(self.tabs) > 0:
-            curr_tab = self.get_tab()
-            file_dir = (tkinter.filedialog.asksaveasfilename(
-                master=self.master,
-                initialdir='/',
-                title='Save As...',
-                filetypes=self.filetypes,
-                defaultextension='.py'))
-            if not file_dir:
-                return
-
-            self.tabs[curr_tab].file_dir = file_dir
-            self.tabs[curr_tab].file_dir = os.path.basename(file_dir)
-            self.nb.tab(curr_tab, text=self.tabs[curr_tab].file_dir)
-            file = open(file_dir, 'w')
-            file.write(self.tabs[curr_tab].textbox.get(1.0, 'end'))
-            file.close()
+    def _open(self, event=None):
+        """This method just prompts the user to open a file when C-O is pressed"""
+        self.open_file()
 
     def save_file(self, _=None):
         """Saves an *existing* file"""
         try:
             curr_tab = self.get_tab()
-            if not self.tabs[curr_tab].file_dir:
-                self.save_as()
-            else:
-                with open(self.tabs[curr_tab].file_dir, 'w') as file:
-                    file.write(self.tabs[curr_tab].textbox.get(1.0,
-                                                               'end').strip())
+            with open(self.tabs[curr_tab].file_dir, 'w') as file:
+                file.write(self.tabs[curr_tab].textbox.get(1.0,
+                                                           'end').strip())
         except Exception:
             pass
 
@@ -1386,10 +1368,20 @@ class Editor:
                            insertbackground='white',
                            highlightthickness=0)
         content.pack(side='left', fill='both')
-        content.focus_set()
-        find_button = ttk.Button(search_frame, text='Highlight Matches')
+
+        ttk.Label(search_frame, text='Replacement: ').pack(side='left',
+                                                           anchor='nw',
+                                                           fill='y')
+        repl = tk.Entry(search_frame,
+                           background='black',
+                           foreground='white',
+                           insertbackground='white',
+                           highlightthickness=0)
+        repl.pack(side='left', fill='both')
+
+        find_button = ttk.Button(search_frame, text='Highlight All')
         find_button.pack(side='left')
-        clear_button = ttk.Button(search_frame, text='Clear Highlights')
+        clear_button = ttk.Button(search_frame, text='Clear All')
         clear_button.pack(side='left')
 
         case_button = ttk.Button(search_frame, text='Case Sensitive[0]')
@@ -1397,6 +1389,9 @@ class Editor:
 
         reg_button = ttk.Button(search_frame, text='RegExp[0]')
         reg_button.pack(side='left')
+
+        repl_button = ttk.Button(search_frame, text='Replace all')
+        repl_button.pack(side='left')
 
         def find(_=None):
             text = self.tabs[self.get_tab()].textbox
@@ -1416,6 +1411,25 @@ class Editor:
                     text.tag_add('found', idx, lastidx)
                     idx = lastidx
                 text.tag_config('found', foreground='red', background='yellow')
+        def replace():
+            text = self.tabs[self.get_tab()].textbox
+            text.tag_remove('found', '1.0', 'end')
+            s = content.get()
+            r = repl.get()
+            if s:
+                idx = '1.0'
+                while 1:
+                    idx = text.search(s,
+                                      idx,
+                                      nocase=(not case),
+                                      stopindex='end',
+                                      regexp=(not regexp))
+                    if not idx:
+                        break
+                    lastidx = '%s+%dc' % (idx, len(s))
+                    text.delete(idx, lastidx)
+                    text.insert(idx, r)
+                    idx = lastidx
 
         def clear():
             text = self.tabs[self.get_tab()].textbox
@@ -1443,6 +1457,7 @@ class Editor:
         clear_button.config(command=clear)
         case_button.config(command=case_yn)
         reg_button.config(command=regexp_yn)
+        repl_button.config(command=replace)
 
         def _exit():
             search_frame.pack_forget()

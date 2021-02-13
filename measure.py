@@ -1,3 +1,5 @@
+#!/usr/local/bin/python3
+# TODO: Port this to Windows
 import sys
 import time
 

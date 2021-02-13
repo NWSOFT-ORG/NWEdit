@@ -49,30 +49,31 @@ from pygments.lexers.data import JsonLexer
 from pygments.styles import get_style_by_name
 from ttkthemes import ThemedStyle
 
-os.chdir(Path(__file__).parent)  # This will fix it!
+_APPDIR = Path(__file__).parent
+os.chdir(_APPDIR)  # This will fix it!
 
 # <editor-fold desc="The constant values">
 _PLTFRM = (True if sys.platform.startswith('win') else False)
 _OSX = (True if sys.platform.startswith('darwin') else False)
 _BATCH_BUILD = ('''#!/bin/bash
 set +v
-python3 ./measure.py start
-python3 -c 'print("==================== OUTPUT ====================")'
-python3 {}
-python3 -c 'print("================================================")'
+{cmd} {dir}/measure.py start
+printf "================================================\n"
+{cmd} {file}
+printf "================================================\n"
 echo Program Finished With Exit Code $?
-python3 ./measure.py stop
+{dir}/measure.py stop
 echo Press enter to continue...
 read -s  # This will pause the script
 ''' if not _PLTFRM else '''@echo off
 title Build Results
-measure.py start
+{dir}/measure.py start
 echo.
 echo.
 echo ----------------------------------------------------
-python3 {}
+{cmd} {file}
 echo Program Finished With Exit Code %ERRORLEVEL%
-measure.py stop
+{dir}/measure.py stop
 echo ----------------------------------------------------
 echo.
 pause
@@ -603,13 +604,6 @@ class TextLineNumbers(tk.Canvas):
     def attach(self, text_widget):
         self.textwidget = text_widget
 
-
-    def cv_return(self, event=None):
-        self.textwidget.tag_remove('sel', '1.0', 'end')
-        self.textwidget.tag_add("sel", f"{event.widget['text']}.0",
-                                f"{event.widget['text']}.end")
-        self.textwidget.mark_set('insert', f"{event.widget['text']}.end")
-
     def redraw(self, line):
         """redraw line numbers"""
         self.delete("all")
@@ -623,16 +617,15 @@ class TextLineNumbers(tk.Canvas):
                 break
             y = dline[1]
             linenum = str(i).split(".")[0]
+
             if str(int(float(i))) == str(line):
                 bold = font.Font(family=self.textwidget['font'], weight='bold')
-                line = self.create_text(2, y, anchor="nw", text=linenum,
-                                 fill='black', font=bold)
-                self.tag_bind(line, '<Button-1>', self.cv_return)
+                self.create_text(2, y, anchor="nw", text=linenum,
+                                        fill='black', font=bold)
             else:
                 self.create_text(2, y, anchor="nw", text=linenum,
-                                 fill='black', font=self.textwidget['font'])
+                                        fill='black', font=self.textwidget['font'])
             i = self.textwidget.index("%s+1line" % i)
-
 
 
 class EnhancedText(tk.Text):
@@ -1034,7 +1027,7 @@ class Editor:
             self.recolorize()
             currtext.statusbar.config(
                 text=f'PyPlus | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))}'
-                f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
+                     f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
             )
             # Update statusbar and titlebar
             self.settitle()
@@ -1050,7 +1043,7 @@ class Editor:
         try:
             currtext.statusbar.config(
                 text=f"PyPlus | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} "
-                f"| col {str(int(currtext.index('insert').split('.')[1:][0]))}"
+                     f"| col {str(int(currtext.index('insert').split('.')[1:][0]))}"
             )
             # Update statusbar and titlebar
             self.settitle()
@@ -1154,9 +1147,9 @@ class Editor:
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
                 self.mouse()
-                if extens == 'py' or extens == 'pyw'or  extens == 'jy'or  extens == 'sage'or  extens == 'sc'or  extens == 'SConstruct'\
-                   or extens == 'SConscript'or  extens == 'bzl'or  extens == 'BUCK'or  extens == 'BUILD'or  file_dir =='BUILD.bazel'\
-                   or extens == 'WORKSPACE'or  extens == 'tac':
+                if extens == 'py' or extens == 'pyw' or extens == 'jy' or extens == 'sage' or extens == 'sc' \
+                        or extens == 'SConstruct' or extens == 'SConscript' or extens == 'bzl' or extens == 'BUCK' \
+                        or extens == 'BUILD' or file_dir == 'BUILD.bazel' or extens == 'WORKSPACE' or extens == 'tac':
                     currtext.lexer = (PythonLexer())
                 elif extens == "txt" or extens == "text":
                     currtext.lexer = (TextLexer())
@@ -1171,15 +1164,15 @@ class Editor:
                     currtext.lexer = (IniLexer())
                 elif extens == "conf" or extens == "cnf" or extens == "config":
                     currtext.lexer = (ApacheConfLexer())
-                elif extens == 'sh'  or extens == 'ksh' or  extens == 'bash'  or extens == 'ebuild'  or extens == 'eclass'\
-                     or extens == 'exheres-0'  or extens == 'exlib'  or extens == 'zsh'  or extens == 'bashrc'\
-                     or extens == 'PKGBUILD':
+                elif extens == 'sh' or extens == 'ksh' or extens == 'bash' or extens == 'ebuild' or extens == 'eclass' \
+                        or extens == 'exheres-0' or extens == 'exlib' or extens == 'zsh' or extens == 'bashrc' \
+                        or extens == 'PKGBUILD':
                     currtext.lexer = (BashLexer())
                 elif extens == "json":
                     currtext.lexer = (JsonLexer())
                 elif extens == 'js' or extens == 'javascript':
                     currtext.lexer = (JavascriptLexer())
-                elif extens =='css':
+                elif extens == 'css':
                     currtext.lexer = (CssLexer())
                 else:
                     currtext.lexer = (TextLexer())
@@ -1188,7 +1181,7 @@ class Editor:
             except Exception:
                 return
 
-    def _open(self, event=None):
+    def _open(self, _=None):
         """This method just prompts the user to open a file when C-O is pressed"""
         self.open_file()
 
@@ -1263,15 +1256,20 @@ class Editor:
             if _PLTFRM:  # Windows
                 with open('build.bat', 'w') as f:
                     f.write((_BATCH_BUILD.format(
-                        self.tabs[self.get_tab()].file_dir)))
+                        dir=_APPDIR,
+                        file=self.tabs[self.get_tab()].file_dir,
+                        cmd='python')))
                 run_in_terminal('build.bat && exit')
             else:
                 with open('build.sh', 'w') as f:
                     f.write((_BATCH_BUILD.format(
-                        self.tabs[self.get_tab()].file_dir)))
-                os.system('chmod 700 build.sh')
+                        dir=_APPDIR,
+                        file=self.tabs[self.get_tab()].file_dir,
+                        cmd='python3')))
+                os.system('chmod 700 build.sh && chmod 700 measure.py')
                 run_in_terminal('./build.sh && exit')
-        except Exception:
+        except Exception as e:
+            print(e)
             messagebox.showerror('Error',
                                  'Terminal emulator cannot be detected.')
 
@@ -1373,10 +1371,10 @@ class Editor:
                                                            anchor='nw',
                                                            fill='y')
         repl = tk.Entry(search_frame,
-                           background='black',
-                           foreground='white',
-                           insertbackground='white',
-                           highlightthickness=0)
+                        background='black',
+                        foreground='white',
+                        insertbackground='white',
+                        highlightthickness=0)
         repl.pack(side='left', fill='both')
 
         find_button = ttk.Button(search_frame, text='Highlight All')
@@ -1411,6 +1409,7 @@ class Editor:
                     text.tag_add('found', idx, lastidx)
                     idx = lastidx
                 text.tag_config('found', foreground='red', background='yellow')
+
         def replace():
             text = self.tabs[self.get_tab()].textbox
             text.tag_remove('found', '1.0', 'end')

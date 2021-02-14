@@ -7,6 +7,7 @@ authors = ["repl.it user <replituser@example.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 ttkthemes = "^3.2.0"
+autopep8 = "^1.5.5"
 
 [tool.poetry.dev-dependencies]
 

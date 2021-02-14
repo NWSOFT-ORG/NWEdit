@@ -57,25 +57,27 @@ _PLTFRM = (True if sys.platform.startswith('win') else False)
 _OSX = (True if sys.platform.startswith('darwin') else False)
 _BATCH_BUILD = ('''#!/bin/bash
 set +v
-{cmd} {dir}/measure.py start
+python3 {dir}/measure.py start
 printf "================================================\n"
-{cmd} {file}
+{cmd} "{file}"
 printf "================================================\n"
 echo Program Finished With Exit Code $?
-{dir}/measure.py stop
+python3 {dir}/measure.py stop
 echo Press enter to continue...
 read -s  # This will pause the script
+rm timertemp.txt
 ''' if not _PLTFRM else '''@echo off
 title Build Results
 {dir}/measure.py start
 echo.
 echo.
 echo ----------------------------------------------------
-{cmd} {file}
+{cmd} "{file}"
 echo Program Finished With Exit Code %ERRORLEVEL%
 {dir}/measure.py stop
 echo ----------------------------------------------------
 echo.
+del timertemp.txt
 pause
 ''')  # The batch files for building.
 _MAIN_KEY = 'Command' if _OSX else 'Control'  # MacOS uses Cmd, but others uses Ctrl
@@ -1151,31 +1153,47 @@ class Editor:
                         or extens == 'SConstruct' or extens == 'SConscript' or extens == 'bzl' or extens == 'BUCK' \
                         or extens == 'BUILD' or file_dir == 'BUILD.bazel' or extens == 'WORKSPACE' or extens == 'tac':
                     currtext.lexer = (PythonLexer())
+                    currtext.cmd = 'python3'
                 elif extens == "txt" or extens == "text":
                     currtext.lexer = (TextLexer())
+                    currtext.cmd = 'more'
                 elif extens == "htm" or extens == "html" or extens == 'xhtml':
                     currtext.lexer = (HtmlLexer())
+                    if _PLTFRM: currtext.cmd = 'start'
+                    elif _OSX: currtext.cmd = 'open'
+                    else: currtext.cmd = 'xdg-open'
                 elif extens == "xml" or extens == "xsl" or extens == "rss" or extens == "xslt" or extens == "xsd" or \
                         extens == "wsdl" or extens == "wsf":
                     currtext.lexer = (XmlLexer())
+                    currtext.cmd = 'more'
                 elif extens == "php" or extens == "php5":
                     currtext.lexer = (HtmlPhpLexer())
+                    if _PLTFRM: currtext.cmd = 'start'
+                    elif _OSX: currtext.cmd = 'open'
+                    else: currtext.cmd = 'xdg-open'
                 elif extens == "ini" or extens == "init":
                     currtext.lexer = (IniLexer())
+                    currtext.cmd = 'more'
                 elif extens == "conf" or extens == "cnf" or extens == "config":
                     currtext.lexer = (ApacheConfLexer())
+                    currtext.cmd = 'more'
                 elif extens == 'sh' or extens == 'ksh' or extens == 'bash' or extens == 'ebuild' or extens == 'eclass' \
                         or extens == 'exheres-0' or extens == 'exlib' or extens == 'zsh' or extens == 'bashrc' \
                         or extens == 'PKGBUILD':
                     currtext.lexer = (BashLexer())
+                    currtext.cmd = 'bash'
                 elif extens == "json":
                     currtext.lexer = (JsonLexer())
+                    currtext.cmd = 'more'
                 elif extens == 'js' or extens == 'javascript':
                     currtext.lexer = (JavascriptLexer())
+                    currtext.cmd = 'node'
                 elif extens == 'css':
                     currtext.lexer = (CssLexer())
+                    currtext.cmd = 'more'
                 else:
                     currtext.lexer = (TextLexer())
+                    currtext.cmd = 'more'
                 self.create_tags()
                 self.recolorize()
             except Exception:
@@ -1258,18 +1276,17 @@ class Editor:
                     f.write((_BATCH_BUILD.format(
                         dir=_APPDIR,
                         file=self.tabs[self.get_tab()].file_dir,
-                        cmd='python')))
+                        cmd=self.tabs[self.get_tab()].textbox.cmd)))
                 run_in_terminal('build.bat && exit')
             else:
                 with open('build.sh', 'w') as f:
                     f.write((_BATCH_BUILD.format(
                         dir=_APPDIR,
                         file=self.tabs[self.get_tab()].file_dir,
-                        cmd='python3')))
+                        cmd=self.tabs[self.get_tab()].textbox.cmd)))
                 os.system('chmod 700 build.sh && chmod 700 measure.py')
                 run_in_terminal('./build.sh && exit')
-        except Exception as e:
-            print(e)
+        except Exception:
             messagebox.showerror('Error',
                                  'Terminal emulator cannot be detected.')
 

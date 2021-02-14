@@ -1,13 +1,87 @@
-************* Module test
-/Users/Andy/Documents/test.py:7:0: C0304: Final newline missing (missing-final-newline)
-/Users/Andy/Documents/test.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-/Users/Andy/Documents/test.py:1:0: C0103: Function name "hi" doesn't conform to snake_case naming style (invalid-name)
-/Users/Andy/Documents/test.py:1:0: C0116: Missing function or method docstring (missing-function-docstring)
-/Users/Andy/Documents/test.py:3:8: C0103: Variable name "x" doesn't conform to snake_case naming style (invalid-name)
-/Users/Andy/Documents/test.py:1:0: R1711: Useless return at end of function or method (useless-return)
-/Users/Andy/Documents/test.py:3:8: W0612: Unused variable 'x' (unused-variable)
+************* Module settings
+settings.json:1:0: W0104: Statement seems to have no effect (pointless-statement)
 
-------------------------------------
-Your code has been rated at -1.67/10
 
-[0m
+Report
+======
+1 statements analysed.
+
+Statistics by type
+------------------
+
++---------+-------+-----------+-----------+------------+---------+
+|type     |number |old number |difference |%documented |%badname |
++=========+=======+===========+===========+============+=========+
+|module   |1      |NC         |NC         |NC          |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+|class    |0      |NC         |NC         |0           |0        |
++---------+-------+-----------+-----------+------------+---------+
+|method   |0      |NC         |NC         |0           |0        |
++---------+-------+-----------+-----------+------------+---------+
+|function |0      |NC         |NC         |0           |0        |
++---------+-------+-----------+-----------+------------+---------+
+
+
+
+Raw metrics
+-----------
+
++----------+-------+------+---------+-----------+
+|type      |number |%     |previous |difference |
++==========+=======+======+=========+===========+
+|code      |3      |33.33 |NC       |NC         |
++----------+-------+------+---------+-----------+
+|docstring |5      |55.56 |NC       |NC         |
++----------+-------+------+---------+-----------+
+|comment   |0      |0.00  |NC       |NC         |
++----------+-------+------+---------+-----------+
+|empty     |1      |11.11 |NC       |NC         |
++----------+-------+------+---------+-----------+
+
+
+
+Duplication
+-----------
+
++-------------------------+------+---------+-----------+
+|                         |now   |previous |difference |
++=========================+======+=========+===========+
+|nb duplicated lines      |0     |NC       |NC         |
++-------------------------+------+---------+-----------+
+|percent duplicated lines |0.000 |NC       |NC         |
++-------------------------+------+---------+-----------+
+
+
+
+Messages by category
+--------------------
+
++-----------+-------+---------+-----------+
+|type       |number |previous |difference |
++===========+=======+=========+===========+
+|convention |0      |NC       |NC         |
++-----------+-------+---------+-----------+
+|refactor   |0      |NC       |NC         |
++-----------+-------+---------+-----------+
+|warning    |1      |NC       |NC         |
++-----------+-------+---------+-----------+
+|error      |0      |NC       |NC         |
++-----------+-------+---------+-----------+
+
+
+
+Messages
+--------
+
++--------------------+------------+
+|message id          |occurrences |
++====================+============+
+|pointless-statement |1           |
++--------------------+------------+
+
+
+
+
+-----------------------------------
+Your code has been rated at 0.00/10
+

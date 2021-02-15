@@ -8,6 +8,8 @@ authors = ["repl.it user <replituser@example.com>"]
 python = "^3.8"
 ttkthemes = "^3.2.0"
 autopep8 = "^1.5.5"
+pygments = "^2.8.0"
+pylint = "^2.6.0"
 
 [tool.poetry.dev-dependencies]
 

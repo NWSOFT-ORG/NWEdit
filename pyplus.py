@@ -350,19 +350,20 @@ def _normalize_path(s):
 # </editor-fold>
 
 # HEX View
-# Copyright © 2016-20 Qtrac Ltd. All rights reserved.
-# This program or module is free software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as published
-# by the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version. It is provided for educational
-# purposes and is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-# General Public License for more details.
-
 
 class HexView:
     def __init__(self, parent):
+        """
+        Copyright © 2016-20 Qtrac Ltd. All rights reserved.
+        This program or module is free software: you can redistribute it and/or
+        modify it under the terms of the GNU General Public License as published
+        by the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version. It is provided for educational
+        purposes and is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+        General Public License for more details.
+        """
         self.parent = parent
         self.create_variables()
         self.create_widgets()
@@ -377,9 +378,9 @@ class HexView:
 
     def create_widgets(self):
         frame = self.frame = ttk.Frame(self.parent)
-        self.offsetLabel = ttk.Label(frame, text="Offset", underline=1)
+        self.offsetLabel = ttk.Label(frame, text="Offset")
         self.offsetSpinbox = Spinbox(
-            frame, from_=0, textvariable=self.offset, increment=BLOCK_SIZE)
+            frame, from_=0, textvariable=self.offset, increment=BLOCK_SIZE, foreground='black')
         self.encodingLabel = ttk.Label(frame, text="Encoding", underline=0)
         self.encodingCombobox = ttk.Combobox(
             frame, values=ENCODINGS, textvariable=self.encoding, state="readonly")
@@ -413,7 +414,7 @@ class HexView:
         for variable in (self.offset, self.encoding):
             variable.trace_variable("w", self.show_block)
 
-    def show_block(self):
+    def show_block(self, *_):
         self.viewText.config(state='normal')
         self.viewText.delete("1.0", "end")
         if not self.filename:
@@ -1087,9 +1088,12 @@ class Editor:
                                   command=self.build,
                                   accelerator=f'{_MAIN_KEY}-b')
         self.codemenu.add_command(label='Lint', command=self.lint_source)
-        self.codemenu.add_command(label='Search',
+        self.codemenu.add_command(label='Auto-format', command=self.autopep)
+        self.codemenu.add_separator()
+        self.codemenu.add_command(label='Find and replace',
                                   command=self.search,
                                   accelerator=f'{_MAIN_KEY}-f')
+        self.codemenu.add_separator()
         self.codemenu.add_command(label='Open Python Shell',
                                   command=self.open_shell)
 
@@ -1133,8 +1137,6 @@ class Editor:
         self.mouse()
         self.master.after(0, self.update_settings)
 
-        # self.open_file('pyplus.py')
-
         def tab(_=None):
             self.tabs[self.get_tab()].textbox.insert(
                 'insert', ' ' * 4)  # Convert tabs to spaces
@@ -1161,6 +1163,7 @@ class Editor:
         textbox = textframe.text  # text widget
         textbox.frame = frame  # The text will be packed into the frame.
         textbox.lexer = PythonLexer()
+        textbox.lint_cmd = 'pylint'
         textbox.bind('<Return>', self.autoindent)
         textbox.bind("<<KeyEvent>>", self.key)
         textbox.bind("<<MouseEvent>>", self.mouse)
@@ -1854,7 +1857,8 @@ class Editor:
     def autopep(self):
         """Auto Pretty-Format the document"""
         currdir = self.tabs[self.get_tab()].file_dir
-        run_in_terminal(f'autopep8 {currdir}')
+        subprocess.run(f'autopep8 "{currdir}" --in-place', shell=True)
+        self.reload()
 
     def goto(self, _=None):
         if len(self.tabs) == 0:
@@ -1888,4 +1892,5 @@ class Editor:
                    width=1).pack(side='right', anchor='se')
 
 
-Editor()
+if __name__ == '__main__':
+    Editor()

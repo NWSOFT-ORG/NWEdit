@@ -74,3 +74,4 @@ simple elegant text editor built on Python/Tkinter
         
         Pyro requires Tkinter and Pygment external libraries.
 ```
+Also from thonny, licensed after the MIT License.

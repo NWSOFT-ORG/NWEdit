@@ -34,6 +34,26 @@ version = "0.4.4"
 
 [[package]]
 category = "main"
+description = "Pythonic argument parser, that will make you smile"
+name = "docopt"
+optional = false
+python-versions = "*"
+version = "0.6.2"
+
+[[package]]
+category = "main"
+description = "Lints an HTML5 file using Google's style guide"
+name = "html-linter"
+optional = false
+python-versions = "*"
+version = "0.4.0"
+
+[package.dependencies]
+docopt = ">=0.6.1"
+template-remover = "*"
+
+[[package]]
+category = "main"
 description = "A Python utility / library to sort Python imports."
 name = "isort"
 optional = false
@@ -91,10 +111,10 @@ description = "python code static checker"
 name = "pylint"
 optional = false
 python-versions = ">=3.5.*"
-version = "2.6.0"
+version = "2.6.2"
 
 [package.dependencies]
-astroid = ">=2.4.0,<=2.5"
+astroid = ">=2.4.0,<2.5"
 colorama = "*"
 isort = ">=4.2.5,<6"
 mccabe = ">=0.6,<0.7"
@@ -110,6 +130,17 @@ version = "1.15.0"
 
 [[package]]
 category = "main"
+description = "Remove the template markup from html files"
+name = "template-remover"
+optional = false
+python-versions = "*"
+version = "0.1.9"
+
+[package.dependencies]
+docopt = ">=0.6.1"
+
+[[package]]
+category = "main"
 description = "Python Library for Tom's Obvious, Minimal Language"
 name = "toml"
 optional = false
@@ -122,7 +153,7 @@ description = "A group of themes for the ttk extensions of Tkinter with a Tkinte
 name = "ttkthemes"
 optional = false
 python-versions = ">=3.5"
-version = "3.2.0"
+version = "3.2.2"
 
 [package.dependencies]
 pillow = "*"
@@ -136,7 +167,7 @@ python-versions = "*"
 version = "1.12.1"
 
 [metadata]
-content-hash = "d4247bf86546979b5a24ff31ced4f03e84b6d680b570cce87d204cea2c4bbdc1"
+content-hash = "ffc76f5899c50157c12381b99273a2df756873e15860f3e92736d70d5cf233b9"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -151,6 +182,12 @@ autopep8 = [
 colorama = [
     {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
     {file = "colorama-0.4.4.tar.gz", hash = "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b"},
+]
+docopt = [
+    {file = "docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"},
+]
+html-linter = [
+    {file = "html-linter-0.4.0.tar.gz", hash = "sha256:342dad677f2fc810a2562fde0959046ed0d8fa1387bd9e085869e908c1941191"},
 ]
 isort = [
     {file = "isort-5.7.0-py3-none-any.whl", hash = "sha256:fff4f0c04e1825522ce6949973e83110a6e907750cd92d128b0d14aaaadbffdc"},
@@ -226,19 +263,22 @@ pygments = [
     {file = "Pygments-2.8.0.tar.gz", hash = "sha256:37a13ba168a02ac54cc5891a42b1caec333e59b66addb7fa633ea8a6d73445c0"},
 ]
 pylint = [
-    {file = "pylint-2.6.0-py3-none-any.whl", hash = "sha256:bfe68f020f8a0fece830a22dd4d5dddb4ecc6137db04face4c3420a46a52239f"},
-    {file = "pylint-2.6.0.tar.gz", hash = "sha256:bb4a908c9dadbc3aac18860550e870f58e1a02c9f2c204fdf5693d73be061210"},
+    {file = "pylint-2.6.2-py3-none-any.whl", hash = "sha256:e71c2e9614a4f06e36498f310027942b0f4f2fde20aebb01655b31edc63b9eaf"},
+    {file = "pylint-2.6.2.tar.gz", hash = "sha256:718b74786ea7ed07aa0c58bf572154d4679f960d26e9641cc1de204a30b87fc9"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
+]
+template-remover = [
+    {file = "template-remover-0.1.9.tar.gz", hash = "sha256:480f1ce63f56affac1edb29356afcca1260e8409cd928fcf9438fc149df5ff41"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
     {file = "toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"},
 ]
 ttkthemes = [
-    {file = "ttkthemes-3.2.0.tar.gz", hash = "sha256:c5a8f3377c2c3e9da53ed63d38dd0c015b3c8a524653be99c2f473c7057b3d69"},
+    {file = "ttkthemes-3.2.2.tar.gz", hash = "sha256:01daed001f2ff0e4f32832a0d9ea48176c0c505203b030756bdde3bd1bcb21d2"},
 ]
 wrapt = [
     {file = "wrapt-1.12.1.tar.gz", hash = "sha256:b62ffa81fb85f4332a4f609cab4ac40709470da05643a082ec1eb88e6d9b97d7"},

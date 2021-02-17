@@ -391,7 +391,8 @@ class HexView:
             self.frame,
             height=BLOCK_HEIGHT,
             width=2 + (BLOCK_WIDTH * 4),
-            state='disabled')
+            state='disabled',
+            wrap='none')
         self.viewText.tag_configure("ascii", foreground="green")
         self.viewText.tag_configure("error", foreground="red")
         self.viewText.tag_configure("hexspace", foreground="navy")
@@ -1308,7 +1309,7 @@ class Editor:
 
         if file_dir:
             try:  # If the file is in binary, ask the user to open in Hex editor
-                if is_binary_string(open(file_dir, 'rb').read(1024)):
+                if is_binary_string(open(file_dir, 'rb').read()):
                     if messagebox.askyesno(
                             'Error',
                             'This file is in binary format, \n'

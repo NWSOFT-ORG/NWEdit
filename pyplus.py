@@ -30,22 +30,19 @@ import tkinter.filedialog
 import tkinter.font as font
 import tkinter.messagebox as messagebox
 import tkinter.ttk as ttk
-import traceback
 from pathlib import Path
 from tkinter.scrolledtext import ScrolledText
 
 import ttkthemes
-from pygments.lexers.configs import ApacheConfLexer
-from pygments.lexers.configs import IniLexer
-from pygments.lexers.css import CssLexer
-from pygments.lexers.data import JsonLexer
-from pygments.lexers.html import HtmlLexer
-from pygments.lexers.html import XmlLexer
-from pygments.lexers.javascript import JavascriptLexer
-from pygments.lexers.python import PythonLexer
-from pygments.lexers.shell import BashLexer
-from pygments.lexers.special import TextLexer
-from pygments.lexers.templates import HtmlPhpLexer
+from pygments.lexers.configs import *
+from pygments.lexers.css import *
+from pygments.lexers.data import *
+from pygments.lexers.html import *
+from pygments.lexers.javascript import *
+from pygments.lexers.python import *
+from pygments.lexers.shell import *
+from pygments.lexers.special import *
+from pygments.lexers.templates import *
 from pygments.styles import get_style_by_name
 from ttkthemes import ThemedStyle
 
@@ -95,15 +92,14 @@ exit
 {cmd} %1 > results.txt
 exit''')
 _MAIN_KEY = 'Command' if _OSX else 'Control'  # MacOS uses Cmd, but others uses Ctrl
-_TK_VERSION = int(float(tk.TkVersion) * 10)  # Gets tkinter's _version
-Spinbox = ttk.Spinbox
-APPNAME = "PyPlus HexEdit"
+_TK_VERSION = int(float(tk.TkVersion) * 10)  # Gets tkinter's version
 BLOCK_WIDTH = 16
 BLOCK_HEIGHT = 32
 BLOCK_SIZE = BLOCK_WIDTH * BLOCK_HEIGHT
 ENCODINGS = ("ASCII", "CP037", "CP850", "CP1140", "CP1252", "Latin1",
              "ISO8859_15", "Mac_Roman", "UTF-8", "UTF-8-sig", "UTF-16",
              "UTF-32")
+
 
 # </editor-fold>
 
@@ -159,7 +155,7 @@ def run_in_terminal(cmd,
         _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open)
     else:
         messagebox.showerror('Error',
-                                 'Cannot run this command in terminal')
+                             'Cannot run this command in terminal')
 
 
 def open_system_shell(cwd='~', env_overrides=None):
@@ -177,7 +173,7 @@ def open_system_shell(cwd='~', env_overrides=None):
         subprocess.Popen(cmd, cwd=cwd, env=env, shell=True)
     else:
         messagebox.showerror('Error',
-                                 'Cannot run this command in terminal')
+                             'Cannot run this command in terminal')
 
 
 def _add_to_path(directory, path):
@@ -185,7 +181,7 @@ def _add_to_path(directory, path):
     # If the directory contains only one Python distribution executables, then
     # it probably won't be in path yet and therefore will be prepended.
     if (directory in path.split(os.pathsep) or platform.system() == "Windows"
-        and directory.lower() in path.lower().split(os.pathsep)):
+            and directory.lower() in path.lower().split(os.pathsep)):
         return path
     else:
         return directory + os.pathsep + path
@@ -315,11 +311,11 @@ def _get_linux_terminal_command():
     xte = shutil.which("x-terminal-emulator")
     if xte:
         if os.path.realpath(xte).endswith("/lxterminal") and shutil.which(
-            "lxterminal"):
+                "lxterminal"):
             # need to know exact program, because it needs special treatment
             return "lxterminal"
         elif os.path.realpath(xte).endswith("/terminator") and shutil.which(
-            "terminator"):
+                "terminator"):
             # https://github.com/thonny/thonny/issues/1129
             return "terminator"
         else:
@@ -327,7 +323,7 @@ def _get_linux_terminal_command():
     # Older konsole didn't pass on the environment
     elif shutil.which("konsole"):
         if (shutil.which("gnome-terminal")
-            and "gnome" in os.environ.get("DESKTOP_SESSION", "").lower()):
+                and "gnome" in os.environ.get("DESKTOP_SESSION", "").lower()):
             return "gnome-terminal"
         else:
             return "konsole"
@@ -350,8 +346,6 @@ def _normalize_path(s):
 
 # </editor-fold>
 
-# HEX View
-
 
 class HexView:
     def __init__(self, parent):
@@ -367,38 +361,30 @@ class HexView:
         General Public License for more details.
         """
         self.parent = parent
-        self.create_variables()
-        self.create_widgets()
-        self.create_layout()
-        self.create_bindings()
-
-    def create_variables(self):
+        self.filename = None
         self.offset = tk.IntVar()
         self.offset.set(0)
         self.encoding = tk.StringVar()
         self.encoding.set(ENCODINGS[0])
 
-    def create_widgets(self):
         frame = self.frame = ttk.Frame(self.parent)
         self.offsetLabel = ttk.Label(frame, text="Offset")
-        self.offsetSpinbox = Spinbox(frame,
-                                     from_=0,
-                                     textvariable=self.offset,
-                                     increment=BLOCK_SIZE,
-                                     foreground='black')
+        self.offsetSpinbox = ttk.Spinbox(frame,
+                                         from_=0,
+                                         textvariable=self.offset,
+                                         increment=BLOCK_SIZE,
+                                         foreground='black')
         self.encodingLabel = ttk.Label(frame, text="Encoding", underline=0)
         self.encodingCombobox = ttk.Combobox(frame,
                                              values=ENCODINGS,
                                              textvariable=self.encoding,
                                              state="readonly")
-        self.create_view()
-
-    def create_view(self):
         self.viewText = tk.Text(self.frame,
                                 height=BLOCK_HEIGHT,
                                 width=2 + (BLOCK_WIDTH * 4),
                                 state='disabled',
                                 wrap='none')
+
         self.viewText.tag_configure("ascii", foreground="green")
         self.viewText.tag_configure("error", foreground="red")
         self.viewText.tag_configure("hexspace", foreground="navy")
@@ -407,15 +393,13 @@ class HexView:
         self.viewText['yscrollcommand'] = yscroll.set
         yscroll.grid(row=1, column=7, sticky='ns')
 
-    def create_layout(self):
         for column, widget in enumerate(
-            (self.offsetLabel, self.offsetSpinbox, self.encodingLabel,
-             self.encodingCombobox)):
+                (self.offsetLabel, self.offsetSpinbox, self.encodingLabel,
+                 self.encodingCombobox)):
             widget.grid(row=0, column=column, sticky=tk.W)
         self.viewText.grid(row=1, column=0, columnspan=6, sticky='nsew')
         self.frame.grid(row=0, column=0, sticky='nsew')
 
-    def create_bindings(self):
         self.parent.bind("<Alt-f>", lambda *args: self.offsetSpinbox.focus())
         self.parent.bind("<Alt-e>",
                          lambda *args: self.encodingCombobox.focus())
@@ -449,7 +433,7 @@ class HexView:
             if byte in b"\t\n\r\v\f":
                 tags = ("hexspace", "graybg")
             elif 0x20 < byte < 0x7F:
-                tags = ("ascii", )
+                tags = ("ascii",)
             self.viewText.insert("end", "{:02X}".format(byte), tags)
             self.viewText.insert("end", " ")
         if len(row) < BLOCK_WIDTH:
@@ -462,22 +446,22 @@ class HexView:
             tags = ()
             if char in "\u2028\u2029\t\n\r\v\f\uFFFD":
                 char = "."
-                tags = ("graybg" if char == "\uFFFD" else "error", )
+                tags = ("graybg" if char == "\uFFFD" else "error",)
             elif 0x20 < ord(char) < 0x7F:
-                tags = ("ascii", )
+                tags = ("ascii",)
             elif not 0x20 <= ord(char) <= 0xFFFF:  # Tcl/Tk limit
                 char = "?"
-                tags = ("error", )
+                tags = ("error",)
             self.viewText.insert("end", char, tags)
         self.viewText.insert("end", "\n")
         self.viewText.config(state='disabled')
 
     def open(self, filename):
         if filename and os.path.exists(filename):
-            self.parent.title("{} — {}".format(filename, APPNAME))
+            self.parent.title("{} — {}".format(filename, "PyPlus"))
             size = os.path.getsize(filename)
             size = (size - BLOCK_SIZE if size > BLOCK_SIZE else size -
-                    BLOCK_WIDTH)
+                                                                BLOCK_WIDTH)
             self.offsetSpinbox.config(to=max(size, 0))
             self.filename = filename
             self.show_block()
@@ -487,6 +471,7 @@ class HexView:
 # /cfa19387a89fda77d20c01f634dfd044525d5c8b/python_console.py
 class Pipe:
     """mock stdin stdout or stderr"""
+
     def __init__(self):
         self.buffer = queue.Queue()
         self.reading = False
@@ -506,6 +491,7 @@ class Pipe:
 
 class Console(ttk.Frame):
     """A tkinter widget which behaves like an interpreter"""
+
     def __init__(self, parent, _locals=None, exit_callback=None):
         super().__init__(parent)
 
@@ -576,10 +562,8 @@ class Console(ttk.Frame):
             compiled = code.compile_command(command)
             is_complete_command = compiled is not None
         except (SyntaxError, OverflowError, ValueError):
-            # if there is an error compiling the command, print it to the console
             self.text.consume_last_line()
             self.prompt()
-            traceback.print_exc(0)
             return
 
         # if it is a complete command
@@ -606,6 +590,7 @@ class ConsoleText(ScrolledText):
     A Text widget which handles some application logic,
     e.g. having a line of input at the end with everything else being un-editable
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -707,6 +692,7 @@ class ConsoleText(ScrolledText):
 
 class EditorErr(Exception):
     """A nice exception class for debugging"""
+
     def __init__(self, message):
         # The error (e+m)
         super().__init__(
@@ -715,6 +701,7 @@ class EditorErr(Exception):
 
 class Settings:
     """A class to read data to/from settings.json"""
+
     def __init__(self):
         try:
             with open('settings.json') as f:
@@ -725,8 +712,9 @@ class Settings:
             self.size = self.settings['font'].split()[1]
             self.filetype = self.settings['file_types']
             return
-        except:
-            messagebox.showerror("Error", "Setings are corrupted. Now using default ones.")
+        except Exception:
+            messagebox.showerror(
+                "Error", "Setings are corrupted. Now using default ones.")
             with open('settings.json', 'w') as f:
                 f.write('''{
   "file_types": "all",
@@ -753,7 +741,7 @@ class Settings:
         elif setting == 'file_type':
             # Always starts with ('All files', '*.* *')
             if self.filetype == 'all':
-                return (('All files', '*.* *'), )
+                return (('All files', '*.* *'),)
             elif self.filetype == 'py':
                 # Extend this list, since Python has a lot of file types
                 return ('All files',
@@ -769,13 +757,14 @@ class Settings:
             else:
                 if messagebox.showerror('Error', 'The settings aren\'t correct, \n\
                 Now using default settings.'):
-                    return (('All files', '*.* *'), )
+                    return (('All files', '*.* *'),)
         else:
             raise EditorErr('The setting is not defined')
 
 
 class TextLineNumbers(tk.Canvas):
     """Line numbers class for tkinter text widgets. From stackoverflow."""
+
     def __init__(self, *args, **kwargs):
         tk.Canvas.__init__(self, *args, **kwargs)
         self.textwidget = None
@@ -819,6 +808,7 @@ class EnhancedText(tk.Text):
     """Text widget, but 'records' your key actions
     If you hit a key, or the text widget's content has changed,
     it generats an event, to redraw the line numbers."""
+
     def __init__(self, *args, **kwargs):
         tk.Text.__init__(self, *args, **kwargs)
 
@@ -831,17 +821,17 @@ class EnhancedText(tk.Text):
         try:
             # The text widget might throw an error while pasting text!
             # let the actual widget perform the requested action
-            cmd = (self._orig, ) + args
+            cmd = (self._orig,) + args
             result = self.tk.call(cmd)
 
             # generate an event if something was added or deleted,
             # or the cursor position changed
             if (args[0] in ("insert", "replace", "delete")
-                or args[0:3] == ("mark", "set", "insert")
-                or args[0:2] == ("xview", "moveto")
-                or args[0:2] == ("xview", "scroll")
-                or args[0:2] == ("yview", "moveto")
-                or args[0:2] == ("yview", "scroll")):
+                    or args[0:3] == ("mark", "set", "insert")
+                    or args[0:2] == ("xview", "moveto")
+                    or args[0:2] == ("xview", "scroll")
+                    or args[0:2] == ("yview", "moveto")
+                    or args[0:2] == ("yview", "scroll")):
                 self.event_generate("<<Change>>", when="tail")
 
             # return what the actual widget returned
@@ -854,6 +844,7 @@ class EnhancedText(tk.Text):
 class EnhancedTextFrame(ttk.Frame):
     """An enhanced text frame to put the
     text widget with linenumbers in."""
+
     def __init__(self, *args, **kwargs):
         ttk.Frame.__init__(self, *args, **kwargs)
         settings_class = Settings()
@@ -890,7 +881,12 @@ class EnhancedTextFrame(ttk.Frame):
 
 class CustomNotebook(ttk.Notebook):
     """A ttk Notebook with close buttons on each tab
-        images drawn by me using the mspaint app (the rubbish in many people's opinion)"""
+        images drawn by me using the mspaint app (the rubbish in many people's opinion)
+
+    Change the layout, makes it look like this:
+    +------------+
+    | title   [X]|
+    +-------------------------"""
 
     __initialized = False
 
@@ -976,17 +972,17 @@ class CustomNotebook(ttk.Notebook):
         })])
         style.layout("CustomNotebook.Tab", [("CustomNotebook.tab", {
             "sticky":
-            "nswe",
+                "nswe",
             "children": [("CustomNotebook.padding", {
                 "side":
-                "top",
+                    "top",
                 "sticky":
-                "nswe",
+                    "nswe",
                 "children": [("CustomNotebook.focus", {
                     "side":
-                    "top",
+                        "top",
                     "sticky":
-                    "nswe",
+                        "nswe",
                     "children": [
                         ("CustomNotebook.label", {
                             "side": "left",
@@ -1002,14 +998,9 @@ class CustomNotebook(ttk.Notebook):
         })])
 
 
-# Change the layout, makes it look like this:
-# +------------+
-# | title   [X]|
-# +-------------------------
-
-
 class Document:
     """Helper class, for the editor"""
+
     def __init__(self, _, TextWidget, FileDir):
         self.file_dir = FileDir
         self.textbox = TextWidget
@@ -1017,165 +1008,177 @@ class Document:
 
 class Editor:
     """The editor class."""
+
     def __init__(self):
         """The editor object, the entire thing that goes in the
         window.
         Lacks these MacOS support:
         * The file selector does not work.
         """
+        try:
+            self.settings_class = Settings()
+            self.theme = self.settings_class.get_settings('theme')
+            self.master = ttkthemes.ThemedTk()
+            self.master.minsize(900, 600)
+            style = ThemedStyle(self.master)
+            style.set_theme(self.theme)  # Apply ttkthemes to master window.
+            self.master.geometry("600x400")
+            self.master.title('PyPlus')
+            self.master.iconphoto(
+                True,
+                tk.PhotoImage(data='''iVBORw0KGgoAAAANSUhEU
+                        gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA
+                        ABJQTFRFAAAAAAAA////TWyK////////WaqEwgAAAAZ0Uk5TAP8U/yr/h0gXnQAAAHpJREF
+                        UeJyNktENgCAMROsGog7ACqbpvzs07L+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D
+                        QGsRhw9B3SMwNSSj1glNEDqhUpUGw/gMuUd+d2Csny6xgAZB4A1IDwG1SxAc/95t7DAPPIm
+                        4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC'''))
+            # Base64 image, this probably decreases the repo size.
 
-        self.settings_class = Settings()
-        self.theme = self.settings_class.get_settings('theme')
-        self.master = ttkthemes.ThemedTk()
-        self.master.minsize(900, 600)
-        style = ThemedStyle(self.master)
-        style.set_theme(self.theme)  # Apply ttkthemes to master window.
-        self.master.geometry("600x400")
-        self.master.title('PyPlus')
-        self.master.iconphoto(
-            True,
-            tk.PhotoImage(data='''iVBORw0KGgoAAAANSUhEU
-                gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA
-                ABJQTFRFAAAAAAAA////TWyK////////WaqEwgAAAAZ0Uk5TAP8U/yr/h0gXnQAAAHpJREF
-                UeJyNktENgCAMROsGog7ACqbpvzs07L+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D
-                QGsRhw9B3SMwNSSj1glNEDqhUpUGw/gMuUd+d2Csny6xgAZB4A1IDwG1SxAc/95t7DAPPIm
-                4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC'''))
-        # Base64 image, this probably decreases the repo size.
+            self.filetypes = self.settings_class.get_settings('file_type')
 
-        self.filetypes = self.settings_class.get_settings('file_type')
+            self.tabs = {}
 
-        self.tabs = {}
+            self.nb = CustomNotebook(self.master, self.close_tab)
+            self.nb.bind('<B1-Motion>', self.move_tab)
+            self.nb.pack(expand=1, fill='both')
+            self.nb.enable_traversal()
 
-        self.nb = CustomNotebook(self.master, self.close_tab)
-        self.nb.bind('<B1-Motion>', self.move_tab)
-        self.nb.pack(expand=1, fill='both')
-        self.nb.enable_traversal()
+            self.master.protocol(
+                'WM_DELETE_WINDOW', self.exit
+            )  # When the window is closed, or quit from Mac, do exit action
 
-        self.master.protocol(
-            'WM_DELETE_WINDOW', self.exit
-        )  # When the window is closed, or quit from Mac, do exit action
+            menubar = tk.Menu(self.master)
+            # Name can be apple only, don't really know why!
+            app_menu = tk.Menu(menubar, name='apple', tearoff=0)
 
-        menubar = tk.Menu(self.master)
-        # Name can be apple only, don't really know why!
-        app_menu = tk.Menu(menubar, name='apple', tearoff=0)
+            app_menu.add_command(label='About PyPlus', command=self._version)
 
-        app_menu.add_command(label='About PyPlus', command=self._version)
+            if _TK_VERSION < 85 or not _OSX:
+                app_menu.add_command(
+                    label="Preferences...", command=self.config)
+                app_menu.add_separator()
+                app_menu.add_command(label='Exit Editor', command=self.exit)
+            else:
+                self.master.createcommand('tk::mac::ShowPreferences',
+                                          self.config)  # OS X
+            app_menu.add_command(label='Restart app', command=self.restart)
 
-        if _TK_VERSION < 85 or not _OSX:
-            app_menu.add_command(label="Preferences...", command=self.config)
-            app_menu.add_separator()
-            app_menu.add_command(label='Exit Editor', command=self.exit)
-        else:
-            self.master.createcommand('tk::mac::ShowPreferences',
-                                      self.config)  # OS X
-        app_menu.add_command(label='Restart app', command=self.restart)
+            filemenu = tk.Menu(menubar, tearoff=0)
+            filemenu.add_command(label='New Tab',
+                                 command=self.new_file,
+                                 accelerator=f'{_MAIN_KEY}-n')
+            filemenu.add_command(label='Open File',
+                                 command=self.open_file,
+                                 accelerator=f'{_MAIN_KEY}-o')
+            filemenu.add_command(label='Save Copy to...',
+                                 command=self.save_as,
+                                 accelerator=f'{_MAIN_KEY}-Shift-S')
+            filemenu.add_command(label='Close Tab',
+                                 command=self.close_tab,
+                                 accelerator=f'{_MAIN_KEY}-w')
+            filemenu.add_command(label='Reload from disk', command=self.reload)
 
-        filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label='New Tab',
-                             command=self.new_file,
-                             accelerator=f'{_MAIN_KEY}-n')
-        filemenu.add_command(label='Open File',
-                             command=self.open_file,
-                             accelerator=f'{_MAIN_KEY}-o')
-        filemenu.add_command(label='Close Tab',
-                             command=self.close_tab,
-                             accelerator=f'{_MAIN_KEY}-w')
-        filemenu.add_command(label='Reload from disk', command=self.reload)
+            editmenu = tk.Menu(menubar, tearoff=0)
+            editmenu.add_command(label='Undo',
+                                 command=self.undo,
+                                 accelerator=f'{_MAIN_KEY}-z')
+            editmenu.add_command(label='Redo',
+                                 command=self.redo,
+                                 accelerator=f'{_MAIN_KEY}-Shift-z')
+            editmenu.add_separator()
+            editmenu.add_command(label='Cut',
+                                 command=self.cut,
+                                 accelerator=f'{_MAIN_KEY}-x')
+            editmenu.add_command(label='Copy',
+                                 command=self.copy,
+                                 accelerator=f'{_MAIN_KEY}-c')
+            editmenu.add_command(label='Paste',
+                                 command=self.paste,
+                                 accelerator=f'{_MAIN_KEY}-v')
+            editmenu.add_command(label='Delete Selected', command=self.delete)
+            editmenu.add_command(label='Select All',
+                                 command=self.select_all,
+                                 accelerator=f'{_MAIN_KEY}-a')
 
-        editmenu = tk.Menu(menubar, tearoff=0)
-        editmenu.add_command(label='Undo',
-                             command=self.undo,
-                             accelerator=f'{_MAIN_KEY}-z')
-        editmenu.add_command(label='Redo',
-                             command=self.redo,
-                             accelerator=f'{_MAIN_KEY}-Shift-z')
-        editmenu.add_separator()
-        editmenu.add_command(label='Cut',
-                             command=self.cut,
-                             accelerator=f'{_MAIN_KEY}-x')
-        editmenu.add_command(label='Copy',
-                             command=self.copy,
-                             accelerator=f'{_MAIN_KEY}-c')
-        editmenu.add_command(label='Paste',
-                             command=self.paste,
-                             accelerator=f'{_MAIN_KEY}-v')
-        editmenu.add_command(label='Delete Selected', command=self.delete)
-        editmenu.add_command(label='Select All',
-                             command=self.select_all,
-                             accelerator=f'{_MAIN_KEY}-a')
+            self.codemenu = tk.Menu(menubar, tearoff=0)
+            self.codemenu.add_command(label='Build',
+                                      command=self.build,
+                                      accelerator=f'{_MAIN_KEY}-b')
+            self.codemenu.add_command(label='Lint', command=self.lint_source)
+            self.codemenu.add_command(
+                label='Auto-format', command=self.autopep)
+            self.codemenu.add_separator()
+            self.codemenu.add_command(label='Find and replace',
+                                      command=self.search,
+                                      accelerator=f'{_MAIN_KEY}-f')
+            self.codemenu.add_separator()
+            self.codemenu.add_command(label='Open Python Shell',
+                                      command=self.open_shell)
+            self.codemenu.add_command(label='Open System Shell',
+                                      command=self.system_shell)
 
-        self.codemenu = tk.Menu(menubar, tearoff=0)
-        self.codemenu.add_command(label='Build',
-                                  command=self.build,
-                                  accelerator=f'{_MAIN_KEY}-b')
-        self.codemenu.add_command(label='Lint', command=self.lint_source)
-        self.codemenu.add_command(label='Auto-format', command=self.autopep)
-        self.codemenu.add_separator()
-        self.codemenu.add_command(label='Find and replace',
-                                  command=self.search,
-                                  accelerator=f'{_MAIN_KEY}-f')
-        self.codemenu.add_separator()
-        self.codemenu.add_command(label='Open Python Shell',
-                                  command=self.open_shell)
-        self.codemenu.add_command(label='Open System Shell',
-                                  command=self.system_shell)
+            navmenu = tk.Menu(menubar, tearoff=0)
+            navmenu.add_command(label='Go to ...',
+                                command=self.goto,
+                                accelerator=f'{_MAIN_KEY}-Shift-N')
 
-        navmenu = tk.Menu(menubar, tearoff=0)
-        navmenu.add_command(label='Go to ...',
-                            command=self.goto,
-                            accelerator=f'{_MAIN_KEY}-Shift-N')
+            menubar.add_cascade(label='App', menu=app_menu)  # App menu
+            menubar.add_cascade(label='File', menu=filemenu)
+            menubar.add_cascade(label='Edit', menu=editmenu)
+            menubar.add_cascade(label='Code', menu=self.codemenu)
+            menubar.add_cascade(label='Navigate', menu=navmenu)
+            self.master.config(menu=menubar)
 
-        menubar.add_cascade(label='App', menu=app_menu)  # App menu
-        menubar.add_cascade(label='File', menu=filemenu)
-        menubar.add_cascade(label='Edit', menu=editmenu)
-        menubar.add_cascade(label='Code', menu=self.codemenu)
-        menubar.add_cascade(label='Navigate', menu=navmenu)
-        self.master.config(menu=menubar)
+            self.right_click_menu = tk.Menu(self.master, tearoff=0)
+            self.right_click_menu.add_command(label='Undo', command=self.undo)
+            self.right_click_menu.add_command(label='Redo', command=self.redo)
+            self.right_click_menu.add_separator()
+            self.right_click_menu.add_command(label='Cut', command=self.cut)
+            self.right_click_menu.add_command(label='Copy', command=self.copy)
+            self.right_click_menu.add_command(
+                label='Paste', command=self.paste)
+            self.right_click_menu.add_command(
+                label='Delete', command=self.delete)
+            self.right_click_menu.add_separator()
+            self.right_click_menu.add_command(label='Select All',
+                                              command=self.select_all)
 
-        self.right_click_menu = tk.Menu(self.master, tearoff=0)
-        self.right_click_menu.add_command(label='Undo', command=self.undo)
-        self.right_click_menu.add_command(label='Redo', command=self.redo)
-        self.right_click_menu.add_separator()
-        self.right_click_menu.add_command(label='Cut', command=self.cut)
-        self.right_click_menu.add_command(label='Copy', command=self.copy)
-        self.right_click_menu.add_command(label='Paste', command=self.paste)
-        self.right_click_menu.add_command(label='Delete', command=self.delete)
-        self.right_click_menu.add_separator()
-        self.right_click_menu.add_command(label='Select All',
-                                          command=self.select_all)
+            self.tab_right_click_menu = tk.Menu(self.master, tearoff=0)
+            self.tab_right_click_menu.add_command(label='New Tab',
+                                                  command=self.new_file)
+            self.tab_right_click_menu.add_command(label='Close Tab',
+                                                  command=self.close_tab)
+            self.nb.bind(('<Button-2>' if _OSX else '<Button-3>'),
+                         self.right_click_tab)
+            # Mouse bindings
+            first_tab = ttk.Frame(self.nb)
+            self.tabs[first_tab] = Document(first_tab,
+                                            self.create_text_widget(first_tab),
+                                            FileDir='None')
+            self.nb.add(first_tab, text='None')
+            self.mouse()
+            self.master.after(0, self.update_settings)
 
-        self.tab_right_click_menu = tk.Menu(self.master, tearoff=0)
-        self.tab_right_click_menu.add_command(label='New Tab',
-                                              command=self.new_file)
-        self.tab_right_click_menu.add_command(label='Close Tab',
-                                              command=self.close_tab)
-        self.nb.bind(('<Button-2>' if _OSX else '<Button-3>'),
-                     self.right_click_tab)
-        # Mouse bindings
-        first_tab = ttk.Frame(self.nb)
-        self.tabs[first_tab] = Document(first_tab,
-                                        self.create_text_widget(first_tab),
-                                        FileDir='None')
-        self.nb.add(first_tab, text='None')
-        self.mouse()
-        self.master.after(0, self.update_settings)
+            def tab(_=None):
+                self.tabs[self.get_tab()].textbox.insert(
+                    'insert', ' ' * 4)  # Convert tabs to spaces
+                # Quit quickly, before a char is being inserted.
+                return 'break'
 
-        def tab(_=None):
-            self.tabs[self.get_tab()].textbox.insert(
-                'insert', ' ' * 4)  # Convert tabs to spaces
-            return 'break'  # Quit quickly, before a char is being inserted.
-
-        # Keyboard bindings
-        self.master.bind(f'<{_MAIN_KEY}-w>', self.close_tab)
-        self.master.bind(f'<{_MAIN_KEY}-o>', self._open)
-        self.master.bind(f'<{_MAIN_KEY}-b>', self.build)
-        self.master.bind(f'<{_MAIN_KEY}-f>', self.search)
-        self.master.bind(f'<{_MAIN_KEY}-n>', self.new_file)
-        self.master.bind(f'<{_MAIN_KEY}-N>', self.goto)
-        self.master.bind('<Tab>', tab)
-        for x in ['"', "'", '(', '[', '{']:
-            self.master.bind(x, self.autoinsert)
-        self.master.mainloop()  # This line can be here only
+            # Keyboard bindings
+            self.master.bind(f'<{_MAIN_KEY}-w>', self.close_tab)
+            self.master.bind(f'<{_MAIN_KEY}-o>', self._open)
+            self.master.bind(f'<{_MAIN_KEY}-b>', self.build)
+            self.master.bind(f'<{_MAIN_KEY}-f>', self.search)
+            self.master.bind(f'<{_MAIN_KEY}-n>', self.new_file)
+            self.master.bind(f'<{_MAIN_KEY}-N>', self.goto)
+            self.master.bind(f'<{_MAIN_KEY}-S>', self.save_as)
+            self.master.bind('<Tab>', tab)
+            for x in ['"', "'", '(', '[', '{']:
+                self.master.bind(x, self.autoinsert)
+            self.master.mainloop()  # This line can be here only
+        except Exception:
+            sys.exit(0)
 
     def create_text_widget(self, frame):
         """Creates a text widget in a frame."""
@@ -1218,9 +1221,8 @@ class Editor:
             self.create_tags()
             self.recolorize()
             currtext.statusbar.config(
-                text=
-                f'PyPlus | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))}'
-                f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
+                text=f'PyPlus | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))}'
+                     f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
             )
             # Update statusbar and titlebar
             self.settitle()
@@ -1238,9 +1240,8 @@ class Editor:
         currtext = self.tabs[self.get_tab()].textbox
         try:
             currtext.statusbar.config(
-                text=
-                f"PyPlus | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} "
-                f"| col {str(int(currtext.index('insert').split('.')[1:][0]))}"
+                text=f"PyPlus | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} "
+                     f"| col {str(int(currtext.index('insert').split('.')[1:][0]))}"
             )
             # Update statusbar and titlebar
             self.settitle()
@@ -1335,14 +1336,14 @@ class Editor:
             try:  # If the file is in binary, ask the user to open in Hex editor
                 if is_binary_string(open(file_dir, 'rb').read()):
                     if messagebox.askyesno(
-                        'Error', 'This file is in binary format, \n'
-                        'which this editor does not edit. \n'
-                        'Would you like to view it in Hex Editor?\n'):
+                            'Error', 'This file is in binary format, \n'
+                                     'which this editor does not edit. \n'
+                                     'Would you like to view it in Hex Editor?\n'):
                         app = tk.Toplevel(self.master)
                         ttkthemes.ThemedStyle(app).set_theme(self.theme)
                         app.transient(self.master)
-						app.focus_set()
-                        app.title(APPNAME)
+                        app.focus_set()
+                        app.title("PyPlus HexEdit")
                         window = HexView(app)
                         window.open(file_dir)
                         app.resizable(width=False, height=False)
@@ -1395,10 +1396,10 @@ class Editor:
                         currtext.cmd = 'start'
                     elif _OSX:
                         currtext.cmd = 'open -a Safari'
-                        currtext.lint_cmd = 'vendor/bin/phplint -w -n --no-ansi'
+                        currtext.lint_cmd = 'php vendor/bin/phplint -w -n --no-ansi'
                     else:
                         currtext.cmd = 'xdg-open'
-                        currtext.lint_cmd = 'vendor/bin/phplint -w -n --no-ansi'
+                        currtext.lint_cmd = 'php vendor/bin/phplint -w -n --no-ansi'
                 elif extens == "ini" or extens == "init":
                     currtext.lexer = (IniLexer())
                     currtext.cmd = 'more'
@@ -1421,7 +1422,7 @@ class Editor:
                 elif extens == 'js' or extens == 'javascript':
                     currtext.lexer = (JavascriptLexer())
                     currtext.cmd = 'node'
-                    currtext.lint_cmd = 'eslint'
+                    currtext.lint_cmd = 'node ./node_modules/.bin/eslint'
                 elif extens == 'css':
                     currtext.lexer = (CssLexer())
                     currtext.cmd = 'more'
@@ -1432,15 +1433,17 @@ class Editor:
                     currtext.lint_cmd = None
                 self.create_tags()
                 self.recolorize()
+                currtext.see('end')
+                currtext.focus_set()
                 return 'break'
-            except Exception as e:
-                print(str(e))
+            except Exception:
+                pass
 
     def _open(self, _=None):
         """This method just prompts the user to open a file when C-O is pressed"""
         self.open_file()
 
-    def save_as(self):
+    def save_as(self, _=None):
         if len(self.tabs) > 0:
             curr_tab = self.get_tab()
             file_dir = (tkinter.filedialog.asksaveasfilename(
@@ -1551,7 +1554,8 @@ class Editor:
         except Exception:
             pass
 
-    def system_shell(self):
+    @staticmethod
+    def system_shell():
         open_system_shell()
 
     def open_shell(self):
@@ -1577,30 +1581,30 @@ class Editor:
             currtext.insert('insert', event.char)
             currtext.mark_set(
                 'insert', '%d.%s' %
-                (int(float(currtext.index('insert'))),
-                 str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
+                          (int(float(currtext.index('insert'))),
+                           str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
             self.key()
         # Others
         elif event.char == '(':
             currtext.insert('insert', ')')
             currtext.mark_set(
                 'insert', '%d.%s' %
-                (int(float(currtext.index('insert'))),
-                 str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
+                          (int(float(currtext.index('insert'))),
+                           str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
             return 'break'
         elif event.char == '[':
             currtext.insert('insert', ']')
             currtext.mark_set(
                 'insert', '%d.%s' %
-                (int(float(currtext.index('insert'))),
-                 str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
+                          (int(float(currtext.index('insert'))),
+                           str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
             return 'break'
         elif event.char == '{':
             currtext.insert('insert', '}')
             currtext.mark_set(
                 'insert', '%d.%s' %
-                (int(float(currtext.index('insert'))),
-                 str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
+                          (int(float(currtext.index('insert'))),
+                           str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
             return 'break'
 
     def autoindent(self, _=None):
@@ -1622,7 +1626,7 @@ class Editor:
         if 'return' in linetext or 'break' in linetext:
             indentation = indentation[4:]
         if linetext.endswith('(') or linetext.endswith(
-            ', ') or linetext.endswith(','):
+                ', ') or linetext.endswith(','):
             indentation += " " * 4
 
         currtext.insert(currtext.index("insert"), "\n" + indentation)
@@ -1633,12 +1637,14 @@ class Editor:
         global case
         global regexp
         global start, end
+        global starts
         if len(self.tabs) == 0:
             return
         case = 0
         regexp = 0
         start = tk.FIRST if not tk.SEL_FIRST else tk.SEL_FIRST
         end = tk.END if not tk.SEL_LAST else tk.SEL_LAST
+        starts = []
         search_frame = ttk.Frame(self.tabs[self.get_tab()].textbox.frame)
         style = ThemedStyle(search_frame)
         style.set_theme(self.theme)
@@ -1653,6 +1659,12 @@ class Editor:
                            insertbackground='white',
                            highlightthickness=0)
         content.pack(side='left', fill='both')
+
+        forward = ttk.Button(search_frame, text='<', width=1)
+        forward.pack(side='left')
+
+        backward = ttk.Button(search_frame, text='>', width=1)
+        backward.pack(side='left')
 
         ttk.Label(search_frame, text='Replacement: ').pack(side='left',
                                                            anchor='nw',
@@ -1694,6 +1706,7 @@ class Editor:
                         break
                     lastidx = '%s+%dc' % (idx, len(s))
                     text.tag_add('found', idx, lastidx)
+                    starts.append(idx)
                     idx = lastidx
                 text.tag_config('found', foreground='red', background='yellow')
 
@@ -1739,11 +1752,19 @@ class Editor:
                 regexp = 1
                 reg_button.config(text='RegExp[1]')
 
+        def nav_forward():
+            pass
+
+        def nav_backward():
+            pass
+
         find_button.config(command=find)
         clear_button.config(command=clear)
         case_button.config(command=case_yn)
         reg_button.config(command=regexp_yn)
         repl_button.config(command=replace)
+        forward.config(command=nav_forward)
+        backward.config(command=nav_backward)
 
         def _exit():
             search_frame.pack_forget()
@@ -1830,7 +1851,7 @@ class Editor:
                 return
 
     def _version(self):
-        """Shows the _version and related info of the editor."""
+        """Shows the version and related info of the editor."""
         ver = tk.Toplevel()
         style = ThemedStyle(ver)
         style.set_theme(self.theme)  # Applies the ttk theme
@@ -1861,14 +1882,14 @@ class Editor:
                     f.write(
                         _LINT_BATCH.format(
                             cmd=self.tabs[self.get_tab()].textbox.lint_cmd))
-                subprocess.run(f'lint.bat {currdir}', shell=True)
+                subprocess.run(f'lint.bat "{currdir}"', shell=True)
                 os.remove('lint.bat')
             else:
                 with open('lint.sh', 'w') as f:
                     f.write(
                         _LINT_BATCH.format(
                             cmd=self.tabs[self.get_tab()].textbox.lint_cmd))
-                subprocess.run(f'chmod 700 lint.sh && ./lint.sh {currdir}',
+                subprocess.run(f'chmod 700 lint.sh && ./lint.sh "{currdir}"',
                                shell=True)
                 os.remove('lint.sh')
             self.open_file('results.txt')

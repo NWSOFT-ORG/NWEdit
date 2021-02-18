@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/PyPlusSource.iml" filepath="$PROJECT_DIR$/.idea/PyPlusSource.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/PyPlus.iml" filepath="$PROJECT_DIR$/.idea/PyPlus.iml" />
     </modules>
   </component>
 </project>

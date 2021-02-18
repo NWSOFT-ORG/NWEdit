@@ -105,7 +105,6 @@ ENCODINGS = ("ASCII", "CP037", "CP850", "CP1140", "CP1252", "Latin1",
              "ISO8859_15", "Mac_Roman", "UTF-8", "UTF-8-sig", "UTF-16",
              "UTF-32")
 
-
 # </editor-fold>
 
 
@@ -159,10 +158,11 @@ def run_in_terminal(cmd,
     elif platform.system() == "Darwin":
         _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open)
     else:
-        raise RuntimeError("Can't launch terminal in " + platform.system())
+        messagebox.showerror('Error',
+                                 'Cannot run this command in terminal')
 
 
-def open_system_shell(cwd, env_overrides=None):
+def open_system_shell(cwd='~', env_overrides=None):
     if env_overrides is None:
         env_overrides = {}
     env = get_environment_with_overrides(env_overrides)
@@ -176,7 +176,8 @@ def open_system_shell(cwd, env_overrides=None):
         cmd = _get_linux_terminal_command()
         subprocess.Popen(cmd, cwd=cwd, env=env, shell=True)
     else:
-        raise RuntimeError("Can't launch terminal in " + platform.system())
+        messagebox.showerror('Error',
+                                 'Cannot run this command in terminal')
 
 
 def _add_to_path(directory, path):
@@ -184,7 +185,7 @@ def _add_to_path(directory, path):
     # If the directory contains only one Python distribution executables, then
     # it probably won't be in path yet and therefore will be prepended.
     if (directory in path.split(os.pathsep) or platform.system() == "Windows"
-            and directory.lower() in path.lower().split(os.pathsep)):
+        and directory.lower() in path.lower().split(os.pathsep)):
         return path
     else:
         return directory + os.pathsep + path
@@ -287,8 +288,8 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
     # do script ... in window 1 would solve this, but if Terminal is already
     # open, this could run the script in existing terminal (in undesirable env on situation)
     # That's why I need to prepare two variations of the 'do script' command
-    do_script_cmd1 = """		do script %s """ % cmd_as_apple_script_string_literal
-    do_script_cmd2 = """		do script %s in window 1 """ % cmd_as_apple_script_string_literal
+    do_script_cmd1 = """        do script %s """ % cmd_as_apple_script_string_literal
+    do_script_cmd2 = """        do script %s in window 1 """ % cmd_as_apple_script_string_literal
 
     # The whole AppleScript will be executed with osascript by giving script
     # lines as arguments. The lines containing our script need to be shell-quoted:
@@ -298,12 +299,12 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
     # Now we can finally assemble the osascript command line
     cmd_line = ("osascript" +
                 """ -e 'if application "Terminal" is running then ' """ +
-                """ -e '	tell application "Terminal"' """ + """ -e """ +
-                quoted_cmd1 + """ -e '		activate' """ +
-                """ -e '	end tell' """ + """ -e 'else' """ +
-                """ -e '	tell application "Terminal"' """ + """ -e """ +
-                quoted_cmd2 + """ -e '		activate' """ +
-                """ -e '	end tell' """ + """ -e 'end if' """)
+                """ -e '    tell application "Terminal"' """ + """ -e """ +
+                quoted_cmd1 + """ -e '        activate' """ +
+                """ -e '    end tell' """ + """ -e 'else' """ +
+                """ -e '    tell application "Terminal"' """ + """ -e """ +
+                quoted_cmd2 + """ -e '        activate' """ +
+                """ -e '    end tell' """ + """ -e 'end if' """)
 
     subprocess.Popen(cmd_line, cwd=cwd, shell=True)
 
@@ -314,11 +315,11 @@ def _get_linux_terminal_command():
     xte = shutil.which("x-terminal-emulator")
     if xte:
         if os.path.realpath(xte).endswith("/lxterminal") and shutil.which(
-                "lxterminal"):
+            "lxterminal"):
             # need to know exact program, because it needs special treatment
             return "lxterminal"
         elif os.path.realpath(xte).endswith("/terminator") and shutil.which(
-                "terminator"):
+            "terminator"):
             # https://github.com/thonny/thonny/issues/1129
             return "terminator"
         else:
@@ -326,7 +327,7 @@ def _get_linux_terminal_command():
     # Older konsole didn't pass on the environment
     elif shutil.which("konsole"):
         if (shutil.which("gnome-terminal")
-                and "gnome" in os.environ.get("DESKTOP_SESSION", "").lower()):
+            and "gnome" in os.environ.get("DESKTOP_SESSION", "").lower()):
             return "gnome-terminal"
         else:
             return "konsole"
@@ -339,7 +340,7 @@ def _get_linux_terminal_command():
     elif shutil.which("xterm"):
         return "xterm"
     else:
-        raise RuntimeError("Don't know how to open terminal emulator")
+        messagebox.showerror('Error', 'Terminal emulator cannot be detected.')
 
 
 def _normalize_path(s):
@@ -350,6 +351,7 @@ def _normalize_path(s):
 # </editor-fold>
 
 # HEX View
+
 
 class HexView:
     def __init__(self, parent):
@@ -379,20 +381,24 @@ class HexView:
     def create_widgets(self):
         frame = self.frame = ttk.Frame(self.parent)
         self.offsetLabel = ttk.Label(frame, text="Offset")
-        self.offsetSpinbox = Spinbox(
-            frame, from_=0, textvariable=self.offset, increment=BLOCK_SIZE, foreground='black')
+        self.offsetSpinbox = Spinbox(frame,
+                                     from_=0,
+                                     textvariable=self.offset,
+                                     increment=BLOCK_SIZE,
+                                     foreground='black')
         self.encodingLabel = ttk.Label(frame, text="Encoding", underline=0)
-        self.encodingCombobox = ttk.Combobox(
-            frame, values=ENCODINGS, textvariable=self.encoding, state="readonly")
+        self.encodingCombobox = ttk.Combobox(frame,
+                                             values=ENCODINGS,
+                                             textvariable=self.encoding,
+                                             state="readonly")
         self.create_view()
 
     def create_view(self):
-        self.viewText = tk.Text(
-            self.frame,
-            height=BLOCK_HEIGHT,
-            width=2 + (BLOCK_WIDTH * 4),
-            state='disabled',
-            wrap='none')
+        self.viewText = tk.Text(self.frame,
+                                height=BLOCK_HEIGHT,
+                                width=2 + (BLOCK_WIDTH * 4),
+                                state='disabled',
+                                wrap='none')
         self.viewText.tag_configure("ascii", foreground="green")
         self.viewText.tag_configure("error", foreground="red")
         self.viewText.tag_configure("hexspace", foreground="navy")
@@ -403,15 +409,16 @@ class HexView:
 
     def create_layout(self):
         for column, widget in enumerate(
-                (self.offsetLabel, self.offsetSpinbox, self.encodingLabel,
-                 self.encodingCombobox)):
+            (self.offsetLabel, self.offsetSpinbox, self.encodingLabel,
+             self.encodingCombobox)):
             widget.grid(row=0, column=column, sticky=tk.W)
         self.viewText.grid(row=1, column=0, columnspan=6, sticky='nsew')
         self.frame.grid(row=0, column=0, sticky='nsew')
 
     def create_bindings(self):
         self.parent.bind("<Alt-f>", lambda *args: self.offsetSpinbox.focus())
-        self.parent.bind("<Alt-e>", lambda *args: self.encodingCombobox.focus())
+        self.parent.bind("<Alt-e>",
+                         lambda *args: self.encodingCombobox.focus())
         for variable in (self.offset, self.encoding):
             variable.trace_variable("w", self.show_block)
 
@@ -426,7 +433,9 @@ class HexView:
                 block = file.read(BLOCK_SIZE)
             except Exception:  # Empty offsetSpinbox
                 return
-        rows = [block[i:i + BLOCK_WIDTH] for i in range(0, len(block), BLOCK_WIDTH)]
+        rows = [
+            block[i:i + BLOCK_WIDTH] for i in range(0, len(block), BLOCK_WIDTH)
+        ]
         for row in rows:
             self.show_bytes(row)
             self.show_line(row)
@@ -440,7 +449,7 @@ class HexView:
             if byte in b"\t\n\r\v\f":
                 tags = ("hexspace", "graybg")
             elif 0x20 < byte < 0x7F:
-                tags = ("ascii",)
+                tags = ("ascii", )
             self.viewText.insert("end", "{:02X}".format(byte), tags)
             self.viewText.insert("end", " ")
         if len(row) < BLOCK_WIDTH:
@@ -453,12 +462,12 @@ class HexView:
             tags = ()
             if char in "\u2028\u2029\t\n\r\v\f\uFFFD":
                 char = "."
-                tags = ("graybg" if char == "\uFFFD" else "error",)
+                tags = ("graybg" if char == "\uFFFD" else "error", )
             elif 0x20 < ord(char) < 0x7F:
-                tags = ("ascii",)
+                tags = ("ascii", )
             elif not 0x20 <= ord(char) <= 0xFFFF:  # Tcl/Tk limit
                 char = "?"
-                tags = ("error",)
+                tags = ("error", )
             self.viewText.insert("end", char, tags)
         self.viewText.insert("end", "\n")
         self.viewText.config(state='disabled')
@@ -467,7 +476,8 @@ class HexView:
         if filename and os.path.exists(filename):
             self.parent.title("{} — {}".format(filename, APPNAME))
             size = os.path.getsize(filename)
-            size = (size - BLOCK_SIZE if size > BLOCK_SIZE else size - BLOCK_WIDTH)
+            size = (size - BLOCK_SIZE if size > BLOCK_SIZE else size -
+                    BLOCK_WIDTH)
             self.offsetSpinbox.config(to=max(size, 0))
             self.filename = filename
             self.show_block()
@@ -477,7 +487,6 @@ class HexView:
 # /cfa19387a89fda77d20c01f634dfd044525d5c8b/python_console.py
 class Pipe:
     """mock stdin stdout or stderr"""
-
     def __init__(self):
         self.buffer = queue.Queue()
         self.reading = False
@@ -497,7 +506,6 @@ class Pipe:
 
 class Console(ttk.Frame):
     """A tkinter widget which behaves like an interpreter"""
-
     def __init__(self, parent, _locals=None, exit_callback=None):
         super().__init__(parent)
 
@@ -598,7 +606,6 @@ class ConsoleText(ScrolledText):
     A Text widget which handles some application logic,
     e.g. having a line of input at the end with everything else being un-editable
     """
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -700,7 +707,6 @@ class ConsoleText(ScrolledText):
 
 class EditorErr(Exception):
     """A nice exception class for debugging"""
-
     def __init__(self, message):
         # The error (e+m)
         super().__init__(
@@ -709,15 +715,33 @@ class EditorErr(Exception):
 
 class Settings:
     """A class to read data to/from settings.json"""
-
     def __init__(self):
-        with open('settings.json') as f:
-            self.settings = json.load(f)
-        self.theme = self.settings['theme']
-        self.highlight_theme = self.settings['pygments']
-        self.font = self.settings['font'].split()[0]
-        self.size = self.settings['font'].split()[1]
-        self.filetype = self.settings['file_types']
+        try:
+            with open('settings.json') as f:
+                self.settings = json.load(f)
+            self.theme = self.settings['theme']
+            self.highlight_theme = self.settings['pygments']
+            self.font = self.settings['font'].split()[0]
+            self.size = self.settings['font'].split()[1]
+            self.filetype = self.settings['file_types']
+            return
+        except:
+            messagebox.showerror("Error", "Setings are corrupted. Now using default ones.")
+            with open('settings.json', 'w') as f:
+                f.write('''{
+  "file_types": "all",
+  "font": "Consolas 13",
+  "theme": "black",
+  "pygments": "default"
+}'''.strip())
+            with open('settings.json') as f:
+                self.settings = json.load(f)
+            self.theme = self.settings['theme']
+            self.highlight_theme = self.settings['pygments']
+            self.font = self.settings['font'].split()[0]
+            self.size = self.settings['font'].split()[1]
+            self.filetype = self.settings['file_types']
+            return
 
     def get_settings(self, setting):
         if setting == 'font':
@@ -729,7 +753,7 @@ class Settings:
         elif setting == 'file_type':
             # Always starts with ('All files', '*.* *')
             if self.filetype == 'all':
-                return (('All files', '*.* *'),)
+                return (('All files', '*.* *'), )
             elif self.filetype == 'py':
                 # Extend this list, since Python has a lot of file types
                 return ('All files',
@@ -743,15 +767,15 @@ class Settings:
                 return ('All files', '*.* *'), ('XML',
                                                 '*.xml *.plist *.iml *.rss'),
             else:
-                raise EditorErr(
-                    'The file type is not supported by this editor (yet)')
+                if messagebox.showerror('Error', 'The settings aren\'t correct, \n\
+                Now using default settings.'):
+                    return (('All files', '*.* *'), )
         else:
             raise EditorErr('The setting is not defined')
 
 
 class TextLineNumbers(tk.Canvas):
     """Line numbers class for tkinter text widgets. From stackoverflow."""
-
     def __init__(self, *args, **kwargs):
         tk.Canvas.__init__(self, *args, **kwargs)
         self.textwidget = None
@@ -795,7 +819,6 @@ class EnhancedText(tk.Text):
     """Text widget, but 'records' your key actions
     If you hit a key, or the text widget's content has changed,
     it generats an event, to redraw the line numbers."""
-
     def __init__(self, *args, **kwargs):
         tk.Text.__init__(self, *args, **kwargs)
 
@@ -808,17 +831,17 @@ class EnhancedText(tk.Text):
         try:
             # The text widget might throw an error while pasting text!
             # let the actual widget perform the requested action
-            cmd = (self._orig,) + args
+            cmd = (self._orig, ) + args
             result = self.tk.call(cmd)
 
             # generate an event if something was added or deleted,
             # or the cursor position changed
             if (args[0] in ("insert", "replace", "delete")
-                    or args[0:3] == ("mark", "set", "insert")
-                    or args[0:2] == ("xview", "moveto")
-                    or args[0:2] == ("xview", "scroll")
-                    or args[0:2] == ("yview", "moveto")
-                    or args[0:2] == ("yview", "scroll")):
+                or args[0:3] == ("mark", "set", "insert")
+                or args[0:2] == ("xview", "moveto")
+                or args[0:2] == ("xview", "scroll")
+                or args[0:2] == ("yview", "moveto")
+                or args[0:2] == ("yview", "scroll")):
                 self.event_generate("<<Change>>", when="tail")
 
             # return what the actual widget returned
@@ -831,7 +854,6 @@ class EnhancedText(tk.Text):
 class EnhancedTextFrame(ttk.Frame):
     """An enhanced text frame to put the
     text widget with linenumbers in."""
-
     def __init__(self, *args, **kwargs):
         ttk.Frame.__init__(self, *args, **kwargs)
         settings_class = Settings()
@@ -954,17 +976,17 @@ class CustomNotebook(ttk.Notebook):
         })])
         style.layout("CustomNotebook.Tab", [("CustomNotebook.tab", {
             "sticky":
-                "nswe",
+            "nswe",
             "children": [("CustomNotebook.padding", {
                 "side":
-                    "top",
+                "top",
                 "sticky":
-                    "nswe",
+                "nswe",
                 "children": [("CustomNotebook.focus", {
                     "side":
-                        "top",
+                    "top",
                     "sticky":
-                        "nswe",
+                    "nswe",
                     "children": [
                         ("CustomNotebook.label", {
                             "side": "left",
@@ -988,7 +1010,6 @@ class CustomNotebook(ttk.Notebook):
 
 class Document:
     """Helper class, for the editor"""
-
     def __init__(self, _, TextWidget, FileDir):
         self.file_dir = FileDir
         self.textbox = TextWidget
@@ -996,7 +1017,6 @@ class Document:
 
 class Editor:
     """The editor class."""
-
     def __init__(self):
         """The editor object, the entire thing that goes in the
         window.
@@ -1097,6 +1117,8 @@ class Editor:
         self.codemenu.add_separator()
         self.codemenu.add_command(label='Open Python Shell',
                                   command=self.open_shell)
+        self.codemenu.add_command(label='Open System Shell',
+                                  command=self.system_shell)
 
         navmenu = tk.Menu(menubar, tearoff=0)
         navmenu.add_command(label='Go to ...',
@@ -1196,8 +1218,9 @@ class Editor:
             self.create_tags()
             self.recolorize()
             currtext.statusbar.config(
-                text=f'PyPlus | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))}'
-                     f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
+                text=
+                f'PyPlus | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))}'
+                f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
             )
             # Update statusbar and titlebar
             self.settitle()
@@ -1215,8 +1238,9 @@ class Editor:
         currtext = self.tabs[self.get_tab()].textbox
         try:
             currtext.statusbar.config(
-                text=f"PyPlus | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} "
-                     f"| col {str(int(currtext.index('insert').split('.')[1:][0]))}"
+                text=
+                f"PyPlus | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} "
+                f"| col {str(int(currtext.index('insert').split('.')[1:][0]))}"
             )
             # Update statusbar and titlebar
             self.settitle()
@@ -1311,14 +1335,13 @@ class Editor:
             try:  # If the file is in binary, ask the user to open in Hex editor
                 if is_binary_string(open(file_dir, 'rb').read()):
                     if messagebox.askyesno(
-                            'Error',
-                            'This file is in binary format, \n'
-                            'which this editor does not edit. \n'
-                            'Would you like to view it in Hex Editor?\n'
-                    ):
+                        'Error', 'This file is in binary format, \n'
+                        'which this editor does not edit. \n'
+                        'Would you like to view it in Hex Editor?\n'):
                         app = tk.Toplevel(self.master)
                         ttkthemes.ThemedStyle(app).set_theme(self.theme)
                         app.transient(self.master)
+						app.focus_set()
                         app.title(APPNAME)
                         window = HexView(app)
                         window.open(file_dir)
@@ -1371,13 +1394,11 @@ class Editor:
                     if _PLTFRM:
                         currtext.cmd = 'start'
                     elif _OSX:
-                        os.system('phplint/bin/phplint')
                         currtext.cmd = 'open -a Safari'
-                        currtext.lint_cmd = 'phplint/bin/phplint'
+                        currtext.lint_cmd = 'vendor/bin/phplint -w -n --no-ansi'
                     else:
-                        os.system('phplint/bin/phplint')
                         currtext.cmd = 'xdg-open'
-                        currtext.lint_cmd = 'phplint/bin/phplint'
+                        currtext.lint_cmd = 'vendor/bin/phplint -w -n --no-ansi'
                 elif extens == "ini" or extens == "init":
                     currtext.lexer = (IniLexer())
                     currtext.cmd = 'more'
@@ -1400,7 +1421,7 @@ class Editor:
                 elif extens == 'js' or extens == 'javascript':
                     currtext.lexer = (JavascriptLexer())
                     currtext.cmd = 'node'
-                    currtext.lint_cmd = None
+                    currtext.lint_cmd = 'eslint'
                 elif extens == 'css':
                     currtext.lexer = (CssLexer())
                     currtext.cmd = 'more'
@@ -1488,7 +1509,9 @@ class Editor:
     def paste(self):
         try:
             self.tabs[self.get_tab()].textbox.insert(
-                tk.INSERT, self.tabs[self.get_tab()].textbox.clipboard_get())
+                tk.INSERT,
+                self.tabs[self.get_tab()].textbox.clipboard_get().replace(
+                    '\t', ' ' * 4))
         except Exception:
             pass
 
@@ -1521,12 +1544,15 @@ class Editor:
                         dir=_APPDIR,
                         file=self.tabs[self.get_tab()].file_dir,
                         cmd=self.tabs[self.get_tab()].textbox.cmd,
-                        script_dir=Path(self.tabs[self.get_tab()].file_dir).parent)))
+                        script_dir=Path(
+                            self.tabs[self.get_tab()].file_dir).parent)))
                 os.system('chmod 700 build.sh')
                 run_in_terminal('./build.sh && exit && rm build.sh')
         except Exception:
-            messagebox.showerror('Error',
-                                 'Terminal emulator cannot be detected.')
+            pass
+
+    def system_shell(self):
+        open_system_shell()
 
     def open_shell(self):
         root = tk.Toplevel()
@@ -1551,30 +1577,30 @@ class Editor:
             currtext.insert('insert', event.char)
             currtext.mark_set(
                 'insert', '%d.%s' %
-                          (int(float(currtext.index('insert'))),
-                           str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
+                (int(float(currtext.index('insert'))),
+                 str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
             self.key()
         # Others
         elif event.char == '(':
             currtext.insert('insert', ')')
             currtext.mark_set(
                 'insert', '%d.%s' %
-                          (int(float(currtext.index('insert'))),
-                           str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
+                (int(float(currtext.index('insert'))),
+                 str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
             return 'break'
         elif event.char == '[':
             currtext.insert('insert', ']')
             currtext.mark_set(
                 'insert', '%d.%s' %
-                          (int(float(currtext.index('insert'))),
-                           str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
+                (int(float(currtext.index('insert'))),
+                 str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
             return 'break'
         elif event.char == '{':
             currtext.insert('insert', '}')
             currtext.mark_set(
                 'insert', '%d.%s' %
-                          (int(float(currtext.index('insert'))),
-                           str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
+                (int(float(currtext.index('insert'))),
+                 str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
             return 'break'
 
     def autoindent(self, _=None):
@@ -1596,7 +1622,7 @@ class Editor:
         if 'return' in linetext or 'break' in linetext:
             indentation = indentation[4:]
         if linetext.endswith('(') or linetext.endswith(
-                ', ') or linetext.endswith(','):
+            ', ') or linetext.endswith(','):
             indentation += " " * 4
 
         currtext.insert(currtext.index("insert"), "\n" + indentation)
@@ -1616,7 +1642,6 @@ class Editor:
         search_frame = ttk.Frame(self.tabs[self.get_tab()].textbox.frame)
         style = ThemedStyle(search_frame)
         style.set_theme(self.theme)
-        self.codemenu.entryconfigure(3, state='disabled')
 
         search_frame.pack(anchor='nw')
         ttk.Label(search_frame, text='Search: ').pack(side='left',
@@ -1724,7 +1749,6 @@ class Editor:
             search_frame.pack_forget()
             clear()
             self.tabs[self.get_tab()].textbox.focus_set()
-            self.codemenu.entryconfigure(3, state='normal')
 
         ttk.Button(search_frame, text='x', command=_exit,
                    width=1).pack(side='right', anchor='ne')

@@ -75,3 +75,31 @@ simple elegant text editor built on Python/Tkinter
         Pyro requires Tkinter and Pygment external libraries.
 ```
 Also from thonny, licensed after the MIT License.
+And Hex editor  
+
+```
+Copyright © 2016-20 Qtrac Ltd. All rights reserved.
+This program or module is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version. It is provided for educational
+purposes and is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+```
+  
+# Installing dependencies
+This editor needs a **LOT** of dependencies.  
+I have installed a lot.  
+However, to make sure that it works fully, you need to install them  
+Dependencies:  
+- npm -> eslint (for JavaScript)
+- autopep8
+- pylint
+- html-linter
+- ttkthemes
+- Pygments
+You can install them using the following commands:  
+`poetry install && npm install eslint` (Works on Linux, Mac, and Windows)  
+To get Poetry, go to here: [python-poetry/poetry](https://github.com/python-poetry/poetry#installation)

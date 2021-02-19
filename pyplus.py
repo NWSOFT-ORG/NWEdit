@@ -86,10 +86,10 @@ del timertemp.txt
 pause
 ''')  # The batch files for building.
 _LINT_BATCH = ('''#!/bin/bash
-{cmd} $1 > results.txt
+{cmd} "$1" > results.txt
 exit
 ''' if not _PLTFRM else '''@echo off
-{cmd} %1 > results.txt
+{cmd} "%1" > results.txt
 exit''')
 _MAIN_KEY = 'Command' if _OSX else 'Control'  # MacOS uses Cmd, but others uses Ctrl
 _TK_VERSION = int(float(tk.TkVersion) * 10)  # Gets tkinter's version
@@ -864,11 +864,16 @@ class EnhancedTextFrame(ttk.Frame):
                                            bd=0,
                                            highlightthickness=0)
         self.linenumbers.attach(self.text)
+
         self.linenumbers.pack(side="left", fill="y")
+        xscroll = ttk.Scrollbar(self, command=self.text.xview, orient='horizontal')
+        xscroll.pack(side='bottom', fill='x', anchor='nw')
         yscroll = ttk.Scrollbar(self, command=self.text.yview)
         self.text['yscrollcommand'] = yscroll.set
         yscroll.pack(side='right', fill='y')
         self.text.pack(side="right", fill="both", expand=True)
+
+        self.text['xscrollcommand'] = xscroll.set
 
         self.text.bind("<<Change>>", self._on_change)
         self.text.bind("<Configure>", self._on_change)
@@ -1121,6 +1126,8 @@ class Editor:
             navmenu.add_command(label='Go to ...',
                                 command=self.goto,
                                 accelerator=f'{_MAIN_KEY}-Shift-N')
+            navmenu.add_command(label='-1 char', command=self.nav_1cb)
+            navmenu.add_command(label='+1 char', command=self.nav_1cf)
 
             menubar.add_cascade(label='App', menu=app_menu)  # App menu
             menubar.add_cascade(label='File', menu=filemenu)
@@ -1202,8 +1209,6 @@ class Editor:
         textbox.statusbar.pack(side='bottom', fill='x', anchor='e')
         textbox.bind(('<Button-2>' if _OSX else '<Button-3>'),
                      self.right_click)
-
-        self.master.geometry('1000x600')  # Configure window size
         textbox.focus_set()
         return textbox
 
@@ -1691,9 +1696,11 @@ class Editor:
         repl_button.pack(side='left')
 
         def find(_=None):
+            global starts
             text = self.tabs[self.get_tab()].textbox
             text.tag_remove('found', '1.0', 'end')
             s = content.get()
+            starts.clear()
             if s:
                 idx = '1.0'
                 while 1:
@@ -1707,8 +1714,11 @@ class Editor:
                     lastidx = '%s+%dc' % (idx, len(s))
                     text.tag_add('found', idx, lastidx)
                     starts.append(idx)
+                    text.mark_set('insert', idx)
+                    text.focus_set()
                     idx = lastidx
                 text.tag_config('found', foreground='red', background='yellow')
+            text.see('insert')
 
         def replace():
             text = self.tabs[self.get_tab()].textbox
@@ -1736,27 +1746,39 @@ class Editor:
 
         def case_yn():
             global case
-            if case == 1:
-                case = 0
-                case_button.config(text='Case Sensitive[0]')
-            else:
-                case = 1
-                case_button.config(text='Case Sensitive[1]')
+            case = not case
+            case_button.config(text=f'Case Sensitive[{int(case)}]')
 
         def regexp_yn():
             global regexp
-            if regexp == 1:
-                regexp = 0
-                reg_button.config(text='RegExp[0]')
-            else:
-                regexp = 1
-                reg_button.config(text='RegExp[1]')
+            regexp = not regexp
+            reg_button.config(text=f'RegExp[{int(regexp)}]')
 
         def nav_forward():
-            pass
+            try:
+                global starts
+                text = self.tabs[self.get_tab()].textbox
+                curpos = text.index('insert')
+                if curpos in starts:
+                    prev = starts.index(curpos) - 1
+                    text.mark_set('insert', starts[prev])
+                    text.see('insert')
+                    text.focus_set()
+            except Exception:
+                pass
 
         def nav_backward():
-            pass
+            try:
+                global starts
+                text = self.tabs[self.get_tab()].textbox
+                curpos = text.index('insert')
+                if curpos in starts:
+                    prev = starts.index(curpos) + 1
+                    text.mark_set('insert', starts[prev])
+                    text.see('insert')
+                    text.focus_set()
+            except Exception:
+                pass
 
         find_button.config(command=find)
         clear_button.config(command=clear)
@@ -1765,6 +1787,7 @@ class Editor:
         repl_button.config(command=replace)
         forward.config(command=nav_forward)
         backward.config(command=nav_backward)
+        content.bind('<KeyRelease>', find)
 
         def _exit():
             search_frame.pack_forget()
@@ -1895,9 +1918,7 @@ class Editor:
             self.open_file('results.txt')
             os.remove('results.txt')
         else:
-            messagebox.showerror(
-                'Error', 'Linters for languages other \
-            than Python is not supported (yet)')
+            messagebox.showerror('Error')
             return
 
     def autopep(self):
@@ -1936,6 +1957,14 @@ class Editor:
         goto_button.pack(side='left')
         ttk.Button(goto_frame, text='x', command=_exit,
                    width=1).pack(side='right', anchor='se')
+
+    def nav_1cf(self):
+        currtext = self.tabs[self.get_tab()].textbox
+        currtext.mark_set('insert', 'insert+1c')
+
+    def nav_1cb(self):
+        currtext = self.tabs[self.get_tab()].textbox
+        currtext.mark_set('insert', 'insert-1c')
 
 
 if __name__ == '__main__':

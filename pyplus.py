@@ -1641,12 +1641,14 @@ class Editor:
     def search(self, _=None):
         global case
         global regexp
+        global word
         global start, end
         global starts
         if len(self.tabs) == 0:
             return
         case = 0
         regexp = 0
+        word = 0
         start = tk.FIRST if not tk.SEL_FIRST else tk.SEL_FIRST
         end = tk.END if not tk.SEL_LAST else tk.SEL_LAST
         starts = []
@@ -1681,8 +1683,8 @@ class Editor:
                         highlightthickness=0)
         repl.pack(side='left', fill='both')
 
-        find_button = ttk.Button(search_frame, text='Highlight All')
-        find_button.pack(side='left')
+        repl_button = ttk.Button(search_frame, text='Replace all')
+        repl_button.pack(side='left')
         clear_button = ttk.Button(search_frame, text='Clear All')
         clear_button.pack(side='left')
 
@@ -1692,8 +1694,8 @@ class Editor:
         reg_button = ttk.Button(search_frame, text='RegExp[0]')
         reg_button.pack(side='left')
 
-        repl_button = ttk.Button(search_frame, text='Replace all')
-        repl_button.pack(side='left')
+        word_button = ttk.Button(search_frame, text='Whole Word[0]')
+        word_button.pack(side='left')
 
         def find(_=None):
             global starts
@@ -1708,7 +1710,7 @@ class Editor:
                                       idx,
                                       nocase=(not case),
                                       stopindex='end',
-                                      regexp=(not regexp))
+                                      regexp=(not regexp), exact=(not word))
                     if not idx:
                         break
                     lastidx = '%s+%dc' % (idx, len(s))
@@ -1732,7 +1734,8 @@ class Editor:
                                       idx,
                                       nocase=(not case),
                                       stopindex='end',
-                                      regexp=(not regexp))
+                                      regexp=(not regexp),
+                                      exact=(not word))
                     if not idx:
                         break
                     lastidx = '%s+%dc' % (idx, len(s))
@@ -1748,11 +1751,19 @@ class Editor:
             global case
             case = not case
             case_button.config(text=f'Case Sensitive[{int(case)}]')
+            find()
 
         def regexp_yn():
             global regexp
             regexp = not regexp
             reg_button.config(text=f'RegExp[{int(regexp)}]')
+            find()
+
+        def words_yn():
+            global word
+            word = not word
+            word_button.config(text=f'Whole Word[{int(word)}]')
+            find()
 
         def nav_forward():
             try:
@@ -1779,14 +1790,13 @@ class Editor:
                     text.focus_set()
             except Exception:
                 pass
-
-        find_button.config(command=find)
         clear_button.config(command=clear)
         case_button.config(command=case_yn)
         reg_button.config(command=regexp_yn)
         repl_button.config(command=replace)
         forward.config(command=nav_forward)
         backward.config(command=nav_backward)
+        word_button.config(command=words_yn)
         content.bind('<KeyRelease>', find)
 
         def _exit():

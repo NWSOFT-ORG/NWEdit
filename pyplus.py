@@ -1,4 +1,4 @@
-#!python3
+#!/usr/local/bin/python3.7
 # coding: utf-8
 """
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
@@ -55,6 +55,7 @@ def is_binary_string(byte):
 
 
 _APPDIR = Path(__file__).parent
+os.chdir(_APPDIR)
 # <editor-fold desc="The constant values">
 _PLTFRM = (True if sys.platform.startswith('win') else False)
 _OSX = (True if sys.platform.startswith('darwin') else False)
@@ -158,7 +159,7 @@ def run_in_terminal(cmd,
                              'Cannot run this command in terminal')
 
 
-def open_system_shell(cwd='~', env_overrides=None):
+def open_system_shell(cwd=os.path.expanduser('~'), env_overrides=None):
     if env_overrides is None:
         env_overrides = {}
     env = get_environment_with_overrides(env_overrides)
@@ -857,7 +858,8 @@ class EnhancedTextFrame(ttk.Frame):
                                  selectbackground='white',
                                  highlightthickness=0,
                                  font=self.font,
-                                 wrap='none')
+                                 wrap='none',
+                                 insertwidth=3)
         self.linenumbers = TextLineNumbers(self,
                                            width=30,
                                            bg='gray',
@@ -1641,14 +1643,12 @@ class Editor:
     def search(self, _=None):
         global case
         global regexp
-        global word
         global start, end
         global starts
         if len(self.tabs) == 0:
             return
         case = 0
         regexp = 0
-        word = 0
         start = tk.FIRST if not tk.SEL_FIRST else tk.SEL_FIRST
         end = tk.END if not tk.SEL_LAST else tk.SEL_LAST
         starts = []
@@ -1694,11 +1694,9 @@ class Editor:
         reg_button = ttk.Button(search_frame, text='RegExp[0]')
         reg_button.pack(side='left')
 
-        word_button = ttk.Button(search_frame, text='Whole Word[0]')
-        word_button.pack(side='left')
-
         def find(_=None):
             global starts
+            found = tk.IntVar()
             text = self.tabs[self.get_tab()].textbox
             text.tag_remove('found', '1.0', 'end')
             s = content.get()
@@ -1710,7 +1708,8 @@ class Editor:
                                       idx,
                                       nocase=(not case),
                                       stopindex='end',
-                                      regexp=(not regexp), exact=(not word))
+                                      regexp=(not regexp),
+                                      count=found)
                     if not idx:
                         break
                     lastidx = '%s+%dc' % (idx, len(s))
@@ -1721,6 +1720,7 @@ class Editor:
                     idx = lastidx
                 text.tag_config('found', foreground='red', background='yellow')
             text.see('insert')
+            text.statusbar.config(text=f'Found {found.get()} matches')
 
         def replace():
             text = self.tabs[self.get_tab()].textbox
@@ -1734,8 +1734,7 @@ class Editor:
                                       idx,
                                       nocase=(not case),
                                       stopindex='end',
-                                      regexp=(not regexp),
-                                      exact=(not word))
+                                      regexp=(not regexp))
                     if not idx:
                         break
                     lastidx = '%s+%dc' % (idx, len(s))
@@ -1757,12 +1756,6 @@ class Editor:
             global regexp
             regexp = not regexp
             reg_button.config(text=f'RegExp[{int(regexp)}]')
-            find()
-
-        def words_yn():
-            global word
-            word = not word
-            word_button.config(text=f'Whole Word[{int(word)}]')
             find()
 
         def nav_forward():
@@ -1796,7 +1789,6 @@ class Editor:
         repl_button.config(command=replace)
         forward.config(command=nav_forward)
         backward.config(command=nav_backward)
-        word_button.config(command=words_yn)
         content.bind('<KeyRelease>', find)
 
         def _exit():

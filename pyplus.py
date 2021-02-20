@@ -30,9 +30,11 @@ import tkinter.filedialog
 import tkinter.font as font
 import tkinter.messagebox as messagebox
 import tkinter.ttk as ttk
+import webbrowser
 from pathlib import Path
 from tkinter.scrolledtext import ScrolledText
 
+import requests
 import ttkthemes
 from pygments.lexers.configs import *
 from pygments.lexers.css import *
@@ -55,6 +57,7 @@ def is_binary_string(byte):
 
 
 _APPDIR = Path(__file__).parent
+_VERSION = '5.0-DEV'
 os.chdir(_APPDIR)
 # <editor-fold desc="The constant values">
 _PLTFRM = (True if sys.platform.startswith('win') else False)
@@ -103,6 +106,20 @@ ENCODINGS = ("ASCII", "CP037", "CP850", "CP1140", "CP1252", "Latin1",
 
 
 # </editor-fold>
+
+def download_file(update_url):
+    """Downloads a file from remote path"""
+    local_filename = update_url.split('/')[-1]
+    # NOTE the stream=True parameter below
+    with requests.get(update_url, stream=True) as r:
+        r.raise_for_status()
+        with open(local_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                # If you have chunk encoded response uncomment if
+                # and set chunk_size parameter to None.
+                # if chunk:
+                f.write(chunk)
+    return local_filename
 
 
 # <editor-fold desc="shell utility">
@@ -1069,6 +1086,7 @@ class Editor:
                 self.master.createcommand('tk::mac::ShowPreferences',
                                           self.config)  # OS X
             app_menu.add_command(label='Restart app', command=self.restart)
+            app_menu.add_command(label='Check for updates', command=self.check_updates)
 
             filemenu = tk.Menu(menubar, tearoff=0)
             filemenu.add_command(label='New Tab',
@@ -1783,6 +1801,7 @@ class Editor:
                     text.focus_set()
             except Exception:
                 pass
+
         clear_button.config(command=clear)
         case_button.config(command=case_yn)
         reg_button.config(command=regexp_yn)
@@ -1967,6 +1986,30 @@ class Editor:
     def nav_1cb(self):
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set('insert', 'insert-1c')
+
+    def check_updates(self):
+        if 'DEV' in _VERSION:
+            messagebox.showerror("Updates", "Updates aren't supported by develop builds,\n\
+            since you're always on the latest version!")  # If you're on the latest build, you don't need updates!
+            return
+        download_file(update_url="https://zcg-coder.github.io/NWSOFT/PyPlusWeb/ver.json")
+        with open('ver.json') as f:
+            newest = json.load(f)
+        updatewin = tk.Toplevel(self.master)
+        updatewin.title('Updates')
+        updatewin.resizable(0, 0)
+        updatewin.transient(self.master)
+        version = newest["version"]
+        ttkthemes.ThemedStyle(updatewin)
+        if version != _VERSION:
+            ttk.Label(updatewin, text='Update available!', font='Arial 30').pack(fill='both')
+            ttk.Label(updatewin, text=version).pack(fill='both')
+            ttk.Label(updatewin, text=newest["details"]).pack(fill='both')
+            url = newest["url"]
+            ttk.Button(updatewin, text='Get this update', command=lambda: webbrowser.open(url)).pack()
+        else:
+            ttk.Label(updatewin, text='No updates available', font='Arial 30').pack(fill='both')
+        updatewin.mainloop()
 
 
 if __name__ == '__main__':

@@ -101,5 +101,5 @@ Dependencies:
 - ttkthemes
 - Pygments
 You can install them using the following commands:  
-`poetry install && npm install eslint` (Works on Linux, Mac, and Windows)  
+`poetry install && npm install` (Works on Linux, Mac, and Windows)  
 To get Poetry, go here: [python-poetry/poetry](https://github.com/python-poetry/poetry#installation)

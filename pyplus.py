@@ -1257,9 +1257,8 @@ class Editor:
             self.create_tags()
             self.recolorize()
             currtext.statusbar.config(
-                text=
-                f'PyPlus | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))}'
-                f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
+                text=f'PyPlus | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))}'
+                     f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
             )
             # Update statusbar and titlebar
             self.settitle()
@@ -1277,9 +1276,8 @@ class Editor:
         currtext = self.tabs[self.get_tab()].textbox
         try:
             currtext.statusbar.config(
-                text=
-                f"PyPlus | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} "
-                f"| col {str(int(currtext.index('insert').split('.')[1:][0]))}"
+                text=f"PyPlus | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} "
+                     f"| col {str(int(currtext.index('insert').split('.')[1:][0]))}"
             )
             # Update statusbar and titlebar
             self.settitle()
@@ -1488,14 +1486,12 @@ class Editor:
                 master=self.master,
                 initialdir='/',
                 title='Save As...',
-                filetypes=self.filetypes,
-                defaultextension='.py'))
+                filetypes=self.filetypes))
             if not file_dir:
                 return
 
             self.tabs[curr_tab].file_dir = file_dir
-            self.tabs[curr_tab].file_dir = os.path.basename(file_dir)
-            self.nb.tab(curr_tab, text=self.tabs[curr_tab].file_dir)
+            self.nb.tab(curr_tab, text=os.path.basename(file_dir))
             file = open(file_dir, 'w')
             file.write(self.tabs[curr_tab].textbox.get(1.0, 'end'))
             file.close()
@@ -2045,10 +2041,9 @@ class Editor:
             if os.path.isdir(os.path.join(currdir, '.git')):
                 messagebox.showerror("Error!", "This is already a git repository!")
             else:
-                run_in_terminal(cwd=currdir, cmd="git init")
+                run_in_terminal(cwd=currdir, cmd='git init && git add . && git commit -am \"Added files\"')
         elif action == 'addall':
-            run_in_terminal(cwd=currdir, cmd='git add .')
-            run_in_terminal(cwd=currdir, cmd='git commit -am "Added files"')
+            run_in_terminal(cwd=currdir, cmd='git add . && git commit -am "Added files"')
         elif action == 'addsel':
             files = tk.filedialog.askopenfilenames(master=self.master,
                                                    initialdir='/',

@@ -17,11 +17,11 @@ Also, it's cross-compatible!
 import code
 import hashlib
 import io
-import json
 import os
 import platform
 import queue
 import shlex
+import shutil
 import subprocess
 import sys
 import threading
@@ -34,17 +34,11 @@ import webbrowser
 from pathlib import Path
 from tkinter.scrolledtext import ScrolledText
 
+import json5 as json
 import requests
 import ttkthemes
-from pygments.lexers.configs import *
-from pygments.lexers.css import *
-from pygments.lexers.data import *
-from pygments.lexers.html import *
-from pygments.lexers.javascript import *
-from pygments.lexers.python import *
-from pygments.lexers.shell import *
-from pygments.lexers.special import *
-from pygments.lexers.templates import *
+from pygments import lexers
+from pygments.lexers.python import PythonLexer
 from pygments.styles import get_style_by_name
 from ttkthemes import ThemedStyle
 
@@ -57,8 +51,8 @@ def is_binary_string(byte):
 
 
 # <editor-fold desc="The constant values">
-_PLTFRM = (True if sys.platform.startswith('win') else False)
-_OSX = (True if sys.platform.startswith('darwin') else False)
+_WINDOWS = bool(sys.platform.startswith('win'))
+_OSX = bool(sys.platform.startswith('darwin'))
 _APPDIR = Path(__file__).parent
 _VERSION = '5.0-DEV-MAIN'
 os.chdir(_APPDIR)
@@ -74,7 +68,7 @@ python3 {dir}/measure.py stop
 echo Press enter to continue...
 read -s  # This will pause the script
 rm timertemp.txt
-''' if not _PLTFRM else '''@echo off
+''' if not _WINDOWS else '''@echo off
 title Build Results
 cd "{script_dir}"
 {dir}/measure.py start
@@ -92,7 +86,7 @@ pause
 _LINT_BATCH = ('''#!/bin/bash
 {cmd} "$1" > results.txt
 exit
-''' if not _PLTFRM else '''@echo off
+''' if not _WINDOWS else '''@echo off
 {cmd} "%1" > results.txt
 exit''')
 _MAIN_KEY = 'Command' if _OSX else 'Control'  # MacOS uses Cmd, but others uses Ctrl
@@ -200,8 +194,7 @@ def _add_to_path(directory, path):
     if (directory in path.split(os.pathsep) or platform.system() == "Windows"
             and directory.lower() in path.lower().split(os.pathsep)):
         return path
-    else:
-        return directory + os.pathsep + path
+    return directory + os.pathsep + path
 
 
 def _run_in_terminal_in_windows(cmd,
@@ -323,8 +316,6 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
 
 
 def _get_linux_terminal_command():
-    import shutil
-
     xte = shutil.which("x-terminal-emulator")
     if xte:
         if os.path.realpath(xte).endswith("/lxterminal") and shutil.which(
@@ -365,8 +356,7 @@ def _normalize_path(s):
 
 
 class HexView:
-    def __init__(self, parent):
-        """
+    """
         Copyright © 2016-20 Qtrac Ltd. All rights reserved.
         This program or module is free software: you can redistribute it and/or
         modify it under the terms of the GNU General Public License as published
@@ -377,6 +367,9 @@ class HexView:
         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
         General Public License for more details.
         """
+
+    def __init__(self, parent):
+        """Initializes the class"""
         self.parent = parent
         self.filename = None
         self.offset = tk.IntVar()
@@ -385,47 +378,47 @@ class HexView:
         self.encoding.set(ENCODINGS[0])
 
         frame = self.frame = ttk.Frame(self.parent)
-        self.offsetLabel = ttk.Label(frame, text="Offset")
-        self.offsetSpinbox = ttk.Spinbox(frame,
-                                         from_=0,
-                                         textvariable=self.offset,
-                                         increment=BLOCK_SIZE,
-                                         foreground='black')
-        self.encodingLabel = ttk.Label(frame, text="Encoding", underline=0)
-        self.encodingCombobox = ttk.Combobox(frame,
-                                             values=ENCODINGS,
-                                             textvariable=self.encoding,
-                                             state="readonly")
-        self.viewText = tk.Text(self.frame,
-                                height=BLOCK_HEIGHT,
-                                width=2 + (BLOCK_WIDTH * 4),
-                                state='disabled',
-                                wrap='none')
+        self.offset_label = ttk.Label(frame, text="Offset")
+        self.offset_spinbox = ttk.Spinbox(frame,
+                                          from_=0,
+                                          textvariable=self.offset,
+                                          increment=BLOCK_SIZE,
+                                          foreground='black')
+        self.encoding_label = ttk.Label(frame, text="Encoding", underline=0)
+        self.encoding_combobox = ttk.Combobox(frame,
+                                              values=ENCODINGS,
+                                              textvariable=self.encoding,
+                                              state="readonly")
+        self.textbox = tk.Text(self.frame,
+                               height=BLOCK_HEIGHT,
+                               width=2 + (BLOCK_WIDTH * 4),
+                               state='disabled',
+                               wrap='none')
 
-        self.viewText.tag_configure("ascii", foreground="green")
-        self.viewText.tag_configure("error", foreground="red")
-        self.viewText.tag_configure("hexspace", foreground="navy")
-        self.viewText.tag_configure("graybg", background="lightgray")
-        yscroll = ttk.Scrollbar(self.frame, command=self.viewText.yview)
-        self.viewText['yscrollcommand'] = yscroll.set
+        self.textbox.tag_configure("ascii", foreground="green")
+        self.textbox.tag_configure("error", foreground="red")
+        self.textbox.tag_configure("hexspace", foreground="navy")
+        self.textbox.tag_configure("graybg", background="lightgray")
+        yscroll = ttk.Scrollbar(self.frame, command=self.textbox.yview)
+        self.textbox['yscrollcommand'] = yscroll.set
         yscroll.grid(row=1, column=7, sticky='ns')
 
         for column, widget in enumerate(
-                (self.offsetLabel, self.offsetSpinbox, self.encodingLabel,
-                 self.encodingCombobox)):
+                (self.offset_label, self.offset_spinbox, self.encoding_label,
+                 self.encoding_combobox)):
             widget.grid(row=0, column=column, sticky=tk.W)
-        self.viewText.grid(row=1, column=0, columnspan=6, sticky='nsew')
+        self.textbox.grid(row=1, column=0, columnspan=6, sticky='nsew')
         self.frame.grid(row=0, column=0, sticky='nsew')
 
-        self.parent.bind("<Alt-f>", lambda *args: self.offsetSpinbox.focus())
+        self.parent.bind("<Alt-f>", lambda *args: self.offset_spinbox.focus())
         self.parent.bind("<Alt-e>",
-                         lambda *args: self.encodingCombobox.focus())
+                         lambda *args: self.encoding_combobox.focus())
         for variable in (self.offset, self.encoding):
             variable.trace_variable("w", self.show_block)
 
     def show_block(self, *_):
-        self.viewText.config(state='normal')
-        self.viewText.delete("1.0", "end")
+        self.textbox.config(state='normal')
+        self.textbox.delete("1.0", "end")
         if not self.filename:
             return
         with open(self.filename, "rb") as file:
@@ -440,25 +433,25 @@ class HexView:
         for row in rows:
             self.show_bytes(row)
             self.show_line(row)
-        self.viewText.insert("end", "\n")
-        self.viewText.config(state='disabled')
+        self.textbox.insert("end", "\n")
+        self.textbox.config(state='disabled')
 
     def show_bytes(self, row):
-        self.viewText.config(state='normal')
+        self.textbox.config(state='normal')
         for byte in row:
             tags = ()
             if byte in b"\t\n\r\v\f":
                 tags = ("hexspace", "graybg")
             elif 0x20 < byte < 0x7F:
                 tags = ("ascii",)
-            self.viewText.insert("end", "{:02X}".format(byte), tags)
-            self.viewText.insert("end", " ")
+            self.textbox.insert("end", "{:02X}".format(byte), tags)
+            self.textbox.insert("end", " ")
         if len(row) < BLOCK_WIDTH:
-            self.viewText.insert("end", " " * (BLOCK_WIDTH - len(row)) * 3)
-        self.viewText.config(state='disabled')
+            self.textbox.insert("end", " " * (BLOCK_WIDTH - len(row)) * 3)
+        self.textbox.config(state='disabled')
 
     def show_line(self, row):
-        self.viewText.config(state='normal')
+        self.textbox.config(state='normal')
         for char in row.decode(self.encoding.get(), errors="replace"):
             tags = ()
             if char in "\u2028\u2029\t\n\r\v\f\uFFFD":
@@ -469,9 +462,9 @@ class HexView:
             elif not 0x20 <= ord(char) <= 0xFFFF:  # Tcl/Tk limit
                 char = "?"
                 tags = ("error",)
-            self.viewText.insert("end", char, tags)
-        self.viewText.insert("end", "\n")
-        self.viewText.config(state='disabled')
+            self.textbox.insert("end", char, tags)
+        self.textbox.insert("end", "\n")
+        self.textbox.config(state='disabled')
 
     def open(self, filename):
         if filename and os.path.exists(filename):
@@ -479,7 +472,7 @@ class HexView:
             size = os.path.getsize(filename)
             size = (size - BLOCK_SIZE if size > BLOCK_SIZE else size -
                                                                 BLOCK_WIDTH)
-            self.offsetSpinbox.config(to=max(size, 0))
+            self.offset_spinbox.config(to=max(size, 0))
             self.filename = filename
             self.show_block()
 
@@ -651,7 +644,8 @@ class ConsoleText(ScrolledText):
             self.mark_set("committed_text", "end-1c")
             self.mark_gravity("committed_text", tk.LEFT)
         else:
-            # if text is added before the last prompt (">>> "), update the stored position of the tag
+            # if text is added before the last prompt (">>> "),
+            # update the stored position of the tag
             for i, (tag_name, _,
                     _) in reversed(list(enumerate(self.console_tags))):
                 if tag_name == "prompt":
@@ -685,7 +679,7 @@ class ConsoleText(ScrolledText):
 
     def on_text_change(self, _):
         """If the text is changed, check if the change is part of the committed
-        # text, and if it is revert the change"""
+        text, and if it is revert the change"""
         if self.get_committed_text_hash() != self.committed_hash:
             # revert change
             self.mark_gravity("committed_text", tk.RIGHT)
@@ -717,11 +711,11 @@ class EditorErr(Exception):
 
 
 class Settings:
-    """A class to read data to/from settings.json"""
+    """A class to read data to/from general-settings.json"""
 
     def __init__(self):
         try:
-            with open('settings.json') as f:
+            with open('Settings/general-settings.json') as f:
                 self.settings = json.load(f)
             self.theme = self.settings['theme']
             self.highlight_theme = self.settings['pygments']
@@ -729,17 +723,18 @@ class Settings:
             self.size = self.settings['font'].split()[1]
             self.filetype = self.settings['file_types']
             return
-        except Exception:
+        except Exception as e:
+            print(e)
             messagebox.showerror(
                 "Error", "Setings are corrupted. Now using default ones.")
-            with open('settings.json', 'w') as f:
+            with open('Settings/general-settings.json', 'w') as f:
                 f.write('''{
   "file_types": "all",
   "font": "Consolas 13",
   "theme": "black",
   "pygments": "default"
 }'''.strip())
-            with open('settings.json') as f:
+            with open('Settings/general-settings.json') as f:
                 self.settings = json.load(f)
             self.theme = self.settings['theme']
             self.highlight_theme = self.settings['pygments']
@@ -778,6 +773,37 @@ class Settings:
                     return (('All files', '*.* *'),)
         else:
             raise EditorErr('The setting is not defined')
+
+
+class Filetype:
+    def __init__(self):
+        with open("Settings/lexer-settings.json") as f:
+            all_settings = json.load(f)
+        self.extens = []
+        self.lexers = []
+        for key, value in all_settings.items():
+            self.extens.append(key)
+            self.lexers.append(value)
+
+    def get_lexer_settings(self, extension):
+        return lexers.get_lexer_by_name(self.lexers[self.extens.index(extension)])
+
+
+class Linter:
+    def __init__(self):
+        with open("Settings/linter-settings.json") as f:
+            all_settings = json.load(f)
+        self.extens = []
+        self.linters = []
+        for key, value in all_settings.items():
+            self.extens.append(key)
+            self.linters.append(value)
+
+    def get_linter_settings(self, extension):
+        if self.linters[self.extens.index(extension)] == "none":
+            return None
+        else:
+            return self.linters[self.extens.index(extension)]
 
 
 class TextLineNumbers(tk.Canvas):
@@ -1041,185 +1067,183 @@ class Editor:
         Lacks these MacOS support:
         * The file selector does not work.
         """
-        try:
-            self.settings_class = Settings()
-            self.theme = self.settings_class.get_settings('theme')
-            self.master = ttkthemes.ThemedTk()
-            self.master.minsize(900, 600)
-            style = ThemedStyle(self.master)
-            style.set_theme(self.theme)  # Apply ttkthemes to master window.
-            self.master.geometry("600x400")
-            self.master.title('PyPlus')
-            self.master.iconphoto(
-                True,
-                tk.PhotoImage(data='''iVBORw0KGgoAAAANSUhEU
-                        gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA
-                        ABJQTFRFAAAAAAAA////TWyK////////WaqEwgAAAAZ0Uk5TAP8U/yr/h0gXnQAAAHpJREF
-                        UeJyNktENgCAMROsGog7ACqbpvzs07L+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D
-                        QGsRhw9B3SMwNSSj1glNEDqhUpUGw/gMuUd+d2Csny6xgAZB4A1IDwG1SxAc/95t7DAPPIm
-                        4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC'''))
-            # Base64 image, this probably decreases the repo size.
+        self.settings_class = Settings()
+        self.file_setting_class = Filetype()
+        self.linter_setting_class = Linter()
+        self.theme = self.settings_class.get_settings('theme')
+        self.master = ttkthemes.ThemedTk()
+        self.master.minsize(900, 600)
+        ttkthemes.ThemedStyle(self.master).set_theme(self.theme)
+        self.master.geometry("600x400")
+        self.master.title('PyPlus')
+        self.master.iconphoto(
+            True,
+            tk.PhotoImage(data=('iVBORw0KGgoAAAANSUhEU\n'
+                                'gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA\n '
+                                'ABJQTFRFAAAAAAAA////TWyK////////WaqEwgAAAAZ0Uk5TAP8U/yr/h0gXnQAAAHpJREF\n '
+                                'UeJyNktENgCAMROsGog7ACqbpvzs07L+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D\n '
+                                'QGsRhw9B3SMwNSSj1glNEDqhUpUGw/gMuUd+d2Csny6xgAZB4A1IDwG1SxAc/95t7DAPPIm\n '
+                                '4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC')))
+        # Base64 image, this probably decreases the repo size.
 
-            self.filetypes = self.settings_class.get_settings('file_type')
+        self.filetypes = self.settings_class.get_settings('file_type')
 
-            self.tabs = {}
+        self.tabs = {}
 
-            self.nb = CustomNotebook(self.master, self.close_tab)
-            self.nb.bind('<B1-Motion>', self.move_tab)
-            self.nb.pack(expand=1, fill='both')
-            self.nb.enable_traversal()
+        self.nb = CustomNotebook(self.master, self.close_tab)
+        self.nb.bind('<B1-Motion>', self.move_tab)
+        self.nb.pack(expand=1, fill='both')
+        self.nb.enable_traversal()
 
-            self.master.protocol(
-                'WM_DELETE_WINDOW', self.exit
-            )  # When the window is closed, or quit from Mac, do exit action
+        self.master.protocol(
+            'WM_DELETE_WINDOW', self.exit
+        )  # When the window is closed, or quit from Mac, do exit action
 
-            menubar = tk.Menu(self.master)
-            # Name can be apple only, don't really know why!
-            app_menu = tk.Menu(menubar, name='apple', tearoff=0)
+        menubar = tk.Menu(self.master)
+        # Name can be apple only, don't really know why!
+        app_menu = tk.Menu(menubar, name='apple', tearoff=0)
 
-            app_menu.add_command(label='About PyPlus', command=self._version)
+        app_menu.add_command(label='About PyPlus', command=self._version)
+        preferences = tk.Menu(app_menu)
+        preferences.add_command(label="General Settings", command=self.config)
+        preferences.add_command(label="File type Settings", command=self.filetype_config)
+        app_menu.add_cascade(label="Preferences", menu=preferences)
+        app_menu.add_separator()
+        app_menu.add_command(label='Exit Editor', command=self.exit)
+        app_menu.add_command(label='Restart app', command=self.restart)
+        app_menu.add_command(label='Check for updates',
+                             command=self.check_updates)
 
-            if _TK_VERSION < 85 or not _OSX:
-                app_menu.add_command(label="Preferences...",
-                                     command=self.config)
-                app_menu.add_separator()
-                app_menu.add_command(label='Exit Editor', command=self.exit)
-            else:
-                self.master.createcommand('tk::mac::ShowPreferences',
-                                          self.config)  # OS X
-            app_menu.add_command(label='Restart app', command=self.restart)
-            app_menu.add_command(label='Check for updates',
-                                 command=self.check_updates)
+        filemenu = tk.Menu(menubar, tearoff=0)
+        filemenu.add_command(label='New Tab',
+                             command=self.new_file,
+                             accelerator=f'{_MAIN_KEY}-n')
+        filemenu.add_command(label='Open File',
+                             command=self.open_file,
+                             accelerator=f'{_MAIN_KEY}-o')
+        filemenu.add_command(label='Save Copy to...',
+                             command=self.save_as,
+                             accelerator=f'{_MAIN_KEY}-Shift-S')
+        filemenu.add_command(label='Close Tab',
+                             command=self.close_tab,
+                             accelerator=f'{_MAIN_KEY}-w')
+        filemenu.add_command(label='Reload from disk', command=self.reload)
 
-            filemenu = tk.Menu(menubar, tearoff=0)
-            filemenu.add_command(label='New Tab',
-                                 command=self.new_file,
-                                 accelerator=f'{_MAIN_KEY}-n')
-            filemenu.add_command(label='Open File',
-                                 command=self.open_file,
-                                 accelerator=f'{_MAIN_KEY}-o')
-            filemenu.add_command(label='Save Copy to...',
-                                 command=self.save_as,
-                                 accelerator=f'{_MAIN_KEY}-Shift-S')
-            filemenu.add_command(label='Close Tab',
-                                 command=self.close_tab,
-                                 accelerator=f'{_MAIN_KEY}-w')
-            filemenu.add_command(label='Reload from disk', command=self.reload)
+        editmenu = tk.Menu(menubar, tearoff=0)
+        editmenu.add_command(label='Undo',
+                             command=self.undo,
+                             accelerator=f'{_MAIN_KEY}-z')
+        editmenu.add_command(label='Redo',
+                             command=self.redo,
+                             accelerator=f'{_MAIN_KEY}-Shift-z')
+        editmenu.add_separator()
+        editmenu.add_command(label='Cut',
+                             command=self.cut,
+                             accelerator=f'{_MAIN_KEY}-x')
+        editmenu.add_command(label='Copy',
+                             command=self.copy,
+                             accelerator=f'{_MAIN_KEY}-c')
+        editmenu.add_command(label='Paste',
+                             command=self.paste,
+                             accelerator=f'{_MAIN_KEY}-v')
+        editmenu.add_command(label='Delete Selected', command=self.delete)
+        editmenu.add_command(label='Select All',
+                             command=self.select_all,
+                             accelerator=f'{_MAIN_KEY}-a')
 
-            editmenu = tk.Menu(menubar, tearoff=0)
-            editmenu.add_command(label='Undo',
-                                 command=self.undo,
-                                 accelerator=f'{_MAIN_KEY}-z')
-            editmenu.add_command(label='Redo',
-                                 command=self.redo,
-                                 accelerator=f'{_MAIN_KEY}-Shift-z')
-            editmenu.add_separator()
-            editmenu.add_command(label='Cut',
-                                 command=self.cut,
-                                 accelerator=f'{_MAIN_KEY}-x')
-            editmenu.add_command(label='Copy',
-                                 command=self.copy,
-                                 accelerator=f'{_MAIN_KEY}-c')
-            editmenu.add_command(label='Paste',
-                                 command=self.paste,
-                                 accelerator=f'{_MAIN_KEY}-v')
-            editmenu.add_command(label='Delete Selected', command=self.delete)
-            editmenu.add_command(label='Select All',
-                                 command=self.select_all,
-                                 accelerator=f'{_MAIN_KEY}-a')
+        self.codemenu = tk.Menu(menubar, tearoff=0)
+        self.codemenu.add_command(label='Build',
+                                  command=self.build,
+                                  accelerator=f'{_MAIN_KEY}-b')
+        self.codemenu.add_command(label='Lint', command=self.lint_source)
+        self.codemenu.add_command(label='Auto-format',
+                                  command=self.autopep)
+        self.codemenu.add_separator()
+        self.codemenu.add_command(label='Find and replace',
+                                  command=self.search,
+                                  accelerator=f'{_MAIN_KEY}-f')
+        self.codemenu.add_separator()
+        self.codemenu.add_command(label='Open Python Shell',
+                                  command=self.open_shell)
+        self.codemenu.add_command(label='Open System Shell',
+                                  command=self.system_shell)
 
-            self.codemenu = tk.Menu(menubar, tearoff=0)
-            self.codemenu.add_command(label='Build',
-                                      command=self.build,
-                                      accelerator=f'{_MAIN_KEY}-b')
-            self.codemenu.add_command(label='Lint', command=self.lint_source)
-            self.codemenu.add_command(label='Auto-format',
-                                      command=self.autopep)
-            self.codemenu.add_separator()
-            self.codemenu.add_command(label='Find and replace',
-                                      command=self.search,
-                                      accelerator=f'{_MAIN_KEY}-f')
-            self.codemenu.add_separator()
-            self.codemenu.add_command(label='Open Python Shell',
-                                      command=self.open_shell)
-            self.codemenu.add_command(label='Open System Shell',
-                                      command=self.system_shell)
+        navmenu = tk.Menu(menubar, tearoff=0)
+        navmenu.add_command(label='Go to ...',
+                            command=self.goto,
+                            accelerator=f'{_MAIN_KEY}-Shift-N')
+        navmenu.add_command(label='-1 char', command=self.nav_1cb)
+        navmenu.add_command(label='+1 char', command=self.nav_1cf)
 
-            navmenu = tk.Menu(menubar, tearoff=0)
-            navmenu.add_command(label='Go to ...',
-                                command=self.goto,
-                                accelerator=f'{_MAIN_KEY}-Shift-N')
-            navmenu.add_command(label='-1 char', command=self.nav_1cb)
-            navmenu.add_command(label='+1 char', command=self.nav_1cf)
+        gitmenu = tk.Menu(menubar, tearoff=0)
+        gitmenu.add_command(label='Initialize', command=lambda: self.git('init'))
+        gitmenu.add_command(label='Add all', command=lambda: self.git('addall'))
+        gitmenu.add_command(label='Add selected', command=lambda: self.git('addsel'))
+        gitmenu.add_command(label='Commit', command=lambda: self.git('commit'))
+        gitmenu.add_command(label='Other', command=lambda: self.git('other'))
 
-            gitmenu = tk.Menu(menubar, tearoff=0)
-            gitmenu.add_command(label='Initialize', command=lambda: self.git('init'))
-            gitmenu.add_command(label='Add all', command=lambda: self.git('addall'))
-            gitmenu.add_command(label='Add selected', command=lambda: self.git('addsel'))
-            gitmenu.add_command(label='Commit', command=lambda: self.git('commit'))
-            gitmenu.add_command(label='Other', command=lambda: self.git('other'))
+        menubar.add_cascade(label='App', menu=app_menu)  # App menu
+        menubar.add_cascade(label='File', menu=filemenu)
+        menubar.add_cascade(label='Edit', menu=editmenu)
+        menubar.add_cascade(label='Code', menu=self.codemenu)
+        menubar.add_cascade(label='Navigate', menu=navmenu)
+        menubar.add_cascade(label='Git', menu=gitmenu)
+        self.master.config(menu=menubar)
 
-            menubar.add_cascade(label='App', menu=app_menu)  # App menu
-            menubar.add_cascade(label='File', menu=filemenu)
-            menubar.add_cascade(label='Edit', menu=editmenu)
-            menubar.add_cascade(label='Code', menu=self.codemenu)
-            menubar.add_cascade(label='Navigate', menu=navmenu)
-            menubar.add_cascade(label='Git', menu=gitmenu)
-            self.master.config(menu=menubar)
+        self.right_click_menu = tk.Menu(self.master, tearoff=0)
+        self.right_click_menu.add_command(label='Undo', command=self.undo)
+        self.right_click_menu.add_command(label='Redo', command=self.redo)
+        self.right_click_menu.add_separator()
+        self.right_click_menu.add_command(label='Cut', command=self.cut)
+        self.right_click_menu.add_command(label='Copy', command=self.copy)
+        self.right_click_menu.add_command(label='Paste',
+                                          command=self.paste)
+        self.right_click_menu.add_command(label='Delete',
+                                          command=self.delete)
+        self.right_click_menu.add_separator()
+        self.right_click_menu.add_command(label='Select All',
+                                          command=self.select_all)
 
-            self.right_click_menu = tk.Menu(self.master, tearoff=0)
-            self.right_click_menu.add_command(label='Undo', command=self.undo)
-            self.right_click_menu.add_command(label='Redo', command=self.redo)
-            self.right_click_menu.add_separator()
-            self.right_click_menu.add_command(label='Cut', command=self.cut)
-            self.right_click_menu.add_command(label='Copy', command=self.copy)
-            self.right_click_menu.add_command(label='Paste',
-                                              command=self.paste)
-            self.right_click_menu.add_command(label='Delete',
-                                              command=self.delete)
-            self.right_click_menu.add_separator()
-            self.right_click_menu.add_command(label='Select All',
-                                              command=self.select_all)
+        self.tab_right_click_menu = tk.Menu(self.master, tearoff=0)
+        self.tab_right_click_menu.add_command(label='New Tab',
+                                              command=self.new_file)
+        self.tab_right_click_menu.add_command(label='Close Tab',
+                                              command=self.close_tab)
+        self.nb.bind(('<Button-2>' if _OSX else '<Button-3>'),
+                     self.right_click_tab)
+        # Mouse bindings
+        first_tab = ttk.Frame(self.nb)
+        self.tabs[first_tab] = Document(first_tab,
+                                        self.create_text_widget(first_tab),
+                                        FileDir='None')
+        self.nb.add(first_tab, text='None')
+        self.mouse()
+        self.master.after(0, self.update_settings)
 
-            self.tab_right_click_menu = tk.Menu(self.master, tearoff=0)
-            self.tab_right_click_menu.add_command(label='New Tab',
-                                                  command=self.new_file)
-            self.tab_right_click_menu.add_command(label='Close Tab',
-                                                  command=self.close_tab)
-            self.nb.bind(('<Button-2>' if _OSX else '<Button-3>'),
-                         self.right_click_tab)
-            # Mouse bindings
-            first_tab = ttk.Frame(self.nb)
-            self.tabs[first_tab] = Document(first_tab,
-                                            self.create_text_widget(first_tab),
-                                            FileDir='None')
-            self.nb.add(first_tab, text='None')
-            self.mouse()
-            self.master.after(0, self.update_settings)
+        # Keyboard bindings
+        self.master.bind(f'<{_MAIN_KEY}-w>', self.close_tab)
+        self.master.bind(f'<{_MAIN_KEY}-o>', self._open)
+        self.master.bind(f'<{_MAIN_KEY}-b>', self.build)
+        self.master.bind(f'<{_MAIN_KEY}-f>', self.search)
+        self.master.bind(f'<{_MAIN_KEY}-n>', self.new_file)
+        self.master.bind(f'<{_MAIN_KEY}-N>', self.goto)
+        self.master.bind(f'<{_MAIN_KEY}-S>', self.save_as)
 
-            def tab(_=None):
-                self.tabs[self.get_tab()].textbox.insert(
-                    'insert', ' ' * 4)  # Convert tabs to spaces
-                # Quit quickly, before a char is being inserted.
-                return 'break'
-
-            # Keyboard bindings
-            self.master.bind(f'<{_MAIN_KEY}-w>', self.close_tab)
-            self.master.bind(f'<{_MAIN_KEY}-o>', self._open)
-            self.master.bind(f'<{_MAIN_KEY}-b>', self.build)
-            self.master.bind(f'<{_MAIN_KEY}-f>', self.search)
-            self.master.bind(f'<{_MAIN_KEY}-n>', self.new_file)
-            self.master.bind(f'<{_MAIN_KEY}-N>', self.goto)
-            self.master.bind(f'<{_MAIN_KEY}-S>', self.save_as)
-            self.master.bind('<Tab>', tab)
-            for x in ['"', "'", '(', '[', '{']:
-                self.master.bind(x, self.autoinsert)
-            self.master.mainloop()  # This line can be here only
-        except Exception:
-            sys.exit(0)
+        self.master.bind("<<MouseEvent>>", self.mouse)
+        self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
+        for x in ['"', "'", '(', '[', '{']:
+            self.master.bind(x, self.autoinsert)
+        self.master.mainloop()  # This line can be here only
 
     def create_text_widget(self, frame):
         """Creates a text widget in a frame."""
+
+        def tab(_=None):
+            self.tabs[self.get_tab()].textbox.insert(
+                'insert', ' ' * 4)  # Convert tabs to spaces
+            # Quit quickly, before a char is being inserted.
+            return 'break'
+
         textframe = EnhancedTextFrame(
             frame)  # The one with line numbers and a nice dark theme
         textframe.pack(fill='both', expand=1)
@@ -1230,9 +1254,8 @@ class Editor:
         textbox.lint_cmd = 'pylint'
         textbox.bind('<Return>', self.autoindent)
         textbox.bind("<<KeyEvent>>", self.key)
-        textbox.bind("<<MouseEvent>>", self.mouse)
         textbox.event_add("<<KeyEvent>>", "<KeyRelease>")
-        textbox.event_add("<<MouseEvent>>", "<ButtonRelease>")
+        textbox.bind('<Tab>', tab)
         textbox.statusbar = ttk.Label(frame,
                                       text='PyPlus',
                                       justify='right',
@@ -1402,78 +1425,15 @@ class Editor:
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
                 self.mouse()
-                if extens == 'py' or extens == 'pyw' or extens == 'jy' or extens == 'sage' or extens == 'sc' \
-                        or extens == 'SConstruct' or extens == 'SConscript' or extens == 'bzl' or extens == 'BUCK' \
-                        or extens == 'BUILD' or file_dir == 'BUILD.bazel' or extens == 'WORKSPACE' or extens == 'tac':
-                    currtext.lexer = (PythonLexer())
-                    currtext.cmd = 'python3'
-                    currtext.lint_cmd = "pylint"
-                elif extens == "txt" or extens == "text":
-                    currtext.lexer = (TextLexer())
-                    currtext.cmd = 'more'
-                    currtext.lint_cmd = None
-                elif extens == "htm" or extens == "html" or extens == 'xhtml':
-                    currtext.lexer = (HtmlLexer())
-                    if _PLTFRM:
-                        currtext.cmd = 'start'
-                    elif _OSX:
-                        currtext.cmd = 'open -a Safari'
-                    else:
-                        currtext.cmd = 'xdg-open'
-                    currtext.lint_cmd = 'html_lint.py'
-                elif extens == "xml" or extens == "xsl" or extens == "rss" or extens == "xslt" or extens == "xsd" or \
-                        extens == "wsdl" or extens == "wsf":
-                    currtext.lexer = (XmlLexer())
-                    currtext.cmd = 'more'
-                    currtext.lint_cmd = None  # I haven't found any XML linters written in Python
-                elif extens == "php" or extens == "php5":
-                    currtext.lexer = (HtmlPhpLexer())
-                    if _PLTFRM:
-                        currtext.cmd = 'start'
-                    elif _OSX:
-                        currtext.cmd = 'open -a Safari'
-                        currtext.lint_cmd = 'php vendor/bin/phplint -w -n --no-ansi'
-                    else:
-                        currtext.cmd = 'xdg-open'
-                        currtext.lint_cmd = 'php vendor/bin/phplint -w -n --no-ansi'
-                elif extens == "ini" or extens == "init":
-                    currtext.lexer = (IniLexer())
-                    currtext.cmd = 'more'
-                    currtext.lint_cmd = None
-                elif extens == "conf" or extens == "cnf" or extens == "config":
-                    currtext.lexer = (ApacheConfLexer())
-                    currtext.cmd = 'more'
-                    currtext.lint_cmd = None
-                elif extens == 'sh' or extens == 'ksh' or extens == 'bash' or extens == 'ebuild' or extens == 'eclass' \
-                        or extens == 'exheres-0' or extens == 'exlib' or extens == 'zsh' or extens == 'bashrc' \
-                        or extens == 'PKGBUILD':
-                    currtext.lexer = (BashLexer())
-                    currtext.cmd = 'bash'
-                    currtext.lint_cmd = None
-
-                elif extens == "json":
-                    currtext.lexer = (JsonLexer())
-                    currtext.cmd = 'more'
-                    currtext.lint_cmd = None
-                elif extens == 'js' or extens == 'javascript':
-                    currtext.lexer = (JavascriptLexer())
-                    currtext.cmd = 'node'
-                    currtext.lint_cmd = 'node ./node_modules/.bin/eslint'
-                elif extens == 'css':
-                    currtext.lexer = (CssLexer())
-                    currtext.cmd = 'more'
-                    currtext.lint_cmd = None
-                else:
-                    currtext.lexer = (TextLexer())
-                    currtext.cmd = 'more'
-                    currtext.lint_cmd = None
+                currtext.lexer = self.file_setting_class.get_lexer_settings(extens)
+                currtext.lint_cmd = self.linter_setting_class.get_linter_settings(extens)
                 self.create_tags()
                 self.recolorize()
-                currtext.see('end')
+                currtext.see('insert')
                 currtext.focus_set()
                 return 'break'
-            except Exception:
-                pass
+            except Exception as e:
+                print(e)
 
     def _open(self, _=None):
         """This method just prompts the user to open a file when C-O is pressed"""
@@ -1495,6 +1455,7 @@ class Editor:
             file = open(file_dir, 'w')
             file.write(self.tabs[curr_tab].textbox.get(1.0, 'end'))
             file.close()
+            self.reload()
 
     def save_file(self, _=None):
         """Saves an *existing* file"""
@@ -1568,7 +1529,7 @@ class Editor:
         2) Linux only: uses chmod to make the sh execuable
         3) Runs the build file"""
         try:
-            if _PLTFRM:  # Windows
+            if _WINDOWS:  # Windows
                 with open('./build.bat', 'w') as f:
                     f.write((_BATCH_BUILD.format(
                         dir=_APPDIR,
@@ -1918,7 +1879,10 @@ class Editor:
         ver.mainloop()
 
     def config(self, _=None):
-        self.open_file('settings.json')
+        self.open_file('Settings/general-settings.json')
+
+    def filetype_config(self, _=None):
+        self.open_file('Settings/lexer-settings.json')
 
     def update_settings(self):
         self.filetypes = self.settings_class.get_settings('file_type')
@@ -1930,7 +1894,7 @@ class Editor:
             return
         if self.tabs[self.get_tab()].textbox.lint_cmd:
             currdir = self.tabs[self.get_tab()].file_dir
-            if _PLTFRM:
+            if _WINDOWS:
                 with open('lint.bat', 'w') as f:
                     f.write(
                         _LINT_BATCH.format(
@@ -1948,7 +1912,7 @@ class Editor:
             self.open_file('results.txt')
             os.remove('results.txt')
         else:
-            messagebox.showerror('Error')
+            messagebox.showerror('Error', 'This language is not supported')
             return
 
     def autopep(self):
@@ -2035,11 +1999,10 @@ class Editor:
         elif action is None:
             raise EditorErr('Invalid action -- ' + str(action))
         currdir = Path(self.tabs[self.get_tab()].file_dir).parent
-        if not os.path.isdir('.git'):
-            run_in_terminal(cwd=currdir, cmd='git init')
         if action == 'init':
             if os.path.isdir(os.path.join(currdir, '.git')):
-                messagebox.showerror("Error!", "This is already a git repository!")
+                if messagebox.askokcancel("Error!", "This is already a git repository!\nDo you want to re-initialize?"):
+                    os.remove(os.path.join(currdir, '.git'))
             else:
                 run_in_terminal(cwd=currdir, cmd='git init && git add . && git commit -am \"Added files\"')
         elif action == 'addall':
@@ -2053,6 +2016,7 @@ class Editor:
                 run_in_terminal(cwd=currdir, cmd=f'git add {x}')
         elif action == 'commit':
             window = tk.Toplevel(master=self.master)
+            window.title('Commit')
             window.transient(self.master)
             window.resizable(0, 0)
             ttkthemes.ThemedStyle(window).set_theme(self.theme)
@@ -2062,11 +2026,13 @@ class Editor:
 
             def commit():
                 run_in_terminal(cwd=currdir, cmd=f'git commit -am "{message.get()}"')
+                window.destroy()
 
             ttk.Button(window, command=commit, text='>> Commit').pack(fill='x')
             window.mainloop()
         elif action == 'other':
             window = tk.Toplevel(master=self.master)
+            window.title('Advanced actions')
             window.transient(self.master)
             window.resizable(0, 0)
             ttkthemes.ThemedStyle(window).set_theme(self.theme)
@@ -2075,6 +2041,7 @@ class Editor:
 
             def do():
                 run_in_terminal(cwd=currdir, cmd=f'git {advancedaction.get()}')
+                window.destroy()
 
             ttk.Button(window, command=do,
                        text='>> Do Action').pack(side='right')

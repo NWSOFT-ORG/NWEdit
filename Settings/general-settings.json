@@ -1,0 +1,18 @@
+/* General settings
+Impropper modifying might causse error
+Please follow the instructions as comments.
+*/
+{
+    /* File types:
+    all:     *, *.*
+    py:      Python
+    xml:     XML
+    text:    Plain Text*/
+    "file_types": "all",
+    // Must be a valid TK font
+    "font": "Consolas 13",
+    // Must be a valid TTK theme
+    "theme": "black",
+    // Must be a valid Pygments theme
+    "pygments": "default"
+}

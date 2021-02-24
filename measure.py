@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-# TODO: Port this to Windows
+"""Measures the time of the execution of a command."""
 import sys
 import time
 
@@ -13,6 +13,6 @@ try:
         with open('timertemp.txt') as f:
             first = "%.1f" % float(f.read())
         second = "%.1f" % time.time()
-        print('Build taken {} seconds.'.format(round(float(second) - float(first), 2)))
-except:
+        print('Command taken {} seconds.'.format(round(float(second) - float(first), 2)))
+except IndexError:
     print('This script needs a parameter.')

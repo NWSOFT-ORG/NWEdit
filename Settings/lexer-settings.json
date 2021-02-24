@@ -1,0 +1,63 @@
+/* File type settings
+Modifying could cause error when highlighting
+*/
+{
+    // Python
+    "py": "Python",
+    "pyw": "Python",
+    "jy": "Python",
+    "sage": "Python",
+    "sc": "Python",
+    "SConstruct": "Python",
+    "SConscript": "Python",
+    "bzl": "Python",
+    "BUCK": "Python",
+    "BUILD": "Python",
+    "BUILD.bazel": "Python",
+    "WORKSPACE": "Python",
+    "tac": "Python",
+    // Text
+    "text": "Text",
+    "txt": "Text",
+    // HTML
+    "html": "HTML",
+    "htm": "HTML",
+    "xhtml": "HTML",
+    // XML
+    "xml": "XML",
+    "xslt": "XML",
+    "xsl": "XML",
+    "rss": "XML",
+    "xsd": "XML",
+    "wsdl": "XML",
+    "wsf": "XML",
+    // HTML, PHP
+    "php": "HTMLPhp",
+    "php5": "HTMLPhp",
+    // Init
+    "ini": "Ini",
+    "init": "Ini",
+    // Conf
+    "conf": "ApacheConf",
+    "cnf": "ApacheConf",
+    "config": "ApacheConf",
+    // Shell
+    "sh": "Bash",
+    "ksh": "Bash",
+    "ebuild": "Bash",
+    "eclass": "Bash",
+    "exheres-0": "Bash",
+    "exlib": "Bash",
+    "zsh": "Bash",
+    "bashrc": "Bash",
+    "PKGBUILD": "Bash",
+    // JSON
+    "json": "JSON",
+    // JavaScript
+    "js": "JavaScript",
+    "javascript": "JavaScript",
+    // CSS
+    "css": "CSS",
+    // Your custom goes here, for example...
+    "zshrc": "Bash"
+}

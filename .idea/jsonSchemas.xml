@@ -18,6 +18,9 @@
                   <Item>
                     <option name="path" value="Settings/linter-settings.json" />
                   </Item>
+                  <Item>
+                    <option name="path" value="Settings/cmd-settings.json" />
+                  </Item>
                 </list>
               </option>
             </SchemaInfo>

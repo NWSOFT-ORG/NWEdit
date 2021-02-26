@@ -4,7 +4,7 @@
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 | pyplus.py -- the editor's ONLY file                 |
 | The somehow-professional editor                     |
-| It's extremely small! (around 40 kB)                |
+| It's extremely small! (around 80 kB)                |
 | You can visit my site for more details!             |
 | +---------------------------------------------+     |
 | | http://ZCG-coder.github.io/NWSOFT/PyPlusWeb |     |
@@ -40,6 +40,7 @@ import ttkthemes
 from pygments import lexers
 from pygments.lexers.python import PythonLexer
 from pygments.styles import get_style_by_name
+from pygson.json_lexer import JSONLexer
 from ttkthemes import ThemedStyle
 
 textchars = bytearray({7, 8, 9, 10, 12, 13, 27}
@@ -102,11 +103,11 @@ ENCODINGS = ("ASCII", "CP037", "CP850", "CP1140", "CP1252", "Latin1",
 # </editor-fold>
 
 
-def download_file(update_url):
+def download_file(url):
     """Downloads a file from remote path"""
-    local_filename = update_url.split('/')[-1]
+    local_filename = url.split('/')[-1]
     # NOTE the stream=True parameter below
-    with requests.get(update_url, stream=True) as r:
+    with requests.get(url, stream=True) as r:
         r.raise_for_status()
         with open(local_filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
@@ -785,8 +786,14 @@ class Filetype:
             self.extens.append(key)
             self.lexers.append(value)
 
-    def get_lexer_settings(self, extension):
-        return lexers.get_lexer_by_name(self.lexers[self.extens.index(extension)])
+    def get_lexer_settings(self, extension: str):
+        try:
+            if lexers.get_lexer_by_name(self.lexers[self.extens.index(extension)]) == lexers.get_lexer_by_name('JSON'):
+                return JSONLexer
+            return lexers.get_lexer_by_name(self.lexers[self.extens.index(extension)])
+        except Exception as e:
+            print(e)
+            return lexers.get_lexer_by_name('Text')
 
 
 class Linter:
@@ -799,11 +806,32 @@ class Linter:
             self.extens.append(key)
             self.linters.append(value)
 
-    def get_linter_settings(self, extension):
-        if self.linters[self.extens.index(extension)] == "none":
-            return None
-        else:
+    def get_linter_settings(self, extension: str):
+        try:
+            if self.linters[self.extens.index(extension)] == "none":
+                return None
             return self.linters[self.extens.index(extension)]
+        except IndexError:
+            return None
+
+
+class BuildCommand:
+    def __init__(self):
+        with open("Settings/cmd-settings.json") as f:
+            all_settings = json.load(f)
+        self.extens = []
+        self.commands = []
+        for key, value in all_settings.items():
+            self.extens.append(key)
+            self.commands.append(value)
+
+    def get_command_settings(self, extension: str):
+        try:
+            if self.commands[self.extens.index(extension)] == "none":
+                return None
+            return self.commands[self.extens.index(extension)]
+        except IndexError:
+            return None
 
 
 class TextLineNumbers(tk.Canvas):
@@ -1070,6 +1098,7 @@ class Editor:
         self.settings_class = Settings()
         self.file_setting_class = Filetype()
         self.linter_setting_class = Linter()
+        self.cmd_setting_class = BuildCommand()
         self.theme = self.settings_class.get_settings('theme')
         self.master = ttkthemes.ThemedTk()
         self.master.minsize(900, 600)
@@ -1105,8 +1134,14 @@ class Editor:
 
         app_menu.add_command(label='About PyPlus', command=self._version)
         preferences = tk.Menu(app_menu)
-        preferences.add_command(label="General Settings", command=self.config)
-        preferences.add_command(label="File type Settings", command=self.filetype_config)
+        preferences.add_command(label="General Settings", command=lambda: self.open_file('Settings/general-settings'
+                                                                                         '.json'))
+        preferences.add_command(label="Lexer Settings", command=lambda: self.open_file('Settings/lexer-settings'
+                                                                                       '.json'))
+        preferences.add_command(label="Linter Settings", command=lambda: self.open_file('Settings/linter-settings'
+                                                                                        '.json'))
+        preferences.add_command(label="Build Command Settings", command=lambda: self.open_file('Settings/cmd-settings'
+                                                                                               '.json'))
         app_menu.add_cascade(label="Preferences", menu=preferences)
         app_menu.add_separator()
         app_menu.add_command(label='Exit Editor', command=self.exit)
@@ -1427,6 +1462,7 @@ class Editor:
                 self.mouse()
                 currtext.lexer = self.file_setting_class.get_lexer_settings(extens)
                 currtext.lint_cmd = self.linter_setting_class.get_linter_settings(extens)
+                currtext.cmd = self.cmd_setting_class.get_command_settings(extens)
                 self.create_tags()
                 self.recolorize()
                 currtext.see('insert')
@@ -1546,8 +1582,8 @@ class Editor:
                             self.tabs[self.get_tab()].file_dir).parent)))
                 os.system('chmod 700 build.sh')
                 run_in_terminal('./build.sh && rm build.sh && exit')
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def system_shell():
@@ -1878,12 +1914,6 @@ class Editor:
         cv.create_image(0, 0, anchor='nw', image=img)
         ver.mainloop()
 
-    def config(self, _=None):
-        self.open_file('Settings/general-settings.json')
-
-    def filetype_config(self, _=None):
-        self.open_file('Settings/lexer-settings.json')
-
     def update_settings(self):
         self.filetypes = self.settings_class.get_settings('file_type')
         self.create_tags()
@@ -1919,6 +1949,7 @@ class Editor:
         """Auto Pretty-Format the document"""
         currdir = self.tabs[self.get_tab()].file_dir
         subprocess.run(f'autopep8 "{currdir}" --in-place', shell=True)
+        # Add the --in-place argument to disable output to console
         self.reload()
 
     def goto(self, _=None):
@@ -1969,7 +2000,7 @@ class Editor:
             )  # If you're on the developer build, you don't need updates!
             return
         download_file(
-            update_url="https://zcg-coder.github.io/NWSOFT/PyPlusWeb/ver.json")
+            url="https://zcg-coder.github.io/NWSOFT/PyPlusWeb/ver.json")
         with open('ver.json') as f:
             newest = json.load(f)
         updatewin = tk.Toplevel(self.master)
@@ -2039,11 +2070,11 @@ class Editor:
             ttk.Label(window, text='Action: git ').pack(side='left')
             advancedaction = ttk.Entry(window)
 
-            def do():
+            def do_action():
                 run_in_terminal(cwd=currdir, cmd=f'git {advancedaction.get()}')
                 window.destroy()
 
-            ttk.Button(window, command=do,
+            ttk.Button(window, command=do_action,
                        text='>> Do Action').pack(side='right')
             advancedaction.pack(side='right')
 

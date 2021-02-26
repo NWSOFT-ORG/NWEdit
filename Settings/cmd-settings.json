@@ -1,0 +1,64 @@
+/* File build command settings
+Follow the instructuins, and modify it to make the editor work on your system.
+Default is MacOS.
+*/
+{
+    // Python
+    "py": "python3",
+    "pyw": "python3",
+    "jy": "none",
+    "sage": "none",
+    "sc": "none",
+    "SConstruct": "none",
+    "SConscript": "none",
+    "bzl": "none",
+    "BUCK": "none",
+    "BUILD": "none",
+    "BUILD.bazel": "none",
+    "WORKSPACE": "none",
+    "tac": "none",
+    // Text
+    "text": "none",
+    "txt": "none",
+    // HTML
+    "html": "open",
+    "htm": "open",
+    "xhtml": "open",
+    // XML
+    "xml": "none",
+    "xslt": "none",
+    "xsl": "none",
+    "rss": "none",
+    "xsd": "none",
+    "wsdl": "none",
+    "wsf": "none",
+    // HTML, PHP
+    "php": "open",
+    "php5": "open",
+    // Init
+    "ini": "none",
+    "init": "none",
+    // Conf
+    "conf": "none",
+    "cnf": "none",
+    "config": "none",
+    // Shell
+    "sh": "sh",
+    "ksh": "ksh",
+    "ebuild": "bash",
+    "eclass": "bash",
+    "exheres-0": "bash",
+    "exlib": "bash",
+    "zsh": "zsh",
+    "bashrc": "bash",
+    "PKGBUILD": "bash",
+    // JSON
+    "json": "none",
+    // JavaScript
+    "js": "node",
+    "javascript": "node",
+    // CSS
+    "css": "none",
+    // Your custom goes here, for example...
+    "zshrc": "zsh"
+}

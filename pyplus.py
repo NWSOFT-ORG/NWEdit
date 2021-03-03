@@ -724,8 +724,7 @@ class Settings:
             self.size = self.settings['font'].split()[1]
             self.filetype = self.settings['file_types']
             return
-        except Exception as e:
-            print(e)
+        except Exception:
             messagebox.showerror(
                 "Error", "Setings are corrupted. Now using default ones.")
             with open('Settings/general-settings.json', 'w') as f:
@@ -791,8 +790,7 @@ class Filetype:
             if lexers.get_lexer_by_name(self.lexers[self.extens.index(extension)]) == lexers.get_lexer_by_name('JSON'):
                 return JSONLexer
             return lexers.get_lexer_by_name(self.lexers[self.extens.index(extension)])
-        except Exception as e:
-            print(e)
+        except Exception:
             return lexers.get_lexer_by_name('Text')
 
 
@@ -1315,7 +1313,7 @@ class Editor:
             self.create_tags()
             self.recolorize()
             currtext.statusbar.config(
-                text=f'PyPlus | file {self.nb.tab(self.get_tab())["text"]}| ln {int(float(currtext.index("insert")))}'
+                text=f'PyPlus | file {self.nb.tab(self.get_tab())["text"]} | ln {int(float(currtext.index("insert")))}'
                      f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
             )
             # Update statusbar and titlebar
@@ -1334,8 +1332,8 @@ class Editor:
         currtext = self.tabs[self.get_tab()].textbox
         try:
             currtext.statusbar.config(
-                text=f"PyPlus | file {self.nb.tab(self.get_tab())['text']}| ln {int(float(currtext.index('insert')))} "
-                     f"| col {str(int(currtext.index('insert').split('.')[1:][0]))}"
+                text=f'PyPlus | file {self.nb.tab(self.get_tab())["text"]} | ln {int(float(currtext.index("insert")))}'
+                     f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
             )
             # Update statusbar and titlebar
             self.settitle()
@@ -1468,8 +1466,8 @@ class Editor:
                 currtext.see('insert')
                 currtext.focus_set()
                 return 'break'
-            except Exception as e:
-                print(e)
+            except Exception:
+                pass
 
     def _open(self, _=None):
         """This method just prompts the user to open a file when C-O is pressed"""
@@ -1582,8 +1580,8 @@ class Editor:
                             self.tabs[self.get_tab()].file_dir).parent)))
                 os.system('chmod 700 build.sh')
                 run_in_terminal('./build.sh && rm build.sh && exit')
-        except Exception as e:
-            print(e)
+        except Exception:
+            pass
 
     @staticmethod
     def system_shell():
@@ -2064,6 +2062,7 @@ class Editor:
         elif action == 'other':
             window = tk.Toplevel(master=self.master)
             window.title('Advanced actions')
+
             window.transient(self.master)
             window.resizable(0, 0)
             ttkthemes.ThemedStyle(window).set_theme(self.theme)

@@ -55,7 +55,7 @@ def is_binary_string(byte):
 _WINDOWS = bool(sys.platform.startswith('win'))
 _OSX = bool(sys.platform.startswith('darwin'))
 _APPDIR = Path(__file__).parent
-_VERSION = '5.0-DEV-MAIN'
+_VERSION = '5.0-TEST'
 os.chdir(_APPDIR)
 _BATCH_BUILD = ('''#!/bin/bash
 set +v
@@ -1901,15 +1901,15 @@ class Editor:
     def _version(self):
         """Shows the version and related info of the editor."""
         ver = tk.Toplevel()
-        style = ThemedStyle(ver)
-        style.set_theme(self.theme)  # Applies the ttk theme
-        ver.geometry('480x190')
         ver.resizable(0, 0)
-        ver.transient(self.master)
-        cv = tk.Canvas(ver)
-        cv.pack(fill='both', expand=1)
-        img = tk.PhotoImage(file='ver.gif')
-        cv.create_image(0, 0, anchor='nw', image=img)
+        ttk.Label(ver, text=f'Version {_VERSION}', font='Arial 30 bold').pack(fill='both')
+        if self.check_updates(popup=False)[0]:
+            update = ttk.Label(ver, text='Updates available',
+                               foreground="blue", cursor="hand2")
+            update.pack(fill='both')
+            update.bind("<Button-1>", lambda e: webbrowser.open_new_tab(self.check_updates(popup=False)[1]))
+        else:
+            ttk.Label(ver, text='No updates available').pack(fill='both')
         ver.mainloop()
 
     def update_settings(self):
@@ -1990,7 +1990,7 @@ class Editor:
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set('insert', 'insert-1c')
 
-    def check_updates(self):
+    def check_updates(self, popup=True):
         if 'DEV' in _VERSION:
             messagebox.showerror(
                 "Updates", "Updates aren't supported by develop builds,\n\
@@ -2001,11 +2001,14 @@ class Editor:
             url="https://zcg-coder.github.io/NWSOFT/PyPlusWeb/ver.json")
         with open('ver.json') as f:
             newest = json.load(f)
+        version = newest["version"]
+        if not popup:
+            os.remove('ver.json')
+            return [bool(version != _VERSION), newest["url"]]
         updatewin = tk.Toplevel(self.master)
         updatewin.title('Updates')
         updatewin.resizable(0, 0)
         updatewin.transient(self.master)
-        version = newest["version"]
         ttkthemes.ThemedStyle(updatewin)
         if version != _VERSION:
             ttk.Label(updatewin, text='Update available!',

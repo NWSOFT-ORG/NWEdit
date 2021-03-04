@@ -57,6 +57,12 @@ _OSX = bool(sys.platform.startswith('darwin'))
 _APPDIR = Path(__file__).parent
 _VERSION = '5.0-TEST'
 os.chdir(_APPDIR)
+_ICON = ('iVBORw0KGgoAAAANSUhEU\n'
+         'gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA\n '
+         'ABJQTFRFAAAAAAAA////TWyK////////WaqEwgAAAAZ0Uk5TAP8U/yr/h0gXnQAAAHpJREF\n '
+         'UeJyNktENgCAMROsGog7ACqbpvzs07L+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D\n '
+         'QGsRhw9B3SMwNSSj1glNEDqhUpUGw/gMuUd+d2Csny6xgAZB4A1IDwG1SxAc/95t7DAPPIm\n '
+         '4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC')
 _BATCH_BUILD = ('''#!/bin/bash
 set +v
 cd "{script_dir}"
@@ -1105,12 +1111,7 @@ class Editor:
         self.master.title('PyPlus')
         self.master.iconphoto(
             True,
-            tk.PhotoImage(data=('iVBORw0KGgoAAAANSUhEU\n'
-                                'gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA\n '
-                                'ABJQTFRFAAAAAAAA////TWyK////////WaqEwgAAAAZ0Uk5TAP8U/yr/h0gXnQAAAHpJREF\n '
-                                'UeJyNktENgCAMROsGog7ACqbpvzs07L+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D\n '
-                                'QGsRhw9B3SMwNSSj1glNEDqhUpUGw/gMuUd+d2Csny6xgAZB4A1IDwG1SxAc/95t7DAPPIm\n '
-                                '4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC')))
+            tk.PhotoImage(data=_ICON))
         # Base64 image, this probably decreases the repo size.
 
         self.filetypes = self.settings_class.get_settings('file_type')
@@ -1902,6 +1903,8 @@ class Editor:
         """Shows the version and related info of the editor."""
         ver = tk.Toplevel()
         ver.resizable(0, 0)
+        img = tk.PhotoImage(data=_ICON)
+        ttk.Label(ver, image=img).pack(fill='both')
         ttk.Label(ver, text=f'Version {_VERSION}', font='Arial 30 bold').pack(fill='both')
         if self.check_updates(popup=False)[0]:
             update = ttk.Label(ver, text='Updates available',

@@ -1104,7 +1104,7 @@ class Editor:
         self.linter_setting_class = Linter()
         self.cmd_setting_class = BuildCommand()
         self.theme = self.settings_class.get_settings('theme')
-        self.master = ttkthemes.ThemedTk()
+        self.master = tk.Tk()
         self.master.minsize(900, 600)
         ttkthemes.ThemedStyle(self.master).set_theme(self.theme)
         self.master.geometry("600x400")
@@ -1868,13 +1868,18 @@ class Editor:
     def reload(self):
         if len(self.tabs) == 0:
             return
-        file_dir = self.tabs[self.get_tab()].file_dir
-        if file_dir == 'None':
-            self.close_tab()
-            self.new_file()
-            return
-        self.close_tab()
-        self.open_file(file_dir)
+        tabs = []
+        self.nb.select(self.nb.index('end') - 1)
+        for value in self.tabs.items():
+            tabs.append(value[1])
+        for tab in tabs:
+            file = tab.file_dir
+            try:
+                self.close_tab()
+                self.get_tab()
+                self.open_file(file)
+            except Exception:
+                self.new_file()
 
     def exit(self, force=False):
         if not force:

@@ -55,7 +55,7 @@ def is_binary_string(byte):
 _WINDOWS = bool(sys.platform.startswith('win'))
 _OSX = bool(sys.platform.startswith('darwin'))
 _APPDIR = Path(__file__).parent
-_VERSION = '5.0-TEST'
+_VERSION = '5.0'
 os.chdir(_APPDIR)
 _ICON = (
     'iVBORw0KGgoAAAANSUhEU\n'

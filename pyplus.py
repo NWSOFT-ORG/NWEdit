@@ -1186,6 +1186,9 @@ class Editor:
                              accelerator=f'{_MAIN_KEY}-a')
 
         self.codemenu = tk.Menu(menubar, tearoff=0)
+        self.codemenu.add_command(label='Indent', command=lambda: self.indent('indent'))
+        self.codemenu.add_command(label='Unident', command=lambda: self.indent('unindent'))
+        self.codemenu.add_separator()
         self.codemenu.add_command(label='Build',
                                   command=self.build,
                                   accelerator=f'{_MAIN_KEY}-b')
@@ -1305,7 +1308,7 @@ class Editor:
             return
         self.master.title(f'PyPlus -- {self.tabs[self.get_tab()].file_dir}')
 
-    def key(self, event=None):
+    def key(self, _=None):
         """Event when a key is pressed."""
         if len(self.tabs) == 0:
             return
@@ -1320,9 +1323,7 @@ class Editor:
             # Update statusbar and titlebar
             self.settitle()
             # Auto-save
-            if event.char and event.keysym not in ('Left', 'Right', 'Up',
-                                                   'Down'):
-                self.save_file()
+            self.save_file()
         except Exception:
             currtext.statusbar.config(text='PyPlus')  # When error occurs
 
@@ -2087,6 +2088,38 @@ class Editor:
             ttk.Button(window, command=do_action,
                        text='>> Do Action').pack(side='right')
             advancedaction.pack(side='right')
+    
+    def indent(self, action='indent'):
+        if len(self.tabs) == 0:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        if action == 'indent':
+            sel_start = currtext.index(tk.SEL_FIRST + '-1c linestart')
+            sel_end = currtext.index(tk.SEL_LAST + '-1c lineend')
+            selected_text = currtext.get(sel_start, sel_end)
+            indented = []
+            for line in selected_text.splitlines():
+                indented.append(' ' * 4 + line)
+            currtext.delete(sel_start, sel_end)
+            currtext.insert(sel_start, '\n'.join(indented))
+            currtext.tag_remove('sel', '1.0', 'end')
+            self.key()
+        elif action == 'unindent':
+            sel_start = currtext.index(tk.SEL_FIRST + '-1c linestart')
+            sel_end = currtext.index(tk.SEL_LAST + '-1c lineend')
+            selected_text = currtext.get(sel_start, sel_end)
+            indented = []
+            for line in selected_text.splitlines():
+                if line.startswith(' ' * 4):
+                    indented.append(line[4:])
+                else:
+                    return
+            currtext.delete(sel_start, sel_end)
+            currtext.insert(sel_start, '\n'.join(indented))
+            currtext.tag_remove('sel', '1.0', 'end')
+            self.key()
+        else:
+            raise EditorErr('Action undefined.')
 
 
 if __name__ == '__main__':

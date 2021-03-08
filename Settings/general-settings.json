@@ -14,5 +14,5 @@ Please follow the instructions as comments.
     // Must be a valid TTK theme
     "theme": "black",
     // Must be a valid Pygments theme
-    "pygments": "default"
+    "pygments": "vim"
 }

@@ -32,7 +32,6 @@ import tkinter.messagebox as messagebox
 import tkinter.ttk as ttk
 import webbrowser
 from pathlib import Path
-from tkinter.scrolledtext import ScrolledText
 
 import json5 as json
 import requests
@@ -509,9 +508,15 @@ class Console(ttk.Frame):
     def __init__(self, parent, _locals=None, exit_callback=None):
         super().__init__(parent)
 
-        self.text = ConsoleText(self, wrap=tk.WORD)
-        self.text.pack(fill=tk.BOTH, expand=True)
-        self.text.insert('insert', sys.version + '\n')
+        self.text = ConsoleText(self, wrap='none')
+        vbar = ttk.Scrollbar(self, command=self.text.yview)
+        vbar.pack(side='right', fill='y', anchor='ne')
+        xbar = ttk.Scrollbar(self, command=self.text.xview, orient='horizontal')
+        xbar.pack(side='bottom', fill='x', anchor='sw')
+        self.text.pack(fill='both', expand=True, side='left', anchor='nw')
+        self.text.config(yscrollcommand=vbar.set)
+        self.text.config(xscrollcommand=xbar.set)
+        self.text.insert('insert', 'Python ' + sys.version + '\n')
 
         self.shell = code.InteractiveConsole(_locals)
 
@@ -599,7 +604,7 @@ class Console(ttk.Frame):
             threading.Thread(target=run_command).start()
 
 
-class ConsoleText(ScrolledText):
+class ConsoleText(tk.Text):
     """
     A Text widget which handles some application logic,
     e.g. having a line of input at the end with everything else being un-editable
@@ -1311,7 +1316,7 @@ class Editor:
 
     def settitle(self, _=None):
         if len(self.tabs) == 0:
-            return
+            self.master.title('PyPlus -- No file open')
         self.master.title(f'PyPlus -- {self.tabs[self.get_tab()].file_dir}')
 
     def key(self, _=None):
@@ -1352,7 +1357,7 @@ class Editor:
 
     def create_tags(self):
         """
-            the method creates the tags associated with each distinct style element of the
+            The method creates the tags associated with each distinct style element of the
             source code 'dressing'
         """
         if len(self.tabs) == 0:
@@ -1387,7 +1392,7 @@ class Editor:
 
     def recolorize(self):
         """
-            this method colors and styles the prepared tags
+            This method colors and styles the prepared tags
         """
         if len(self.tabs) == 0:
             return
@@ -1407,8 +1412,8 @@ class Editor:
                 end_index += len(value)
 
             if value not in (" ", "\n"):
-                index1 = "%s.%s" % (start_line, start_index)
-                index2 = "%s.%s" % (end_line, end_index)
+                index1 = f"{start_line}.{start_index}"
+                index2 = f"{end_line}.{end_index}"
 
                 for tagname in currtext.tag_names(index1):
                     if tagname != 'sel':
@@ -1736,7 +1741,7 @@ class Editor:
             text.tag_remove('found', '1.0', 'end')
             s = content.get()
             starts.clear()
-            if s:
+            if s != '\\':
                 idx = '1.0'
                 while 1:
                     idx = text.search(s,
@@ -1762,7 +1767,7 @@ class Editor:
             text.tag_remove('found', '1.0', 'end')
             s = content.get()
             r = repl.get()
-            if s:
+            if s != '\\':
                 idx = '1.0'
                 while 1:
                     idx = text.search(s,
@@ -1920,6 +1925,7 @@ class Editor:
         """Shows the version and related info of the editor."""
         ver = tk.Toplevel()
         ver.resizable(0, 0)
+        ver.title('About PyPlus')
         img = tk.PhotoImage(data=_ICON)
         ttk.Label(ver, image=img).pack(fill='both')
         ttk.Label(ver, text=f'Version {_VERSION}',
@@ -2114,6 +2120,7 @@ class Editor:
             advancedaction.pack(side='right')
 
     def indent(self, action='indent'):
+        """Indent/unindent feature"""
         if len(self.tabs) == 0:
             return
         currtext = self.tabs[self.get_tab()].textbox
@@ -2127,7 +2134,7 @@ class Editor:
             currtext.delete(sel_start, sel_end)
             currtext.insert(sel_start, '\n'.join(indented))
             currtext.tag_remove('sel', '1.0', 'end')
-            currtext.tag_add('sel', sel_start, sel_end)
+            currtext.tag_add('sel', sel_start, f'{sel_end} +4c')
             self.key()
         elif action == 'unindent':
             selected_text = currtext.get(sel_start, sel_end)

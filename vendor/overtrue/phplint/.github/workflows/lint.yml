@@ -10,10 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@master
-    - name: Checking PHP syntax error
-      uses: overtrue/phplint@master
-      with:
-        path: .
-        options: --exclude=*.log
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Checking PHP syntax error
+        uses: overtrue/phplint@master
+        with:
+          path: .
+          options: --exclude=*.log

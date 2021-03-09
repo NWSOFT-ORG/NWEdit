@@ -1,15 +1,17 @@
 # PyPlusSource
+
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FZCG-coder%2FPyPlusSource&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Views&edge_flat=true)](https://hits.seeyoufarm.com)  
 The source code of the PyPlus editor.
 
 # The code
 
 The code is a modified(*enhanced*) version of  
-[dh7qc/python-text-editor](https://www.github.com/dh7qc/python-text-editor), licensed after the GPL v3.0 license  
+[dh7qc/python-text-editor](https://www.github.com/dh7qc/python-text-editor), licensed after the GPL v3.0 license
 
 **The website is at [here](http://zcg-coder.github.io/NWSOFT/PyPlusWeb)**  
 **The website may be outdated, so please go to source release to download it.**  
-Some code is from pyro written by James Stalings, licensed after the GPL v3.0 License. Thanks him for the source  
+Some code is from pyro written by James Stalings, licensed after the GPL v3.0 License. Thanks him for the source
+
 ```
 simple elegant text editor built on Python/Tkinter
     by James Stallings, June 2015
@@ -74,8 +76,8 @@ simple elegant text editor built on Python/Tkinter
         
         Pyro requires Tkinter and Pygment external libraries.
 ```
-Also, from thonny, licensed after the MIT License.
-And the  Hex editor  
+
+Also, from thonny, licensed after the MIT License. And the Hex editor
 
 ```
 Copyright © 2016-20 Qtrac Ltd. All rights reserved.
@@ -88,18 +90,19 @@ WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 General Public License for more details.
 ```
-  
+
 # Installing dependencies
+
 This editor needs a **LOT** of dependencies.  
 I have installed a lot.  
 However, to make sure that it works fully, you need to install them  
-Dependencies:  
+Dependencies:
+
 - npm -> eslint (for JavaScript)
 - autopep8
 - pylint
 - html-linter
 - ttkthemes
-- Pygments
-You can install them using the following commands:  
-`poetry install && npm install` (Works on Linux, Mac, and Windows)  
-To get Poetry, go here: [python-poetry/poetry](https://github.com/python-poetry/poetry#installation)
+- Pygments You can install them using the following commands:  
+  `poetry install && npm install` (Works on Linux, Mac, and Windows)  
+  To get Poetry, go here: [python-poetry/poetry](https://github.com/python-poetry/poetry#installation)

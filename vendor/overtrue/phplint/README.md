@@ -9,7 +9,6 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/overtrue/phplint/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/overtrue/phplint/?branch=master)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fovertrue%2Fphplint.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fovertrue%2Fphplint?ref=badge_shield)
 
-
 ## Installation
 
 ### Locally, if you have PHP
@@ -80,17 +79,16 @@ warning: false
 $ ./vendor/bin/phplint
 ```
 
-By default, the command will read configuration from file `.phplint.yml` of path specified, you can custom the filename by option: `--configuration=FILENAME` or `-c FILENAME`;
+By default, the command will read configuration from file `.phplint.yml` of path specified, you can custom the filename
+by option: `--configuration=FILENAME` or `-c FILENAME`;
 
 If you want to disable the config file, you can add option `--no-configuration`.
 
 ### Warnings
 
-Not all linting problems are errors, PHP also has warnings, for example when using a `continue` statement within a 
-`switch` `case`. By default these errors are not reported, but you can turn this on with the `warning` cli flag, or
-by setting the `warning` to true in the configuration. 
-
-
+Not all linting problems are errors, PHP also has warnings, for example when using a `continue` statement within a
+`switch` `case`. By default these errors are not reported, but you can turn this on with the `warning` cli flag, or by
+setting the `warning` to true in the configuration.
 
 ### Program
 
@@ -134,6 +132,7 @@ with:
 ### Other CI/CD (f.e. Bitbucket Pipelines, GitLab CI)
 
 Run this command using `overtrue/phplint:latest` Docker image:
+
 ```
 /root/.composer/vendor/bin/phplint ./ --exclude=vendor
 ```
@@ -147,6 +146,5 @@ Run this command using `overtrue/phplint:latest` Docker image:
 ## License
 
 MIT
-
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fovertrue%2Fphplint.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fovertrue%2Fphplint?ref=badge_large)

@@ -2,7 +2,14 @@
     "name": "symfony/string",
     "type": "library",
     "description": "Provides an object-oriented API to strings and deals with bytes, UTF-8 code points and grapheme clusters in a unified way",
-    "keywords": ["string", "utf8", "utf-8", "grapheme", "i18n", "unicode"],
+    "keywords": [
+        "string",
+        "utf8",
+        "utf-8",
+        "grapheme",
+        "i18n",
+        "unicode"
+    ],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -30,8 +37,12 @@
         "symfony/var-exporter": "^4.4|^5.0"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\String\\": "" },
-        "files": [ "Resources/functions.php" ],
+        "psr-4": {
+            "Symfony\\Component\\String\\": ""
+        },
+        "files": [
+            "Resources/functions.php"
+        ],
         "exclude-from-classmap": [
             "/Tests/"
         ]

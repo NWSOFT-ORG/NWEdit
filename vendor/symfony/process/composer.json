@@ -20,7 +20,9 @@
         "symfony/polyfill-php80": "^1.15"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Process\\": "" },
+        "psr-4": {
+            "Symfony\\Component\\Process\\": ""
+        },
         "exclude-from-classmap": [
             "/Tests/"
         ]

@@ -19,7 +19,9 @@
         "php": ">=7.2.5"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\Finder\\": "" },
+        "psr-4": {
+            "Symfony\\Component\\Finder\\": ""
+        },
         "exclude-from-classmap": [
             "/Tests/"
         ]

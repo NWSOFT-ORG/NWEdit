@@ -372,7 +372,7 @@ class HexView:
         WITHOUT ANY WARRANTY; without even the implied warranty of
         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
         General Public License for more details.
-        """
+    """
 	def __init__(self, parent):
 		"""Initializes the class"""
 		self.parent = parent
@@ -682,7 +682,7 @@ class ConsoleText(tk.Text):
 
 		# insert the text
 		self.insert(pos, string)
-		self.see(tk.END)
+		self.see('end')
 
 		# commit text
 		self.commit_to(pos)
@@ -711,6 +711,33 @@ class ConsoleText(tk.Text):
 		return line
 
 
+class FileTree(ttk.Frame):
+	def __init__(self, master, path):
+		ttk.Frame.__init__(self, master)
+		self.tree = ttk.Treeview(self)
+		ysb = ttk.Scrollbar(self, orient='vertical', command=self.tree.yview)
+		xsb = ttk.Scrollbar(self, orient='horizontal', command=self.tree.xview)
+		self.tree.configure(yscroll=ysb.set, xscroll=xsb.set)
+		self.tree.heading('#0', text=path, anchor='w')
+
+		abspath = os.path.abspath(path)
+		root_node = self.tree.insert('', 'end', text=abspath, open=True)
+		self.process_directory(root_node, abspath)
+
+		ysb.pack(side="right", fill='y')
+		xsb.pack(side='bottom', fill='x')
+		self.tree.pack(fill='both', expand=1)
+		self.pack(fill='both', expand=1)
+
+	def process_directory(self, parent, path):
+		for p in os.listdir(path):
+			abspath = os.path.join(path, p)
+			isdir = os.path.isdir(abspath)
+			oid = self.tree.insert(parent, 'end', text=p, open=False)
+			if isdir:
+				self.process_directory(oid, abspath)
+
+
 class EditorErr(Exception):
 	"""A nice exception class for debugging"""
 	def __init__(self, message):
@@ -732,23 +759,8 @@ class Settings:
 			self.filetype = self.settings['file_types']
 			return
 		except Exception:
-			messagebox.showerror(
-			    "Error", "Setings are corrupted. Now using default ones.")
-			with open('Settings/general-settings.json', 'w') as f:
-				f.write('''{
-  "file_types": "all",
-  "font": "Consolas 13",
-  "theme": "black",
-  "pygments": "default"
-}'''.strip())
-			with open('Settings/general-settings.json') as f:
-				self.settings = json.load(f)
-			self.theme = self.settings['theme']
-			self.highlight_theme = self.settings['pygments']
-			self.font = self.settings['font'].split()[0]
-			self.size = self.settings['font'].split()[1]
-			self.filetype = self.settings['file_types']
-			return
+			messagebox.showerror("Error", "Setings are corrupted.")
+			sys.exit(1)
 
 	def get_settings(self, setting):
 		if setting == 'font':
@@ -1168,8 +1180,7 @@ class Editor:
 		                     command=self.reload,
 		                     accelerator=f'{_MAIN_KEY}-r')
 		filemenu.add_separator()
-		filemenu.add_command(label='Startup scren',
-		                     command=self.start_screen)
+		filemenu.add_command(label='Startup scren', command=self.start_screen)
 
 		editmenu = tk.Menu(menubar, tearoff=0)
 		editmenu.add_command(label='Undo',
@@ -1280,22 +1291,30 @@ class Editor:
 			self.master.bind(x, self.autoinsert)
 		self.start_screen()
 		self.master.mainloop()  # This line can be here only
-	
+
 	def start_screen(self):
 		first_tab = tk.Canvas(self.nb, background='white')
-		first_tab.create_text(10, 10, anchor='nw',
+		first_tab.create_text(10,
+		                      10,
+		                      anchor='nw',
 		                      text='Welcome to PyPlus!',
 		                      font='Arial 50')
-		label1 = ttk.Label(first_tab, text='Open file',
-		                   foreground='blue', background='white')
-		label2 = ttk.Label(first_tab, text='New tab',
-		                   foreground='blue', background='white')
-		label3 = ttk.Label(first_tab, text='Close',
-		                   foreground='blue', background='white')
+		label1 = ttk.Label(first_tab,
+		                   text='Open file',
+		                   foreground='blue',
+		                   background='white')
+		label2 = ttk.Label(first_tab,
+		                   text='New tab',
+		                   foreground='blue',
+		                   background='white')
+		label3 = ttk.Label(first_tab,
+		                   text='Exit',
+		                   foreground='blue',
+		                   background='white')
 		label1.bind('<Button>', self._open)
 		label2.bind('<Button>', self.new_file)
-		label3.bind('<Button>', lambda _=None: self.close_tab())
-    
+		label3.bind('<Button>', self.exit)
+
 		first_tab.create_window(50, 100, window=label1, anchor='nw')
 		first_tab.create_window(50, 140, window=label2, anchor='nw')
 		first_tab.create_window(50, 180, window=label3, anchor='nw')
@@ -1332,16 +1351,17 @@ class Editor:
 		return textbox
 
 	def settitle(self, _=None):
-		if len(self.tabs) == 0:
-			self.master.title('PyPlus -- No file open')
-		self.master.title(f'PyPlus -- {self.tabs[self.get_tab()].file_dir}')
+		try:
+			if len(self.tabs) == 0:
+				self.master.title('PyPlus -- No file open')
+			self.master.title(f'PyPlus -- {self.tabs[self.get_tab()].file_dir}')
+		except:
+			self.master.title(f'PyPlus')
 
 	def key(self, _=None):
 		"""Event when a key is pressed."""
-		if len(self.tabs) == 0:
-			return
-		currtext = self.tabs[self.get_tab()].textbox
 		try:
+			currtext = self.tabs[self.get_tab()].textbox
 			self.create_tags()
 			self.recolorize()
 			currtext.statusbar.config(
@@ -1354,14 +1374,12 @@ class Editor:
 			# Auto-save
 			self.save_file()
 		except Exception:
-			currtext.statusbar.config(text='PyPlus')  # When error occurs
+			pass
 
 	def mouse(self, _=None):
 		"""The action done when the mouse is clicked"""
-		if len(self.tabs) == 0:
-			return
-		currtext = self.tabs[self.get_tab()].textbox
 		try:
+			currtext = self.tabs[self.get_tab()].textbox
 			currtext.statusbar.config(
 			    text=
 			    f'PyPlus | file {self.nb.tab(self.get_tab())["text"]} | ln {int(float(currtext.index("insert")))}'
@@ -1370,8 +1388,7 @@ class Editor:
 			# Update statusbar and titlebar
 			self.settitle()
 		except Exception:
-			currtext.statusbar.config(text='PyPlus')  # When error occurs
-
+			pass
 	def create_tags(self):
 		"""
             The method creates the tags associated with each distinct style element of the
@@ -1453,9 +1470,6 @@ class Editor:
 			    initialdir='/',
 			    title='Select file',
 			    filetypes=self.filetypes))
-			if os.access(file_dir, os.R_OK):
-				messagebox.showerror('Error', 'Cannot access file')
-				return
 		else:
 			file_dir = file
 
@@ -1540,7 +1554,8 @@ class Editor:
 				return
 			if os.access(self.tabs[curr_tab].file_dir, os.W_OK):
 				with open(self.tabs[curr_tab].file_dir, 'w') as file:
-					file.write(self.tabs[curr_tab].textbox.get(1.0, 'end').strip())
+					file.write(self.tabs[curr_tab].textbox.get(1.0,
+					                                           'end').strip())
 			else:
 				messagebox.showerror('Error', 'File read only')
 		except Exception:

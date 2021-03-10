@@ -45,6 +45,7 @@ Lacks these MacOS support:
         self.cmd_setting_class = BuildCommand()
         self.theme = self.settings_class.get_settings('theme')
         self.master = tk.Tk()
+        self.master.geometry('900x600')
         ttkthemes.ThemedStyle(self.master).set_theme(self.theme)
         self.master.title('PyPlus')
         self.master.iconphoto(True, tk.PhotoImage(data=ICON))
@@ -431,15 +432,20 @@ pop up to ask the user to select the path.
                 extens = file_dir.split('.')[-1]
 
                 new_tab = ttk.Frame(self.nb)
+                panedwin = ttk.Panedwindow(new_tab, orient='horizontal')
+                panedwin.pack(fill='both', expand=1)
+                textbox = self.create_text_widget(new_tab)
                 self.tabs[new_tab] = Document(new_tab,
-                                              self.create_text_widget(new_tab),
+                                              textbox,
                                               file_dir)
                 self.nb.add(new_tab, text=os.path.basename(file_dir))
                 self.nb.select(new_tab)
 
                 # Puts the contents of the file into the text widget.
                 currtext = self.tabs[new_tab].textbox
-                FileTree(new_tab, currtext, self.open_file, path=Path(file_dir).parent)
+                tree = FileTree(new_tab, currtext, self.open_file, path=Path(file_dir).parent)
+                panedwin.add(tree, weight=1)
+                panedwin.add(textbox.master, weight=10)
                 currtext.insert('end', file.read().replace('\t', ' ' * 4))
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()

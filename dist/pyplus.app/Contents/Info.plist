@@ -22,7 +22,7 @@
 	<key>CFBundleExecutable</key>
 	<string>PyPlus</string>
 	<key>CFBundleIconFile</key>
-	<string>PythonApplet.icns</string>
+	<string>icon.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.pythonmac.unspecified.PyPlus</string>
 	<key>CFBundleInfoDictionaryVersion</key>

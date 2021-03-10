@@ -3,9 +3,8 @@ from modules import *
 
 WINDOWS = bool(sys.platform.startswith('win'))
 OSX = bool(sys.platform.startswith('darwin'))
-APPDIR = Path(__file__).parent
+APPDIR = str(Path(__file__).parent)
 VERSION = '5.0'
-os.chdir(APPDIR)
 ICON = (
     'iVBORw0KGgoAAAANSUhEU\n'
     'gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA\n '

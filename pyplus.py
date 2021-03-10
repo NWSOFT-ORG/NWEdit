@@ -22,6 +22,9 @@ from tktext import *
 from treeview import *
 
 
+os.chdir(APPDIR)
+
+
 class Document:
     """Helper class, for the editor"""
 
@@ -45,6 +48,7 @@ Lacks these MacOS support:
         self.cmd_setting_class = BuildCommand()
         self.theme = self.settings_class.get_settings('theme')
         self.master = tk.Tk()
+        self.master.focus_force()
         self.master.geometry('900x600')
         ttkthemes.ThemedStyle(self.master).set_theme(self.theme)
         self.master.title('PyPlus')
@@ -72,19 +76,19 @@ Lacks these MacOS support:
         preferences = tk.Menu(app_menu, tearoff=0)
         preferences.add_command(
             label="General Settings",
-            command=lambda: self.open_file('Settings/general-settings'
+            command=lambda: self.open_file(APPDIR + '/Settings/general-settings'
                                            '.json'))
         preferences.add_command(
             label="Lexer Settings",
-            command=lambda: self.open_file('Settings/lexer-settings'
+            command=lambda: self.open_file(APPDIR + '/Settings/lexer-settings'
                                            '.json'))
         preferences.add_command(
             label="Linter Settings",
-            command=lambda: self.open_file('Settings/linter-settings'
+            command=lambda: self.open_file(APPDIR + '/Settings/linter-settings'
                                            '.json'))
         preferences.add_command(
             label="Build Command Settings",
-            command=lambda: self.open_file('Settings/cmd-settings'
+            command=lambda: self.open_file(APPDIR + '/Settings/cmd-settings'
                                            '.json'))
         app_menu.add_cascade(label="Preferences", menu=preferences)
         app_menu.add_separator()
@@ -220,7 +224,6 @@ Lacks these MacOS support:
         for x in ['"', "'", '(', '[', '{']:
             self.master.bind(x, self.autoinsert)
         self.start_screen()
-        self.open_file('measure.py')
         self.master.mainloop()  # This line can be here only
 
     def start_screen(self):
@@ -461,8 +464,8 @@ pop up to ask the user to select the path.
                 currtext.see('insert')
                 currtext.focus_set()
                 return 'break'
-            except Exception:
-                pass
+            except Exception as e:
+                print(e)
 
     def _open(self, _=None):
         """This method just prompts the user to open a file when C-O is pressed"""

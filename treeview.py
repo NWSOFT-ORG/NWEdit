@@ -17,12 +17,13 @@ class FileTree(ttk.Frame):
         self.textbox = textbox
         self.path = str(path)
         self.opencommand = opencommand
-        ttk.Button(self, text='\u21B3Parent Directory', command=self.change_parent_dir).pack(
-            anchor='nw'
-        )
-        ttk.Button(self, text='\uFF0BNew File', command=self.new_file).pack(
-            anchor='nw'
-        )
+        topframe = ttk.Frame(self)
+        topframe.pack(side='top', anchor='nw')
+        self.actioncombobox = ttk.Combobox(topframe, state='readonly',
+                                           values=['Parent Directory', 'New File'])
+        self.actioncombobox.set('Parent Directory')
+        self.actioncombobox.pack(anchor='nw', side='left')
+        ttk.Button(topframe, text='>>', command=self.do_action).pack(side='left', anchor='nw')
 
         self.pack(side='left', fill='both', expand=1)
         self.initUI()
@@ -30,8 +31,24 @@ class FileTree(ttk.Frame):
         self.tree.tag_configure('folder', background='black', foreground='yellow')
         self.tree.tag_configure('subfolder', background='black', foreground='#448dc4')
 
+    def do_action(self):
+        action = self.actioncombobox.get()
+        if action == 'Parent Directory':
+            self.change_parent_dir()
+        elif action == 'New File':
+            self.new_file()
+
     def new_file(self):
-        simpledialog.askstring('New file', 'File Name')
+        filename = simpledialog.askstring('New file', 'File Name:')
+        file_abspath = os.path.join(self.path, filename)
+        with open(file_abspath, 'w') as f:
+            f.write('')
+        self.opencommand(file_abspath)
+
+    def new_dir(self):
+        dirname = simpledialog.askstring('New directory', 'Directory Name:')
+        dir_abspath = os.path.join(self.path, dirname)
+        os.mkdir(dir_abspath)
 
     def initUI(self):
         path = os.path.abspath(__file__)
@@ -53,7 +70,7 @@ class FileTree(ttk.Frame):
         root_node = self.tree.insert('', 'end', text=abspath, open=True, tags='folder')
         self.process_directory(root_node, abspath)
 
-        self.tree.pack(side='left', expand=True, fill='both', anchor='n')
+        self.tree.pack(side='bottom', expand=True, fill='both', anchor='nw')
 
         self.refreshTree()
 
@@ -122,12 +139,8 @@ class FileTree(ttk.Frame):
         elif self.tree.item(item, "text").startswith('\u2514'):
             root = self.path
             sub = self.tree.item(item, "text").split()[1]
-            dir = root + sub
-            dir = self.checkPath(dir)
-            try:
-                os.chdir(dir)
-            except Exception:
-                pass
+            dir = os.path.join(root, sub)
+            self.path = dir
 
             self.selected = None
             self.refreshTree()
@@ -139,7 +152,7 @@ class FileTree(ttk.Frame):
             filename = dir + '/' + file
             self.tree.config(cursor="X_cursor")
             self.tree.bind('<Double-1>', self.ignore)
-
+            print(filename)
             try:
                 self.opencommand(filename)
             except Exception:

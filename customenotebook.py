@@ -1,5 +1,5 @@
 """Closable ttk.Notebook"""
-
+from modules import *
 
 class ClosableNotebook(ttk.Notebook):
     """A ttk Notebook with close buttons on each tab

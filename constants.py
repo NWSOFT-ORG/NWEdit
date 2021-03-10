@@ -1,4 +1,5 @@
 """Constants for the editor."""
+from modules import *
 
 WINDOWS = bool(sys.platform.startswith('win'))
 OSX = bool(sys.platform.startswith('darwin'))

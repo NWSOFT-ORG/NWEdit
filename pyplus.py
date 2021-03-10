@@ -261,7 +261,7 @@ Lacks these MacOS support:
 
         textframe = EnhancedTextFrame(
             frame)  # The one with line numbers and a nice dark theme
-        textframe.pack(fill='both', expand=1, side='left')
+        textframe.pack(fill='both', expand=1, side='right')
 
         textbox = textframe.text  # text widget
         textbox.frame = frame  # The text will be packed into the frame.
@@ -285,10 +285,13 @@ Lacks these MacOS support:
         try:
             if len(self.tabs) == 0:
                 self.master.title('PyPlus -- No file open')
+                return "break"
             self.master.title(
                 f'PyPlus -- {self.tabs[self.get_tab()].file_dir}')
+            return 'break'
         except Exception:
             self.master.title(f'PyPlus')
+            return 'break'
 
     def key(self, _=None):
         """Event when a key is pressed."""
@@ -436,7 +439,7 @@ pop up to ask the user to select the path.
 
                 # Puts the contents of the file into the text widget.
                 currtext = self.tabs[new_tab].textbox
-                FileTree(new_tab, '.', self.open_file)
+                FileTree(new_tab, currtext, self.open_file, path=Path(file_dir).parent)
                 currtext.insert('end', file.read().replace('\t', ' ' * 4))
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
@@ -1059,56 +1062,14 @@ Steps:
             for x in files:
                 run_in_terminal(cwd=currdir, cmd=f'git add {x}')
         elif action == 'commit':
-            window = tk.Toplevel(master=self.master)
-            window.title('Commit')
-            window.transient(self.master)
-            window.resizable(0, 0)
-            ttkthemes.ThemedStyle(window).set_theme(self.theme)
-            ttk.Label(window, text='Commit message:').pack(fill='x')
-            message = ttk.Entry(window)
-            message.pack(fill='x')
-
-            def commit():
-                run_in_terminal(cwd=currdir,
-                                cmd=f'git commit -am "{message.get()}"')
-                window.destroy()
-
-            ttk.Button(window, command=commit, text='>> Commit').pack(fill='x')
-            window.mainloop()
+            message = simpledialog.askstring('Commit', 'Commit message')
+            run_in_terminal(f'git commit -am "{message}"')
         elif action == 'other':
-            window = tk.Toplevel(master=self.master)
-            window.title('Advanced actions')
-
-            window.transient(self.master)
-            window.resizable(0, 0)
-            ttkthemes.ThemedStyle(window).set_theme(self.theme)
-            ttk.Label(window, text='Action: git ').pack(side='left')
-            advancedaction = ttk.Entry(window)
-
-            def do_action():
-                run_in_terminal(cwd=currdir, cmd=f'git {advancedaction.get()}')
-                window.destroy()
-
-            ttk.Button(window, command=do_action,
-                       text='>> Do Action').pack(side='right')
-            advancedaction.pack(side='right')
+            action = simpledialog.askstring('Advanced Action', 'git <command>:')
+            run_in_terminal(f'git {action}')
         elif action == 'clone':
-            window = tk.Toplevel(master=self.master)
-            window.title('Clone')
-
-            window.transient(self.master)
-            window.resizable(0, 0)
-            ttkthemes.ThemedStyle(window).set_theme(self.theme)
-            ttk.Label(window, text='Remote url: ').pack(side='left')
-            url = ttk.Entry(window)
-
-            def clone():
-                run_in_terminal(cwd=currdir, cmd=f'git clone {url.get()}')
-                window.destroy()
-
-            ttk.Button(window, command=clone,
-                       text='>> Clone').pack(side='right')
-            url.pack(side='right')
+            url = simpledialog.askstring('Clone from remote', 'URL:')
+            run_in_terminal(f'git clone {url}')
 
     def indent(self, action='indent'):
         """Indent/unindent feature"""

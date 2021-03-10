@@ -1,4 +1,5 @@
 from modules import *
+from constants import *
 
 
 class Settings:
@@ -6,7 +7,7 @@ class Settings:
 
     def __init__(self):
         try:
-            with open('Settings/general-settings.json') as f:
+            with open(os.path.join(APPDIR, 'Settings/general-settings.json')) as f:
                 self.settings = json.load(f)
             self.theme = self.settings['theme']
             self.highlight_theme = self.settings['pygments']
@@ -14,7 +15,8 @@ class Settings:
             self.size = self.settings['font'].split()[1]
             self.filetype = self.settings['file_types']
             return
-        except Exception:
+        except Exception as e:
+            print(e)
             messagebox.showerror("Error", "Setings are corrupted.")
             sys.exit(1)
 
@@ -52,7 +54,7 @@ class Settings:
 
 class Filetype:
     def __init__(self):
-        with open("Settings/lexer-settings.json") as f:
+        with open(os.path.join(APPDIR, "Settings/lexer-settings.json")) as f:
             all_settings = json.load(f)
         self.extens = []
         self.lexers = []
@@ -73,7 +75,7 @@ class Filetype:
 
 class Linter:
     def __init__(self):
-        with open("Settings/linter-settings.json") as f:
+        with open(os.path.join(APPDIR, "Settings/linter-settings.json")) as f:
             all_settings = json.load(f)
         self.extens = []
         self.linters = []
@@ -92,7 +94,7 @@ class Linter:
 
 class BuildCommand:
     def __init__(self):
-        with open("Settings/cmd-settings.json") as f:
+        with open(os.path.join(APPDIR, "Settings/cmd-settings.json")) as f:
             all_settings = json.load(f)
         self.extens = []
         self.commands = []

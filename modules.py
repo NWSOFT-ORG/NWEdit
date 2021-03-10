@@ -14,6 +14,7 @@ import tkinter as tk
 import tkinter.filedialog
 import tkinter.font as font
 import tkinter.messagebox as messagebox
+import tkinter.simpledialog as simpledialog
 import tkinter.ttk as ttk
 import webbrowser
 from pathlib import Path
@@ -26,6 +27,7 @@ from pygments.lexers.python import PythonLexer
 from pygments.styles import get_style_by_name
 from pygson.json_lexer import JSONLexer
 from ttkthemes import ThemedStyle
+
 
 class EditorErr(Exception):
     """A nice exception class for debugging"""

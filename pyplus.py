@@ -309,6 +309,7 @@ Lacks these MacOS support:
         textbox.bind(('<Button-2>' if OSX else '<Button-3>'),
                      self.right_click)
         textbox.focus_set()
+        textbox.tag_configure('sel', foreground='black', background='white')
         logger.debug('Textbox created')
         return textbox
 

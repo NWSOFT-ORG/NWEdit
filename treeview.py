@@ -6,12 +6,12 @@ class FileTree(ttk.Frame):
         LeftPanel ... containing treeView, leftButtonFrame, Buttons
     """
 
-    def __init__(self, master=None, textbox=None, opencommand=None, path=None):
+    def __init__(self, master=None, textbox=None, opencommand=None, path=os.path.expanduser('~')):
         super().__init__(master)
         self.selected = []
         self.destinationItem = None
         self.sourceItem = None
-        self.tree = ttk.Treeview(self, show='tree')
+        self.tree = ttk.Treeview(self)
         yscroll, xscroll = ttk.Scrollbar(self, command=self.tree.yview),\
                           ttk.Scrollbar(self, command=self.tree.xview, orient='horizontal')
         yscroll.pack(side='right', fill='y')
@@ -26,7 +26,8 @@ class FileTree(ttk.Frame):
         topframe = ttk.Frame(self)
         topframe.pack(side='top', anchor='nw')
         self.actioncombobox = ttk.Combobox(topframe, state='readonly',
-                                           values=['Parent Directory', 'New File', 'New Directory'])
+                                           values=['Parent Directory', 'New File',
+                                                   'New Directory', 'Refresh'])
         self.actioncombobox.set('Parent Directory')
         self.actioncombobox.pack(anchor='nw', side='left')
         ttk.Button(topframe, text='>>', command=self.do_action).pack(side='left', anchor='nw')
@@ -45,6 +46,7 @@ class FileTree(ttk.Frame):
             self.new_file()
         elif action == 'New Directory':
             self.new_dir()
+        elif action == 'Refresh':
             self.initUI()
 
     def new_file(self):
@@ -81,10 +83,7 @@ class FileTree(ttk.Frame):
         for item in path_list:
             self.dir += item + '/'
 
-        left_button_frame = ttk.Frame(self, height=25)
-        left_button_frame.pack(side=tk.TOP, fill=tk.X)
-
-        os.chdir(self.path)
+        self.tree.delete(*self.tree.get_children())
         self.tree.bind("<Double-1>", self.on_double_click_treeview)
         self.tree.bind('<<TreeviewSelect>>', self.on_select)
         self.tree.bind('<Alt-Right>', self.change_to_textbox)

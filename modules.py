@@ -15,6 +15,10 @@ import tkinter.filedialog
 import tkinter.font as font
 import tkinter.messagebox as messagebox
 import tkinter.simpledialog as simpledialog
+from constants import *
+import logging
+if OSX:
+    import PyTouchBar
 import tkinter.ttk as ttk
 import webbrowser
 from pathlib import Path

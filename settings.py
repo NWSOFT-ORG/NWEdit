@@ -92,7 +92,7 @@ class Linter:
             return None
 
 
-class BuildCommand:
+class RunCommand:
     def __init__(self):
         with open(os.path.join(APPDIR, "Settings/cmd-settings.json")) as f:
             all_settings = json.load(f)

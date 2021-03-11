@@ -16,6 +16,6 @@ pygments-json = "^0.1"
 
 [tool.poetry.dev-dependencies]
 
-[build-system]
+[run-system]
 requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+run-backend = "poetry.masonry.api"

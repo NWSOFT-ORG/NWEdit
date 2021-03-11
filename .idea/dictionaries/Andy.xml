@@ -1,26 +1,3 @@
 <component name="ProjectDictionaryState">
-  <dictionary name="Andy">
-    <words>
-      <w>autoindent</w>
-      <w>autoinsert</w>
-      <w>cmds</w>
-      <w>currdir</w>
-      <w>currtext</w>
-      <w>errorlevel</w>
-      <w>extens</w>
-      <w>konsole</w>
-      <w>lastidx</w>
-      <w>linenum</w>
-      <w>linestart</w>
-      <w>lxterminal</w>
-      <w>messagebox'll</w>
-      <w>pltfrm</w>
-      <w>pyplus</w>
-      <w>pypr</w>
-      <w>pythonpath</w>
-      <w>shellquote</w>
-      <w>textwidget</w>
-      <w>tkinter's</w>
-    </words>
-  </dictionary>
+  <dictionary name="Andy" />
 </component>

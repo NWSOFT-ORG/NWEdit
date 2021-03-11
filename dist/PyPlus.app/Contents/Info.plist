@@ -6,19 +6,6 @@
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
 	<string>PyPlus</string>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>****</string>
-				<string>fold</string>
-				<string>disk</string>
-			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-		</dict>
-	</array>
 	<key>CFBundleExecutable</key>
 	<string>PyPlus</string>
 	<key>CFBundleIconFile</key>
@@ -56,7 +43,7 @@
 		<key>alias</key>
 		<true/>
 		<key>argv_emulation</key>
-		<true/>
+		<false/>
 		<key>emulate_shell_environment</key>
 		<false/>
 		<key>no_chdir</key>

@@ -24,7 +24,7 @@ use Symfony\Component\Finder\Iterator\SizeRangeFilterIterator;
 use Symfony\Component\Finder\Iterator\SortableIterator;
 
 /**
- * Finder allows to build rules to find files and directories.
+ * Finder allows to run rules to find files and directories.
  *
  * It is a thin wrapper around several specialized iterator classes.
  *

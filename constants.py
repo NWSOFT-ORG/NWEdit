@@ -12,7 +12,7 @@ ICON = (
     'UeJyNktENgCAMROsGog7ACqbpvzs07L+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D\n '
     'QGsRhw9B3SMwNSSj1glNEDqhUpUGw/gMuUd+d2Csny6xgAZB4A1IDwG1SxAc/95t7DAPPIm\n '
     '4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC')
-BATCH_BUILD = ('''#!/bin/bash
+RUN_BATCH = ('''#!/bin/bash
 set +v
 cd "{script_dir}"
 python3 {dir}/measure.py start
@@ -46,7 +46,7 @@ exit
 {cmd} "%1" > results.txt
 exit''')
 MAIN_KEY = 'Command' if OSX else 'Control'  # MacOS uses Cmd, but others uses Ctrl
-_TK_VERSION = int(float(tk.TkVersion) * 10)  # Gets tkinter's version
+TK_VERSION = int(float(tk.TkVersion) * 10)  # Gets tkinter's version
 BLOCK_WIDTH = 16
 BLOCK_HEIGHT = 32
 BLOCK_SIZE = BLOCK_WIDTH * BLOCK_HEIGHT

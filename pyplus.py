@@ -14,6 +14,7 @@
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 Also, it's cross-compatible!
 """
+# These modules are from the base directory
 from console import *
 from customenotebook import *
 from functions import *
@@ -21,8 +22,12 @@ from hexview import *
 from tktext import *
 from treeview import *
 
-
 os.chdir(APPDIR)
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='pyplus.log', filemode='w', level=logging.DEBUG)
+
+logger.info(f'Tkinter version: {tk.TkVersion}')
+logger.debug('All modules imported')
 
 
 class Document:
@@ -42,197 +47,217 @@ window.
 Lacks these MacOS support:
 * The file selector does not work.
 """
-        self.settings_class = Settings()
-        self.file_setting_class = Filetype()
-        self.linter_setting_class = Linter()
-        self.cmd_setting_class = BuildCommand()
-        self.theme = self.settings_class.get_settings('theme')
-        self.master = tk.Tk()
-        self.master.focus_force()
-        self.master.geometry('900x600')
-        ttkthemes.ThemedStyle(self.master).set_theme(self.theme)
-        self.master.title('PyPlus')
-        self.master.iconphoto(True, tk.PhotoImage(data=ICON))
-        # Base64 image, this probably decreases the repo size.
+        try:
+            self.settings_class = Settings()
+            self.file_setting_class = Filetype()
+            self.linter_setting_class = Linter()
+            self.cmd_setting_class = RunCommand()
+            self.theme = self.settings_class.get_settings('theme')
+            logger.debug('Settings loaded')
 
-        self.filetypes = self.settings_class.get_settings('file_type')
+            self.master = tk.Tk()
+            if OSX:
+                PyTouchBar.prepare_tk_windows(self.master)
+                open_button = PyTouchBar.TouchBarItems.Button(title='Open File', action=self._open)
+                save_as_button = PyTouchBar.TouchBarItems.Button(title='Save As', action=self.save_as)
+                space = PyTouchBar.TouchBarItems.Space.Flexible()
+                run_button = PyTouchBar.TouchBarItems.Button(title='Run', action=self.run)
+                PyTouchBar.set_touchbar([open_button, save_as_button, space, run_button])
+            self.master.focus_force()
+            self.master.geometry('900x600')
+            ttkthemes.ThemedStyle(self.master).set_theme(self.theme)
+            self.master.title('PyPlus')
+            self.master.iconphoto(True, tk.PhotoImage(data=ICON))
+            # Base64 image, this probably decreases the repo size.
+            logger.debug('Theme loaded')
 
-        self.tabs = {}
+            self.filetypes = self.settings_class.get_settings('file_type')
 
-        self.nb = ClosableNotebook(self.master, self.close_tab)
-        self.nb.bind('<B1-Motion>', self.move_tab)
-        self.nb.pack(expand=1, fill='both')
-        self.nb.enable_traversal()
+            self.tabs = {}
 
-        self.master.protocol(
-            'WM_DELETE_WINDOW', self.exit
-        )  # When the window is closed, or quit from Mac, do exit action
+            self.nb = ClosableNotebook(self.master, self.close_tab)
+            self.nb.bind('<B1-Motion>', self.move_tab)
+            self.nb.pack(expand=1, fill='both')
+            self.nb.enable_traversal()
 
-        menubar = tk.Menu(self.master)
-        # Name can be apple only, don't really know why!
-        app_menu = tk.Menu(menubar, name='apple', tearoff=0)
+            self.master.protocol(
+                'WM_DELETE_WINDOW', lambda: self.exit(force=False)
+            )  # When the window is closed, or quit from Mac, do exit action
 
-        app_menu.add_command(label='About PyPlus', command=self._version)
-        preferences = tk.Menu(app_menu, tearoff=0)
-        preferences.add_command(
-            label="General Settings",
-            command=lambda: self.open_file(APPDIR + '/Settings/general-settings'
-                                           '.json'))
-        preferences.add_command(
-            label="Lexer Settings",
-            command=lambda: self.open_file(APPDIR + '/Settings/lexer-settings'
-                                           '.json'))
-        preferences.add_command(
-            label="Linter Settings",
-            command=lambda: self.open_file(APPDIR + '/Settings/linter-settings'
-                                           '.json'))
-        preferences.add_command(
-            label="Build Command Settings",
-            command=lambda: self.open_file(APPDIR + '/Settings/cmd-settings'
-                                           '.json'))
-        app_menu.add_cascade(label="Preferences", menu=preferences)
-        app_menu.add_separator()
-        app_menu.add_command(label='Exit Editor', command=self.exit)
-        app_menu.add_command(label='Restart app', command=self.restart)
-        app_menu.add_command(label='Check for updates',
-                             command=self.check_updates)
+            menubar = tk.Menu(self.master)
+            # Name can be apple only, don't really know why!
+            app_menu = tk.Menu(menubar, name='apple', tearoff=0)
 
-        filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label='New Tab',
-                             command=self.new_file,
-                             accelerator=f'{MAIN_KEY}-n')
-        filemenu.add_command(label='Open File',
-                             command=self.open_file,
-                             accelerator=f'{MAIN_KEY}-o')
-        filemenu.add_command(label='Save Copy to...',
-                             command=self.save_as,
-                             accelerator=f'{MAIN_KEY}-Shift-S')
-        filemenu.add_command(label='Close Tab',
-                             command=self.close_tab,
-                             accelerator=f'{MAIN_KEY}-w')
-        filemenu.add_command(label='Reload from disk',
-                             command=self.reload,
-                             accelerator=f'{MAIN_KEY}-r')
-        filemenu.add_separator()
-        filemenu.add_command(label='Startup scren', command=self.start_screen)
+            app_menu.add_command(label='About PyPlus', command=self._version)
+            preferences = tk.Menu(app_menu, tearoff=0)
+            preferences.add_command(
+                label="General Settings",
+                command=lambda: self.open_file(APPDIR + '/Settings/general-settings'
+                                                        '.json'))
+            preferences.add_command(
+                label="Lexer Settings",
+                command=lambda: self.open_file(APPDIR + '/Settings/lexer-settings'
+                                                        '.json'))
+            preferences.add_command(
+                label="Linter Settings",
+                command=lambda: self.open_file(APPDIR + '/Settings/linter-settings'
+                                                        '.json'))
+            preferences.add_command(
+                label="Run Command Settings",
+                command=lambda: self.open_file(APPDIR + '/Settings/cmd-settings'
+                                                        '.json'))
+            app_menu.add_cascade(label="Preferences", menu=preferences)
+            app_menu.add_separator()
+            app_menu.add_command(label='Exit Editor', command=self.exit)
+            app_menu.add_command(label='Restart app', command=self.restart)
+            app_menu.add_command(label='Check for updates',
+                                 command=self.check_updates)
 
-        editmenu = tk.Menu(menubar, tearoff=0)
-        editmenu.add_command(label='Undo',
-                             command=self.undo,
-                             accelerator=f'{MAIN_KEY}-z')
-        editmenu.add_command(label='Redo',
-                             command=self.redo,
-                             accelerator=f'{MAIN_KEY}-Shift-z')
-        editmenu.add_separator()
-        editmenu.add_command(label='Cut',
-                             command=self.cut,
-                             accelerator=f'{MAIN_KEY}-x')
-        editmenu.add_command(label='Copy',
-                             command=self.copy,
-                             accelerator=f'{MAIN_KEY}-c')
-        editmenu.add_command(label='Paste',
-                             command=self.paste,
-                             accelerator=f'{MAIN_KEY}-v')
-        editmenu.add_command(label='Delete Selected', command=self.delete)
-        editmenu.add_command(label='Select All',
-                             command=self.select_all,
-                             accelerator=f'{MAIN_KEY}-a')
+            filemenu = tk.Menu(menubar, tearoff=0)
+            filemenu.add_command(label='New Tab',
+                                 command=self.new_file,
+                                 accelerator=f'{MAIN_KEY}-n')
+            filemenu.add_command(label='Open File',
+                                 command=self.open_file,
+                                 accelerator=f'{MAIN_KEY}-o')
+            filemenu.add_command(label='Save Copy to...',
+                                 command=self.save_as,
+                                 accelerator=f'{MAIN_KEY}-Shift-S')
+            filemenu.add_command(label='Close Tab',
+                                 command=self.close_tab,
+                                 accelerator=f'{MAIN_KEY}-w')
+            filemenu.add_command(label='Reload from disk',
+                                 command=self.reload,
+                                 accelerator=f'{MAIN_KEY}-r')
+            filemenu.add_separator()
+            filemenu.add_command(label='Startup scren', command=self.start_screen)
 
-        self.codemenu = tk.Menu(menubar, tearoff=0)
-        self.codemenu.add_command(label='Indent',
-                                  command=lambda: self.indent('indent'),
-                                  accelerator='Alt-Tab')
-        self.codemenu.add_command(label='Unident',
-                                  command=lambda: self.indent('unindent'),
-                                  accelerator='Alt-Shift-Tab')
-        self.codemenu.add_separator()
-        self.codemenu.add_command(label='Build',
-                                  command=self.build,
-                                  accelerator=f'{MAIN_KEY}-b')
-        self.codemenu.add_command(label='Lint', command=self.lint_source)
-        self.codemenu.add_command(label='Auto-format', command=self.autopep)
-        self.codemenu.add_separator()
-        self.codemenu.add_command(label='Find and replace',
-                                  command=self.search,
-                                  accelerator=f'{MAIN_KEY}-f')
-        self.codemenu.add_separator()
-        self.codemenu.add_command(label='Open Python Shell',
-                                  command=self.open_shell)
-        self.codemenu.add_command(label='Open System Shell',
-                                  command=self.system_shell)
+            editmenu = tk.Menu(menubar, tearoff=0)
+            editmenu.add_command(label='Undo',
+                                 command=self.undo,
+                                 accelerator=f'{MAIN_KEY}-z')
+            editmenu.add_command(label='Redo',
+                                 command=self.redo,
+                                 accelerator=f'{MAIN_KEY}-Shift-z')
+            editmenu.add_separator()
+            editmenu.add_command(label='Cut',
+                                 command=self.cut,
+                                 accelerator=f'{MAIN_KEY}-x')
+            editmenu.add_command(label='Copy',
+                                 command=self.copy,
+                                 accelerator=f'{MAIN_KEY}-c')
+            editmenu.add_command(label='Paste',
+                                 command=self.paste,
+                                 accelerator=f'{MAIN_KEY}-v')
+            editmenu.add_command(label='Delete Selected', command=self.delete)
+            editmenu.add_command(label='Select All',
+                                 command=self.select_all,
+                                 accelerator=f'{MAIN_KEY}-a')
 
-        navmenu = tk.Menu(menubar, tearoff=0)
-        navmenu.add_command(label='Go to ...',
-                            command=self.goto,
-                            accelerator=f'{MAIN_KEY}-Shift-N')
-        navmenu.add_command(label='-1 char', command=self.nav_1cb)
-        navmenu.add_command(label='+1 char', command=self.nav_1cf)
-        gitmenu = tk.Menu(menubar, tearoff=0)
-        gitmenu.add_command(label='Initialize',
-                            command=lambda: self.git('init'))
-        gitmenu.add_command(label='Add all',
-                            command=lambda: self.git('addall'))
-        gitmenu.add_command(label='Add selected',
-                            command=lambda: self.git('addsel'))
-        gitmenu.add_command(label='Commit', command=lambda: self.git('commit'))
-        gitmenu.add_command(label='Clone', command=lambda: self.git('clone'))
-        gitmenu.add_command(label='Other', command=lambda: self.git('other'))
+            self.codemenu = tk.Menu(menubar, tearoff=0)
+            self.codemenu.add_command(label='Indent',
+                                      command=lambda: self.indent('indent'),
+                                      accelerator='Alt-Tab')
+            self.codemenu.add_command(label='Unident',
+                                      command=lambda: self.indent('unindent'),
+                                      accelerator='Alt-Shift-Tab')
+            self.codemenu.add_separator()
+            self.codemenu.add_command(label='Run',
+                                      command=self.run,
+                                      accelerator=f'{MAIN_KEY}-b')
+            self.codemenu.add_command(label='Lint', command=self.lint_source)
+            self.codemenu.add_command(label='Auto-format', command=self.autopep)
+            self.codemenu.add_separator()
+            self.codemenu.add_command(label='Find and replace',
+                                      command=self.search,
+                                      accelerator=f'{MAIN_KEY}-f')
+            self.codemenu.add_separator()
+            self.codemenu.add_command(label='Open Python Shell',
+                                      command=self.open_shell)
+            self.codemenu.add_command(label='Open System Shell',
+                                      command=self.system_shell)
 
-        menubar.add_cascade(label='App', menu=app_menu)  # App menu
-        menubar.add_cascade(label='File', menu=filemenu)
-        menubar.add_cascade(label='Edit', menu=editmenu)
-        menubar.add_cascade(label='Code', menu=self.codemenu)
-        menubar.add_cascade(label='Navigate', menu=navmenu)
-        menubar.add_cascade(label='Git', menu=gitmenu)
-        self.master.config(menu=menubar)
+            navmenu = tk.Menu(menubar, tearoff=0)
+            navmenu.add_command(label='Go to ...',
+                                command=self.goto,
+                                accelerator=f'{MAIN_KEY}-Shift-N')
+            navmenu.add_command(label='-1 char', command=self.nav_1cb)
+            navmenu.add_command(label='+1 char', command=self.nav_1cf)
+            gitmenu = tk.Menu(menubar, tearoff=0)
+            gitmenu.add_command(label='Initialize',
+                                command=lambda: self.git('init'))
+            gitmenu.add_command(label='Add all',
+                                command=lambda: self.git('addall'))
+            gitmenu.add_command(label='Add selected',
+                                command=lambda: self.git('addsel'))
+            gitmenu.add_command(label='Commit', command=lambda: self.git('commit'))
+            gitmenu.add_command(label='Clone', command=lambda: self.git('clone'))
+            gitmenu.add_command(label='Other', command=lambda: self.git('other'))
 
-        self.right_click_menu = tk.Menu(self.master, tearoff=0)
-        self.right_click_menu.add_command(label='Undo', command=self.undo)
-        self.right_click_menu.add_command(label='Redo', command=self.redo)
-        self.right_click_menu.add_separator()
-        self.right_click_menu.add_command(label='Cut', command=self.cut)
-        self.right_click_menu.add_command(label='Copy', command=self.copy)
-        self.right_click_menu.add_command(label='Paste', command=self.paste)
-        self.right_click_menu.add_command(label='Delete', command=self.delete)
-        self.right_click_menu.add_separator()
-        self.right_click_menu.add_command(label='Select All',
-                                          command=self.select_all)
+            menubar.add_cascade(label='App', menu=app_menu)  # App menu
+            menubar.add_cascade(label='File', menu=filemenu)
+            menubar.add_cascade(label='Edit', menu=editmenu)
+            menubar.add_cascade(label='Code', menu=self.codemenu)
+            menubar.add_cascade(label='Navigate', menu=navmenu)
+            menubar.add_cascade(label='Git', menu=gitmenu)
+            self.master.config(menu=menubar)
+            logger.debug('Menu created')
+            self.right_click_menu = tk.Menu(self.master, tearoff=0)
+            self.right_click_menu.add_command(label='Undo', command=self.undo)
+            self.right_click_menu.add_command(label='Redo', command=self.redo)
+            self.right_click_menu.add_separator()
+            self.right_click_menu.add_command(label='Cut', command=self.cut)
+            self.right_click_menu.add_command(label='Copy', command=self.copy)
+            self.right_click_menu.add_command(label='Paste', command=self.paste)
+            self.right_click_menu.add_command(label='Delete', command=self.delete)
+            self.right_click_menu.add_separator()
+            self.right_click_menu.add_command(label='Select All',
+                                              command=self.select_all)
+            logger.debug('Right-click menu created')
 
-        self.tab_right_click_menu = tk.Menu(self.master, tearoff=0)
-        self.tab_right_click_menu.add_command(label='New Tab',
-                                              command=self.new_file)
-        self.tab_right_click_menu.add_command(label='Close Tab',
-                                              command=self.close_tab)
-        self.nb.bind(('<Button-2>' if OSX else '<Button-3>'),
-                     self.right_click_tab)
+            self.tab_right_click_menu = tk.Menu(self.master, tearoff=0)
+            self.tab_right_click_menu.add_command(label='New Tab',
+                                                  command=self.new_file)
+            self.tab_right_click_menu.add_command(label='Close Tab',
+                                                  command=self.close_tab)
+            logger.debug('Tab right-click menu created')
 
-        # Keyboard bindings
-        self.master.bind(f'<{MAIN_KEY}-w>', self.close_tab)
-        self.master.bind(f'<{MAIN_KEY}-o>', self._open)
-        self.master.bind(f'<{MAIN_KEY}-r>', self.reload)
-        self.master.bind(f'<{MAIN_KEY}-b>', self.build)
-        self.master.bind(f'<{MAIN_KEY}-f>', self.search)
-        self.master.bind(f'<{MAIN_KEY}-n>', self.new_file)
-        self.master.bind(f'<{MAIN_KEY}-N>', self.goto)
-        self.master.bind(f'<{MAIN_KEY}-S>', self.save_as)
-        self.master.bind('Alt-Shift-Tab>',
-                         lambda _=None: self.indent('unindent'))
-        self.master.bind('<Alt-Tab>', lambda _=None: self.indent('indent'))
+            self.nb.bind(('<Button-2>' if OSX else '<Button-3>'),
+                         self.right_click_tab)
 
-        self.master.bind("<<MouseEvent>>", self.mouse)
-        self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
-        for x in ['"', "'", '(', '[', '{']:
-            self.master.bind(x, self.autoinsert)
-        self.start_screen()
-        self.master.mainloop()  # This line can be here only
+            # Keyboard bindings
+            self.master.bind(f'<{MAIN_KEY}-w>', self.close_tab)
+            self.master.bind(f'<{MAIN_KEY}-o>', self._open)
+            self.master.bind(f'<{MAIN_KEY}-r>', self.reload)
+            self.master.bind(f'<{MAIN_KEY}-b>', self.run)
+            self.master.bind(f'<{MAIN_KEY}-f>', self.search)
+            self.master.bind(f'<{MAIN_KEY}-n>', self.new_file)
+            self.master.bind(f'<{MAIN_KEY}-N>', self.goto)
+            self.master.bind(f'<{MAIN_KEY}-S>', self.save_as)
+            self.master.bind('Alt-Shift-Tab>',
+                             lambda _=None: self.indent('unindent'))
+            self.master.bind('<Alt-Tab>', lambda _=None: self.indent('indent'))
+            logger.debug('Bindings created')
+
+            self.master.bind("<<MouseEvent>>", self.mouse)
+            self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
+            for x in ['"', "'", '(', '[', '{']:
+                self.master.bind(x, self.autoinsert)
+            self.start_screen()
+            self.master.focus_force()
+            self.master.mainloop()  # This line can be here only
+        except Exception:
+            logger.exception('Error when initializing:')
 
     def start_screen(self):
         first_tab = tk.Canvas(self.nb, background='white')
+        img = tk.PhotoImage(data=ICON)
         first_tab.create_text(10,
                               10,
                               anchor='nw',
                               text='Welcome to PyPlus!',
                               font='Arial 50')
+        first_tab.create_image(0, 0, anchor='nw', image=img)
         label1 = ttk.Label(first_tab,
                            text='Open file',
                            foreground='blue',
@@ -253,6 +278,7 @@ Lacks these MacOS support:
         first_tab.create_window(50, 140, window=label2, anchor='nw')
         first_tab.create_window(50, 180, window=label3, anchor='nw')
         self.nb.add(first_tab, text='Start')
+        logger.debug('Start screen created')
 
     def create_text_widget(self, frame):
         """Creates a text widget in a frame."""
@@ -283,15 +309,18 @@ Lacks these MacOS support:
         textbox.bind(('<Button-2>' if OSX else '<Button-3>'),
                      self.right_click)
         textbox.focus_set()
+        logger.debug('Textbox created')
         return textbox
 
     def settitle(self, _=None):
         try:
             if len(self.tabs) == 0:
                 self.master.title('PyPlus -- No file open')
+                logger.debug('settitle: No file open')
                 return "break"
             self.master.title(
                 f'PyPlus -- {self.tabs[self.get_tab()].file_dir}')
+            logger.debug('settitle: OK')
             return 'break'
         except Exception:
             self.master.title(f'PyPlus')
@@ -308,7 +337,7 @@ Lacks these MacOS support:
                      f' ln {int(float(currtext.index("insert")))}'
                      f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
             )
-            # Update statusbar and titlebar
+            # Update statusbar and title bar
             self.settitle()
             # Auto-save
             self.save_file()
@@ -324,7 +353,7 @@ Lacks these MacOS support:
                      f' ln {int(float(currtext.index("insert")))}'
                      f' | col {str(int(currtext.index("insert").split(".")[1:][0]))}'
             )
-            # Update statusbar and titlebar
+            # Update statusbar and title bar
             self.settitle()
         except Exception:
             pass
@@ -420,16 +449,16 @@ pop up to ask the user to select the path.
                             'Error', 'This file is in binary format, \n'
                                      'which this editor does not edit. \n'
                                      'Would you like to view it in Hex Editor?\n'):
-                        app = tk.Toplevel(self.master)
-                        ttkthemes.ThemedStyle(app).set_theme(self.theme)
-                        app.transient(self.master)
+                        logger.info('HexView: opened')
+                        app = ttk.Frame(self.master)
                         app.focus_set()
-                        app.title("PyPlus HexEdit")
                         window = HexView(app)
                         window.open(file_dir)
-                        app.resizable(width=False, height=False)
-                        app.mainloop()
+                        self.nb.add(app, text='Hex Viewer')
+                        self.nb.select(app)
+                        return
                     else:
+                        logging.info('User pressed No.')
                         return
                 file = open(file_dir)
                 extens = file_dir.split('.')[-1]
@@ -463,9 +492,10 @@ pop up to ask the user to select the path.
                 self.recolorize()
                 currtext.see('insert')
                 currtext.focus_set()
+                logging.info('File opened')
                 return 'break'
-            except Exception as e:
-                print(e)
+            except Exception:
+                logger.exception('Error when opening file:')
 
     def _open(self, _=None):
         """This method just prompts the user to open a file when C-O is pressed"""
@@ -479,16 +509,18 @@ pop up to ask the user to select the path.
                 initialdir='/',
                 title='Save As...',
                 filetypes=self.filetypes))
+            if not file_dir:
+                self.close_tab()
+                return
             if not os.access(file_dir, os.W_OK):
                 messagebox.showerror('Error', 'File read only.')
-            if not file_dir:
-                return
 
             self.tabs[curr_tab].file_dir = file_dir
             self.nb.tab(curr_tab, text=os.path.basename(file_dir))
             file = open(file_dir, 'w')
             file.write(self.tabs[curr_tab].textbox.get(1.0, 'end'))
             file.close()
+            self.settitle()
             self.reload()
 
     def save_file(self, _=None):
@@ -510,10 +542,17 @@ pop up to ask the user to select the path.
     def new_file(self, _=None):
         """Creates a new tab(file)."""
         new_tab = ttk.Frame(self.nb)
+        panedwin = ttk.Panedwindow(new_tab, orient='horizontal')
+        panedwin.pack(fill='both', expand=1)
+        textbox = self.create_text_widget(new_tab)
         self.tabs[new_tab] = Document(new_tab,
-                                      self.create_text_widget(new_tab), 'None')
+                                      textbox, 'None')
+        filetree = FileTree(master=new_tab, textbox=textbox, opencommand=self.open_file)
+        panedwin.add(filetree)
+        panedwin.add(textbox.master)
         self.nb.add(new_tab, text='None')
         self.nb.select(new_tab)
+        self.settitle()
 
     def copy(self):
         try:
@@ -560,30 +599,29 @@ pop up to ask the user to select the path.
         except Exception:
             pass
 
-    def build(self, _=None):
-        """Builds the file
+    def run(self, _=None):
+        """Runs the file
 Steps:
-1) Writes build code into the batch file.
+1) Writes run code into the batch file.
 2) Linux only: uses chmod to make the sh execuable
-3) Runs the build file"""
+3) Runs the run file"""
         try:
             if WINDOWS:  # Windows
-                with open('./build.bat', 'w') as f:
-                    f.write((BATCH_BUILD.format(
+                with open(APPDIR + '/run.bat', 'w') as f:
+                    f.write((RUN_BATCH.format(
                         dir=APPDIR,
                         file=self.tabs[self.get_tab()].file_dir,
                         cmd=self.tabs[self.get_tab()].textbox.cmd)))
-                run_in_terminal('build.bat && del build.bat && exit')
+                run_in_terminal('run.bat && del run.bat && exit', cwd=APPDIR)
             else:
-                with open('./build.sh', 'w') as f:
-                    f.write((BATCH_BUILD.format(
+                with open(APPDIR + '/run.sh', 'w') as f:
+                    f.write((RUN_BATCH.format(
                         dir=APPDIR,
                         file=self.tabs[self.get_tab()].file_dir,
                         cmd=self.tabs[self.get_tab()].textbox.cmd,
                         script_dir=Path(
                             self.tabs[self.get_tab()].file_dir).parent)))
-                os.system('chmod 700 build.sh')
-                run_in_terminal('./build.sh && rm build.sh && exit')
+                run_in_terminal('chmod 700 run.sh && ./run.sh && rm run.sh && exit', cwd=APPDIR)
         except Exception:
             pass
 
@@ -887,6 +925,7 @@ Steps:
     def exit(self, force=False):
         if not force:
             self.master.destroy()
+            logger.info('Window is destroyed')
         else:
             sys.exit(0)
 
@@ -1013,7 +1052,7 @@ Steps:
             messagebox.showerror(
                 "Updates", "Updates aren't supported by develop builds,\n\
             since you're always on the latest version!"
-            )  # If you're on the developer build, you don't need updates!
+            )  # If you're on the developer run, you don't need updates!
             return
         download_file(
             url="https://zcg-coder.github.io/NWSOFT/PyPlusWeb/ver.json")

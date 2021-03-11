@@ -67,7 +67,7 @@ You can also define configuration as a file `.phplint.yml`:
 ```yaml
 path: ./
 jobs: 10
-cache: build/phplint.cache
+cache: run/phplint.cache
 extensions:
   - php
 exclude:

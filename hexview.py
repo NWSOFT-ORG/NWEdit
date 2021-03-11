@@ -25,15 +25,16 @@ General Public License for more details.
         self.encoding = tk.StringVar()
         self.encoding.set(ENCODINGS[0])
 
-        frame = self.frame = ttk.Frame(self.parent)
-        self.offset_label = ttk.Label(frame, text="Offset")
-        self.offset_spinbox = ttk.Spinbox(frame,
+        self.frame = ttk.Frame(self.parent)
+        buttonframe = ttk.Frame(self.parent)
+        self.offset_label = ttk.Label(buttonframe, text="Offset")
+        self.offset_spinbox = ttk.Spinbox(buttonframe,
                                           from_=0,
                                           textvariable=self.offset,
                                           increment=BLOCK_SIZE,
                                           foreground='black')
-        self.encoding_label = ttk.Label(frame, text="Encoding", underline=0)
-        self.encoding_combobox = ttk.Combobox(frame,
+        self.encoding_label = ttk.Label(buttonframe, text="Encoding", underline=0)
+        self.encoding_combobox = ttk.Combobox(buttonframe,
                                               values=ENCODINGS,
                                               textvariable=self.encoding,
                                               state="readonly")
@@ -49,14 +50,14 @@ General Public License for more details.
         self.textbox.tag_configure("graybg", background="lightgray")
         yscroll = ttk.Scrollbar(self.frame, command=self.textbox.yview)
         self.textbox['yscrollcommand'] = yscroll.set
-        yscroll.grid(row=1, column=7, sticky='ns')
-
-        for column, widget in enumerate(
-                (self.offset_label, self.offset_spinbox, self.encoding_label,
-                 self.encoding_combobox)):
-            widget.grid(row=0, column=column, sticky=tk.W)
-        self.textbox.grid(row=1, column=0, columnspan=6, sticky='nsew')
-        self.frame.grid(row=0, column=0, sticky='nsew')
+        buttonframe.pack(side='top')
+        yscroll.pack(side='right', fill='y')
+        self.offset_label.pack(side='left', anchor='nw')
+        self.offset_spinbox.pack(side='left', anchor='nw')
+        self.encoding_label.pack(side='left', anchor='nw')
+        self.encoding_combobox.pack(side='left', anchor='nw')
+        self.textbox.pack(fill='both', expand=1)
+        self.frame.pack(fill='both', expand=1)
 
         self.parent.bind("<Alt-f>", lambda *args: self.offset_spinbox.focus())
         self.parent.bind("<Alt-e>",
@@ -116,7 +117,6 @@ General Public License for more details.
 
     def open(self, filename):
         if filename and os.path.exists(filename):
-            self.parent.title("{} — {}".format(filename, "PyPlus"))
             size = os.path.getsize(filename)
             size = (size - BLOCK_SIZE if size > BLOCK_SIZE else size -
                                                                 BLOCK_WIDTH)

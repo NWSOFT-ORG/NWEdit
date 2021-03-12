@@ -101,7 +101,7 @@ General Public License for more details.
 
     def show_line(self, row):
         self.textbox.config(state='normal')
-        for char in row.decode(self.encoding.get(), errors="replace"):
+        for char in codecs.decode(row, self.encoding.get().upper(), errors="replace"):
             tags = ()
             if char in "\u2028\u2029\t\n\r\v\f\uFFFD":
                 char = "."
@@ -109,7 +109,7 @@ General Public License for more details.
             elif 0x20 < ord(char) < 0x7F:
                 tags = ("ascii",)
             elif not 0x20 <= ord(char) <= 0xFFFF:  # Tcl/Tk limit
-                char = "?"
+                char = "\uFFFD"
                 tags = ("error",)
             self.textbox.insert("end", char, tags)
         self.textbox.insert("end", "\n")

@@ -1,31 +1,25 @@
-INFO:pyplus:Tkinter version: 8.6
-DEBUG:pyplus:All modules imported
-DEBUG:pyplus:Settings loaded
-DEBUG:pyplus:Theme loaded
-DEBUG:pyplus:Menu created
-DEBUG:pyplus:Right-click menu created
-DEBUG:pyplus:Tab right-click menu created
-DEBUG:pyplus:Bindings created
-DEBUG:pyplus:Start screen created
-ERROR:pyplus:Error when handling mouse event:
+INFO:PyPlus:Tkinter version: 8.6
+DEBUG:PyPlus:All modules imported
+DEBUG:PyPlus:Settings loaded
+DEBUG:PyPlus:Theme loaded
+DEBUG:PyPlus:Menu created
+DEBUG:PyPlus:Right-click menu created
+DEBUG:PyPlus:Tab right-click menu created
+DEBUG:PyPlus:Bindings created
+DEBUG:PyPlus:Start screen created
+DEBUG:PyPlus:Textbox created
+ERROR:PyPlus:Error when handling mouse event:
 Traceback (most recent call last):
-  File "/home/runner/PyPlusSource/pyplus.py", line 354, in mouse
+  File "/Applications/OneDrive-Sync.app/Contents/MacOS/.PyPlusSource/pyplus.py", line 370, in mouse
     currtext = self.tabs[self.get_tab()].textbox
 KeyError: <tkinter.Canvas object .!closablenotebook.!canvas>
-DEBUG:pyplus:Textbox created
-DEBUG:pyplus:settitle: OK
-DEBUG:pyplus:settitle: OK
-INFO:root:File opened
-DEBUG:pyplus:settitle: OK
-DEBUG:pyplus:settitle: OK
-INFO:pyplus:HexView: opened
-ERROR:pyplus:Error when handling mouse event:
-Traceback (most recent call last):
-  File "/home/runner/PyPlusSource/pyplus.py", line 355, in mouse
-    currtext.statusbar.config(
-AttributeError: 'Text' object has no attribute 'statusbar'
-ERROR:pyplus:Error when handling mouse event:
-Traceback (most recent call last):
-  File "/home/runner/PyPlusSource/pyplus.py", line 355, in mouse
-    currtext.statusbar.config(
-AttributeError: 'Text' object has no attribute 'statusbar'
+DEBUG:PyPlus:settitle: OK
+DEBUG:PyPlus:settitle: OK
+DEBUG:PyPlus:settitle: OK
+DEBUG:PyPlus:settitle: OK
+DEBUG:PyPlus:settitle: OK
+DEBUG:PyPlus:settitle: OK
+DEBUG:PyPlus:settitle: OK
+DEBUG:PyPlus:settitle: OK
+DEBUG:PyPlus:settitle: OK
+INFO:PyPlus:Window is destroyed

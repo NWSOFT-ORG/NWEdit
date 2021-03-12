@@ -14,6 +14,7 @@ import tkinter as tk
 import tkinter.filedialog
 import tkinter.font as font
 import tkinter.messagebox as messagebox
+import codecs
 import tkinter.simpledialog as simpledialog
 import logging
 if sys.platform == 'darwin':

@@ -1,6 +1,7 @@
 """Closable ttk.Notebook"""
 from modules import *
 
+
 class ClosableNotebook(ttk.Notebook):
     """A ttk Notebook with close buttons on each tab
 images drawn by me using the mspaint app (the rubbish in many people's opinion)
@@ -55,39 +56,13 @@ Change the layout, makes it look like this:
 
     def __initialize_custom_style(self):
         style = ttk.Style()
-        self.images = (tk.PhotoImage("img_close",
-                                     data='''iVBORw0KGgoAAAANSUhEUgAAACAAAAAgA
-            gMAAAAOFJJnAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAxQTFRFA
-            AAAAAAA/yYA////nxJg7AAAAAR0Uk5TAP///7MtQIgAAACMSURBVHicPZC9AQMhCIVJk
-            yEyTZbIEnfLZIhrTgtHYB9HoIB7/CiFfArCA6JfGNGrhX3pnfCnT3i+6BQHu+lU+O5gg
-            KE3HTaRIgBGkk3AUKQ0AE4wAO+IOrDwDBiKCg7dNKGZFPCCFepWyfg1Vx2pytkCvbIpr
-            inDq4QwV5hSS/yhNc4ecI+8l7DW8gDYFaqpCCFJsQAAAABJRU5ErkJggg==
-                '''),
-                       tk.PhotoImage("img_closeactive",
-                                     data='''iVBORw0KGgoAAAANSUhEUgAAACA
-            AAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAA9
-            QTFRFAAAAAAAA/YAI////////uHhEXgAAAAV0Uk5TAP///zOOAqjJAAAAk0lEQVR4nGW
-            S2RGAMAhE44wFaDow6SD035scCwMJHxofyxGwtfYma2zXSPYw6Bl8VTCJJZ2fbkQsYbB
-            CAEAhWAL07QIFLlGHAEiMK7CjYQV6RqAB+UB1AyJBZgCWoDYAS2gUMHewh0iOklSrpLL
-            WR2pMval1c6bLITyu7z3EgLyFNMI65BFTtzUcizpWeS77rr/DDzkRRQdj40f8AAAAAEl
-            FTkSuQmCC
-                '''),
-                       tk.PhotoImage("img_closepressed",
-                                     data='''iVBORw0KGgoAAAANSUhEUgAAAC
-            AAAAAgAgMAAAAOFJJnAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAA
-            xQTFRFAAAAAAAA//8K////dEqdoAAAAAR0Uk5TAP///7MtQIgAAACMSURBVHicPZC9AQ
-            MhCIVJkyEyTZbIEnfLZIhrTgtHYB9HoIB7/CiFfArCA6JfGNGrhX3pnfCnT3i+6BQHu+
-            lU+O5ggKE3HTaRIgBGkk3AUKQ0AE4wAO+IOrDwDBiKCg7dNKGZFPCCFepWyfg1Vx2pyt
-            kCvbIprinDq4QwV5hSS/yhNc4ecI+8l7DW8gDYFaqpCCFJsQAAAABJRU5ErkJggg==
-            '''))  # The images, 32x32-sized
+        self.image = tk.PhotoImage("img_close", file='Images/close.gif')
 
         style.element_create(
             "close",
             "image",
             "img_close",
-            ("active", "pressed", "!disabled", "img_closepressed"),
-            ("active", "!disabled", "img_closeactive"),
-            border=8,
+            border=10,
             sticky='')
         style.layout("CustomNotebook", [("CustomNotebook.client", {
             "sticky": "nswe"

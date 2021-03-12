@@ -23,7 +23,7 @@ from tktext import *
 from treeview import *
 
 os.chdir(APPDIR)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('PyPlus')
 logging.basicConfig(filename='pyplus.log', filemode='w', level=logging.DEBUG)
 
 logger.info(f'Tkinter version: {tk.TkVersion}')
@@ -57,13 +57,18 @@ Lacks these MacOS support:
             logger.debug('Settings loaded')
 
             self.master = tk.Tk()
+            close_icon = tk.PhotoImage(file='Images/close.gif')
+            open_icon = tk.PhotoImage(file='Images/open-16px.gif')
+            run_icon = tk.PhotoImage(file='Images/run.gif')
+            save_as_icon = tk.PhotoImage(file='Images/saveas-16px.gif')
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
-                open_button = PyTouchBar.TouchBarItems.Button(title='Open File', action=self._open)
-                save_as_button = PyTouchBar.TouchBarItems.Button(title='Save As', action=self.save_as)
+                open_button = PyTouchBar.TouchBarItems.Button(image='Images/open.gif', action=self._open)
+                save_as_button = PyTouchBar.TouchBarItems.Button(image='Images/saveas.gif', action=self.save_as)
+                close_button = PyTouchBar.TouchBarItems.Button(image='Images/close.gif', action=self.close_tab)
                 space = PyTouchBar.TouchBarItems.Space.Flexible()
-                run_button = PyTouchBar.TouchBarItems.Button(title='Run', action=self.run)
-                PyTouchBar.set_touchbar([open_button, save_as_button, space, run_button])
+                run_button = PyTouchBar.TouchBarItems.Button(image='Images/run.gif', action=self.run)
+                PyTouchBar.set_touchbar([open_button, save_as_button, close_button, space, run_button])
             self.master.focus_force()
             self.master.geometry('900x600')
             ttkthemes.ThemedStyle(self.master).set_theme(self.theme)
@@ -117,19 +122,27 @@ Lacks these MacOS support:
             filemenu = tk.Menu(menubar, tearoff=0)
             filemenu.add_command(label='New Tab',
                                  command=self.new_file,
+                                 compound = 'left',
                                  accelerator=f'{MAIN_KEY}-n')
             filemenu.add_command(label='Open File',
                                  command=self.open_file,
-                                 accelerator=f'{MAIN_KEY}-o')
+                                 accelerator=f'{MAIN_KEY}-o',
+                                 compound = 'left',
+                                 image=open_icon)
             filemenu.add_command(label='Save Copy to...',
                                  command=self.save_as,
-                                 accelerator=f'{MAIN_KEY}-Shift-S')
+                                 accelerator=f'{MAIN_KEY}-Shift-S',
+                                 compound = 'left',
+                                 image=save_as_icon)
             filemenu.add_command(label='Close Tab',
                                  command=self.close_tab,
-                                 accelerator=f'{MAIN_KEY}-w')
+                                 accelerator=f'{MAIN_KEY}-w',
+                                 compound = 'left',
+                                 image=close_icon)
             filemenu.add_command(label='Reload from disk',
                                  command=self.reload,
-                                 accelerator=f'{MAIN_KEY}-r')
+                                 accelerator=f'{MAIN_KEY}-r',
+                                 compound = 'left')
             filemenu.add_separator()
             filemenu.add_command(label='Startup scren', command=self.start_screen)
 
@@ -262,15 +275,18 @@ Lacks these MacOS support:
         label1 = ttk.Label(first_tab,
                            text='Open file',
                            foreground='blue',
-                           background='white')
+                           background='white',
+                           cursor='hand2')
         label2 = ttk.Label(first_tab,
                            text='New tab',
                            foreground='blue',
-                           background='white')
+                           background='white',
+                           cursor='hand2')
         label3 = ttk.Label(first_tab,
                            text='Exit',
                            foreground='blue',
-                           background='white')
+                           background='white',
+                           cursor='hand2')
         label1.bind('<Button>', self._open)
         label2.bind('<Button>', self.new_file)
         label3.bind('<Button>', self.exit)
@@ -360,8 +376,9 @@ Lacks these MacOS support:
             # Update statusbar and title bar
             self.settitle()
             logger.debug('settitle: OK')
-        except Exception:
-            logger.exception('Error when handling mouse event:')
+        except Exception as e:
+            if type(e).__name__ != 'ValueError':
+                logger.exception('Error when handling mouse event:')
 
     def create_tags(self):
         """
@@ -726,8 +743,8 @@ Steps:
         global starts
         if len(self.tabs) == 0:
             return
-        case = 0
-        regexp = 0
+        case = tk.BooleanVar()
+        regexp = tk.BooleanVar()
         start = tk.FIRST if not tk.SEL_FIRST else tk.SEL_FIRST
         end = tk.END if not tk.SEL_LAST else tk.SEL_LAST
         starts = []
@@ -767,10 +784,10 @@ Steps:
         clear_button = ttk.Button(search_frame, text='Clear All')
         clear_button.pack(side='left')
 
-        case_button = ttk.Button(search_frame, text='Case Sensitive[0]')
-        case_button.pack(side='left')
+        case_yn = ttk.Checkbutton(search_frame, text='Case Sensitive', variable=case)
+        case_yn.pack(side='left')
 
-        reg_button = ttk.Button(search_frame, text='RegExp[0]')
+        reg_button = ttk.Checkbutton(search_frame, text='RegExp', variable=regexp)
         reg_button.pack(side='left')
 
         def find(_=None):
@@ -780,14 +797,14 @@ Steps:
             text.tag_remove('found', '1.0', 'end')
             s = content.get()
             starts.clear()
-            if s != '\\':
+            if s != '\\' and s:
                 idx = '1.0'
                 while 1:
                     idx = text.search(s,
                                       idx,
-                                      nocase=(not case),
+                                      nocase=not (case.get()),
                                       stopindex='end',
-                                      regexp=(not regexp),
+                                      regexp=regexp.get(),
                                       count=found)
                     if not idx:
                         break
@@ -806,14 +823,14 @@ Steps:
             text.tag_remove('found', '1.0', 'end')
             s = content.get()
             r = repl.get()
-            if s != '\\':
+            if s != '\\' and s:
                 idx = '1.0'
                 while 1:
                     idx = text.search(s,
                                       idx,
-                                      nocase=(not case),
+                                      nocase=not (case.get()),
                                       stopindex='end',
-                                      regexp=(not regexp))
+                                      regexp=regexp.get())
                     if not idx:
                         break
                     lastidx = '%s+%dc' % (idx, len(s))
@@ -824,18 +841,6 @@ Steps:
         def clear():
             text = self.tabs[self.get_tab()].textbox
             text.tag_remove('found', '1.0', 'end')
-
-        def case_yn():
-            global case
-            case = not case
-            case_button.config(text=f'Case Sensitive[{int(case)}]')
-            find()
-
-        def regexp_yn():
-            global regexp
-            regexp = not regexp
-            reg_button.config(text=f'RegExp[{int(regexp)}]')
-            find()
 
         def nav_forward():
             try:
@@ -864,8 +869,6 @@ Steps:
                 pass
 
         clear_button.config(command=clear)
-        case_button.config(command=case_yn)
-        reg_button.config(command=regexp_yn)
         repl_button.config(command=replace)
         forward.config(command=nav_forward)
         backward.config(command=nav_backward)

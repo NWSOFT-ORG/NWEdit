@@ -1,7 +1,7 @@
 from setuptools import setup
 
 APP = ['PyPlus.py']
-OPTIONS = {'iconfile': 'icon.icns'}
+OPTIONS = {'iconfile': 'Images/icon.icns'}
 
 setup(
     app=APP,

@@ -8,17 +8,17 @@ class FileTree(ttk.Frame):
 
     def __init__(self, master=None, textbox=None, opencommand=None, path=os.path.expanduser('~')):
         super().__init__(master)
-        self.selected = []
         self.destinationItem = None
         self.sourceItem = None
         self.tree = ttk.Treeview(self)
-        yscroll, xscroll = ttk.Scrollbar(self, command=self.tree.yview),\
-                          ttk.Scrollbar(self, command=self.tree.xview, orient='horizontal')
+        yscroll, xscroll = ttk.Scrollbar(self, command=self.tree.yview), \
+                           ttk.Scrollbar(self, command=self.tree.xview, orient='horizontal')
         yscroll.pack(side='right', fill='y')
         xscroll.pack(side='bottom', fill='x')
         self.tree['yscrollcommand'] = yscroll.set
         self.tree['xscrollcommand'] = xscroll.set
         self.dir = ''
+        self.selected = []
         self.master = master
         self.textbox = textbox
         self.path = str(path)
@@ -50,8 +50,8 @@ class FileTree(ttk.Frame):
             self.initUI()
 
     def new_file(self):
-        filename = simpledialog.askstring('New file', 'File Name:')
-        file_abspath = os.path.join(self.path, filename)
+        _filename = simpledialog.askstring('New file', 'File Name:')
+        file_abspath = os.path.join(self.path, _filename)
         if os.path.exists(file_abspath):
             if messagebox.askyesno('Confirm', 'This file already exists, do you want to overwrite?'):
                 with open(file_abspath, 'w') as f:
@@ -77,7 +77,7 @@ class FileTree(ttk.Frame):
             else:
                 return
 
-    def initUI(self):
+    def initUI(self, _=None):
         path = os.path.abspath(__file__)
         path_list = path.split('/')[:-1]
         for item in path_list:
@@ -85,7 +85,6 @@ class FileTree(ttk.Frame):
 
         self.tree.delete(*self.tree.get_children())
         self.tree.bind("<Double-1>", self.on_double_click_treeview)
-        self.tree.bind('<<TreeviewSelect>>', self.on_select)
         self.tree.bind('<Alt-Right>', self.change_to_textbox)
         self.tree.heading('#0', text='Directory Structure')
         self.tree.update()
@@ -139,17 +138,16 @@ class FileTree(ttk.Frame):
             sub = self.tree.item(item, "text").split()[1]
             dir = os.path.join(root, sub)
             self.path = dir
-
-            self.selected = None
             self.refreshTree()
 
         else:
             file = self.tree.item(item, "text")
             dir = self.path
             dir = self.checkPath(dir)
-            filename = dir + '/' + file
+            _filename = dir + '/' + file
+            self.selected = []
             try:
-                self.opencommand(filename)
+                self.opencommand(_filename)
             except Exception:
                 pass
 
@@ -169,9 +167,6 @@ class FileTree(ttk.Frame):
         if '\\' in path:
             path = path.replace('\\', '/')
         return path
-
-    def on_select(self, event):
-        self.selected = event.widget.selection()
 
     def refreshTree(self):
         for i in self.tree.get_children():

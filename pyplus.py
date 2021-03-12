@@ -33,9 +33,10 @@ logger.debug('All modules imported')
 class Document:
     """Helper class, for the editor"""
 
-    def __init__(self, _, TextWidget, FileDir):
-        self.file_dir = FileDir
-        self.textbox = TextWidget
+    def __init__(self, frame, textbox, file_dir):
+        self.frame = frame
+        self.file_dir = file_dir
+        self.textbox = textbox
 
 
 class Editor:
@@ -194,7 +195,7 @@ Lacks these MacOS support:
             gitmenu.add_command(label='Clone', command=lambda: self.git('clone'))
             gitmenu.add_command(label='Other', command=lambda: self.git('other'))
 
-            menubar.add_cascade(label='App', menu=app_menu)  # App menu
+            menubar.add_cascade(label='PyPlus', menu=app_menu)  # App menu
             menubar.add_cascade(label='File', menu=filemenu)
             menubar.add_cascade(label='Edit', menu=editmenu)
             menubar.add_cascade(label='Code', menu=self.codemenu)
@@ -340,10 +341,12 @@ Lacks these MacOS support:
             )
             # Update statusbar and title bar
             self.settitle()
+            logger.debug('settitle: OK')
+
             # Auto-save
             self.save_file()
         except Exception:
-            pass
+            logger.exception('Error when handling keyboard event:')
 
     def mouse(self, _=None):
         """The action done when the mouse is clicked"""
@@ -356,8 +359,9 @@ Lacks these MacOS support:
             )
             # Update statusbar and title bar
             self.settitle()
+            logger.debug('settitle: OK')
         except Exception:
-            pass
+            logger.exception('Error when handling mouse event:')
 
     def create_tags(self):
         """
@@ -445,6 +449,10 @@ pop up to ask the user to select the path.
 
         if file_dir:
             try:  # If the file is in binary, ask the user to open in Hex editor
+                for tab in self.tabs.items():
+                    if file_dir == tab[1].file_dir:
+                        self.nb.select(tab[1].frame)
+                        return
                 if is_binary_string(open(file_dir, 'rb').read()):
                     if messagebox.askyesno(
                             'Error', 'This file is in binary format, \n'
@@ -455,6 +463,9 @@ pop up to ask the user to select the path.
                         app.focus_set()
                         window = HexView(app)
                         window.open(file_dir)
+                        self.tabs[app] = Document(app,
+                                                  window.textbox,
+                                                  file_dir)
                         self.nb.add(app, text='Hex Viewer')
                         self.nb.select(app)
                         return
@@ -495,8 +506,11 @@ pop up to ask the user to select the path.
                 currtext.focus_set()
                 logging.info('File opened')
                 return 'break'
-            except Exception:
-                logger.exception('Error when opening file:')
+            except Exception as e:
+                if type(e).__name__ != "ValueError":
+                    logger.exception('Error when opening file:')
+                else:
+                    logger.warning(f'Warning! Program has ValueError: {e}')
 
     def _open(self, _=None):
         """This method just prompts the user to open a file when C-O is pressed"""

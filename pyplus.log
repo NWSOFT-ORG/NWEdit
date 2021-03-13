@@ -7,19 +7,3 @@ DEBUG:PyPlus:Right-click menu created
 DEBUG:PyPlus:Tab right-click menu created
 DEBUG:PyPlus:Bindings created
 DEBUG:PyPlus:Start screen created
-DEBUG:PyPlus:Textbox created
-ERROR:PyPlus:Error when handling mouse event:
-Traceback (most recent call last):
-  File "/Applications/OneDrive-Sync.app/Contents/MacOS/.PyPlusSource/pyplus.py", line 370, in mouse
-    currtext = self.tabs[self.get_tab()].textbox
-KeyError: <tkinter.Canvas object .!closablenotebook.!canvas>
-DEBUG:PyPlus:settitle: OK
-DEBUG:PyPlus:settitle: OK
-DEBUG:PyPlus:settitle: OK
-DEBUG:PyPlus:settitle: OK
-DEBUG:PyPlus:settitle: OK
-DEBUG:PyPlus:settitle: OK
-DEBUG:PyPlus:settitle: OK
-DEBUG:PyPlus:settitle: OK
-DEBUG:PyPlus:settitle: OK
-INFO:PyPlus:Window is destroyed

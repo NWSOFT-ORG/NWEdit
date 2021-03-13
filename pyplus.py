@@ -59,8 +59,16 @@ Lacks these MacOS support:
             self.master = tk.Tk()
             close_icon = tk.PhotoImage(file='Images/close.gif')
             open_icon = tk.PhotoImage(file='Images/open-16px.gif')
-            run_icon = tk.PhotoImage(file='Images/run.gif')
             save_as_icon = tk.PhotoImage(file='Images/saveas-16px.gif')
+            run_icon = tk.PhotoImage(file='Images/run-16px.gif')
+            cut_icon = tk.PhotoImage(file='Images/cut.gif')
+            new_icon = tk.PhotoImage(file='Images/new.gif')
+            redo_icon = tk.PhotoImage(file='Images/redo.gif')
+            undo_icon = tk.PhotoImage(file='Images/undo.gif')
+            copy_icon = tk.PhotoImage(file='Images/copy.gif')
+            cut_icon = tk.PhotoImage(file='Images/cut.gif')
+            reload_icon = tk.PhotoImage(file='Images/reload.gif')
+            paste_icon = tk.PhotoImage(file='Images/paste.gif')
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
                 open_button = PyTouchBar.TouchBarItems.Button(image='Images/open.gif', action=self._open)
@@ -123,7 +131,8 @@ Lacks these MacOS support:
             filemenu.add_command(label='New Tab',
                                  command=self.new_file,
                                  compound = 'left',
-                                 accelerator=f'{MAIN_KEY}-n')
+                                 accelerator=f'{MAIN_KEY}-n',
+                                 image=new_icon)
             filemenu.add_command(label='Open File',
                                  command=self.open_file,
                                  accelerator=f'{MAIN_KEY}-o',
@@ -142,27 +151,38 @@ Lacks these MacOS support:
             filemenu.add_command(label='Reload from disk',
                                  command=self.reload,
                                  accelerator=f'{MAIN_KEY}-r',
-                                 compound = 'left')
+                                 compound = 'left',
+                                 image=reload_icon)
             filemenu.add_separator()
             filemenu.add_command(label='Startup scren', command=self.start_screen)
 
             editmenu = tk.Menu(menubar, tearoff=0)
             editmenu.add_command(label='Undo',
                                  command=self.undo,
-                                 accelerator=f'{MAIN_KEY}-z')
+                                 accelerator=f'{MAIN_KEY}-z',
+                                 compound = 'left',
+                                 image=undo_icon)
             editmenu.add_command(label='Redo',
                                  command=self.redo,
-                                 accelerator=f'{MAIN_KEY}-Shift-z')
+                                 accelerator=f'{MAIN_KEY}-Shift-z',
+                                 compound = 'left',
+                                 image=redo_icon)
             editmenu.add_separator()
             editmenu.add_command(label='Cut',
                                  command=self.cut,
-                                 accelerator=f'{MAIN_KEY}-x')
+                                 accelerator=f'{MAIN_KEY}-x',
+                                 compound = 'left',
+                                 image=cut_icon)
             editmenu.add_command(label='Copy',
                                  command=self.copy,
-                                 accelerator=f'{MAIN_KEY}-c')
+                                 accelerator=f'{MAIN_KEY}-c',
+                                 compound = 'left',
+                                 image=copy_icon)
             editmenu.add_command(label='Paste',
                                  command=self.paste,
-                                 accelerator=f'{MAIN_KEY}-v')
+                                 accelerator=f'{MAIN_KEY}-v',
+                                 compound = 'left',
+                                 image=paste_icon)
             editmenu.add_command(label='Delete Selected', command=self.delete)
             editmenu.add_command(label='Select All',
                                  command=self.select_all,
@@ -178,7 +198,9 @@ Lacks these MacOS support:
             self.codemenu.add_separator()
             self.codemenu.add_command(label='Run',
                                       command=self.run,
-                                      accelerator=f'{MAIN_KEY}-b')
+                                      accelerator=f'{MAIN_KEY}-b',
+                                      compound = 'left',
+                                      image=run_icon)
             self.codemenu.add_command(label='Lint', command=self.lint_source)
             self.codemenu.add_command(label='Auto-format', command=self.autopep)
             self.codemenu.add_separator()

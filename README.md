@@ -110,7 +110,7 @@ Dependencies:
 You can find clues about how it works, initializes etc. in the log file.  
 ## How it updates:
 This editor uses the magical requests module to get a file from remote.  
-It is at [here](ZCG-coder.github.io/PyPlusWeb/ver.json).  
+It is at [here](https://zcg-coder.github.io/NWSOFT/PyPlusWeb/ver.json).  
 Then it reads the text, parse it, and determine if there's an update.  
 ## How the syntax highlight works:
 This editor uses pygments as its syntax highlighter.  

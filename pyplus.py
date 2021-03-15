@@ -7,7 +7,7 @@
 | It's extremely small! (around 80 kB)                |
 | You can visit my site for more details!             |
 | +---------------------------------------------+     |
-| | http://ZCG-coder.github.io/NWSOFT/PyPlusWeb |     |
+| | http://ZCG-coder.github.io/PyPlusWeb        |     |
 | +---------------------------------------------+     |
 | You can also contribute it on github!               |
 | Note: Some parts are adapted from stack overflow.   |
@@ -50,25 +50,37 @@ Lacks these MacOS support:
 """
         try:
             self.settings_class = Settings()
-            self.file_setting_class = Filetype()
-            self.linter_setting_class = Linter()
-            self.cmd_setting_class = RunCommand()
+            self.file_settings_class = Filetype()
+            self.linter_settings_class = Linter()
+            self.cmd_settings_class = RunCommand()
+            self.format_settings_class = FormatCommand()
             self.theme = self.settings_class.get_settings('theme')
             logger.debug('Settings loaded')
 
             self.master = tk.Tk()
-            close_icon = tk.PhotoImage(file='Images/close.gif')
-            open_icon = tk.PhotoImage(file='Images/open-16px.gif')
-            save_as_icon = tk.PhotoImage(file='Images/saveas-16px.gif')
-            run_icon = tk.PhotoImage(file='Images/run-16px.gif')
-            cut_icon = tk.PhotoImage(file='Images/cut.gif')
-            new_icon = tk.PhotoImage(file='Images/new.gif')
-            redo_icon = tk.PhotoImage(file='Images/redo.gif')
-            undo_icon = tk.PhotoImage(file='Images/undo.gif')
-            copy_icon = tk.PhotoImage(file='Images/copy.gif')
-            cut_icon = tk.PhotoImage(file='Images/cut.gif')
-            reload_icon = tk.PhotoImage(file='Images/reload.gif')
-            paste_icon = tk.PhotoImage(file='Images/paste.gif')
+            self.close_icon = tk.PhotoImage(file='Images/close.gif')
+            self.close_icon_dark = tk.PhotoImage(file='Images/close-dark.gif')
+            self.copy_icon = tk.PhotoImage(file='Images/copy.gif')
+            self.cut_icon = tk.PhotoImage(file='Images/cut.gif')
+            self.cut_icon = tk.PhotoImage(file='Images/cut.gif')
+            self.delete_icon = tk.PhotoImage(file='Images/delete.gif')
+            self.indent_icon = tk.PhotoImage(file='Images/indent.gif')
+            self.lint_icon = tk.PhotoImage(file='Images/lint.gif')
+            self.new_icon = tk.PhotoImage(file='Images/new.gif')
+            self.open_icon = tk.PhotoImage(file='Images/open-16px.gif')
+            self.paste_icon = tk.PhotoImage(file='Images/paste.gif')
+            self.pyterm_icon = tk.PhotoImage(file='Images/py-term.gif')
+            self.redo_icon = tk.PhotoImage(file='Images/redo.gif')
+            self.reload_icon = tk.PhotoImage(file='Images/reload.gif')
+            self.run_icon = tk.PhotoImage(file='Images/run-16px.gif')
+            self.save_as_icon = tk.PhotoImage(file='Images/saveas-16px.gif')
+            self.search_icon = tk.PhotoImage(file='Images/search.gif')
+            self.term_icon = tk.PhotoImage(file='Images/term.gif')
+            self.undo_icon = tk.PhotoImage(file='Images/undo.gif')
+            self.unindent_icon = tk.PhotoImage(file='Images/unindent.gif')
+            self.sel_all_icon = tk.PhotoImage(file='Images/sel-all.gif')
+            self.format_icon = tk.PhotoImage(file='Images/format.gif')
+            logger.debug('Icons loaded')
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
                 open_button = PyTouchBar.TouchBarItems.Button(image='Images/open.gif', action=self._open)
@@ -81,7 +93,8 @@ Lacks these MacOS support:
             self.master.geometry('900x600')
             ttkthemes.ThemedStyle(self.master).set_theme(self.theme)
             self.master.title('PyPlus')
-            self.master.iconphoto(True, tk.PhotoImage(data=ICON))
+            self.icon = tk.PhotoImage(file='Images/pyplus.gif')
+            self.master.iconphoto(True, self.icon)
             # Base64 image, this probably decreases the repo size.
             logger.debug('Theme loaded')
 
@@ -109,6 +122,10 @@ Lacks these MacOS support:
                 command=lambda: self.open_file(APPDIR + '/Settings/general-settings'
                                                         '.json'))
             preferences.add_command(
+                label="Format Command Settings",
+                command=lambda: self.open_file(APPDIR + '/Settings/format-settings'
+                                                        '.json'))
+            preferences.add_command(
                 label="Lexer Settings",
                 command=lambda: self.open_file(APPDIR + '/Settings/lexer-settings'
                                                         '.json'))
@@ -132,27 +149,27 @@ Lacks these MacOS support:
                                  command=self.new_file,
                                  compound = 'left',
                                  accelerator=f'{MAIN_KEY}-n',
-                                 image=new_icon)
+                                 image=self.new_icon)
             filemenu.add_command(label='Open File',
                                  command=self.open_file,
                                  accelerator=f'{MAIN_KEY}-o',
                                  compound = 'left',
-                                 image=open_icon)
+                                 image=self.open_icon)
             filemenu.add_command(label='Save Copy to...',
                                  command=self.save_as,
                                  accelerator=f'{MAIN_KEY}-Shift-S',
                                  compound = 'left',
-                                 image=save_as_icon)
+                                 image=self.save_as_icon)
             filemenu.add_command(label='Close Tab',
                                  command=self.close_tab,
                                  accelerator=f'{MAIN_KEY}-w',
                                  compound = 'left',
-                                 image=close_icon)
+                                 image=self.close_icon)
             filemenu.add_command(label='Reload from disk',
                                  command=self.reload,
                                  accelerator=f'{MAIN_KEY}-r',
                                  compound = 'left',
-                                 image=reload_icon)
+                                 image=self.reload_icon)
             filemenu.add_separator()
             filemenu.add_command(label='Startup scren', command=self.start_screen)
 
@@ -161,57 +178,77 @@ Lacks these MacOS support:
                                  command=self.undo,
                                  accelerator=f'{MAIN_KEY}-z',
                                  compound = 'left',
-                                 image=undo_icon)
+                                 image=self.undo_icon)
             editmenu.add_command(label='Redo',
                                  command=self.redo,
                                  accelerator=f'{MAIN_KEY}-Shift-z',
                                  compound = 'left',
-                                 image=redo_icon)
+                                 image=self.redo_icon)
             editmenu.add_separator()
             editmenu.add_command(label='Cut',
                                  command=self.cut,
                                  accelerator=f'{MAIN_KEY}-x',
                                  compound = 'left',
-                                 image=cut_icon)
+                                 image=self.cut_icon)
             editmenu.add_command(label='Copy',
                                  command=self.copy,
                                  accelerator=f'{MAIN_KEY}-c',
                                  compound = 'left',
-                                 image=copy_icon)
+                                 image=self.copy_icon)
             editmenu.add_command(label='Paste',
                                  command=self.paste,
                                  accelerator=f'{MAIN_KEY}-v',
                                  compound = 'left',
-                                 image=paste_icon)
-            editmenu.add_command(label='Delete Selected', command=self.delete)
+                                 image=self.paste_icon)
+            editmenu.add_command(label='Delete Selected',
+                                 compound = 'left',
+                                 image=self.delete_icon,
+                                 command=self.delete)
             editmenu.add_command(label='Select All',
                                  command=self.select_all,
-                                 accelerator=f'{MAIN_KEY}-a')
+                                 accelerator=f'{MAIN_KEY}-a',
+                                 compound = 'left',
+                                 image=self.sel_all_icon)
 
             self.codemenu = tk.Menu(menubar, tearoff=0)
             self.codemenu.add_command(label='Indent',
                                       command=lambda: self.indent('indent'),
-                                      accelerator='Alt-Tab')
+                                      accelerator='Alt-Tab',
+                                      compound = 'left',
+                                      image=self.indent_icon)
             self.codemenu.add_command(label='Unident',
                                       command=lambda: self.indent('unindent'),
-                                      accelerator='Alt-Shift-Tab')
+                                      accelerator='Alt-Shift-Tab',
+                                      compound = 'left',
+                                      image=self.unindent_icon)
             self.codemenu.add_separator()
             self.codemenu.add_command(label='Run',
                                       command=self.run,
                                       accelerator=f'{MAIN_KEY}-b',
                                       compound = 'left',
-                                      image=run_icon)
-            self.codemenu.add_command(label='Lint', command=self.lint_source)
-            self.codemenu.add_command(label='Auto-format', command=self.autopep)
+                                      image=self.run_icon)
+            self.codemenu.add_command(label='Lint', command=self.lint_source,
+                                      compound = 'left',
+                                      image=self.lint_icon)
+            self.codemenu.add_command(label='Auto-format',
+                                      command=self.autopep,
+                                      compound = 'left',
+                                      image=self.format_icon)
             self.codemenu.add_separator()
             self.codemenu.add_command(label='Find and replace',
                                       command=self.search,
-                                      accelerator=f'{MAIN_KEY}-f')
+                                      accelerator=f'{MAIN_KEY}-f',
+                                      compound = 'left',
+                                      image=self.search_icon)
             self.codemenu.add_separator()
             self.codemenu.add_command(label='Open Python Shell',
-                                      command=self.open_shell)
+                                      command=self.open_shell,
+                                      compound = 'left',
+                                      image=self.pyterm_icon)
             self.codemenu.add_command(label='Open System Shell',
-                                      command=self.system_shell)
+                                      command=self.system_shell,
+                                      compound = 'left',
+                                      image=self.term_icon)
 
             navmenu = tk.Menu(menubar, tearoff=0)
             navmenu.add_command(label='Go to ...',
@@ -279,6 +316,7 @@ Lacks these MacOS support:
             self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
             for x in ['"', "'", '(', '[', '{']:
                 self.master.bind(x, self.autoinsert)
+            self.first_tab_created = False
             self.start_screen()
             self.master.focus_force()
             self.master.mainloop()  # This line can be here only
@@ -286,38 +324,44 @@ Lacks these MacOS support:
             logger.exception('Error when initializing:')
 
     def start_screen(self):
-        first_tab = tk.Canvas(self.nb, background='white')
-        img = tk.PhotoImage(data=ICON)
-        first_tab.create_text(10,
-                              10,
-                              anchor='nw',
-                              text='Welcome to PyPlus!',
-                              font='Arial 50')
-        first_tab.create_image(0, 0, anchor='nw', image=img)
-        label1 = ttk.Label(first_tab,
-                           text='Open file',
-                           foreground='blue',
-                           background='white',
-                           cursor='hand2')
-        label2 = ttk.Label(first_tab,
-                           text='New tab',
-                           foreground='blue',
-                           background='white',
-                           cursor='hand2')
-        label3 = ttk.Label(first_tab,
-                           text='Exit',
-                           foreground='blue',
-                           background='white',
-                           cursor='hand2')
-        label1.bind('<Button>', self._open)
-        label2.bind('<Button>', self.new_file)
-        label3.bind('<Button>', self.exit)
-
-        first_tab.create_window(50, 100, window=label1, anchor='nw')
-        first_tab.create_window(50, 140, window=label2, anchor='nw')
-        first_tab.create_window(50, 180, window=label3, anchor='nw')
-        self.nb.add(first_tab, text='Start')
-        logger.debug('Start screen created')
+        if not self.first_tab_created:
+            first_tab = tk.Canvas(self.nb, background='white')
+            first_tab.create_text(10,
+                                  10,
+                                  anchor='nw',
+                                  text='Welcome to PyPlus!',
+                                  font='Arial 50')
+            label1 = ttk.Label(first_tab,
+                               text='Open file',
+                               foreground='blue',
+                               background='white',
+                               cursor='hand2',
+                               compound='left',
+                               image=self.open_icon)
+            label2 = ttk.Label(first_tab,
+                               text='New tab',
+                               foreground='blue',
+                               background='white',
+                               cursor='hand2',
+                               compound='left',
+                               image=self.new_icon)
+            label3 = ttk.Label(first_tab,
+                               text='Exit',
+                               foreground='blue',
+                               background='white',
+                               cursor='hand2',
+                               compound='left',
+                               image=self.close_icon_dark)
+            label1.bind('<Button>', self._open)
+            label2.bind('<Button>', self.new_file)
+            label3.bind('<Button>', lambda _=None: self.exit(force=True))
+    
+            first_tab.create_window(50, 100, window=label1, anchor='nw')
+            first_tab.create_window(50, 140, window=label2, anchor='nw')
+            first_tab.create_window(50, 180, window=label3, anchor='nw')
+            self.nb.add(first_tab, text='Start')
+            self.first_tab_created = True
+            logger.debug('Start screen created')
 
     def create_text_widget(self, frame):
         """Creates a text widget in a frame."""
@@ -336,6 +380,7 @@ Lacks these MacOS support:
         textbox.frame = frame  # The text will be packed into the frame.
         textbox.lexer = PythonLexer()
         textbox.lint_cmd = None
+        textbox.format_command = None
         textbox.bind('<Return>', self.autoindent)
         textbox.bind("<<KeyEvent>>", self.key)
         textbox.event_add("<<KeyEvent>>", "<KeyRelease>")
@@ -533,11 +578,13 @@ pop up to ask the user to select the path.
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
                 self.mouse()
-                currtext.lexer = self.file_setting_class.get_lexer_settings(
+                currtext.lexer = self.file_settings_class.get_lexer_settings(
                     extens)
-                currtext.lint_cmd = self.linter_setting_class.get_linter_settings(
+                currtext.lint_cmd = self.linter_settings_class.get_linter_settings(
                     extens)
-                currtext.cmd = self.cmd_setting_class.get_command_settings(
+                currtext.cmd = self.cmd_settings_class.get_command_settings(
+                    extens)
+                currtext.format_command = self.format_settings_class.get_command_settings(
                     extens)
                 self.create_tags()
                 self.recolorize()
@@ -677,8 +724,7 @@ Steps:
                             self.tabs[self.get_tab()].file_dir).parent)))
                 run_in_terminal('chmod 700 run.sh && ./run.sh && rm run.sh && exit', cwd=APPDIR)
         except Exception:
-            pass
-
+            messagebox.showerror('Error', 'This language is not supported.')
     @staticmethod
     def system_shell():
         open_system_shell()
@@ -991,8 +1037,7 @@ Steps:
         ver = tk.Toplevel()
         ver.resizable(0, 0)
         ver.title('About PyPlus')
-        img = tk.PhotoImage(data=ICON)
-        ttk.Label(ver, image=img).pack(fill='both')
+        ttk.Label(ver, image=self.icon).pack(fill='both')
         ttk.Label(ver, text=f'Version {VERSION}',
                   font='Arial 30 bold').pack(fill='both')
         if self.check_updates(popup=False)[0]:
@@ -1016,36 +1061,43 @@ Steps:
     def lint_source(self):
         if len(self.tabs) == 0:
             return
-        if self.tabs[self.get_tab()].textbox.lint_cmd:
-            currdir = self.tabs[self.get_tab()].file_dir
-            if WINDOWS:
-                with open('lint.bat', 'w') as f:
-                    f.write(
-                        LINT_BATCH.format(
-                            cmd=self.tabs[self.get_tab()].textbox.lint_cmd))
-                subprocess.run(f'lint.bat "{currdir}"', shell=True)
-                os.remove('lint.bat')
-            else:
-                with open('lint.sh', 'w') as f:
-                    f.write(
-                        LINT_BATCH.format(
-                            cmd=self.tabs[self.get_tab()].textbox.lint_cmd))
-                subprocess.run(f'chmod 700 lint.sh && ./lint.sh "{currdir}"',
-                               shell=True)
-                os.remove('lint.sh')
-            self.open_file('results.txt')
-            os.remove('results.txt')
-        else:
+        try:
+            if self.tabs[self.get_tab()].textbox.lint_cmd:
+                currdir = self.tabs[self.get_tab()].file_dir
+                if WINDOWS:
+                    with open('lint.bat', 'w') as f:
+                        f.write(
+                            LINT_BATCH.format(
+                                cmd=self.tabs[self.get_tab()].textbox.lint_cmd))
+                    subprocess.run(f'lint.bat "{currdir}"', shell=True)
+                    os.remove('lint.bat')
+                else:
+                    with open('lint.sh', 'w') as f:
+                        f.write(
+                            LINT_BATCH.format(
+                                cmd=self.tabs[self.get_tab()].textbox.lint_cmd))
+                    subprocess.run(f'chmod 700 lint.sh && ./lint.sh "{currdir}"',
+                                   shell=True)
+                    os.remove('lint.sh')
+                self.open_file('results.txt')
+                os.remove('results.txt')
+        except:
             messagebox.showerror('Error', 'This language is not supported')
             return
 
     def autopep(self):
         """Auto Pretty-Format the document"""
-        # TODO: ADD MORE SUPPORTED LANGUAGES
-        currdir = self.tabs[self.get_tab()].file_dir
-        subprocess.run(f'autopep8 "{currdir}" --in-place', shell=True)
-        # Add the --in-place argument to disable output to console
-        self.reload()
+        try:
+            currtext = self.tabs[self.get_tab()].textbox
+            currdir = self.tabs[self.get_tab()].file_dir
+            if currtext.format_command:
+                subprocess.run(f'{currtext.format_command} "{currdir}" > {os.devnull}', shell=True)
+            else:
+                messagebox.showerror('Error', 'Language not supported.')
+                return
+            self.reload()
+        except Exception:
+            logger.exception('Error when formatting:')
 
     def goto(self, _=None):
         if len(self.tabs) == 0:
@@ -1095,7 +1147,7 @@ Steps:
             )  # If you're on the developer run, you don't need updates!
             return
         download_file(
-            url="https://zcg-coder.github.io/NWSOFT/PyPlusWeb/ver.json")
+            url="https://zcg-coder.github.io/PyPlusWeb/ver.json")
         with open('ver.json') as f:
             newest = json.load(f)
         version = newest["version"]

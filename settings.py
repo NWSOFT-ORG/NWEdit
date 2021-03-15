@@ -92,6 +92,26 @@ class Linter:
             return None
 
 
+
+class FormatCommand:
+    def __init__(self):
+        with open(os.path.join(APPDIR, "Settings/format-settings.json")) as f:
+            all_settings = json.load(f)
+        self.extens = []
+        self.format_commands = []
+        for key, value in all_settings.items():
+            self.extens.append(key)
+            self.format_commands.append(value)
+
+    def get_command_settings(self, extension: str):
+        try:
+            if self.format_commands[self.extens.index(extension)] == "none":
+                return None
+            return self.format_commands[self.extens.index(extension)]
+        except IndexError:
+            return None
+
+
 class RunCommand:
     def __init__(self):
         with open(os.path.join(APPDIR, "Settings/cmd-settings.json")) as f:

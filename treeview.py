@@ -3,7 +3,7 @@ from modules import *
 
 class FileTree(ttk.Frame):
     """
-        LeftPanel ... containing treeView, leftButtonFrame, Buttons
+        Treeview to select files
     """
 
     def __init__(self, master=None, textbox=None, opencommand=None, path=os.path.expanduser('~')):
@@ -78,7 +78,7 @@ class FileTree(ttk.Frame):
                 return
 
     def initUI(self, _=None):
-        path = os.path.abspath(__file__)
+        path = os.path.expanduser('~')
         path_list = path.split('/')[:-1]
         for item in path_list:
             self.dir += item + '/'
@@ -106,45 +106,40 @@ class FileTree(ttk.Frame):
         self.refreshTree()
 
     def process_directory(self, parent, path):
-        try:
-            ls = []
-            for p in os.listdir(path):
-                abspath = os.path.join(path, p)
-                isdir = os.path.isdir(abspath)
+        ls = os.listdir(path)
+        dirs = []
+        files = []
+        for file in ls:
+            if os.path.isdir(os.path.join(self.path, file)):
+                dirs.append(file)
+            else:
+                files.append(file)
 
-                if isdir:
-                    item = '\u2514 ' + str(p)
-                    ls.append(item)
-                    continue
+        for item in sorted(dirs):
+            self.tree.insert(parent, 'end', text=str(item), open=False, tags='subfolder')
 
-                else:
-                    item = str(p)
-                    ls.append(item)
-            ls.sort()
-
-            for items in ls:
-                if items.startswith('\u2514'):
-                    self.tree.insert(parent, 'end', text=str(items), open=False, tags='subfolder')
-                else:
-                    self.tree.insert(parent, 'end', text=str(items), open=False, tags='row')
-
-        except Exception:
-            return
+        for item in sorted(files):
+            self.tree.insert(parent, 'end', text=str(item), open=False, tags='row')
 
     def on_double_click_treeview(self, event):
         item = self.tree.identify('item', event.x, event.y)
-        if self.tree.item(item, "text").startswith('\u2514'):
+        tags = self.tree.item(item, "tags")[0]
+        if tags == 'subfolder':
             root = self.path
-            sub = self.tree.item(item, "text").split()[1]
+            sub = self.tree.item(item, "text")
             dir = os.path.join(root, sub)
             self.path = dir
             self.refreshTree()
+        
+        elif tags == 'folder':
+            self.refreshTree()
+            return
 
         else:
             file = self.tree.item(item, "text")
             dir = self.path
             dir = self.checkPath(dir)
-            _filename = dir + '/' + file
+            _filename = os.path.join(dir, file)
             self.selected = []
             try:
                 self.opencommand(_filename)
@@ -155,7 +150,7 @@ class FileTree(ttk.Frame):
             self.textbox.mark_set("insert", "1.0")
             self.textbox.focus_set()
 
-            # workaround 
+            # workaround
             # step 2
             self.refreshTree()
             self.tree.update()

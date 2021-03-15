@@ -1,6 +1,7 @@
 INFO:PyPlus:Tkinter version: 8.6
 DEBUG:PyPlus:All modules imported
 DEBUG:PyPlus:Settings loaded
+DEBUG:PyPlus:Icons loaded
 DEBUG:PyPlus:Theme loaded
 DEBUG:PyPlus:Menu created
 DEBUG:PyPlus:Right-click menu created

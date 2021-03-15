@@ -5,13 +5,6 @@ WINDOWS = bool(sys.platform.startswith('win'))
 OSX = bool(sys.platform.startswith('darwin'))
 APPDIR = str(Path(__file__).parent)
 VERSION = '5.0'
-ICON = (
-    'iVBORw0KGgoAAAANSUhEU\n'
-    'gAAACAAAAAgBAMAAACBVGfHAAAAAXNSR0IB2cksfwAAAAlwSFlzAAASdAAAEnQB3mYfeAAA\n '
-    'ABJQTFRFAAAAAAAA////TWyK////////WaqEwgAAAAZ0Uk5TAP8U/yr/h0gXnQAAAHpJREF\n '
-    'UeJyNktENgCAMROsGog7ACqbpvzs07L+KFCKWFg0XQtLHFQIHAEBoiiAK2BSkXlBpzWDX4D\n '
-    'QGsRhw9B3SMwNSSj1glNEDqhUpUGw/gMuUd+d2Csny6xgAZB4A1IDwG1SxAc/95t7DAPPIm\n '
-    '4/BBeWjdGHr73AB3CCCXSvLODzvAAAAAElFTkSuQmCC')
 RUN_BATCH = ('''#!/bin/bash
 set +v
 cd "{script_dir}"

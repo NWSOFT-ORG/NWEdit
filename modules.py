@@ -17,6 +17,7 @@ import tkinter.messagebox as messagebox
 import codecs
 import tkinter.simpledialog as simpledialog
 import logging
+
 if sys.platform == 'darwin':
     import PyTouchBar
 import tkinter.ttk as ttk

@@ -8,8 +8,19 @@
       <sourceFolder url="file://$MODULE_DIR$/vendor" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/definations" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Images" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/node_modules/.bin" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/venv" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/node_modules/.bin" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/lib/python3.9/site-packages/pkg_resources/_vendor/packaging" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/lib/python3.9/site-packages/pkg_resources/extern" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/lib/python3.9/site-packages/setuptools/_vendor/packaging" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/lib/python3.9/site-packages/setuptools/command" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/lib/python3.9/site-packages/setuptools/extern" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/lib/python3.9/site-packages/pip" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/lib/python3.9/site-packages/pip-21.0.1.dist-info" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/bin" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (.PyPlusSource)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">
@@ -19,5 +30,19 @@
     <option name="format" value="PLAIN" />
     <option name="myDocStringFormat" value="Plain" />
     <option name="renderExternalDocumentation" value="true" />
+  </component>
+  <component name="PyNamespacePackagesService">
+    <option name="namespacePackageFolders">
+      <list>
+        <option value="$MODULE_DIR$/node_modules/.bin" />
+      </list>
+    </option>
+  </component>
+  <component name="TemplatesService">
+    <option name="TEMPLATE_FOLDERS">
+      <list>
+        <option value="$MODULE_DIR$/node_modules/.bin" />
+      </list>
+    </option>
   </component>
 </module>

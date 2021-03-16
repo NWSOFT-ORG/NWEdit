@@ -106,24 +106,33 @@ Dependencies:
 - Pygments You can install them using the following commands:  
   `poetry install && npm install` (Works on Linux, Mac, and Windows)  
   To get Poetry, go here: [python-poetry/poetry](https://github.com/python-poetry/poetry#installation)
+
 # How it works
-You can find clues about how it works, initializes etc. in the log file.  
+
+You can find clues about how it works, initializes etc. in the log file.
+
 ## How it updates:
+
 This editor uses the magical requests module to get a file from remote.  
 It is at [here](https://zcg-coder.github.io/NWSOFT/PyPlusWeb/ver.json).  
-Then it reads the text, parse it, and determine if there's an update.  
+Then it reads the text, parse it, and determine if there's an update.
+
 ## How the syntax highlight works:
+
 This editor uses pygments as its syntax highlighter.  
 When it initilizes, it reads the general-settings.json file at the Settings directory  
 There should be a key, which tells it the syntax highlight theme  
 When a file is opened, it will read another json, called lexer-settings.json.  
 It tells pygments the correct lexer to use.  
 When a key is pressed, it recolorizes the text.  
-It creates the tags, then configure them to make the text's color look different.  
+It creates the tags, then configure them to make the text's color look different.
+
 ## How it handle exeptions
+
 The exceptions will get logged into a file, and I debug it by looking in the log file.  
 I'll try to make the logs contain as much info as I can.  
-If you want to know if the editor works, view the log! If it works, the log should start with:  
+If you want to know if the editor works, view the log! If it works, the log should start with:
+
 ```
 INFO:pyplus:Tkinter version: 8.6
 DEBUG:pyplus:All modules imported

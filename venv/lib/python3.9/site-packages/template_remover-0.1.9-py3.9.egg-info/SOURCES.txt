@@ -1,0 +1,12 @@
+MANIFEST.in
+README.rst
+setup.cfg
+setup.py
+template_remover.py
+scripts/remove_template.py
+template_remover.egg-info/PKG-INFO
+template_remover.egg-info/SOURCES.txt
+template_remover.egg-info/dependency_links.txt
+template_remover.egg-info/requires.txt
+template_remover.egg-info/top_level.txt
+test/test_template_remover.py

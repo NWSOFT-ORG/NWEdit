@@ -1,6 +1,7 @@
 """Python console for the editor."""
 from modules import *
 
+
 # from https://gist.githubusercontent.com/olisolomons/e90d53191d162d48ac534bf7c02a50cd/raw
 # /cfa19387a89fda77d20c01f634dfd044525d5c8b/python_console.py
 class Pipe:

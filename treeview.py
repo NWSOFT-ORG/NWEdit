@@ -142,7 +142,7 @@ class FileTree(ttk.Frame):
             dir = os.path.join(root, sub)
             self.path = dir
             self.refreshTree()
-        
+
         elif tags == 'folder':
             self.refreshTree()
             return

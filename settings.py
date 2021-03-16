@@ -92,7 +92,6 @@ class Linter:
             return None
 
 
-
 class FormatCommand:
     def __init__(self):
         with open(os.path.join(APPDIR, "Settings/format-settings.json")) as f:

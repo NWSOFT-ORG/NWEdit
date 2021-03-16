@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: PyTouchBar
+Version: 0.2.0
+Summary: Use MacBook Pro's TouchBar in Python
+Home-page: https://github.com/Maxmad68/PyTouchBar
+Author: Maxmad68
+Author-email: maxime@madrau.fr
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.2
+Description-Content-Type: text/markdown
+
+Use MacBook Pro's TouchBar in Python. PyTouchBar make easy the use of the TouchBar with Python graphical modules Tkinter and Pygame (other are coming). Currently works with Buttons, Labels, Sliders, Steppers, ColorPickers, Popovers, Segmented Controls and Spaces.
+See <a href="https://github.com/Maxmad68/PyTouchBar/wiki">my Github for docs</a>
+

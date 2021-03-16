@@ -1,10 +1,19 @@
-INFO:PyPlus:Tkinter version: 8.6
-DEBUG:PyPlus:All modules imported
-DEBUG:PyPlus:Settings loaded
-DEBUG:PyPlus:Icons loaded
-DEBUG:PyPlus:Theme loaded
-DEBUG:PyPlus:Menu created
-DEBUG:PyPlus:Right-click menu created
-DEBUG:PyPlus:Tab right-click menu created
-DEBUG:PyPlus:Bindings created
-DEBUG:PyPlus:Start screen created
+2021-03-16 11:39:07,102 : INFO : <module> : MainThread : Tkinter version: 8.6
+2021-03-16 11:39:07,103 : DEBUG : <module> : MainThread : All modules imported
+2021-03-16 11:39:07,339 : DEBUG : __init__ : MainThread : Settings loaded
+2021-03-16 11:39:07,899 : DEBUG : __init__ : MainThread : Icons loaded
+2021-03-16 11:39:08,239 : DEBUG : __init__ : MainThread : Theme loaded
+2021-03-16 11:39:08,267 : DEBUG : __init__ : MainThread : Menu created
+2021-03-16 11:39:08,268 : DEBUG : __init__ : MainThread : Right-click menu created
+2021-03-16 11:39:08,268 : DEBUG : __init__ : MainThread : Tab right-click menu created
+2021-03-16 11:39:08,269 : DEBUG : __init__ : MainThread : Bindings created
+2021-03-16 11:39:08,297 : DEBUG : start_screen : MainThread : Start screen created
+2021-03-16 11:39:08,299 : DEBUG : update_title : MainThread : update_title: No file open
+2021-03-16 11:39:08,299 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
+2021-03-16 11:39:10,875 : DEBUG : create_text_widget : MainThread : Textbox created
+2021-03-16 11:39:10,958 : DEBUG : update_statusbar : MainThread : update_statusbar: OK
+2021-03-16 11:39:10,959 : DEBUG : update_title : MainThread : update_title: OK
+2021-03-16 11:39:10,960 : DEBUG : update_statusbar : MainThread : update_statusbar: OK
+2021-03-16 11:39:10,960 : DEBUG : update_title : MainThread : update_title: OK
+2021-03-16 11:39:10,960 : DEBUG : mouse : MainThread : update_title: OK
+2021-03-16 11:39:14,909 : INFO : exit : MainThread : Window is destroyed

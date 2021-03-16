@@ -102,9 +102,14 @@ Lacks these MacOS support:
 
             self.tabs = {}
 
+            self.pandedwin = ttk.Panedwindow(self.master, orient='horizontal')
+            self.pandedwin.pack(fill='both', expand=1)
             self.nb = ClosableNotebook(self.master, self.close_tab)
             self.nb.bind('<B1-Motion>', self.move_tab)
             self.nb.pack(expand=1, fill='both')
+            self.filetree = FileTree(self.master, self.open_file)
+            self.pandedwin.add(self.filetree)
+            self.pandedwin.add(self.nb)
             self.nb.enable_traversal()
 
             self.master.protocol(
@@ -321,7 +326,7 @@ Lacks these MacOS support:
             self.master.focus_force()
             self.statusbar = ttk.Frame(self.master)
             self.statusbar.pack(side='bottom', fill='x', anchor='nw')
-            self.statusbar.label1 = ttk.Label(self.statusbar, text='PyPlus | ')
+            self.statusbar.label1 = ttk.Label(self.statusbar, text='PyPlus |')
             self.statusbar.label1.pack(side='left')
             self.statusbar.label2 = ttk.Label(self.statusbar)
             self.statusbar.label2.pack(side='left')
@@ -576,8 +581,6 @@ pop up to ask the user to select the path.
                 extens = file_dir.split('.')[-1]
 
                 new_tab = ttk.Frame(self.nb)
-                panedwin = ttk.Panedwindow(new_tab, orient='horizontal')
-                panedwin.pack(fill='both', expand=1)
                 textbox = self.create_text_widget(new_tab)
                 self.tabs[new_tab] = Document(new_tab,
                                               textbox,
@@ -587,9 +590,6 @@ pop up to ask the user to select the path.
 
                 # Puts the contents of the file into the text widget.
                 currtext = self.tabs[new_tab].textbox
-                tree = FileTree(new_tab, currtext, self.open_file, path=Path(file_dir).parent)
-                panedwin.add(tree, weight=1)
-                panedwin.add(textbox.master, weight=10)
                 currtext.insert('end', file.read().replace('\t', ' ' * 4))
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
@@ -658,16 +658,13 @@ pop up to ask the user to select the path.
     def new_file(self, _=None):
         """Creates a new tab(file)."""
         new_tab = ttk.Frame(self.nb)
-        panedwin = ttk.Panedwindow(new_tab, orient='horizontal')
-        panedwin.pack(fill='both', expand=1)
         textbox = self.create_text_widget(new_tab)
         self.tabs[new_tab] = Document(new_tab,
                                       textbox, 'None')
-        filetree = FileTree(master=new_tab, textbox=textbox, opencommand=self.open_file)
-        panedwin.add(filetree)
-        panedwin.add(textbox.master)
         self.nb.add(new_tab, text='None')
         self.nb.select(new_tab)
+        self.create_tags()
+        self.recolorize()
         self.update_statusbar()
         self.update_title()
 
@@ -1070,11 +1067,6 @@ Steps:
             ttk.Label(ver, text='No updates available').pack(fill='both')
         ver.mainloop()
 
-    def update_settings(self):
-        self.filetypes = self.settings_class.get_settings('file_type')
-        self.create_tags()
-        self.recolorize()
-
     def lint_source(self):
         if len(self.tabs) == 0:
             return
@@ -1164,7 +1156,7 @@ Steps:
             )  # If you're on the developer run, you don't need updates!
             return
         download_file(
-            url="https://zcg-coder.github.io/NWSOFT/PyPlusWeb/ver.json")
+            url="https://raw.githubusercontent.com/ZCG-coder/NWSOFT/master/PyPlusWeb/ver.json")
         with open('ver.json') as f:
             newest = json.load(f)
         version = newest["version"]

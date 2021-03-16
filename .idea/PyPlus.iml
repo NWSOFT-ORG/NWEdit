@@ -31,13 +31,6 @@
     <option name="myDocStringFormat" value="Plain" />
     <option name="renderExternalDocumentation" value="true" />
   </component>
-  <component name="PyNamespacePackagesService">
-    <option name="namespacePackageFolders">
-      <list>
-        <option value="$MODULE_DIR$/node_modules/.bin" />
-      </list>
-    </option>
-  </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_FOLDERS">
       <list>

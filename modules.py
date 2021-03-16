@@ -12,15 +12,12 @@ import sys
 import threading
 import tkinter as tk
 import tkinter.filedialog
+import tkinter.ttk as ttk
 import tkinter.font as font
 import tkinter.messagebox as messagebox
 import codecs
 import tkinter.simpledialog as simpledialog
 import logging
-
-if sys.platform == 'darwin':
-    import PyTouchBar
-import tkinter.ttk as ttk
 import webbrowser
 from pathlib import Path
 
@@ -32,6 +29,9 @@ from pygments.lexers.python import PythonLexer
 from pygments.styles import get_style_by_name
 from pygson.json_lexer import JSONLexer
 from ttkthemes import ThemedStyle
+
+if sys.platform == 'darwin':
+    import PyTouchBar
 
 
 class EditorErr(Exception):

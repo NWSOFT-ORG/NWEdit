@@ -1,7 +1,0 @@
-setuptools==47.1.0
-PyTouchBar==0.2.0
-json5==0.9.5
-requests==2.25.1
-ttkthemes==3.2.0
-Pygments==2.7.3
-pygments-json==0.1

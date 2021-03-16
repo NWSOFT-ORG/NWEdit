@@ -20,4 +20,5 @@ python = "^3.8"
 requests = "^2.25.1"
 setuptools = "^54.1.2"
 ttkthemes = "^3.2.0"
+py2app = "^0.23"
 [tool.poetry.dev-dependencies]

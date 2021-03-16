@@ -6,7 +6,7 @@ class FileTree(ttk.Frame):
         Treeview to select files
     """
 
-    def __init__(self, master=None, textbox=None, opencommand=None, path=os.path.expanduser('~')):
+    def __init__(self, master=None, opencommand=None, path=os.path.expanduser('~')):
         super().__init__(master)
         self.destinationItem = None
         self.sourceItem = None
@@ -20,21 +20,18 @@ class FileTree(ttk.Frame):
         self.dir = ''
         self.selected = []
         self.master = master
-        self.textbox = textbox
         self.path = str(path)
         self.opencommand = opencommand
         topframe = ttk.Frame(self)
         topframe.pack(side='top', anchor='nw')
         self.actioncombobox = ttk.Combobox(topframe, state='readonly',
-                                           values=['Parent Directory', 'New File',
-                                                   'New Directory', 'Refresh',
-                                                   'Remove...'])
+                                           values=['Parent Directory', 'New...', 'Refresh', 'Remove...'])
         self.actioncombobox.set('Parent Directory')
         self.actioncombobox.pack(anchor='nw', side='left')
         ttk.Button(topframe, text='>>', command=self.do_action).pack(side='left', anchor='nw')
 
         self.pack(side='left', fill='both', expand=1)
-        self.initUI()
+        self.init_ui()
         self.tree.tag_configure('row', background='black', foreground='white')
         self.tree.tag_configure('folder', background='black', foreground='yellow')
         self.tree.tag_configure('subfolder', background='black', foreground='#448dc4')
@@ -43,15 +40,13 @@ class FileTree(ttk.Frame):
         action = self.actioncombobox.get()
         if action == 'Parent Directory':
             self.change_parent_dir()
-        elif action == 'New File':
+        elif action == 'New...':
             self.new_file()
-        elif action == 'New Directory':
-            self.new_dir()
         elif action == 'Refresh':
-            self.initUI()
+            self.init_ui()
         elif action == 'Remove...':
             self.remove()
-    
+
     def remove(self):
         path = os.path.join(self.path, self.tree.item(self.tree.focus())['text'])
         if messagebox.askyesno('Warning!', 'This file/directory will be deleted immediately!'):
@@ -59,37 +54,54 @@ class FileTree(ttk.Frame):
                 shutil.rmtree(path)
             else:
                 os.remove(path)
-            self.initUI()
+            self.init_ui()
 
     def new_file(self):
-        _filename = simpledialog.askstring('New file', 'File Name:')
-        file_abspath = os.path.join(self.path, _filename)
-        if os.path.exists(file_abspath):
-            if messagebox.askyesno('Confirm', 'This file already exists, do you want to overwrite?'):
-                with open(file_abspath, 'w') as f:
-                    f.write('')
-                self.opencommand(file_abspath)
-                return
-            return
-        else:
-            with open(file_abspath, 'w') as f:
-                f.write('')
-            self.opencommand(file_abspath)
-            return
+        global _type
+        win = tk.Toplevel(master=self.master)
+        win.title('New File/Directory')
+        win.transient('.')
+        filename = tk.Entry(win)
+        filename.pack()
+        _type = tk.IntVar()
+        _type.set(1)
 
-    def new_dir(self):
-        dirname = simpledialog.askstring('New directory', 'Directory Name:')
-        dir_abspath = os.path.join(self.path, dirname)
-        try:
-            os.mkdir(dir_abspath)
-        except FileExistsError:
-            if messagebox.askyesno('Confirm', 'This directory already exists, do you want to overwrite?'):
-                shutil.rmtree(dir_abspath, ignore_errors=True)
-                os.mkdir(dir_abspath)
+        def select(_=None):
+            _type.set(not _type.get())
+            print(_type.get())
+
+        _dir = ttk.Radiobutton(win, value=1, text='Directory', command=select)
+        _dir.pack(side='left')
+        _file = ttk.Radiobutton(win, value=0, text='File', command=select)
+        _file.pack(side='left')
+
+        def create(_=None):
+            path = os.path.join(self.path, filename.get())
+            if not _type:
+                try:
+                    os.mkdir(path)
+                except FileExistsError:
+                    if messagebox.askyesno('This directory already exsists!', 'Do you want to overwrite?'):
+                        shutil.rmtree(path, ignore_errors=True)
+                        os.mkdir(path)
             else:
-                return
+                if os.path.exists(path):
+                    if messagebox.askyesno('This file already exsists!', 'Do you want to overwrite?'):
+                        with open(path, 'w') as f:
+                            f.write('')
+                        self.opencommand(path)
+                else:
+                    with open(path, 'w') as f:
+                        f.write('')
+                    self.opencommand(path)
 
-    def initUI(self, _=None):
+        okbtn = ttk.Button(win, text='OK', command=create)
+        okbtn.pack()
+        cancelbtn = ttk.Button(win, text='Cancel', command=lambda _=None: win.destroy())
+        cancelbtn.pack()
+        win.mainloop()
+
+    def init_ui(self, _=None):
         path = os.path.expanduser('~')
         path_list = path.split('/')[:-1]
         for item in path_list:
@@ -97,7 +109,6 @@ class FileTree(ttk.Frame):
 
         self.tree.delete(*self.tree.get_children())
         self.tree.bind("<Double-1>", self.on_double_click_treeview)
-        self.tree.bind('<Alt-Right>', self.change_to_textbox)
         self.tree.heading('#0', text='Directory Structure')
         self.tree.update()
 
@@ -107,15 +118,11 @@ class FileTree(ttk.Frame):
 
         self.tree.pack(side='bottom', expand=True, fill='both', anchor='nw')
 
-        self.refreshTree()
-
-    def change_to_textbox(self, _=None):
-        if self.textbox:
-            self.textbox.focus_set()
+        self.refresh_tree()
 
     def change_parent_dir(self):
         self.path = str(Path(os.path.abspath(self.path)).parent)
-        self.refreshTree()
+        self.refresh_tree()
 
     def process_directory(self, parent, path):
         ls = os.listdir(path)
@@ -134,48 +141,49 @@ class FileTree(ttk.Frame):
             self.tree.insert(parent, 'end', text=str(item), open=False, tags='row')
 
     def on_double_click_treeview(self, event):
-        item = self.tree.identify('item', event.x, event.y)
-        tags = self.tree.item(item, "tags")[0]
-        if tags == 'subfolder':
-            root = self.path
-            sub = self.tree.item(item, "text")
-            dir = os.path.join(root, sub)
-            self.path = dir
-            self.refreshTree()
+        try:
+            item = self.tree.identify('item', event.x, event.y)
+            tags = self.tree.item(item, "tags")[0]
+            if tags == 'subfolder':
+                root = self.path
+                sub = self.tree.item(item, "text")
+                _dir = os.path.join(root, sub)
+                self.path = _dir
+                self.refresh_tree()
 
-        elif tags == 'folder':
-            self.refreshTree()
-            return
+            elif tags == 'folder':
+                self.refresh_tree()
+                return
 
-        else:
-            file = self.tree.item(item, "text")
-            dir = self.path
-            dir = self.checkPath(dir)
-            _filename = os.path.join(dir, file)
-            self.selected = []
-            try:
-                self.opencommand(_filename)
-            except Exception:
-                pass
+            else:
+                file = self.tree.item(item, "text")
+                _dir = self.path
+                _dir = self.check_path(_dir)
+                _filename = os.path.join(_dir, file)
+                self.selected = []
+                try:
+                    self.opencommand(_filename)
+                except Exception:
+                    pass
 
-            self.tree.update()
-            self.textbox.mark_set("insert", "1.0")
-            self.textbox.focus_set()
+                self.tree.update()
 
-            # workaround
-            # step 2
-            self.refreshTree()
-            self.tree.update()
+                # workaround
+                # step 2
+                self.refresh_tree()
+                self.tree.update()
 
-        self.refreshTree()
+            self.refresh_tree()
+        except Exception:
+            pass
 
     @staticmethod
-    def checkPath(path):
+    def check_path(path):
         if '\\' in path:
             path = path.replace('\\', '/')
         return path
 
-    def refreshTree(self):
+    def refresh_tree(self):
         for i in self.tree.get_children():
             self.tree.delete(i)
         path = self.path

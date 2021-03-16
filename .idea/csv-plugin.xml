@@ -3,7 +3,21 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="$APPLICATION_CONFIG_DIR$/scratches/scratch.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/pyplus.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/treeview.py">
           <value>
             <Attribute>
               <option name="separator" value="," />

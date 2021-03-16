@@ -7,11 +7,11 @@ def is_binary_string(byte):
     return bool(byte.translate(None, textchars))
 
 
-def download_file(url):
+def download_file(url, localfile=None):
     """Downloads a file from remote path"""
-    local_filename = url.split('/')[-1]
+    local_filename = (url.split('/')[-1] if not localfile else localfile)
     # NOTE the stream=True parameter below
-    with requests.get(url, stream=True) as r:
+    with requests.get(url, stream=True, allow_redirects=True) as r:
         r.raise_for_status()
         with open(local_filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):

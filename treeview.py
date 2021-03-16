@@ -27,7 +27,8 @@ class FileTree(ttk.Frame):
         topframe.pack(side='top', anchor='nw')
         self.actioncombobox = ttk.Combobox(topframe, state='readonly',
                                            values=['Parent Directory', 'New File',
-                                                   'New Directory', 'Refresh'])
+                                                   'New Directory', 'Refresh',
+                                                   'Remove...'])
         self.actioncombobox.set('Parent Directory')
         self.actioncombobox.pack(anchor='nw', side='left')
         ttk.Button(topframe, text='>>', command=self.do_action).pack(side='left', anchor='nw')
@@ -47,6 +48,17 @@ class FileTree(ttk.Frame):
         elif action == 'New Directory':
             self.new_dir()
         elif action == 'Refresh':
+            self.initUI()
+        elif action == 'Remove...':
+            self.remove()
+    
+    def remove(self):
+        path = os.path.join(self.path, self.tree.item(self.tree.focus())['text'])
+        if messagebox.askyesno('Warning!', 'This file/directory will be deleted immediately!'):
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+            else:
+                os.remove(path)
             self.initUI()
 
     def new_file(self):

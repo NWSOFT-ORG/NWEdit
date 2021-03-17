@@ -1,4 +1,5 @@
 from modules import *
+from constants import *
 
 
 class FileTree(ttk.Frame):
@@ -25,7 +26,8 @@ class FileTree(ttk.Frame):
         topframe = ttk.Frame(self)
         topframe.pack(side='top', anchor='nw')
         self.actioncombobox = ttk.Combobox(topframe, state='readonly',
-                                           values=['Parent Directory', 'New...', 'Refresh', 'Remove...'])
+                                           values=['Parent Directory', 'New...', 'Refresh',
+                                                   'Remove...', 'Get info...'])
         self.actioncombobox.set('Parent Directory')
         self.actioncombobox.pack(anchor='nw', side='left')
         ttk.Button(topframe, text='>>', command=self.do_action).pack(side='left', anchor='nw')
@@ -46,6 +48,8 @@ class FileTree(ttk.Frame):
             self.init_ui()
         elif action == 'Remove...':
             self.remove()
+        elif action == 'Get info...':
+            self.get_info()
 
     def remove(self):
         path = os.path.join(self.path, self.tree.item(self.tree.focus())['text'])
@@ -55,12 +59,45 @@ class FileTree(ttk.Frame):
             else:
                 os.remove(path)
             self.init_ui()
+    
+    def get_info(self):
+        path = os.path.join(self.path, self.tree.item(self.tree.focus())['text'])
+        basename = os.path.basename(path)
+        size = str(os.path.getsize(path))
+        if int(size) / 1024 < 1:
+            size += 'Bytes'
+        elif int(size) / 1024 >= 1 <= 2:
+            size = f'{int(size) // 1024} Kilobytes'
+        elif int(size) / 1024 ** 2 >= 1 <= 2:
+            size = f'{int(size) // 1024 ** 2} Megabytes'
+        elif int(size) / 1073.741824 >= 1 <= 2:
+            size = f'{int(size) // 1024 ** 2} Gigabytes'
+        elif int(size) / 1099.511627776 >= 1 <= 2:
+            size = f'{int(size) // 1024 ** 2} Terrabytes'
+        # It can go on and on, but the newest PCs won't have more than a PB storage!
+        mdate = f"Last modified: {time.ctime(os.path.getmtime(path))}"
+        cdate = f"Created: {time.ctime(os.path.getctime(path))}"
+        win = tk.Toplevel(master=self.master)
+        win.title(f'Info of {basename}')
+        win.resizable(0, 0)
+        win.transient('.')
+        ttk.Label(win, text=f'Name: {basename}').pack(side='top', anchor='nw', fill='x')
+        ttk.Label(win, text=f'Path: {path}').pack(side='top', anchor='nw', fill='x')
+        ttk.Label(win, text=f'Size: {size}').pack(side='top', anchor='nw', fill='x')
+        ttk.Label(win, text=mdate).pack(side='top', anchor='nw', fill='x')
+        ttk.Label(win, text=cdate).pack(side='top', anchor='nw', fill='x')
+        if not WINDOWS or OSX:
+            ttk.Label(win,
+                      text='Note: the dates would not be the exact date of creation or modification!')\
+            .pack(side='top', anchor='nw', fill='x')
+        win.mainloop()
 
     def new_file(self):
         global _type
         win = tk.Toplevel(master=self.master)
         win.title('New File/Directory')
         win.transient('.')
+        win.resizable(0, 0)
         filename = tk.Entry(win)
         filename.pack()
         _type = tk.IntVar()
@@ -68,7 +105,6 @@ class FileTree(ttk.Frame):
 
         def select(_=None):
             _type.set(not _type.get())
-            print(_type.get())
 
         _dir = ttk.Radiobutton(win, value=1, text='Directory', command=select)
         _dir.pack(side='left')
@@ -94,6 +130,7 @@ class FileTree(ttk.Frame):
                     with open(path, 'w') as f:
                         f.write('')
                     self.opencommand(path)
+            self.init_ui()
 
         okbtn = ttk.Button(win, text='OK', command=create)
         okbtn.pack()

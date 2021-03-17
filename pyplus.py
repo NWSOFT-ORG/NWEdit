@@ -7,7 +7,7 @@
 | It's extremely small! (around 80 kB)                |
 | You can visit my site for more details!             |
 | +---------------------------------------------+     |
-| | https://ZCG-coder.github.io/NWSOFT/PyPlusWeb |     |
+| | https://ZCG-coder.github.io/NWSOFT/PyPlusWeb|     |
 | +---------------------------------------------+     |
 | You can also contribute it on github!               |
 | Note: Some parts are adapted from stack overflow.   |
@@ -117,6 +117,14 @@ Lacks these MacOS support:
             )  # When the window is closed, or quit from Mac, do exit action
 
             menubar = tk.Menu(self.master)
+            self.statusbar = ttk.Frame(self.master)
+            self.statusbar.pack(side='bottom', fill='x', anchor='nw')
+            self.statusbar.label1 = ttk.Label(self.statusbar, text='PyPlus |')
+            self.statusbar.label1.pack(side='left')
+            self.statusbar.label2 = ttk.Label(self.statusbar)
+            self.statusbar.label2.pack(side='left')
+            self.statusbar.label3 = ttk.Label(self.statusbar)
+            self.statusbar.label3.pack(side='left')
             # Name can be apple only, don't really know why!
             app_menu = tk.Menu(menubar, name='apple', tearoff=0)
 
@@ -218,12 +226,12 @@ Lacks these MacOS support:
             self.codemenu = tk.Menu(menubar, tearoff=0)
             self.codemenu.add_command(label='Indent',
                                       command=lambda: self.indent('indent'),
-                                      accelerator=f'<{MAIN_KEY}-i>',
+                                      accelerator=f'{MAIN_KEY}-i',
                                       compound='left',
                                       image=self.indent_icon)
             self.codemenu.add_command(label='Unident',
                                       command=lambda: self.indent('unindent'),
-                                      accelerator=f'<{MAIN_KEY}-u>',
+                                      accelerator=f'{MAIN_KEY}-u',
                                       compound='left',
                                       image=self.unindent_icon)
             self.codemenu.add_separator()
@@ -324,14 +332,6 @@ Lacks these MacOS support:
             self.first_tab_created = False
             self.start_screen()
             self.master.focus_force()
-            self.statusbar = ttk.Frame(self.master)
-            self.statusbar.pack(side='bottom', fill='x', anchor='nw')
-            self.statusbar.label1 = ttk.Label(self.statusbar, text='PyPlus |')
-            self.statusbar.label1.pack(side='left')
-            self.statusbar.label2 = ttk.Label(self.statusbar)
-            self.statusbar.label2.pack(side='left')
-            self.statusbar.label3 = ttk.Label(self.statusbar)
-            self.statusbar.label3.pack(side='left')
             self.update_title()
             self.update_statusbar()
             self.master.mainloop()  # This line can be here only

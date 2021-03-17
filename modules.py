@@ -18,6 +18,7 @@ import tkinter.messagebox as messagebox
 import codecs
 import tkinter.simpledialog as simpledialog
 import logging
+import time
 import webbrowser
 from pathlib import Path
 

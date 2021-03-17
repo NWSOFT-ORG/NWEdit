@@ -593,7 +593,6 @@ pop up to ask the user to select the path.
                 currtext.insert('end', file.read().replace('\t', ' ' * 4))
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
-                self.mouse()
                 currtext.lexer = self.file_settings_class.get_lexer_settings(
                     extens)
                 currtext.lint_cmd = self.linter_settings_class.get_linter_settings(
@@ -603,6 +602,8 @@ pop up to ask the user to select the path.
                 currtext.format_command = self.format_settings_class.get_command_settings(
                     extens)
                 self.key()
+                self.create_tags()
+                self.recolorize()
                 currtext.see('insert')
                 currtext.focus_set()
                 logging.info('File opened')
@@ -727,7 +728,7 @@ Steps:
                         file=self.tabs[self.get_tab()].file_dir,
                         cmd=self.tabs[self.get_tab()].textbox.cmd)))
                 run_in_terminal('run.bat && del run.bat && exit', cwd=APPDIR)
-            else:
+            else:  # Others
                 with open(APPDIR + '/run.sh', 'w') as f:
                     f.write((RUN_BATCH.format(
                         dir=APPDIR,

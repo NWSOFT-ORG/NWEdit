@@ -1,38 +1,43 @@
-2021-03-17 02:18:28,271 : INFO : <module> : MainThread : Tkinter version: 8.6
-2021-03-17 02:18:28,271 : DEBUG : <module> : MainThread : All modules imported
-2021-03-17 02:18:28,366 : DEBUG : __init__ : MainThread : Settings loaded
-2021-03-17 02:18:28,514 : DEBUG : __init__ : MainThread : Icons loaded
-2021-03-17 02:18:29,050 : DEBUG : __init__ : MainThread : Theme loaded
-2021-03-17 02:18:29,124 : DEBUG : __init__ : MainThread : Menu created
-2021-03-17 02:18:29,125 : DEBUG : __init__ : MainThread : Right-click menu created
-2021-03-17 02:18:29,125 : DEBUG : __init__ : MainThread : Tab right-click menu created
-2021-03-17 02:18:29,125 : DEBUG : __init__ : MainThread : Bindings created
-2021-03-17 02:18:29,133 : DEBUG : start_screen : MainThread : Start screen created
-2021-03-17 02:18:29,134 : DEBUG : update_title : MainThread : update_title: No file open
-2021-03-17 02:18:29,136 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
-2021-03-17 02:18:37,093 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
-2021-03-17 02:18:37,094 : DEBUG : update_title : MainThread : update_title: No file open
-2021-03-17 02:18:37,094 : DEBUG : mouse : MainThread : update_title: OK
-2021-03-17 02:18:37,250 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
-2021-03-17 02:18:37,251 : DEBUG : update_title : MainThread : update_title: No file open
-2021-03-17 02:18:37,251 : DEBUG : mouse : MainThread : update_title: OK
-2021-03-17 02:18:39,245 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
-2021-03-17 02:18:39,245 : DEBUG : update_title : MainThread : update_title: No file open
-2021-03-17 02:18:39,245 : DEBUG : mouse : MainThread : update_title: OK
-2021-03-17 02:18:39,434 : DEBUG : create_text_widget : MainThread : Textbox created
-2021-03-17 02:18:39,552 : DEBUG : update_statusbar : MainThread : update_statusbar: OK
-2021-03-17 02:18:39,552 : DEBUG : update_title : MainThread : update_title: OK
-2021-03-17 02:18:39,553 : DEBUG : mouse : MainThread : update_title: OK
-2021-03-17 02:18:39,635 : DEBUG : update_statusbar : MainThread : update_statusbar: OK
-2021-03-17 02:18:39,636 : DEBUG : update_title : MainThread : update_title: OK
-2021-03-17 02:18:39,636 : DEBUG : key : MainThread : update_title: OK
-2021-03-17 02:18:39,639 : INFO : open_file : MainThread : File opened
-2021-03-17 02:18:39,643 : DEBUG : update_statusbar : MainThread : update_statusbar: OK
-2021-03-17 02:18:39,643 : DEBUG : update_title : MainThread : update_title: OK
-2021-03-17 02:18:39,643 : DEBUG : mouse : MainThread : update_title: OK
-2021-03-17 02:18:43,443 : DEBUG : update_statusbar : MainThread : update_statusbar: OK
-2021-03-17 02:18:43,443 : DEBUG : update_title : MainThread : update_title: OK
-2021-03-17 02:18:43,443 : DEBUG : mouse : MainThread : update_title: OK
-2021-03-17 02:18:43,741 : DEBUG : update_statusbar : MainThread : update_statusbar: OK
-2021-03-17 02:18:43,747 : DEBUG : update_title : MainThread : update_title: OK
-2021-03-17 02:18:43,747 : DEBUG : mouse : MainThread : update_title: OK
+2021-03-17 11:57:43,723 : INFO : <module> : MainThread : Tkinter version: 8.6
+2021-03-17 11:57:43,723 : DEBUG : <module> : MainThread : All modules imported
+2021-03-17 11:57:43,802 : DEBUG : __init__ : MainThread : Settings loaded
+2021-03-17 11:57:44,113 : DEBUG : __init__ : MainThread : Icons loaded
+2021-03-17 11:57:44,509 : DEBUG : __init__ : MainThread : Theme loaded
+2021-03-17 11:57:44,712 : DEBUG : __init__ : MainThread : Menu created
+2021-03-17 11:57:44,713 : DEBUG : __init__ : MainThread : Right-click menu created
+2021-03-17 11:57:44,713 : DEBUG : __init__ : MainThread : Tab right-click menu created
+2021-03-17 11:57:44,713 : DEBUG : __init__ : MainThread : Bindings created
+2021-03-17 11:57:44,721 : DEBUG : start_screen : MainThread : Start screen created
+2021-03-17 11:57:44,722 : DEBUG : update_title : MainThread : update_title: No file open
+2021-03-17 11:57:44,722 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
+2021-03-17 11:57:55,041 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
+2021-03-17 11:57:55,041 : DEBUG : update_title : MainThread : update_title: No file open
+2021-03-17 11:57:55,041 : DEBUG : mouse : MainThread : update_title: OK
+2021-03-17 11:57:55,856 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
+2021-03-17 11:57:55,857 : DEBUG : update_title : MainThread : update_title: No file open
+2021-03-17 11:57:55,857 : DEBUG : mouse : MainThread : update_title: OK
+2021-03-17 11:58:00,073 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
+2021-03-17 11:58:00,073 : DEBUG : update_title : MainThread : update_title: No file open
+2021-03-17 11:58:00,074 : DEBUG : mouse : MainThread : update_title: OK
+2021-03-17 11:58:02,479 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
+2021-03-17 11:58:02,479 : DEBUG : update_title : MainThread : update_title: No file open
+2021-03-17 11:58:02,480 : DEBUG : mouse : MainThread : update_title: OK
+2021-03-17 11:58:03,857 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
+2021-03-17 11:58:03,857 : DEBUG : update_title : MainThread : update_title: No file open
+2021-03-17 11:58:03,857 : DEBUG : mouse : MainThread : update_title: OK
+2021-03-17 11:58:06,013 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
+2021-03-17 11:58:06,014 : DEBUG : update_title : MainThread : update_title: No file open
+2021-03-17 11:58:06,014 : DEBUG : mouse : MainThread : update_title: OK
+2021-03-17 11:58:09,398 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
+2021-03-17 11:58:09,398 : DEBUG : update_title : MainThread : update_title: No file open
+2021-03-17 11:58:09,398 : DEBUG : mouse : MainThread : update_title: OK
+2021-03-17 11:58:12,585 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
+2021-03-17 11:58:12,585 : DEBUG : update_title : MainThread : update_title: No file open
+2021-03-17 11:58:12,585 : DEBUG : mouse : MainThread : update_title: OK
+2021-03-17 11:58:15,724 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
+2021-03-17 11:58:15,725 : DEBUG : update_title : MainThread : update_title: No file open
+2021-03-17 11:58:15,725 : DEBUG : mouse : MainThread : update_title: OK
+2021-03-17 11:58:18,448 : DEBUG : update_statusbar : MainThread : update_statusbar: No file open
+2021-03-17 11:58:18,448 : DEBUG : update_title : MainThread : update_title: No file open
+2021-03-17 11:58:18,448 : DEBUG : mouse : MainThread : update_title: OK
+2021-03-17 11:58:22,153 : INFO : exit : MainThread : Window is destroyed

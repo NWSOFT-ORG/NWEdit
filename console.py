@@ -2,8 +2,7 @@
 from modules import *
 
 
-# from https://gist.githubusercontent.com/olisolomons/e90d53191d162d48ac534bf7c02a50cd/raw
-# /cfa19387a89fda77d20c01f634dfd044525d5c8b/python_console.py
+# from olisolomos's gist
 class Pipe:
     """mock stdin stdout or stderr"""
 
@@ -55,14 +54,14 @@ class Console(ttk.Frame):
         sys.stderr = Pipe()
         sys.stdin = Pipe()
 
-        self.readFromPipe(sys.stdout, "stdout")
-        self.readFromPipe(sys.stderr, "stderr", foreground='red')
+        self.read_from_pipe(sys.stdout, "stdout")
+        self.read_from_pipe(sys.stderr, "stderr", foreground='red')
 
     def prompt(self):
         """Add a '>>> ' to the console"""
         self.prompt_flag = True
 
-    def readFromPipe(self, pipe: Pipe, tag_name, **kwargs):
+    def read_from_pipe(self, pipe: Pipe, tag_name, **kwargs):
         """Method for writing data from the replaced stdin and stdout to the console widget"""
 
         # write the >>>
@@ -82,7 +81,7 @@ class Console(ttk.Frame):
             self.text.write(str_data, "prompt_end")
 
         # loop
-        self.after(50, lambda: self.readFromPipe(pipe, tag_name, **kwargs))
+        self.after(50, lambda: self.read_from_pipe(pipe, tag_name, **kwargs))
 
     def enter(self, _):
         """The <Return> key press handler"""

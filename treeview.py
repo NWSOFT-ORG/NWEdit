@@ -86,7 +86,7 @@ class FileTree(ttk.Frame):
         ttk.Label(win, text=f'Size: {size}').pack(side='top', anchor='nw', fill='x')
         ttk.Label(win, text=mdate).pack(side='top', anchor='nw', fill='x')
         ttk.Label(win, text=cdate).pack(side='top', anchor='nw', fill='x')
-        if not WINDOWS or OSX:
+        if not (WINDOWS or OSX):
             ttk.Label(win,
                       text='Note: the dates would not be the exact date of creation or modification!')\
             .pack(side='top', anchor='nw', fill='x')

@@ -20,7 +20,7 @@
       <excludeFolder url="file://$MODULE_DIR$/venv/lib/python3.9/site-packages/pip-21.0.1.dist-info" />
       <excludeFolder url="file://$MODULE_DIR$/venv/bin" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.9 (.PyPlusSource)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">

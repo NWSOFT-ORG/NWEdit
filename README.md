@@ -1,6 +1,6 @@
 # PyPlusSource
 
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FZCG-coder%2FPyPlusSource&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Views&edge_flat=true)](https://hits.seeyoufarm.com)  
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FZCG-coder%2FPyPlusSource&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Views&edge_flat=true)](#)  
 The source code of the PyPlus editor.
 
 # The code
@@ -90,6 +90,8 @@ WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 General Public License for more details.
 ```
+  
+Thanks to overture for the phplint tool, and thanks to people who wrote greate code on Gist and stack overflow.
 
 # Installing dependencies
 

@@ -390,7 +390,7 @@ Lacks these MacOS support:
                      self.right_click)
         for char in ['"', "'", '(', '[', '{']:
             textbox.bind(char, self.autoinsert)
-        for char in ['"', "'", ')', ']', '}']:
+        for char in [')', ']', '}']:
             textbox.bind(char, self.close_brackets)
         textbox.focus_set()
         logger.debug('Textbox created')
@@ -617,11 +617,6 @@ pop up to ask the user to select the path.
                 initialdir='/',
                 title='Save As...',
                 filetypes=self.filetypes))
-            if not file_dir:
-                self.close_tab()
-                return
-            if not os.access(file_dir, os.W_OK):
-                messagebox.showerror('Error', 'File read only.')
 
             self.tabs[curr_tab].file_dir = file_dir
             self.nb.tab(curr_tab, text=os.path.basename(file_dir))
@@ -746,7 +741,7 @@ Steps:
             return
         currtext = self.tabs[self.get_tab()].textbox
         if currtext.get('insert', 'insert +1c') in [')', ']', '}', '\'', '"']:
-            currtext.delete('insert', 'insert +1c')
+            currtext.mark_set('insert', 'insert +1c')
             return 'break'
 
     def autoinsert(self, event=None):
@@ -761,9 +756,19 @@ Steps:
         currtext = self.tabs[self.get_tab()].textbox
         char = event.char
         if char == '\'':
+            if currtext.get('insert -1c', 'insert +1c') == "''":
+                currtext.mark_set('insert', 'insert +1c')
+                return 'break'
             currtext.insert('insert', '\'\'')
+            currtext.mark_set('insert', 'insert -1c')
+            return 'break'
         elif char == '"':
+            if currtext.get('insert -1c', 'insert +1c') == '""':
+                currtext.mark_set('insert', 'insert +1c')
+                return 'break'
             currtext.insert('insert', '""')
+            currtext.mark_set('insert', 'insert -1c')
+            return 'break'
         elif char == '(':
             currtext.insert('insert', ')')
         elif char == '[':

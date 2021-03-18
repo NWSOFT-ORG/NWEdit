@@ -1,4 +1,3 @@
-from modules import *
 from constants import *
 
 
@@ -13,7 +12,7 @@ class FileTree(ttk.Frame):
         self.sourceItem = None
         self.tree = ttk.Treeview(self)
         yscroll, xscroll = ttk.Scrollbar(self, command=self.tree.yview), \
-                           ttk.Scrollbar(self, command=self.tree.xview, orient='horizontal')
+            ttk.Scrollbar(self, command=self.tree.xview, orient='horizontal')
         yscroll.pack(side='right', fill='y')
         xscroll.pack(side='bottom', fill='x')
         self.tree['yscrollcommand'] = yscroll.set
@@ -35,6 +34,7 @@ class FileTree(ttk.Frame):
         self.tree.tag_configure('row', background='black', foreground='white')
         self.tree.tag_configure('folder', background='black', foreground='yellow')
         self.tree.tag_configure('subfolder', background='black', foreground='#448dc4')
+        self.tree.pack(fill='both', expand=1, anchor='nw')
 
     def do_action(self):
         action = self.actioncombobox.get()
@@ -95,7 +95,7 @@ class FileTree(ttk.Frame):
         if not (WINDOWS or OSX):
             ttk.Label(win,
                       text='Note: the dates would not be the exact date of creation or modification!')\
-            .pack(side='top', anchor='nw', fill='x')
+                .pack(side='top', anchor='nw', fill='x')
         win.mainloop()
 
     def new_file(self, _=None):
@@ -108,7 +108,7 @@ class FileTree(ttk.Frame):
         filename = tk.Entry(win)
         filename.pack(side='top', anchor='nw')
         ttk.Label(win, text='Type:').pack(anchor='nw')
-        _type = ttk.Combobox(win, values=['Directory', 'File'])
+        _type = ttk.Combobox(win, values=['Directory', 'File'], state='readonly')
         _type.pack(side='top', anchor='nw')
         _type.set('File')
 
@@ -144,7 +144,6 @@ class FileTree(ttk.Frame):
 
     def init_ui(self, _=None):
         path = os.path.expanduser('~')
-        path_list = path.split('/')[:-1]
 
         self.tree.delete(*self.tree.get_children())
         self.tree.bind("<Double-1>", self.on_double_click_treeview)
@@ -154,8 +153,6 @@ class FileTree(ttk.Frame):
         abspath = os.path.abspath(path)
         root_node = self.tree.insert('', 'end', text=abspath, open=True, tags='folder')
         self.process_directory(root_node, abspath)
-
-        self.tree.pack(side='bottom', expand=True, fill='both', anchor='nw')
 
         self.refresh_tree()
 

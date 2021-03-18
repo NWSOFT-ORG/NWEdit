@@ -6,9 +6,9 @@
 | The somehow-professional editor                     |
 | It's extremely small! (around 80 kB)                |
 | You can visit my site for more details!             |
-| +---------------------------------------------+     |
-| | https://ZCG-coder.github.io/NWSOFT/PyPlusWeb|     |
-| +---------------------------------------------+     |
+| +----------------------------------------------+    |
+| | https://ZCG-coder.github.io/NWSOFT/PyPlusWeb |    |
+| +----------------------------------------------+    |
 | You can also contribute it on github!               |
 | Note: Some parts are adapted from stack overflow.   |
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
@@ -25,7 +25,7 @@ from treeview import *
 os.chdir(APPDIR)
 logger = logging.getLogger('PyPlus')
 logging.basicConfig(filename='pyplus.log', filemode='w', level=logging.DEBUG,
-                    format='%(asctime)s : %(levelname)s : %(funcName)s : %(threadName)s : %(message)s')
+                    format='%(asctime)s : %(levelname)s : %(funcName)s : %(message)s')
 
 logger.info(f'Tkinter version: {tk.TkVersion}')
 logger.debug('All modules imported')
@@ -255,7 +255,7 @@ Lacks these MacOS support:
                                       image=self.search_icon)
             self.codemenu.add_separator()
             self.codemenu.add_command(label='Open Python Shell',
-                                      command=self.open_shell,
+                                      command=self.python_shell,
                                       compound='left',
                                       image=self.pyterm_icon)
             self.codemenu.add_command(label='Open System Shell',
@@ -317,8 +317,6 @@ Lacks these MacOS support:
 
             self.master.bind("<<MouseEvent>>", self.mouse)
             self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
-            for x in ['"', "'", '(', '[', '{']:
-                self.master.bind(x, self.autoinsert)
             self.first_tab_created = False
             self.start_screen()
             self.master.focus_force()
@@ -346,7 +344,7 @@ Lacks these MacOS support:
                                compound='left',
                                image=self.open_icon)
             label2 = ttk.Label(first_tab,
-                               text='New tab',
+                               text='New...',
                                foreground='blue',
                                background='white',
                                cursor='hand2',
@@ -379,21 +377,21 @@ Lacks these MacOS support:
             # Quit quickly, before a char is being inserted.
             return 'break'
 
-        textframe = EnhancedTextFrame(
-            frame)  # The one with line numbers and a nice dark theme
+        textframe = EnhancedTextFrame(frame)  # The one with line numbers and a nice dark theme
+        textframe.set_update_command(self.key)
         textframe.pack(fill='both', expand=1, side='right')
 
         textbox = textframe.text  # text widget
         textbox.frame = frame  # The text will be packed into the frame.
-        textbox.lexer = PythonLexer()
-        textbox.lint_cmd = None
-        textbox.format_command = None
         textbox.bind('<Return>', self.autoindent)
-        textbox.bind("<<KeyEvent>>", self.key)
-        textbox.event_add("<<KeyEvent>>", "<KeyRelease>")
         textbox.bind('<Tab>', tab)
+        textbox.bind('<BackSpace>', self.backspace)
         textbox.bind(('<Button-2>' if OSX else '<Button-3>'),
                      self.right_click)
+        for char in ['"', "'", '(', '[', '{']:
+            textbox.bind(char, self.autoinsert)
+        for char in ['"', "'", ')', ']', '}']:
+            textbox.bind(char, self.close_brackets)
         textbox.focus_set()
         logger.debug('Textbox created')
         return textbox
@@ -439,13 +437,12 @@ Lacks these MacOS support:
             # This might require extra computer resource
             highlight_thread = threading.Thread(target=self.recolorize)
             highlight_thread.start()
+            # Auto-save
+            self.save_file()
             self.update_statusbar()
             # Update statusbar and title bar
             self.update_title()
             logger.debug('update_title: OK')
-
-            # Auto-save
-            self.save_file()
         except Exception:
             logger.exception('Error when handling keyboard event:')
 
@@ -501,7 +498,8 @@ This method colors and styles the prepared tags
 """
         if len(self.tabs) == 0:
             return
-        self.create_tags()
+        create_tags_thread = threading.Thread(self.create_tags())
+        create_tags_thread.start()
         currtext = self.tabs[self.get_tab()].textbox
         _code = currtext.get("1.0", "end-1c")
         tokensource = currtext.lexer.get_tokens(_code)
@@ -530,6 +528,8 @@ This method colors and styles the prepared tags
             start_line = end_line
             start_index = end_index
             currtext.tag_configure('sel', foreground='black')
+
+        currtext.update()
 
     def open_file(self, file=''):
         """Opens a file
@@ -722,13 +722,32 @@ Steps:
     def system_shell():
         open_system_shell()
 
-    def open_shell(self):
+    def python_shell(self):
         root = tk.Toplevel()
         root.title('Python Shell')
         ttkthemes.ThemedStyle(root).set_theme(self.theme)
         main_window = Console(root, None, root.destroy)
         main_window.pack(fill=tk.BOTH, expand=True)
         root.mainloop()
+
+    def backspace(self, _=None):
+        if len(self.tabs) == 0:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        # Backchar
+        if currtext.get('insert -1c', 'insert +1c') in ['\'\'', '""', '[]', '{}', '()']:
+            currtext.delete('insert', 'insert +1c')
+        # Backtab
+        if currtext.get('insert -4c', 'insert') == ' ' * 4:
+            currtext.delete('insert -4c', 'insert')
+
+    def close_brackets(self, _=None):
+        if len(self.tabs) == 0:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        if currtext.get('insert', 'insert +1c') in [')', ']', '}', '\'', '"']:
+            currtext.delete('insert', 'insert +1c')
+            return 'break'
 
     def autoinsert(self, event=None):
         """Auto-inserts a symbol
@@ -740,36 +759,19 @@ Steps:
         if len(self.tabs) == 0:
             return
         currtext = self.tabs[self.get_tab()].textbox
-        # Strings
-        if event.char not in ['(', '[', '{']:
-            currtext.insert('insert', event.char)
-            currtext.mark_set(
-                'insert', '%d.%s' %
-                          (int(float(currtext.index('insert'))),
-                           str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
-            self.key()
-        # Others
-        elif event.char == '(':
+        char = event.char
+        if char == '\'':
+            currtext.insert('insert', '\'\'')
+        elif char == '"':
+            currtext.insert('insert', '""')
+        elif char == '(':
             currtext.insert('insert', ')')
-            currtext.mark_set(
-                'insert', '%d.%s' %
-                          (int(float(currtext.index('insert'))),
-                           str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
-            return 'break'
-        elif event.char == '[':
+        elif char == '[':
             currtext.insert('insert', ']')
-            currtext.mark_set(
-                'insert', '%d.%s' %
-                          (int(float(currtext.index('insert'))),
-                           str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
-            return 'break'
-        elif event.char == '{':
+        elif char == '{':
             currtext.insert('insert', '}')
-            currtext.mark_set(
-                'insert', '%d.%s' %
-                          (int(float(currtext.index('insert'))),
-                           str(int(currtext.index('insert').split('.')[1:][0]) - 1)))
-            return 'break'
+        currtext.mark_set('insert', 'insert -1c')
+        self.key()
 
     def autoindent(self, _=None):
         """Auto-indents the next line"""
@@ -958,9 +960,6 @@ Steps:
     def right_click(self, event):
         self.right_click_menu.post(event.x_root, event.y_root)
 
-    def right_click_tab(self, event):
-        self.tab_right_click_menu.post(event.x_root, event.y_root)
-
     def close_tab(self, event=None):
         global selected_tab
         try:
@@ -999,7 +998,7 @@ Steps:
                 self.get_tab()
                 self.open_file(file)
             except Exception:
-                self.new_file()
+                pass
 
     def exit(self, force=False):
         if not force:

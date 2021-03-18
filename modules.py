@@ -26,7 +26,6 @@ import json5 as json
 import requests
 import ttkthemes
 from pygments import lexers
-from pygments.lexers.python import PythonLexer
 from pygments.styles import get_style_by_name
 from pygson.json_lexer import JSONLexer
 from ttkthemes import ThemedStyle

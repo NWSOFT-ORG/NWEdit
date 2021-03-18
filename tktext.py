@@ -126,3 +126,7 @@ text widget with linenumbers in."""
         currline = int(float(self.text.index('insert linestart')))
         self.linenumbers.redraw(currline)
         self.text.config(font=self.font)
+        self.update_command()
+
+    def set_update_command(self, command):
+        self.update_command = command

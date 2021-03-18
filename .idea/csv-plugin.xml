@@ -10,6 +10,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/pyplus.log">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/pyplus.py">
           <value>
             <Attribute>

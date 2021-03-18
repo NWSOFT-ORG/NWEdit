@@ -57,7 +57,7 @@ class FileTree(ttk.Frame):
             else:
                 os.remove(path)
             self.init_ui()
-    
+
     def get_info(self):
         path = os.path.join(self.path, self.tree.item(self.tree.focus())['text'])
         basename = os.path.basename(path)
@@ -104,12 +104,17 @@ class FileTree(ttk.Frame):
         win.title('New File/Directory')
         win.transient('.')
         win.resizable(0, 0)
+        ttk.Label(win, text='Name:').pack(side='top', anchor='nw')
         filename = tk.Entry(win)
-        filename.pack()
+        filename.pack(side='top', anchor='nw')
+        ttk.Label(win, text='Type:').pack(anchor='nw')
         _type = ttk.Combobox(win, values=['Directory', 'File'])
-        _type.pack()
+        _type.pack(side='top', anchor='nw')
+        _type.set('File')
 
         def create(_=None):
+            if not filename.get():
+                return
             path = os.path.join(self.path, filename.get())
             if _type.get() == 'Directory':
                 try:
@@ -132,9 +137,9 @@ class FileTree(ttk.Frame):
             win.destroy()
 
         okbtn = ttk.Button(win, text='OK', command=create)
-        okbtn.pack()
+        okbtn.pack(side='left', anchor='w', fill='x')
         cancelbtn = ttk.Button(win, text='Cancel', command=lambda _=None: win.destroy())
-        cancelbtn.pack()
+        cancelbtn.pack(side='left', anchor='w', fill='x')
         win.mainloop()
 
     def init_ui(self, _=None):

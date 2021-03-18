@@ -18,8 +18,6 @@ class FileTree(ttk.Frame):
         xscroll.pack(side='bottom', fill='x')
         self.tree['yscrollcommand'] = yscroll.set
         self.tree['xscrollcommand'] = xscroll.set
-        self.dir = ''
-        self.selected = []
         self.master = master
         self.path = str(path)
         self.opencommand = opencommand
@@ -64,17 +62,25 @@ class FileTree(ttk.Frame):
         path = os.path.join(self.path, self.tree.item(self.tree.focus())['text'])
         basename = os.path.basename(path)
         size = str(os.path.getsize(path))
+        # Determine the correct unit
         if int(size) / 1024 < 1:
             size += 'Bytes'
         elif int(size) / 1024 >= 1 <= 2:
             size = f'{int(size) // 1024} Kilobytes'
         elif int(size) / 1024 ** 2 >= 1 <= 2:
             size = f'{int(size) // 1024 ** 2} Megabytes'
-        elif int(size) / 1073.741824 >= 1 <= 2:
-            size = f'{int(size) // 1024 ** 2} Gigabytes'
-        elif int(size) / 1099.511627776 >= 1 <= 2:
-            size = f'{int(size) // 1024 ** 2} Terrabytes'
-        # It can go on and on, but the newest PCs won't have more than a PB storage!
+        elif int(size) / 1024 ** 3 >= 1 <= 2:
+            size = f'{int(size) // 1024 ** 3} Gigabytes'
+        elif int(size) / 1024 ** 4 >= 1 <= 2:
+            size = f'{int(size) // 1024 ** 4} Terrabytes'
+        # It can go on and on, but the newest PCs won't have more than a PB storage
+        #      /-------------/|
+        #     /             / /
+        #    /  SSD        / /
+        #   /   10 TB     / /
+        #  /             / /
+        # /             / /
+        # \=============\/
         mdate = f"Last modified: {time.ctime(os.path.getmtime(path))}"
         cdate = f"Created: {time.ctime(os.path.getctime(path))}"
         win = tk.Toplevel(master=self.master)
@@ -92,7 +98,7 @@ class FileTree(ttk.Frame):
             .pack(side='top', anchor='nw', fill='x')
         win.mainloop()
 
-    def new_file(self):
+    def new_file(self, _=None):
         global _type
         win = tk.Toplevel(master=self.master)
         win.title('New File/Directory')
@@ -100,20 +106,12 @@ class FileTree(ttk.Frame):
         win.resizable(0, 0)
         filename = tk.Entry(win)
         filename.pack()
-        _type = tk.IntVar()
-        _type.set(1)
-
-        def select(_=None):
-            _type.set(not _type.get())
-
-        _dir = ttk.Radiobutton(win, value=1, text='Directory', command=select)
-        _dir.pack(side='left')
-        _file = ttk.Radiobutton(win, value=0, text='File', command=select)
-        _file.pack(side='left')
+        _type = ttk.Combobox(win, values=['Directory', 'File'])
+        _type.pack()
 
         def create(_=None):
             path = os.path.join(self.path, filename.get())
-            if not _type:
+            if _type.get() == 'Directory':
                 try:
                     os.mkdir(path)
                 except FileExistsError:
@@ -131,6 +129,7 @@ class FileTree(ttk.Frame):
                         f.write('')
                     self.opencommand(path)
             self.init_ui()
+            win.destroy()
 
         okbtn = ttk.Button(win, text='OK', command=create)
         okbtn.pack()
@@ -141,8 +140,6 @@ class FileTree(ttk.Frame):
     def init_ui(self, _=None):
         path = os.path.expanduser('~')
         path_list = path.split('/')[:-1]
-        for item in path_list:
-            self.dir += item + '/'
 
         self.tree.delete(*self.tree.get_children())
         self.tree.bind("<Double-1>", self.on_double_click_treeview)
@@ -195,9 +192,7 @@ class FileTree(ttk.Frame):
             else:
                 file = self.tree.item(item, "text")
                 _dir = self.path
-                _dir = self.check_path(_dir)
                 _filename = os.path.join(_dir, file)
-                self.selected = []
                 try:
                     self.opencommand(_filename)
                 except Exception:
@@ -213,12 +208,6 @@ class FileTree(ttk.Frame):
             self.refresh_tree()
         except Exception:
             pass
-
-    @staticmethod
-    def check_path(path):
-        if '\\' in path:
-            path = path.replace('\\', '/')
-        return path
 
     def refresh_tree(self):
         for i in self.tree.get_children():

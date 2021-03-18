@@ -158,8 +158,8 @@ Lacks these MacOS support:
                                  command=self.check_updates)
 
             filemenu = tk.Menu(menubar, tearoff=0)
-            filemenu.add_command(label='New Tab',
-                                 command=self.new_file,
+            filemenu.add_command(label='New...',
+                                 command=self.filetree.new_file,
                                  compound='left',
                                  accelerator=f'{MAIN_KEY}-n',
                                  image=self.new_icon)
@@ -301,23 +301,13 @@ Lacks these MacOS support:
                                               command=self.select_all)
             logger.debug('Right-click menu created')
 
-            self.tab_right_click_menu = tk.Menu(self.master, tearoff=0)
-            self.tab_right_click_menu.add_command(label='New Tab',
-                                                  command=self.new_file)
-            self.tab_right_click_menu.add_command(label='Close Tab',
-                                                  command=self.close_tab)
-            logger.debug('Tab right-click menu created')
-
-            self.nb.bind(('<Button-2>' if OSX else '<Button-3>'),
-                         self.right_click_tab)
-
             # Keyboard bindings
             self.master.bind(f'<{MAIN_KEY}-w>', self.close_tab)
             self.master.bind(f'<{MAIN_KEY}-o>', self._open)
             self.master.bind(f'<{MAIN_KEY}-r>', self.reload)
             self.master.bind(f'<{MAIN_KEY}-b>', self.run)
             self.master.bind(f'<{MAIN_KEY}-f>', self.search)
-            self.master.bind(f'<{MAIN_KEY}-n>', self.new_file)
+            self.master.bind(f'<{MAIN_KEY}-n>', self.filetree.new_file)
             self.master.bind(f'<{MAIN_KEY}-N>', self.goto)
             self.master.bind(f'<{MAIN_KEY}-S>', self.save_as)
             self.master.bind(f'<{MAIN_KEY}-u>',
@@ -370,7 +360,7 @@ Lacks these MacOS support:
                                compound='left',
                                image=self.close_icon_dark)
             label1.bind('<Button>', self._open)
-            label2.bind('<Button>', self.new_file)
+            label2.bind('<Button>', self.filetree.new_file)
             label3.bind('<Button>', lambda _=None: self.exit(force=True))
 
             first_tab.create_window(50, 100, window=label1, anchor='nw')
@@ -445,8 +435,10 @@ Lacks these MacOS support:
     def key(self, _=None):
         """Event when a key is pressed."""
         try:
-            self.create_tags()
-            self.recolorize()
+            # Do the highlight in a separate thread.
+            # This might require extra computer resource
+            highlight_thread = threading.Thread(target=self.recolorize)
+            highlight_thread.start()
             self.update_statusbar()
             # Update statusbar and title bar
             self.update_title()
@@ -509,6 +501,7 @@ This method colors and styles the prepared tags
 """
         if len(self.tabs) == 0:
             return
+        self.create_tags()
         currtext = self.tabs[self.get_tab()].textbox
         _code = currtext.get("1.0", "end-1c")
         tokensource = currtext.lexer.get_tokens(_code)
@@ -602,8 +595,6 @@ pop up to ask the user to select the path.
                 currtext.format_command = self.format_settings_class.get_command_settings(
                     extens)
                 self.key()
-                self.create_tags()
-                self.recolorize()
                 currtext.see('insert')
                 currtext.focus_set()
                 logging.info('File opened')
@@ -655,19 +646,6 @@ pop up to ask the user to select the path.
                 messagebox.showerror('Error', 'File read only')
         except Exception:
             pass
-
-    def new_file(self, _=None):
-        """Creates a new tab(file)."""
-        new_tab = ttk.Frame(self.nb)
-        textbox = self.create_text_widget(new_tab)
-        self.tabs[new_tab] = Document(new_tab,
-                                      textbox, 'None')
-        self.nb.add(new_tab, text='None')
-        self.nb.select(new_tab)
-        self.create_tags()
-        self.recolorize()
-        self.update_statusbar()
-        self.update_title()
 
     def copy(self):
         try:
@@ -1214,12 +1192,12 @@ Steps:
         elif action == 'commit':
             message = simpledialog.askstring('Commit', 'Commit message')
             run_in_terminal(f'git commit -am "{message}"')
-        elif action == 'other':
-            action = simpledialog.askstring('Advanced Action', 'git <command>:')
-            run_in_terminal(f'git {action}')
         elif action == 'clone':
             url = simpledialog.askstring('Clone from remote', 'URL:')
             run_in_terminal(f'git clone {url}')
+        elif action == 'other':
+            action = simpledialog.askstring('Advanced Action', 'git <command>:')
+            run_in_terminal(f'git {action}')
 
     def indent(self, action='indent'):
         """Indent/unindent feature"""

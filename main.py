@@ -1,4 +1,7 @@
 #!/usr/bin/python3
 import pyplus
+from modules import *
 
-pyplus.Editor()  # Starts the Editor
+root = tk.Tk()
+pyplus.Editor(master=root)
+root.mainloop()

@@ -128,3 +128,11 @@ class RunCommand:
             return self.commands[self.extens.index(extension)]
         except IndexError:
             return None
+
+
+class AutoCloseBracket:
+    def __init__(self):
+        with open(os.path.join(APPDIR, "Settings/autoclose-triggers.json")) as f:
+            all_settings = json.load(f)
+        self.close_tag = all_settings['close_tags']
+        self.html_formats = all_settings['html_formats']

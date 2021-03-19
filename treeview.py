@@ -58,6 +58,15 @@ class FileTree(ttk.Frame):
                 os.remove(path)
             self.init_ui()
 
+    def rename(self):
+        path = os.path.join(self.path,
+                            self.tree.item(
+                                self.tree.focus())['text'])
+        win = tk.Toplevel()
+        win.mainloop()
+        os.rename(path, 'name')
+        self.init_ui()
+
     def get_info(self):
         path = os.path.join(self.path, self.tree.item(self.tree.focus())['text'])
         basename = os.path.basename(path)

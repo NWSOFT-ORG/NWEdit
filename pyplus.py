@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3.7
+#!/usr/local/bin/python3.9
 # coding: utf-8
 """
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
@@ -43,7 +43,7 @@ class Document:
 class Editor:
     """The editor class."""
 
-    def __init__(self):
+    def __init__(self, master):
         """The editor object, the entire thing that goes in the
 window.
 Lacks these MacOS support:
@@ -58,7 +58,7 @@ Lacks these MacOS support:
             self.theme = self.settings_class.get_settings('theme')
             logger.debug('Settings loaded')
 
-            self.master = tk.Tk()
+            self.master = master
             self.close_icon = tk.PhotoImage(file='Images/close.gif')
             self.close_icon_dark = tk.PhotoImage(file='Images/close-dark.gif')
             self.copy_icon = tk.PhotoImage(file='Images/copy.gif')
@@ -217,6 +217,8 @@ Lacks these MacOS support:
                                  compound='left',
                                  image=self.delete_icon,
                                  command=self.delete)
+            editmenu.add_command(label='Duplicate Line or Selected',
+                                 command=self.duplicate_line)
             editmenu.add_command(label='Select All',
                                  command=self.select_all,
                                  accelerator=f'{MAIN_KEY}-a',
@@ -269,6 +271,9 @@ Lacks these MacOS support:
                                 accelerator=f'{MAIN_KEY}-Shift-N')
             navmenu.add_command(label='-1 char', command=self.nav_1cb)
             navmenu.add_command(label='+1 char', command=self.nav_1cf)
+            navmenu.add_command(label='Word end', command=self.nav_wordend)
+            navmenu.add_command(label='Word start', command=self.nav_wordstart)
+            navmenu.add_command(label='Select word', command=self.sel_word)
             gitmenu = tk.Menu(menubar, tearoff=0)
             gitmenu.add_command(label='Initialize',
                                 command=lambda: self.git('init'))
@@ -322,7 +327,6 @@ Lacks these MacOS support:
             self.master.focus_force()
             self.update_title()
             self.update_statusbar()
-            self.master.mainloop()  # This line can be here only
         except Exception:
             logger.exception('Error when initializing:')
 
@@ -414,6 +418,7 @@ Lacks these MacOS support:
         try:
             if len(self.tabs) == 0:
                 self.statusbar.label2.config(text='No file open |')
+                self.statusbar.label3.config(text='')
                 logger.debug('update_statusbar: No file open')
                 return "break"
             currtext = self.tabs[self.get_tab()].textbox
@@ -435,7 +440,8 @@ Lacks these MacOS support:
         try:
             # Do the highlight in a separate thread.
             # This might require extra computer resource
-            highlight_thread = threading.Thread(target=self.recolorize)
+            currtext = self.tabs[self.get_tab()].textbox
+            highlight_thread = threading.Thread(target=self.recolorize, args=(currtext,))
             highlight_thread.start()
             # Auto-save
             self.save_file()
@@ -457,14 +463,12 @@ Lacks these MacOS support:
             if type(e).__name__ != 'ValueError':
                 logger.exception('Error when handling mouse event:')
 
-    def create_tags(self):
+    def create_tags(self, textbox):
         """
 The method creates the tags associated with each distinct style element of the
 source code 'dressing'
 """
-        if len(self.tabs) == 0:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
+        currtext = textbox
         bold_font = font.Font(currtext, currtext.cget("font"))
         bold_font.configure(weight=font.BOLD)
         italic_font = font.Font(currtext, currtext.cget("font"))
@@ -492,15 +496,15 @@ source code 'dressing'
                                    foreground=foreground,
                                    font=tag_font)
 
-    def recolorize(self):
+    def recolorize(self, textbox):
         """
 This method colors and styles the prepared tags
 """
         if len(self.tabs) == 0:
             return
-        create_tags_thread = threading.Thread(self.create_tags())
+        create_tags_thread = threading.Thread(target=self.create_tags, args=(textbox,))
         create_tags_thread.start()
-        currtext = self.tabs[self.get_tab()].textbox
+        currtext = textbox
         _code = currtext.get("1.0", "end-1c")
         tokensource = currtext.lexer.get_tokens(_code)
         start_line = 1
@@ -529,7 +533,7 @@ This method colors and styles the prepared tags
             start_index = end_index
             currtext.tag_configure('sel', foreground='black')
 
-        currtext.update()
+        currtext.update()  # Have to update
 
     def open_file(self, file=''):
         """Opens a file
@@ -658,27 +662,27 @@ pop up to ask the user to select the path.
         except Exception:
             pass
 
-    def cut(self, textbox=None):
+    def cut(self):
         try:
             currtext = self.tabs[self.get_tab()].textbox
             sel = currtext.get(tk.SEL_FIRST, tk.SEL_LAST)
-            textbox.clipboard_clear()
-            textbox.clipboard_append(sel)
+            currtext.clipboard_clear()
+            currtext.clipboard_append(sel)
             currtext.delete(tk.SEL_FIRST, tk.SEL_LAST)
             self.key()
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
 
     def paste(self):
         try:
-            self.tabs[self.get_tab()].textbox.insert(
-                tk.INSERT,
-                self.tabs[self.get_tab()].textbox.clipboard_get().replace(
-                    '\t', ' ' * 4))
+            clipboard = self.tabs[self.get_tab()].textbox.clipboard_get()
+            if clipboard:
+                self.tabs[self.get_tab()].textbox.insert(
+                    'insert', clipboard.replace('\t', ' ' * 4))
         except Exception:
             pass
 
-    def select_all(self, _=None):
+    def select_all(self):
         try:
             curr_tab = self.get_tab()
             self.tabs[curr_tab].textbox.tag_add(tk.SEL, '1.0', tk.END)
@@ -686,6 +690,18 @@ pop up to ask the user to select the path.
             self.tabs[curr_tab].textbox.see(tk.INSERT)
         except Exception:
             pass
+
+    def duplicate_line(self):
+        if len(self.tabs) == 0:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        sel = currtext.get(tk.SEL_FIRST, tk.SEL_LAST)
+        if sel != 'None':
+            currtext.tag_remove('sel', '1.0', 'end')
+            currtext.insert('insert', sel)
+        else:
+            text = currtext.get('insert linestart', 'insert lineend')
+            currtext.insert('insert', '\n' + text)
 
     def run(self, _=None):
         """Runs the file
@@ -754,6 +770,7 @@ Steps:
         if len(self.tabs) == 0:
             return
         currtext = self.tabs[self.get_tab()].textbox
+        extens = self.tabs[self.get_tab()].file_dir.split('.')[-1]
         char = event.char
         if char == '\'':
             if currtext.get('insert -1c', 'insert +1c') == "''":
@@ -813,8 +830,12 @@ Steps:
             return
         case = tk.BooleanVar()
         regexp = tk.BooleanVar()
-        start = tk.FIRST if not tk.SEL_FIRST else tk.SEL_FIRST
-        end = tk.END if not tk.SEL_LAST else tk.SEL_LAST
+        start = tk.SEL_FIRST
+        end = tk.SEL_LAST
+        currtext = self.tabs[self.get_tab()].textbox
+        if currtext.get(start, end) == 'None':
+            start = tk.FIRST
+            end = tk.END
         starts = []
         search_frame = ttk.Frame(self.tabs[self.get_tab()].textbox.frame)
         style = ThemedStyle(search_frame)
@@ -1014,7 +1035,9 @@ Steps:
 
     def restart(self):
         self.exit()
-        self.__init__()
+        newtk = tk.Tk()
+        self.__init__(newtk)
+        newtk.mainloop()
 
     def get_tab(self):
         return self.nb.nametowidget(self.nb.select())
@@ -1125,11 +1148,23 @@ Steps:
 
     def nav_1cf(self):
         currtext = self.tabs[self.get_tab()].textbox
-        currtext.mark_set('insert', 'insert+1c')
+        currtext.mark_set('insert', 'insert +1c')
 
     def nav_1cb(self):
         currtext = self.tabs[self.get_tab()].textbox
-        currtext.mark_set('insert', 'insert-1c')
+        currtext.mark_set('insert', 'insert -1c')
+
+    def nav_wordstart(self):
+        currtext = self.tabs[self.get_tab()].textbox
+        currtext.mark_set('insert', 'insert -1c wordstart')
+
+    def nav_wordend(self):
+        currtext = self.tabs[self.get_tab()].textbox
+        currtext.mark_set('insert', 'insert wordend')
+
+    def sel_word(self):
+        currtext = self.tabs[self.get_tab()].textbox
+        currtext.tag_add('sel', 'insert -1c wordstart', 'insert wordend')
 
     def check_updates(self, popup=True):
         if 'DEV' in VERSION:
@@ -1171,6 +1206,7 @@ Steps:
             return
         elif action is None:
             raise EditorErr('Invalid action -- ' + str(action))
+            return
         currdir = Path(self.tabs[self.get_tab()].file_dir).parent
         if action == 'init':
             if os.path.isdir(os.path.join(currdir, '.git')):
@@ -1195,12 +1231,18 @@ Steps:
                 run_in_terminal(cwd=currdir, cmd=f'git add {x}')
         elif action == 'commit':
             message = simpledialog.askstring('Commit', 'Commit message')
+            if not message:
+                return
             run_in_terminal(f'git commit -am "{message}"')
         elif action == 'clone':
             url = simpledialog.askstring('Clone from remote', 'URL:')
+            if not url:
+                return
             run_in_terminal(f'git clone {url}')
         elif action == 'other':
             action = simpledialog.askstring('Advanced Action', 'git <command>:')
+            if not action:
+                return
             run_in_terminal(f'git {action}')
 
     def indent(self, action='indent'):
@@ -1238,4 +1280,6 @@ Steps:
 
 
 if __name__ == '__main__':
-    Editor()
+    root = tk.Tk()
+    app = Editor(master=root)
+    root.mainloop()

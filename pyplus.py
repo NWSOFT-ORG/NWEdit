@@ -309,15 +309,6 @@ Lacks these MacOS support:
             # Keyboard bindings
             self.master.bind(f'<{MAIN_KEY}-w>', self.close_tab)
             self.master.bind(f'<{MAIN_KEY}-o>', self._open)
-            self.master.bind(f'<{MAIN_KEY}-r>', self.reload)
-            self.master.bind(f'<{MAIN_KEY}-b>', self.run)
-            self.master.bind(f'<{MAIN_KEY}-f>', self.search)
-            self.master.bind(f'<{MAIN_KEY}-n>', self.filetree.new_file)
-            self.master.bind(f'<{MAIN_KEY}-N>', self.goto)
-            self.master.bind(f'<{MAIN_KEY}-S>', self.save_as)
-            self.master.bind(f'<{MAIN_KEY}-u>',
-                             lambda _=None: self.indent('unindent'))
-            self.master.bind(f'<{MAIN_KEY}-i>', lambda _=None: self.indent('indent'))
             logger.debug('Bindings created')
 
             self.master.bind("<<MouseEvent>>", self.mouse)
@@ -375,9 +366,12 @@ Lacks these MacOS support:
     def create_text_widget(self, frame):
         """Creates a text widget in a frame."""
 
-        def tab(_=None):
-            self.tabs[self.get_tab()].textbox.insert(
+        def tab(event=None):
+            event.widget.edit_separator()
+            event.widget.insert(
                 'insert', ' ' * 4)  # Convert tabs to spaces
+            self.key()
+            event.widget.edit_separator()
             # Quit quickly, before a char is being inserted.
             return 'break'
 
@@ -387,11 +381,20 @@ Lacks these MacOS support:
 
         textbox = textframe.text  # text widget
         textbox.frame = frame  # The text will be packed into the frame.
-        textbox.bind('<Return>', self.autoindent)
-        textbox.bind('<Tab>', tab)
-        textbox.bind('<BackSpace>', self.backspace)
         textbox.bind(('<Button-2>' if OSX else '<Button-3>'),
                      self.right_click)
+        textbox.bind('<BackSpace>', self.backspace)
+        textbox.bind('<Return>', self.autoindent)
+        textbox.bind('<Tab>', tab)
+        textbox.bind(f'<{MAIN_KEY}-b>', self.run)
+        textbox.bind(f'<{MAIN_KEY}-f>', self.search)
+        textbox.bind(f'<{MAIN_KEY}-i>', lambda _=None: self.indent('indent'))
+        textbox.bind(f'<{MAIN_KEY}-n>', self.filetree.new_file)
+        textbox.bind(f'<{MAIN_KEY}-N>', self.goto)
+        textbox.bind(f'<{MAIN_KEY}-r>', self.reload)
+        textbox.bind(f'<{MAIN_KEY}-S>', self.save_as)
+        textbox.bind(f'<{MAIN_KEY}-u>', lambda _=None: self.indent('unindent'))
+        textbox.bind(f'<{MAIN_KEY}-Z>', self.redo)
         for char in ['"', "'", '(', '[', '{']:
             textbox.bind(char, self.autoinsert)
         for char in [')', ']', '}']:
@@ -402,7 +405,7 @@ Lacks these MacOS support:
 
     def update_title(self, _=None):
         try:
-            if len(self.tabs) == 0:
+            if not self.tabs:
                 self.master.title('PyPlus -- No file open')
                 logger.debug('update_title: No file open')
                 return "break"
@@ -416,7 +419,7 @@ Lacks these MacOS support:
 
     def update_statusbar(self, _=None):
         try:
-            if len(self.tabs) == 0:
+            if not self.tabs:
                 self.statusbar.label2.config(text='No file open |')
                 self.statusbar.label3.config(text='')
                 logger.debug('update_statusbar: No file open')
@@ -443,6 +446,7 @@ Lacks these MacOS support:
             currtext = self.tabs[self.get_tab()].textbox
             highlight_thread = threading.Thread(target=self.recolorize, args=(currtext,))
             highlight_thread.start()
+            currtext.edit_separator()
             # Auto-save
             self.save_file()
             self.update_statusbar()
@@ -500,7 +504,7 @@ source code 'dressing'
         """
 This method colors and styles the prepared tags
 """
-        if len(self.tabs) == 0:
+        if not self.tabs:
             return
         create_tags_thread = threading.Thread(target=self.create_tags, args=(textbox,))
         create_tags_thread.start()
@@ -561,15 +565,15 @@ pop up to ask the user to select the path.
                                      'which this editor does not edit. \n'
                                      'Would you like to view it in Hex Editor?\n'):
                         logger.info('HexView: opened')
-                        app = ttk.Frame(self.master)
-                        app.focus_set()
-                        window = HexView(app)
+                        viewer = ttk.Frame(self.master)
+                        viewer.focus_set()
+                        window = HexView(viewer)
                         window.open(file_dir)
-                        self.tabs[app] = Document(app,
-                                                  window.textbox,
-                                                  file_dir)
-                        self.nb.add(app, text='Hex Viewer')
-                        self.nb.select(app)
+                        self.tabs[viewer] = Document(viewer,
+                                                     window.textbox,
+                                                     file_dir)
+                        self.nb.add(viewer, text='Hex Viewer')
+                        self.nb.select(viewer)
                         return
                     else:
                         logging.info('User pressed No.')
@@ -634,7 +638,7 @@ pop up to ask the user to select the path.
         """Saves an *existing* file"""
         try:
             curr_tab = self.get_tab()
-            if self.tabs[curr_tab].file_dir == 'None':
+            if not os.path.exists(self.tabs[curr_tab].file_dir):
                 self.save_as()
                 return
             if os.access(self.tabs[curr_tab].file_dir, os.W_OK):
@@ -665,10 +669,12 @@ pop up to ask the user to select the path.
     def cut(self):
         try:
             currtext = self.tabs[self.get_tab()].textbox
+            currtext.edit_separator()
             sel = currtext.get(tk.SEL_FIRST, tk.SEL_LAST)
             currtext.clipboard_clear()
             currtext.clipboard_append(sel)
             currtext.delete(tk.SEL_FIRST, tk.SEL_LAST)
+            currtext.edit_separator()
             self.key()
         except Exception as e:
             print(e)
@@ -676,9 +682,12 @@ pop up to ask the user to select the path.
     def paste(self):
         try:
             clipboard = self.tabs[self.get_tab()].textbox.clipboard_get()
+            self.tabs[self.get_tab()].textbox.edit_separator()
             if clipboard:
                 self.tabs[self.get_tab()].textbox.insert(
                     'insert', clipboard.replace('\t', ' ' * 4))
+            self.key()
+            self.tabs[self.get_tab()].textbox.edit_separator()
         except Exception:
             pass
 
@@ -692,16 +701,19 @@ pop up to ask the user to select the path.
             pass
 
     def duplicate_line(self):
-        if len(self.tabs) == 0:
+        if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
+        currtext.edit_separator()
         sel = currtext.get(tk.SEL_FIRST, tk.SEL_LAST)
-        if sel != 'None':
+        if currtext.tag_ranges('sel'):
             currtext.tag_remove('sel', '1.0', 'end')
             currtext.insert('insert', sel)
         else:
             text = currtext.get('insert linestart', 'insert lineend')
             currtext.insert('insert', '\n' + text)
+        currtext.edit_separator()
+        self.key()
 
     def run(self, _=None):
         """Runs the file
@@ -734,31 +746,36 @@ Steps:
         open_system_shell()
 
     def python_shell(self):
-        root = tk.Toplevel()
-        root.title('Python Shell')
-        ttkthemes.ThemedStyle(root).set_theme(self.theme)
-        main_window = Console(root, None, root.destroy)
+        shell_frame = ttk.Frame()
+        ttkthemes.ThemedStyle(shell_frame).set_theme(self.theme)
+        main_window = Console(shell_frame, None, shell_frame.destroy)
         main_window.pack(fill=tk.BOTH, expand=True)
-        root.mainloop()
+        shell_frame.mainloop()
 
     def backspace(self, _=None):
-        if len(self.tabs) == 0:
+        if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
+        currtext.edit_separator()
         # Backchar
         if currtext.get('insert -1c', 'insert +1c') in ['\'\'', '""', '[]', '{}', '()']:
             currtext.delete('insert', 'insert +1c')
         # Backtab
         if currtext.get('insert -4c', 'insert') == ' ' * 4:
             currtext.delete('insert -4c', 'insert')
+        self.key()
+        currtext.edit_separator()
 
     def close_brackets(self, _=None):
-        if len(self.tabs) == 0:
+        if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
         if currtext.get('insert', 'insert +1c') in [')', ']', '}', '\'', '"']:
             currtext.mark_set('insert', 'insert +1c')
+            self.key()
             return 'break'
+        currtext.edit_separator()
+        self.key()
 
     def autoinsert(self, event=None):
         """Auto-inserts a symbol
@@ -767,10 +784,10 @@ Steps:
 * ( -> ()
 * [ -> []
 * { -> {}"""
-        if len(self.tabs) == 0:
+        if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
-        extens = self.tabs[self.get_tab()].file_dir.split('.')[-1]
+        currtext.edit_separator()
         char = event.char
         if char == '\'':
             if currtext.get('insert -1c', 'insert +1c') == "''":
@@ -793,11 +810,13 @@ Steps:
         elif char == '{':
             currtext.insert('insert', '}')
         currtext.mark_set('insert', 'insert -1c')
+        currtext.edit_separator()
         self.key()
 
     def autoindent(self, _=None):
         """Auto-indents the next line"""
         currtext = self.tabs[self.get_tab()].textbox
+        currtext.edit_separator()
         indentation = ""
         lineindex = currtext.index("insert").split(".")[0]
         linetext = currtext.get(lineindex + ".0", lineindex + ".end")
@@ -818,6 +837,7 @@ Steps:
             indentation += " " * 4
 
         currtext.insert(currtext.index("insert"), "\n" + indentation)
+        currtext.edit_separator()
         self.key()
         return "break"
 
@@ -826,14 +846,14 @@ Steps:
         global regexp
         global start, end
         global starts
-        if len(self.tabs) == 0:
+        if not self.tabs:
             return
         case = tk.BooleanVar()
         regexp = tk.BooleanVar()
         start = tk.SEL_FIRST
         end = tk.SEL_LAST
         currtext = self.tabs[self.get_tab()].textbox
-        if currtext.get(start, end) == 'None':
+        if not currtext.tag_ranges('sel'):
             start = tk.FIRST
             end = tk.END
         starts = []
@@ -1011,7 +1031,7 @@ Steps:
             pass
 
     def reload(self):
-        if len(self.tabs) == 0:
+        if not self.tabs:
             return
         tabs = []
         self.nb.select(self.nb.index('end') - 1)
@@ -1034,7 +1054,7 @@ Steps:
             sys.exit(0)
 
     def restart(self):
-        self.exit()
+        self.exit(force=False)
         newtk = tk.Tk()
         self.__init__(newtk)
         newtk.mainloop()
@@ -1074,7 +1094,7 @@ Steps:
         ver.mainloop()
 
     def lint_source(self):
-        if len(self.tabs) == 0:
+        if not self.tabs:
             return
         try:
             if self.tabs[self.get_tab()].textbox.lint_cmd:
@@ -1104,6 +1124,7 @@ Steps:
         """Auto Pretty-Format the document"""
         try:
             currtext = self.tabs[self.get_tab()].textbox
+            currtext.edit_separator()
             currdir = self.tabs[self.get_tab()].file_dir
             if currtext.format_command:
                 subprocess.run(f'{currtext.format_command} "{currdir}" > {os.devnull}', shell=True)
@@ -1111,11 +1132,12 @@ Steps:
                 messagebox.showerror('Error', 'Language not supported.')
                 return
             self.reload()
+            currtext.edit_separator()
         except Exception:
             logger.exception('Error when formatting:')
 
     def goto(self, _=None):
-        if len(self.tabs) == 0:
+        if not self.tabs:
             return
         goto_frame = ttk.Frame(self.tabs[self.get_tab()].textbox.frame)
         style = ttkthemes.ThemedStyle(goto_frame)
@@ -1202,11 +1224,10 @@ Steps:
         updatewin.mainloop()
 
     def git(self, action=None):
-        if len(self.tabs) == 0:
+        if not self.tabs:
             return
         elif action is None:
             raise EditorErr('Invalid action -- ' + str(action))
-            return
         currdir = Path(self.tabs[self.get_tab()].file_dir).parent
         if action == 'init':
             if os.path.isdir(os.path.join(currdir, '.git')):
@@ -1247,11 +1268,16 @@ Steps:
 
     def indent(self, action='indent'):
         """Indent/unindent feature"""
-        if len(self.tabs) == 0:
+        if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
-        sel_start = currtext.index('sel.first linestart')
-        sel_end = currtext.index('sel.last lineend')
+        currtext.edit_separator()
+        if currtext.tag_ranges('sel'):
+            sel_start = currtext.index('sel.first linestart')
+            sel_end = currtext.index('sel.last lineend')
+        else:
+            sel_start = currtext.index('insert linestart')
+            sel_end = currtext.index('insert lineend')
         if action == 'indent':
             selected_text = currtext.get(sel_start, sel_end)
             indented = []
@@ -1277,6 +1303,7 @@ Steps:
             self.key()
         else:
             raise EditorErr('Action undefined.')
+        currtext.edit_separator()
 
 
 if __name__ == '__main__':

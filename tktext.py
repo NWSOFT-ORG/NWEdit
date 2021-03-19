@@ -99,7 +99,10 @@ text widget with linenumbers in."""
                                  highlightthickness=0,
                                  font=self.font,
                                  wrap='none',
-                                 insertwidth=3)
+                                 insertwidth=3,
+                                 maxundo=-1,
+                                 autoseparators=1,
+                                 undo=True)
         self.linenumbers = TextLineNumbers(self,
                                            width=30,
                                            bg='gray',

@@ -274,23 +274,12 @@ Lacks these MacOS support:
             navmenu.add_command(label='Word end', command=self.nav_wordend)
             navmenu.add_command(label='Word start', command=self.nav_wordstart)
             navmenu.add_command(label='Select word', command=self.sel_word)
-            gitmenu = tk.Menu(menubar, tearoff=0)
-            gitmenu.add_command(label='Initialize',
-                                command=lambda: self.git('init'))
-            gitmenu.add_command(label='Add all',
-                                command=lambda: self.git('addall'))
-            gitmenu.add_command(label='Add selected',
-                                command=lambda: self.git('addsel'))
-            gitmenu.add_command(label='Commit', command=lambda: self.git('commit'))
-            gitmenu.add_command(label='Clone', command=lambda: self.git('clone'))
-            gitmenu.add_command(label='Other', command=lambda: self.git('other'))
 
             menubar.add_cascade(label='PyPlus', menu=app_menu)  # App menu
             menubar.add_cascade(label='File', menu=filemenu)
             menubar.add_cascade(label='Edit', menu=editmenu)
             menubar.add_cascade(label='Code', menu=self.codemenu)
             menubar.add_cascade(label='Navigate', menu=navmenu)
-            menubar.add_cascade(label='Git', menu=gitmenu)
             self.master.config(menu=menubar)
             logger.debug('Menu created')
             self.right_click_menu = tk.Menu(self.master, tearoff=0)
@@ -1222,49 +1211,6 @@ Steps:
                       font='Arial 30').pack(fill='both')
         os.remove('ver.json')
         updatewin.mainloop()
-
-    def git(self, action=None):
-        if not self.tabs:
-            return
-        elif action is None:
-            raise EditorErr('Invalid action -- ' + str(action))
-        currdir = Path(self.tabs[self.get_tab()].file_dir).parent
-        if action == 'init':
-            if os.path.isdir(os.path.join(currdir, '.git')):
-                if messagebox.askokcancel(
-                        "Error!",
-                        "This is already a git repository!\nDo you want to re-initialize?"
-                ):
-                    os.remove(os.path.join(currdir, '.git'))
-            else:
-                run_in_terminal(
-                    cwd=currdir,
-                    cmd='git init && git add . && git commit -am \"Added files\"')
-        elif action == 'addall':
-            run_in_terminal(cwd=currdir,
-                            cmd='git add . && git commit -am "Added files"')
-        elif action == 'addsel':
-            files = tkinter.filedialog.askopenfilenames(master=self.master,
-                                                        initialdir='/',
-                                                        title='Select file',
-                                                        filetypes=self.filetypes)
-            for x in files:
-                run_in_terminal(cwd=currdir, cmd=f'git add {x}')
-        elif action == 'commit':
-            message = simpledialog.askstring('Commit', 'Commit message')
-            if not message:
-                return
-            run_in_terminal(f'git commit -am "{message}"')
-        elif action == 'clone':
-            url = simpledialog.askstring('Clone from remote', 'URL:')
-            if not url:
-                return
-            run_in_terminal(f'git clone {url}')
-        elif action == 'other':
-            action = simpledialog.askstring('Advanced Action', 'git <command>:')
-            if not action:
-                return
-            run_in_terminal(f'git {action}')
 
     def indent(self, action='indent'):
         """Indent/unindent feature"""

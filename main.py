@@ -1,7 +1,9 @@
 #!/usr/bin/python3
-import pyplus
-from modules import *
+# import pyplus
+# from modules import *
 
-root = tk.Tk()
-pyplus.Editor(master=root)
-root.mainloop()
+# root = tk.Tk()
+# pyplus.Editor(master=root)
+# root.mainloop()
+import git
+git.commitgui()

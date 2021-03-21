@@ -255,6 +255,8 @@ Lacks these MacOS support:
                                       accelerator=f'{MAIN_KEY}-f',
                                       compound='left',
                                       image=self.search_icon)
+            self.codemenu.add_command(label='Bigger view',
+                                      command=self.biggerview)
             self.codemenu.add_separator()
             self.codemenu.add_command(label='Open Python Shell',
                                       command=self.python_shell,
@@ -377,6 +379,7 @@ Lacks these MacOS support:
 
         textframe = EnhancedTextFrame(frame)  # The one with line numbers and a nice dark theme
         textframe.set_update_command(self.key)
+        textframe.set_first_line(1)
         textframe.pack(fill='both', expand=1, side='right')
 
         textbox = textframe.text  # text widget
@@ -504,40 +507,41 @@ source code 'dressing'
         """
 This method colors and styles the prepared tags
 """
-        if not self.tabs:
-            return
-        create_tags_thread = threading.Thread(target=self.create_tags, args=(textbox,))
-        create_tags_thread.start()
-        currtext = textbox
-        _code = currtext.get("1.0", "end-1c")
-        tokensource = currtext.lexer.get_tokens(_code)
-        start_line = 1
-        start_index = 0
-        end_line = 1
-        end_index = 0
-
-        for ttype, value in tokensource:
-            if "\n" in value:
-                end_line += value.count("\n")
-                end_index = len(value.rsplit("\n", 1)[1])
-            else:
-                end_index += len(value)
-
-            if value not in (" ", "\n"):
-                index1 = f"{start_line}.{start_index}"
-                index2 = f"{end_line}.{end_index}"
-
-                for tagname in currtext.tag_names(index1):
-                    if tagname != 'sel':
-                        currtext.tag_remove(tagname, index1, index2)
-
-                currtext.tag_add(str(ttype), index1, index2)
-
-            start_line = end_line
-            start_index = end_index
-            currtext.tag_configure('sel', foreground='black')
-
-        currtext.update()  # Have to update
+        try:
+            create_tags_thread = threading.Thread(target=self.create_tags, args=(textbox,))
+            create_tags_thread.start()
+            currtext = textbox
+            _code = currtext.get("1.0", "end-1c")
+            tokensource = currtext.lexer.get_tokens(_code)
+            start_line = 1
+            start_index = 0
+            end_line = 1
+            end_index = 0
+    
+            for ttype, value in tokensource:
+                if "\n" in value:
+                    end_line += value.count("\n")
+                    end_index = len(value.rsplit("\n", 1)[1])
+                else:
+                    end_index += len(value)
+    
+                if value not in (" ", "\n"):
+                    index1 = f"{start_line}.{start_index}"
+                    index2 = f"{end_line}.{end_index}"
+    
+                    for tagname in currtext.tag_names(index1):
+                        if tagname != 'sel':
+                            currtext.tag_remove(tagname, index1, index2)
+    
+                    currtext.tag_add(str(ttype), index1, index2)
+    
+                start_line = end_line
+                start_index = end_index
+                currtext.tag_configure('sel', foreground='black')
+    
+            currtext.update()  # Have to update
+        except Exception:
+            logger.exception('Error: ')
 
     def open_file(self, file=''):
         """Opens a file
@@ -572,7 +576,7 @@ pop up to ask the user to select the path.
                         self.tabs[viewer] = Document(viewer,
                                                      window.textbox,
                                                      file_dir)
-                        self.nb.add(viewer, text='Hex Viewer')
+                        self.nb.add(viewer, text=f'Hex -- {file_dir}')
                         self.nb.select(viewer)
                         return
                     else:
@@ -1187,6 +1191,26 @@ Steps:
     def sel_word(self):
         currtext = self.tabs[self.get_tab()].textbox
         currtext.tag_add('sel', 'insert -1c wordstart', 'insert wordend')
+    
+    def biggerview(self):
+        if not self.tabs:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        if not currtext.tag_ranges('sel'):
+            return
+        selected_text = currtext.get('sel.first -1c linestart', 'sel.last lineend')
+        win = tk.Toplevel(self.master)
+        win.resizable(0, 0)
+        win.transient(self.master)
+        textframe = EnhancedTextFrame(win)
+        currline = int(float(currtext.index('insert')))
+        textframe.set_first_line(currline)
+        textframe.text.insert('insert', selected_text)
+        textframe.text['state'] = 'disabled'
+        textframe.text.lexer = currtext.lexer
+        textframe.pack(fill='both', expand=1)
+        self.recolorize(textframe.text)
+        win.mainloop()
 
     def check_updates(self, popup=True):
         if 'DEV' in VERSION:
@@ -1224,22 +1248,21 @@ Steps:
         updatewin.mainloop()
 
     def git(self, action=None):
+        if action == 'clone':
+            url = simpledialog.askstring('Clone from remote', 'URL:')
+            if not url:
+                return
+            run_in_terminal(f'git clone {url}')
+            return
         if not self.tabs:
             return
         elif action is None:
             raise EditorErr('Invalid action -- ' + str(action))
         currdir = Path(self.tabs[self.get_tab()].file_dir).parent
         if action == 'init':
-            if os.path.isdir(os.path.join(currdir, '.git')):
-                if messagebox.askokcancel(
-                        "Error!",
-                        "This is already a git repository!\nDo you want to re-initialize?"
-                ):
-                    os.remove(os.path.join(currdir, '.git'))
-            else:
-                run_in_terminal(
-                    cwd=currdir,
-                    cmd='git init && git add . && git commit -am \"Added files\"')
+            run_in_terminal(
+                cwd=currdir,
+                cmd='git init && git add . && git commit -am \"Added files\"')
         elif action == 'addall':
             run_in_terminal(cwd=currdir,
                             cmd='git add . && git commit -am "Added files"')
@@ -1255,11 +1278,6 @@ Steps:
             if not message:
                 return
             run_in_terminal(f'git commit -am "{message}"')
-        elif action == 'clone':
-            url = simpledialog.askstring('Clone from remote', 'URL:')
-            if not url:
-                return
-            run_in_terminal(f'git clone {url}')
         elif action == 'other':
             action = simpledialog.askstring('Advanced Action', 'git <command>:')
             if not action:

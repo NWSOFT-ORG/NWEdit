@@ -13,7 +13,7 @@ class TextLineNumbers(tk.Canvas):
     def attach(self, text_widget):
         self.textwidget = text_widget
 
-    def redraw(self, line):
+    def redraw(self, line, first):
         """redraw line numbers"""
         self.delete("all")
 
@@ -25,7 +25,7 @@ class TextLineNumbers(tk.Canvas):
             if dline is None:
                 break
             y = dline[1]
-            linenum = str(i).split(".")[0]
+            linenum = str(int(str(i).split(".")[0]) + first - 1)
 
             if str(int(float(i))) == str(line):
                 bold = font.Font(family=self.textwidget['font'], weight='bold')
@@ -127,9 +127,15 @@ text widget with linenumbers in."""
 
     def _on_change(self, _=None):
         currline = int(float(self.text.index('insert linestart')))
-        self.linenumbers.redraw(currline)
+        self.linenumbers.redraw(line=currline, first=self.first_line)
         self.text.config(font=self.font)
-        self.update_command()
+        try:
+            self.update_command()
+        except AttributeError:
+            pass
 
     def set_update_command(self, command):
         self.update_command = command
+
+    def set_first_line(self, line):
+        self.first_line = line

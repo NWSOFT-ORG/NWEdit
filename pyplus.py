@@ -183,8 +183,6 @@ Lacks these MacOS support:
                                  accelerator=f'{MAIN_KEY}-r',
                                  compound='left',
                                  image=self.reload_icon)
-            filemenu.add_separator()
-            filemenu.add_command(label='Startup scren', command=self.start_screen)
 
             editmenu = tk.Menu(menubar, tearoff=0)
             editmenu.add_command(label='Undo',
@@ -315,7 +313,6 @@ Lacks these MacOS support:
 
             self.master.bind("<<MouseEvent>>", self.mouse)
             self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
-            self.first_tab_created = False
             self.start_screen()
             self.master.focus_force()
             self.update_title()
@@ -324,46 +321,45 @@ Lacks these MacOS support:
             logger.exception('Error when initializing:')
 
     def start_screen(self):
-        if not self.first_tab_created:
-            first_tab = tk.Canvas(self.nb, background='white')
-            first_tab.create_image(20, 20, anchor='nw', image=self.icon)
-            first_tab.create_text(60,
-                                  10,
-                                  anchor='nw',
-                                  text='Welcome to PyPlus!',
-                                  font='Arial 50',
-                                  fill='black')
-            label1 = ttk.Label(first_tab,
-                               text='Open file',
-                               foreground='blue',
-                               background='white',
-                               cursor='hand2',
-                               compound='left',
-                               image=self.open_icon)
-            label2 = ttk.Label(first_tab,
-                               text='New...',
-                               foreground='blue',
-                               background='white',
-                               cursor='hand2',
-                               compound='left',
-                               image=self.new_icon)
-            label3 = ttk.Label(first_tab,
-                               text='Exit',
-                               foreground='blue',
-                               background='white',
-                               cursor='hand2',
-                               compound='left',
-                               image=self.close_icon_dark)
-            label1.bind('<Button>', self._open)
-            label2.bind('<Button>', self.filetree.new_file)
-            label3.bind('<Button>', lambda _=None: self.exit(force=True))
+        first_tab = tk.Canvas(self.nb, background='white')
+        first_tab.create_image(20, 20, anchor='nw', image=self.icon)
+        first_tab.create_text(60,
+                              10,
+                              anchor='nw',
+                              text='Welcome to PyPlus!',
+                              font='Arial 50',
+                              fill='black')
+        label1 = ttk.Label(first_tab,
+                           text='Open file',
+                           foreground='blue',
+                           background='white',
+                           cursor='hand2',
+                           compound='left',
+                           image=self.open_icon)
+        label2 = ttk.Label(first_tab,
+                           text='New...',
+                           foreground='blue',
+                           background='white',
+                           cursor='hand2',
+                           compound='left',
+                           image=self.new_icon)
+        label3 = ttk.Label(first_tab,
+                           text='Exit',
+                           foreground='blue',
+                           background='white',
+                           cursor='hand2',
+                           compound='left',
+                           image=self.close_icon_dark)
+        label1.bind('<Button>', self._open)
+        label2.bind('<Button>', self.filetree.new_file)
+        label3.bind('<Button>', lambda _=None: self.exit(force=True))
 
-            first_tab.create_window(50, 100, window=label1, anchor='nw')
-            first_tab.create_window(50, 140, window=label2, anchor='nw')
-            first_tab.create_window(50, 180, window=label3, anchor='nw')
-            self.nb.add(first_tab, text='Start')
-            self.first_tab_created = True
-            logger.debug('Start screen created')
+        first_tab.create_window(50, 100, window=label1, anchor='nw')
+        first_tab.create_window(50, 140, window=label2, anchor='nw')
+        first_tab.create_window(50, 180, window=label3, anchor='nw')
+        self.nb.add(first_tab, text='Start')
+        self.first_tab_created = True
+        logger.debug('Start screen created')
 
     def create_text_widget(self, frame):
         """Creates a text widget in a frame."""

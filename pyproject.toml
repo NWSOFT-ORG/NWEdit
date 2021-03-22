@@ -23,5 +23,4 @@ ttkthemes = "^3.2.0"
 py2app = "^0.23"
 pyclean = "^2.0.0"
 python-pydebug = "^0.6"
-pydebug = "^1.0.3"
 [tool.poetry.dev-dependencies]

@@ -3,5 +3,5 @@ pyplus.log
 build/
 dist/
 __pycache__/
-*.pyc*
+*.pyc
 /venv/

@@ -1,4 +1,3 @@
-from modules import *
 from constants import *
 
 
@@ -130,9 +129,20 @@ class RunCommand:
             return None
 
 
-class AutoCloseBracket:
+class CommentMarker:
     def __init__(self):
-        with open(os.path.join(APPDIR, "Settings/autoclose-triggers.json")) as f:
+        with open(os.path.join(APPDIR, "Settings/comment_markers.json")) as f:
             all_settings = json.load(f)
-        self.close_tag = all_settings['close_tags']
-        self.html_formats = all_settings['html_formats']
+        self.extens = []
+        self.comments = []
+        for key, value in all_settings.items():
+            self.extens.append(key)
+            self.comments.append(value)
+
+    def get_comment_settings(self, extension: str):
+        try:
+            if self.comments[self.extens.index(extension)] == "none":
+                return None
+            return self.comments[self.extens.index(extension)]
+        except IndexError:
+            return None

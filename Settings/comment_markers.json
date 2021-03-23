@@ -1,0 +1,49 @@
+/* File run command settings
+Follow the instructions, and modify it to make the editor work on your system.
+Default is MacOS.
+*/
+{
+    // Python
+    "py": "#",
+    "pyw": "#",
+    "jy": "#",
+    "sage": "#",
+    "sc": "#",
+    "SConstruct": "#",
+    "SConscript": "#",
+    "bzl": "#",
+    "BUCK": "#",
+    "BUILD": "#",
+    "BUILD.bazel": "#",
+    "WORKSPACE": "#",
+    "tac": "#",
+    // HTML, PHP
+    "php": "#",
+    "php5": "#",
+    // Init
+    "ini": "#",
+    "init": "#",
+    // Conf
+    "conf": "#",
+    "cnf": "#",
+    "config": "#",
+    // Shell
+    "sh": "#",
+    "ksh": "#",
+    "ebuild": "#",
+    "eclass": "#",
+    "exheres-0": "#",
+    "exlib": "#",
+    "zsh": "#",
+    "bashrc": "#",
+    "PKGBUILD": "#",
+    // JSON
+    "json": "//",
+    // JavaScript
+    "js": "//",
+    "javascript": "//",
+    // CSS
+    "css": "//",
+    // Your custom goes here, for example...
+    "zshrc": "#"
+}

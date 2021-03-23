@@ -55,10 +55,12 @@ Lacks these MacOS support:
             self.linter_settings_class = Linter()
             self.cmd_settings_class = RunCommand()
             self.format_settings_class = FormatCommand()
+            self.commet_settings_class = CommentMarker()
             self.theme = self.settings_class.get_settings('theme')
             logger.debug('Settings loaded')
 
             self.master = master
+            self.master.geometry('900x600')
             self.close_icon = tk.PhotoImage(file='Images/close.gif')
             self.close_icon_dark = tk.PhotoImage(file='Images/close-dark.gif')
             self.copy_icon = tk.PhotoImage(file='Images/copy.gif')
@@ -90,8 +92,6 @@ Lacks these MacOS support:
                 space = PyTouchBar.TouchBarItems.Space.Flexible()
                 run_button = PyTouchBar.TouchBarItems.Button(image='Images/run.gif', action=self.run)
                 PyTouchBar.set_touchbar([open_button, save_as_button, close_button, space, run_button])
-            self.master.focus_force()
-            self.master.geometry('900x600')
             ttkthemes.ThemedStyle(self.master).set_theme(self.theme)
             self.icon = tk.PhotoImage(file='Images/pyplus.gif')
             self.master.iconphoto(True, self.icon)
@@ -236,6 +236,8 @@ Lacks these MacOS support:
                                       accelerator=f'{MAIN_KEY}-u',
                                       compound='left',
                                       image=self.unindent_icon)
+            self.codemenu.add_separator()
+            self.codemenu.add_command(label='Comment Line or Selected', command=self.comment_lines)
             self.codemenu.add_separator()
             self.codemenu.add_command(label='Run',
                                       command=self.run,
@@ -449,7 +451,6 @@ Lacks these MacOS support:
             currtext = self.tabs[self.get_tab()].textbox
             highlight_thread = threading.Thread(target=self.recolorize, args=(currtext,))
             highlight_thread.start()
-            currtext.edit_separator()
             # Auto-save
             self.save_file()
             self.update_statusbar()
@@ -517,28 +518,28 @@ This method colors and styles the prepared tags
             start_index = 0
             end_line = 1
             end_index = 0
-    
+
             for ttype, value in tokensource:
                 if "\n" in value:
                     end_line += value.count("\n")
                     end_index = len(value.rsplit("\n", 1)[1])
                 else:
                     end_index += len(value)
-    
+
                 if value not in (" ", "\n"):
                     index1 = f"{start_line}.{start_index}"
                     index2 = f"{end_line}.{end_index}"
-    
+
                     for tagname in currtext.tag_names(index1):
                         if tagname != 'sel':
                             currtext.tag_remove(tagname, index1, index2)
-    
+
                     currtext.tag_add(str(ttype), index1, index2)
-    
+
                 start_line = end_line
                 start_index = end_index
                 currtext.tag_configure('sel', foreground='black')
-    
+
             currtext.update()  # Have to update
         except Exception:
             logger.exception('Error: ')
@@ -549,11 +550,11 @@ If a file is not provided, a messagebox'll
 pop up to ask the user to select the path.
 """
         if not file:
-            file_dir = (tkinter.filedialog.askopenfilename(
+            file_dir = tkinter.filedialog.askopenfilename(
                 master=self.master,
                 initialdir='/',
                 title='Select file',
-                filetypes=self.filetypes))
+                filetypes=self.filetypes)
         else:
             file_dir = file
 
@@ -592,6 +593,10 @@ pop up to ask the user to select the path.
                                               file_dir)
                 self.nb.add(new_tab, text=os.path.basename(file_dir))
                 self.nb.select(new_tab)
+                shell_frame = ttk.Frame(new_tab)
+                ttkthemes.ThemedStyle(shell_frame).set_theme(self.theme)
+                main_window = Console(shell_frame, None, shell_frame.destroy)
+                main_window.pack(fill=tk.BOTH, expand=True)
 
                 # Puts the contents of the file into the text widget.
                 currtext = self.tabs[new_tab].textbox
@@ -605,6 +610,8 @@ pop up to ask the user to select the path.
                 currtext.cmd = self.cmd_settings_class.get_command_settings(
                     extens)
                 currtext.format_command = self.format_settings_class.get_command_settings(
+                    extens)
+                currtext.comment_marker = self.commet_settings_class.get_comment_settings(
                     extens)
                 self.key()
                 currtext.see('insert')
@@ -766,7 +773,7 @@ Steps:
             currtext.delete('insert', 'insert +1c')
         # Backtab
         if currtext.get('insert -4c', 'insert') == ' ' * 4:
-            currtext.delete('insert -4c', 'insert')
+            currtext.delete('insert -3c', 'insert')
         self.key()
         currtext.edit_separator()
 
@@ -1191,7 +1198,7 @@ Steps:
     def sel_word(self):
         currtext = self.tabs[self.get_tab()].textbox
         currtext.tag_add('sel', 'insert -1c wordstart', 'insert wordend')
-    
+
     def biggerview(self):
         if not self.tabs:
             return
@@ -1322,6 +1329,24 @@ Steps:
         else:
             raise EditorErr('Action undefined.')
         currtext.edit_separator()
+
+    def comment_lines(self, _=None):
+        try:
+            currtext = self.tabs[self.get_tab()].textbox
+            if not currtext.comment_marker:
+                return
+            if currtext.tag_ranges('sel'):
+                start_index, end_index = 'sel.first linestart', 'sel.last lineend'
+                for line in currtext.get(start_index, end_index).splitlines():
+                    currtext.delete(start_index, end_index)
+                    currtext.insert('insert', f'{currtext.comment_marker} {line}\n')
+            else:
+                start_index, end_index = 'insert linestart', 'insert lineend'
+                line = currtext.get(start_index, end_index)
+                currtext.delete(start_index, end_index)
+                currtext.insert('insert', f'{currtext.comment_marker} {line}\n')
+        except (KeyError, AttributeError):
+            return
 
 
 if __name__ == '__main__':

@@ -126,13 +126,14 @@ text widget with linenumbers in."""
         self.text.bind("<Configure>", self._on_change)
 
     def _on_change(self, _=None):
+        self.text.edit_separator()
         currline = int(float(self.text.index('insert linestart')))
         self.linenumbers.redraw(line=currline, first=self.first_line)
-        self.text.config(font=self.font)
         try:
             self.update_command()
         except AttributeError:
             pass
+        self.text.edit_separator()
 
     def set_update_command(self, command):
         self.update_command = command

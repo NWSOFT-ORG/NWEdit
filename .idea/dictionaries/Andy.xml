@@ -3,6 +3,7 @@
     <words>
       <w>backchar</w>
       <w>backtab</w>
+      <w>statusbar</w>
     </words>
   </dictionary>
 </component>

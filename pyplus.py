@@ -235,7 +235,7 @@ Lacks these MacOS support:
                                       compound='left',
                                       image=self.unindent_icon)
             self.codemenu.add_separator()
-            self.codemenu.add_command(label='Comment Line or Selected', command=self.comment_lines)
+            self.codemenu.add_command(label='Comment/Uncomment Line or Selected', command=self.comment_lines)
             self.codemenu.add_separator()
             self.codemenu.add_command(label='Run',
                                       command=self.run,
@@ -453,7 +453,8 @@ Lacks these MacOS support:
             # Update statusbar and title bar
             self.update_title()
             logger.debug('update_title: OK')
-        except Exception:
+        except KeyError:
+            self.master.bell()
             logger.exception('Error when handling keyboard event:')
 
     def mouse(self, _=None):
@@ -463,9 +464,9 @@ Lacks these MacOS support:
             # Update statusbar and title bar
             self.update_title()
             logger.debug('update_title: OK')
-        except Exception as e:
-            if type(e).__name__ != 'ValueError':
-                logger.exception('Error when handling mouse event:')
+        except KeyError:
+            self.master.bell()
+            logger.exception('Error when handling mouse event:')
 
     def create_tags(self, textbox):
         """
@@ -753,9 +754,14 @@ Steps:
         open_system_shell()
 
     def python_shell(self):
-        shell_frame = ttk.Frame()
+        shell_frame = tk.Toplevel()
+        shell_frame.title('Python Shell')
         ttkthemes.ThemedStyle(shell_frame).set_theme(self.theme)
         main_window = Console(shell_frame, None, shell_frame.destroy)
+        main_window.text.lexer = lexers.get_lexer_by_name('pycon')
+        main_window.text.focus_set()
+        self.recolorize(main_window.text)
+        main_window.text.bind('<KeyRelease>', lambda _=None: self.recolorize(main_window.text))
         main_window.pack(fill=tk.BOTH, expand=True)
         shell_frame.mainloop()
 
@@ -1335,12 +1341,18 @@ Steps:
                 start_index, end_index = 'sel.first linestart', 'sel.last lineend'
                 for line in currtext.get(start_index, end_index).splitlines():
                     currtext.delete(start_index, end_index)
-                    currtext.insert('insert', f'{currtext.comment_marker} {line}\n')
+                    if line.startswith(currtext.comment_marker):
+                        currtext.insert('insert', f'{line[len(currtext.comment_marker):]}\n')
+                    else:
+                        currtext.insert('insert', f'{currtext.comment_marker}{line}\n')
             else:
                 start_index, end_index = 'insert linestart', 'insert lineend'
                 line = currtext.get(start_index, end_index)
                 currtext.delete(start_index, end_index)
-                currtext.insert('insert', f'{currtext.comment_marker} {line}\n')
+                if line.startswith(currtext.comment_marker):
+                    currtext.insert('insert', f'{line[len(currtext.comment_marker):]}\n')
+                else:
+                    currtext.insert('insert', f'{currtext.comment_marker}{line}\n')
         except (KeyError, AttributeError):
             return
 

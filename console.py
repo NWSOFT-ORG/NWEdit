@@ -1,5 +1,5 @@
 """Python console for the editor."""
-from modules import *
+from settings import *
 
 
 # from olisolomos's gist
@@ -26,10 +26,19 @@ class Pipe:
 class Console(ttk.Frame):
     """A tkinter widget which behaves like an interpreter"""
 
-    def __init__(self, parent, _locals=None, exit_callback=None):
+    def __init__(self, parent: tk.Misc, _locals=None, exit_callback=None):
         super().__init__(parent)
-
-        self.text = ConsoleText(self, wrap='none')
+        settings_class = Settings()
+        self.font = settings_class.get_settings('font')
+        self.text = ConsoleText(self, wrap='none',
+                                bg='black',
+                                fg='white',
+                                insertbackground='white',
+                                selectforeground='black',
+                                selectbackground='white',
+                                highlightthickness=0,
+                                font=self.font,
+                                insertwidth=3)
         vbar = ttk.Scrollbar(self, command=self.text.yview)
         vbar.pack(side='right', fill='y', anchor='ne')
         xbar = ttk.Scrollbar(self,

@@ -4,6 +4,7 @@
       <w>backchar</w>
       <w>backtab</w>
       <w>statusbar</w>
+      <w>stdin</w>
     </words>
   </dictionary>
 </component>

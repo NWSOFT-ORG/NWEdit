@@ -1,5 +1,5 @@
 /* General settings
-Impropper modifying might causse error
+Improper modifying might cause error
 Please follow the instructions as comments.
 */
 {
@@ -14,5 +14,6 @@ Please follow the instructions as comments.
     // Must be a valid TTK theme
     "theme": "black",
     // Must be a valid Pygments theme
-    "pygments": "monokai"
+    "pygments": "monokai",
+    "tabwidth": 8
 }

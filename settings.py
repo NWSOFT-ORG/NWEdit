@@ -10,12 +10,12 @@ class Settings:
                 self.settings = json.load(f)
             self.theme = self.settings['theme']
             self.highlight_theme = self.settings['pygments']
+            self.tabwidth = self.settings['tabwidth']
             self.font = self.settings['font'].split()[0]
             self.size = self.settings['font'].split()[1]
             self.filetype = self.settings['file_types']
             return
-        except Exception as e:
-            print(e)
+        except Exception:
             messagebox.showerror("Error", "Setings are corrupted.")
             sys.exit(1)
 
@@ -24,12 +24,14 @@ class Settings:
             return f'{self.font} {self.size}'
         elif setting == 'theme':
             return self.theme
+        elif setting == 'tab':
+            return self.tabwidth
         elif setting == 'pygments':
             return self.highlight_theme
         elif setting == 'file_type':
             # Always starts with ('All files', '*.* *')
             if self.filetype == 'all':
-                return (('All files', '*.* *'),)
+                return ('All files', '*.* *'),
             elif self.filetype == 'py':
                 # Extend this list, since Python has a lot of file types
                 return ('All files',

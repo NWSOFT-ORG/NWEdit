@@ -4,7 +4,7 @@ from modules import *
 WINDOWS = bool(sys.platform.startswith('win'))
 OSX = bool(sys.platform.startswith('darwin'))
 APPDIR = str(Path(__file__).parent)
-VERSION = '5.0'
+VERSION = '6.0'
 RUN_BATCH = ('''#!/bin/bash
 set +v
 cd "{script_dir}"

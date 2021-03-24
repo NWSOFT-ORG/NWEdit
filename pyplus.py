@@ -382,7 +382,6 @@ Lacks these MacOS support:
         first_tab.create_window(50, 140, window=label2, anchor='nw')
         first_tab.create_window(50, 180, window=label3, anchor='nw')
         self.nb.add(first_tab, text='Start')
-        self.first_tab_created = True
         logger.debug('Start screen created')
 
     def create_text_widget(self, frame):
@@ -462,12 +461,8 @@ Lacks these MacOS support:
     def key(self, _=None):
         """Event when a key is pressed."""
         try:
-            # Do the highlight in a separate thread.
-            # This might require extra computer resource
             currtext = self.tabs[self.get_tab()].textbox
-            highlight_thread = threading.Thread(target=self.recolorize,
-                                                args=(currtext,))
-            highlight_thread.start()
+            self.recolorize(currtext)
             # Auto-save
             self.save_file()
             self.update_statusbar()
@@ -527,9 +522,7 @@ source code 'dressing'
 This method colors and styles the prepared tags
 """
         try:
-            create_tags_thread = threading.Thread(target=self.create_tags,
-                                                  args=(textbox,))
-            create_tags_thread.start()
+            self.create_tags(textbox)
             currtext = textbox
             _code = currtext.get("1.0", "end-1c")
             tokensource = currtext.lexer.get_tokens(_code)
@@ -824,6 +817,29 @@ Steps:
         currtext = self.tabs[self.get_tab()].textbox
         currtext.edit_separator()
         char = event.char
+        if currtext.tag_ranges('sel'):
+            selected = currtext.get('sel.first', 'sel.last')
+            if char == "'":
+                currtext.delete('sel.first', 'sel.last')
+                currtext.insert('insert', f"'{selected}'")
+                return 'break'
+            if char == '"':
+                currtext.delete('sel.first', 'sel.last')
+                currtext.insert('insert', f'"{selected}"')
+                return 'break'
+            if char == "(":
+                currtext.delete('sel.first', 'sel.last')
+                currtext.insert('insert', f"({selected})")
+                return 'break'
+            if char == "[":
+                currtext.delete('sel.first', 'sel.last')
+                currtext.insert('insert', f"[{selected}]")
+                return 'break'
+            if char == "{":
+                currtext.delete('sel.first', 'sel.last')
+                currtext.insert('insert', "{" + selected + "}")  # Can't use f-string for this!
+                return 'break'
+
         if char == '\'':
             if currtext.get('insert', 'insert +1c') == "'":
                 currtext.mark_set('insert', 'insert +1c')
@@ -896,7 +912,7 @@ Steps:
         style = ThemedStyle(search_frame)
         style.set_theme(self.theme)
 
-        search_frame.pack(anchor='nw')
+        search_frame.pack(anchor='nw', side='bottom')
         ttk.Label(search_frame, text='Search: ').pack(side='left',
                                                       anchor='nw',
                                                       fill='y')
@@ -1259,8 +1275,7 @@ Steps:
             )  # If you're on the developer run, you don't need updates!
             return
         download_file(
-            url=
-            "https://raw.githubusercontent.com/ZCG-coder/NWSOFT/master/PyPlusWeb/ver.json"
+            url="https://raw.githubusercontent.com/ZCG-coder/NWSOFT/master/PyPlusWeb/ver.json"
         )
         with open('ver.json') as f:
             newest = json.load(f)

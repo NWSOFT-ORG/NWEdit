@@ -90,6 +90,7 @@ text widget with linenumbers in."""
         ttk.Frame.__init__(self, *args, **kwargs)
         settings_class = Settings()
         self.font = settings_class.get_settings('font')
+        self.first_line = 1
         self.text = EnhancedText(self,
                                  bg='black',
                                  fg='white',
@@ -119,11 +120,11 @@ text widget with linenumbers in."""
         self.text['yscrollcommand'] = yscroll.set
         yscroll.pack(side='right', fill='y')
         self.text.pack(side="right", fill="both", expand=True)
+        self._on_change()
 
         self.text['xscrollcommand'] = xscroll.set
 
         self.text.bind("<<Change>>", self._on_change)
-        self.text.bind("<Configure>", self._on_change)
 
     def _on_change(self, _=None):
         self.text.edit_separator()

@@ -126,6 +126,9 @@ Lacks these MacOS support:
             self.master.protocol(
                 'WM_DELETE_WINDOW', lambda: self.exit(force=False)
             )  # When the window is closed, or quit from Mac, do exit action
+            self.master.createcommand(
+                'exit', lambda: self.exit(force=False)
+            )  # When the window is closed, or quit from Mac, do exit action
 
             menubar = tk.Menu(self.master)
             self.statusbar = ttk.Frame(self.master)
@@ -822,14 +825,14 @@ Steps:
         currtext.edit_separator()
         char = event.char
         if char == '\'':
-            if currtext.get('insert -1c', 'insert +1c') == "''":
+            if currtext.get('insert', 'insert +1c') == "'":
                 currtext.mark_set('insert', 'insert +1c')
                 return 'break'
             currtext.insert('insert', '\'\'')
             currtext.mark_set('insert', 'insert -1c')
             return 'break'
         elif char == '"':
-            if currtext.get('insert -1c', 'insert +1c') == '""':
+            if currtext.get('insert', 'insert +1c') == '"':
                 currtext.mark_set('insert', 'insert +1c')
                 return 'break'
             currtext.insert('insert', '""')

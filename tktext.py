@@ -125,6 +125,7 @@ text widget with linenumbers in."""
         self.text['xscrollcommand'] = xscroll.set
 
         self.text.bind("<<Change>>", self._on_change)
+        self.text.bind("<Configure>", self._on_change)
 
     def _on_change(self, _=None):
         self.text.edit_separator()

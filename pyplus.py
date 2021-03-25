@@ -639,6 +639,7 @@ pop up to ask the user to select the path.
                 self.recolorize(currtext)
                 currtext.see('insert')
                 currtext.focus_set()
+                currtext.master._on_change()
                 logging.info('File opened')
                 return 'break'
             except Exception as e:

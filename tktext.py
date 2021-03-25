@@ -12,6 +12,37 @@ class TextLineNumbers(tk.Canvas):
 
     def attach(self, text_widget):
         self.textwidget = text_widget
+    
+    def advancedredraw(self, line, first):
+        """redraw line numbers"""
+        self.delete("all")
+
+        i = self.textwidget.index("@0,0")
+        w = len(self.textwidget.index("end-1c linestart"))
+        self.config(width=w * 10)
+        while True:
+            dline = self.textwidget.dlineinfo(i)
+            if dline is None:
+                break
+            y = dline[1]
+            linenum = str(int(str(i).split(".")[0]) + first - 1)
+
+            if int(linenum) == int(float(line)):
+                bold = font.Font(family=self.textwidget['font'], weight='bold')
+                self.create_text(2,
+                                 y,
+                                 anchor="nw",
+                                 text=linenum,
+                                 fill='black',
+                                 font=bold)
+            else:
+                self.create_text(2,
+                                 y,
+                                 anchor="nw",
+                                 text=linenum,
+                                 fill='black',
+                                 font=self.textwidget['font'])
+            i = self.textwidget.index("%s+1line" % i)
 
     def redraw(self, first):
         """redraw line numbers"""
@@ -26,13 +57,12 @@ class TextLineNumbers(tk.Canvas):
                 break
             y = dline[1]
             linenum = str(int(str(i).split(".")[0]) + first - 1)
-            bold = font.Font(family=self.textwidget['font'], weight='bold')
             self.create_text(2,
                              y,
                              anchor="nw",
                              text=linenum,
                              fill='black',
-                             font=bold)
+                             font=self.textwidget['font'])
             i = self.textwidget.index("%s+1line" % i)
 
 
@@ -111,14 +141,23 @@ text widget with linenumbers in."""
         self.text['yscrollcommand'] = yscroll.set
         yscroll.pack(side='right', fill='y')
         self.text.pack(side="right", fill="both", expand=True)
-        self._on_change()
 
         self.text['xscrollcommand'] = xscroll.set
 
         self.text.bind("<<Change>>", self._on_change)
-        self.text.bind("<Configure>", self._on_change)
+        self.text.bind("<Configure>", self._on_resize)
 
     def _on_change(self, _=None):
+        self.text.edit_separator()
+        currline = self.text.index('insert')
+        self.linenumbers.advancedredraw(first=self.first_line, line=currline)
+        try:
+            self.update_command()
+        except AttributeError:
+            pass
+        self.text.edit_separator()
+    
+    def _on_resize(self, _=None):
         self.text.edit_separator()
         self.linenumbers.redraw(first=self.first_line)
         try:

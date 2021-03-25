@@ -1,5 +1,10 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
+    <Python>
+      <option name="SPACE_BEFORE_NUMBER_SIGN" value="false" />
+      <option name="DICT_ALIGNMENT" value="2" />
+      <option name="OPTIMIZE_IMPORTS_SORT_NAMES_IN_FROM_IMPORTS" value="true" />
+    </Python>
     <codeStyleSettings language="JSON">
       <indentOptions>
         <option name="INDENT_SIZE" value="4" />
@@ -7,6 +12,8 @@
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="Python">
+      <option name="RIGHT_MARGIN" value="120" />
+      <option name="WRAP_LONG_LINES" value="true" />
       <indentOptions>
         <option name="SMART_TABS" value="true" />
       </indentOptions>

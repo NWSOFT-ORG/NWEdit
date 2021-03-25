@@ -13,7 +13,7 @@ class TextLineNumbers(tk.Canvas):
     def attach(self, text_widget):
         self.textwidget = text_widget
 
-    def redraw(self, line, first):
+    def redraw(self, first):
         """redraw line numbers"""
         self.delete("all")
 
@@ -26,22 +26,13 @@ class TextLineNumbers(tk.Canvas):
                 break
             y = dline[1]
             linenum = str(int(str(i).split(".")[0]) + first - 1)
-
-            if str(int(float(i))) == str(line):
-                bold = font.Font(family=self.textwidget['font'], weight='bold')
-                self.create_text(2,
-                                 y,
-                                 anchor="nw",
-                                 text=linenum,
-                                 fill='black',
-                                 font=bold)
-            else:
-                self.create_text(2,
-                                 y,
-                                 anchor="nw",
-                                 text=linenum,
-                                 fill='black',
-                                 font=self.textwidget['font'])
+            bold = font.Font(family=self.textwidget['font'], weight='bold')
+            self.create_text(2,
+                             y,
+                             anchor="nw",
+                             text=linenum,
+                             fill='black',
+                             font=bold)
             i = self.textwidget.index("%s+1line" % i)
 
 
@@ -129,8 +120,7 @@ text widget with linenumbers in."""
 
     def _on_change(self, _=None):
         self.text.edit_separator()
-        currline = int(float(self.text.index('insert linestart')))
-        self.linenumbers.redraw(line=currline, first=self.first_line)
+        self.linenumbers.redraw(first=self.first_line)
         try:
             self.update_command()
         except AttributeError:

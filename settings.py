@@ -19,6 +19,32 @@ class Settings:
             messagebox.showerror("Error", "Setings are corrupted.")
             sys.exit(1)
 
+    @staticmethod
+    def zip_settings():
+        backupdir = tkinter.filedialog.askdirectory()
+
+        def zipdir(path, zip_obj):
+            for root, dirs, files in os.walk(path):
+                for file in files:
+                    zip_obj.write(os.path.join(root, file),
+                                  os.path.relpath(os.path.join(root, file),
+                                                  os.path.join(path, '..')))
+
+        with zipfile.ZipFile(os.path.join(backupdir, f'Settings{time.time()}.zip'), 'w',
+                             zipfile.ZIP_DEFLATED) as zipobj:
+            zipdir('Settings/', zipobj)
+        messagebox.showinfo('Done', 'Settings backed up.')
+
+    @staticmethod
+    def unzip_settings():
+        try:
+            backupdir = tkinter.filedialog.askopenfilename()
+            with zipfile.ZipFile(backupdir) as zipobj:
+                zipobj.extractall(path=APPDIR)
+            messagebox.showinfo('Done', 'Settings extracted. Please restart to apply changes.')
+        except (zipfile.BadZipFile, zipfile.BadZipfile, zipfile.LargeZipFile):
+            pass
+
     def get_settings(self, setting):
         if setting == 'font':
             return f'{self.font} {self.size}'
@@ -29,7 +55,7 @@ class Settings:
         elif setting == 'pygments':
             return self.highlight_theme
         elif setting == 'file_type':
-            # Always starts with ('All files', '*.* *')
+            # Always starts with ('All files', '*.* *'),
             if self.filetype == 'all':
                 return ('All files', '*.* *'),
             elif self.filetype == 'py':
@@ -48,7 +74,7 @@ class Settings:
                 if messagebox.showerror(
                         'Error', 'The settings aren\'t correct, \n\
                 Now using default settings.'):
-                    return (('All files', '*.* *'),)
+                    return ('All files', '*.* *'),
         else:
             raise EditorErr('The setting is not defined')
 

@@ -38,6 +38,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/tktext.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/treeview.py">
           <value>
             <Attribute>

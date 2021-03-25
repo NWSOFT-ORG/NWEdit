@@ -29,6 +29,7 @@ from pygments import lexers
 from pygments.styles import get_style_by_name
 from pygson.json_lexer import JSONLexer
 from ttkthemes import ThemedStyle
+import zipfile
 
 if sys.platform == 'darwin':
     import PyTouchBar

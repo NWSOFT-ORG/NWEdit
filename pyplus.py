@@ -164,6 +164,9 @@ Lacks these MacOS support:
                                     command=lambda: self.open_file(
                                         APPDIR + '/Settings/cmd-settings'
                                                  '.json'))
+            preferences.add_separator()
+            preferences.add_command(label='Backup Settings to...', command=self.settings_class.zip_settings)
+            preferences.add_command(label='Load Settings from...', command=self.settings_class.unzip_settings)
             app_menu.add_cascade(label="Preferences", menu=preferences)
             app_menu.add_separator()
             app_menu.add_command(label='Exit Editor', command=self.exit)
@@ -192,8 +195,13 @@ Lacks these MacOS support:
                                  accelerator=f'{MAIN_KEY}-w',
                                  compound='left',
                                  image=self.close_icon)
-            filemenu.add_command(label='Reload from disk',
-                                 command=self.reload,
+            filemenu.add_command(label='Reload current file from disk',
+                                 command=lambda: self.reload(file='current'),
+                                 accelerator=f'{MAIN_KEY}-r',
+                                 compound='left',
+                                 image=self.reload_icon)
+            filemenu.add_command(label='Reload all files from disk',
+                                 command=lambda: self.reload(file='all'),
                                  accelerator=f'{MAIN_KEY}-r',
                                  compound='left',
                                  image=self.reload_icon)
@@ -395,11 +403,11 @@ Lacks these MacOS support:
             # Quit quickly, before a char is being inserted.
             return 'break'
 
-        textframe = EnhancedTextFrame(
-            frame)  # The one with line numbers and a nice dark theme
-        textframe.set_update_command(self.key)
-        textframe.set_first_line(1)
+        textframe = EnhancedTextFrame(frame)
+        # The one with line numbers and a nice dark theme
         textframe.pack(fill='both', expand=1, side='right')
+        textframe.set_first_line(1)
+        textframe.set_update_command(self.key)
 
         textbox = textframe.text  # text widget
         textbox.frame = frame  # The text will be packed into the frame.
@@ -412,10 +420,14 @@ Lacks these MacOS support:
         textbox.bind(f'<{MAIN_KEY}-i>', lambda _=None: self.indent('indent'))
         textbox.bind(f'<{MAIN_KEY}-n>', self.filetree.new_file)
         textbox.bind(f'<{MAIN_KEY}-N>', self.goto)
-        textbox.bind(f'<{MAIN_KEY}-r>', self.reload)
+        textbox.bind(f'<{MAIN_KEY}-r>', lambda _=None: self.reload(file='current'))
+        textbox.bind(f'<{MAIN_KEY}-R>', lambda _=None: self.reload(file='all'))
         textbox.bind(f'<{MAIN_KEY}-S>', self.save_as)
         textbox.bind(f'<{MAIN_KEY}-u>', lambda _=None: self.indent('unindent'))
         textbox.bind(f'<{MAIN_KEY}-Z>', self.redo)
+        textbox.bind(f'<{MAIN_KEY}-z>', self.undo)
+        textbox.bind('<<Key>>', self.key)
+        textbox.event_add('<<Key>>', '<KeyRelease>')
         for char in ['"', "'", '(', '[', '{']:
             textbox.bind(char, self.autoinsert)
         for char in [')', ']', '}']:
@@ -463,6 +475,8 @@ Lacks these MacOS support:
         try:
             currtext = self.tabs[self.get_tab()].textbox
             self.recolorize(currtext)
+            currtext.edit_separator()
+            currtext.see('insert')
             # Auto-save
             self.save_file()
             self.update_statusbar()
@@ -622,7 +636,7 @@ pop up to ask the user to select the path.
                     extens)
                 currtext.comment_marker = self.commet_settings_class.get_comment_settings(
                     extens)
-                self.key()
+                self.recolorize(currtext)
                 currtext.see('insert')
                 currtext.focus_set()
                 logging.info('File opened')
@@ -652,7 +666,7 @@ pop up to ask the user to select the path.
             file.write(self.tabs[curr_tab].textbox.get(1.0, 'end'))
             file.close()
             self.update_title()
-            self.reload()
+            self.reload(file='current')
 
     def save_file(self, _=None):
         """Saves an *existing* file"""
@@ -790,7 +804,7 @@ Steps:
             currtext.delete('insert', 'insert +1c')
         # Backtab
         if currtext.get(f'insert -{self.tabwidth}c', 'insert') == ' ' * self.tabwidth:
-            currtext.delete(f'insert -{self.tabwidth -1}c', 'insert')
+            currtext.delete(f'insert -{self.tabwidth - 1}c', 'insert')
         self.key()
         currtext.edit_separator()
 
@@ -1048,15 +1062,17 @@ Steps:
 
     def undo(self, _=None):
         try:
+            print('undo')
             self.tabs[self.get_tab()].textbox.edit_undo()
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
 
     def redo(self, _=None):
         try:
+            print('redo')
             self.tabs[self.get_tab()].textbox.edit_redo()
-        except Exception:
-            pass
+        except Exception as e:
+            logger.exception(e)
 
     def right_click(self, event):
         self.right_click_menu.post(event.x_root, event.y_root)
@@ -1085,8 +1101,12 @@ Steps:
         except Exception:
             pass
 
-    def reload(self):
+    def reload(self, file='current'):
         if not self.tabs:
+            return
+        if file == 'current':
+            self.close_tab()
+            self.open_file(file)
             return
         tabs = []
         self.nb.select(self.nb.index('end') - 1)
@@ -1096,7 +1116,6 @@ Steps:
             file = tab.file_dir
             try:
                 self.close_tab()
-                self.get_tab()
                 self.open_file(file)
             except Exception:
                 pass
@@ -1189,7 +1208,7 @@ Steps:
             else:
                 messagebox.showerror('Error', 'Language not supported.')
                 return
-            self.reload()
+            self.reload(file='current')
             currtext.edit_separator()
         except Exception:
             logger.exception('Error when formatting:')
@@ -1258,8 +1277,7 @@ Steps:
         win.resizable(0, 0)
         win.transient(self.master)
         textframe = EnhancedTextFrame(win)
-        currline = int(float(currtext.index('insert')))
-        textframe.set_first_line(currline)
+        textframe.set_first_line(1)
         textframe.text.insert('insert', selected_text)
         textframe.text['state'] = 'disabled'
         textframe.text.lexer = currtext.lexer

@@ -659,6 +659,8 @@ pop up to ask the user to select the path.
                 initialdir='/',
                 title='Save As...',
                 filetypes=self.filetypes))
+            if not file_dir:
+                return
 
             self.tabs[curr_tab].file_dir = file_dir
             self.nb.tab(curr_tab, text=os.path.basename(file_dir))

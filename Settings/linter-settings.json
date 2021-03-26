@@ -1,8 +1,4 @@
-/* Linting settings
-Modifying could cause error when linting
-*/
 {
-    // Python
     "py": "pylint",
     "pyw": "pylint",
     "jy": "pylint",
@@ -16,14 +12,11 @@ Modifying could cause error when linting
     "BUILD.bazel": "pylint",
     "WORKSPACE": "pylint",
     "tac": "pylint",
-    // Text
     "text": "none",
     "txt": "none",
-    // HTML
     "html": "html_lint.py",
     "htm": "html_lint.py",
     "xhtml": "html_lint.py",
-    // XML
     "xml": "none",
     "xslt": "none",
     "xsl": "none",
@@ -31,17 +24,13 @@ Modifying could cause error when linting
     "xsd": "none",
     "wsdl": "none",
     "wsf": "none",
-    // HTML, PHP
     "php": "html_lint.py",
     "php5": "html_lint.py",
-    // Init
     "ini": "none",
     "init": "none",
-    // Conf
     "conf": "none",
     "cnf": "none",
     "config": "none",
-    // Shell
     "sh": "none",
     "ksh": "none",
     "ebuild": "none",
@@ -51,13 +40,9 @@ Modifying could cause error when linting
     "zsh": "none",
     "bashrc": "none",
     "PKGBUILD": "none",
-    // JSON
     "json": "none",
-    // JavaScript
     "js": "node ./node_modules/.bin/eslint",
     "javascript": "node ./node_modules/.bin/eslint",
-    // CSS
     "css": "none",
-    // Your custom goes here, for example...
     "zshrc": "none"
 }

@@ -1,9 +1,4 @@
-/* File run command settings
-Follow the instructions, and modify it to make the editor work on your system.
-Default is MacOS.
-*/
 {
-    // Python
     "py": "# ",
     "pyw": "# ",
     "jy": "# ",
@@ -17,17 +12,13 @@ Default is MacOS.
     "BUILD.bazel": "# ",
     "WORKSPACE": "# ",
     "tac": "# ",
-    // HTML, PHP
     "php": "# ",
     "php5": "# ",
-    // Init
     "ini": "# ",
     "init": "# ",
-    // Conf
     "conf": "# ",
     "cnf": "# ",
     "config": "# ",
-    // Shell
     "sh": "# ",
     "ksh": "# ",
     "ebuild": "# ",
@@ -37,13 +28,9 @@ Default is MacOS.
     "zsh": "# ",
     "bashrc": "# ",
     "PKGBUILD": "# ",
-    // JSON
     "json": "// ",
-    // JavaScript
     "js": "// ",
     "javascript": "// ",
-    // CSS
     "css": "// ",
-    // Your custom goes here, for example...
     "zshrc": "# "
 }

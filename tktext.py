@@ -6,14 +6,14 @@ from settings import *
 class TextLineNumbers(tk.Canvas):
     """Line numbers class for tkinter text widgets. From stackoverflow."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: any, **kwargs: any) -> None:
         tk.Canvas.__init__(self, *args, **kwargs)
         self.textwidget = None
 
-    def attach(self, text_widget):
+    def attach(self, text_widget: tk.Text) -> None:
         self.textwidget = text_widget
-    
-    def advancedredraw(self, line, first):
+
+    def advancedredraw(self, line: str, first: int) -> None:
         """redraw line numbers"""
         self.delete("all")
 
@@ -44,7 +44,7 @@ class TextLineNumbers(tk.Canvas):
                                  font=self.textwidget['font'])
             i = self.textwidget.index("%s+1line" % i)
 
-    def redraw(self, first):
+    def redraw(self, first: int) -> None:
         """redraw line numbers"""
         self.delete("all")
 
@@ -71,15 +71,19 @@ class EnhancedText(tk.Text):
 If you hit a key, or the text widget's content has changed,
 it generats an event, to redraw the line numbers."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: any, **kwargs: any) -> None:
         tk.Text.__init__(self, *args, **kwargs)
+        self.lexer = None
 
         # create a proxy for the underlying widget
         self._orig = self._w + "_orig"
         self.tk.call("rename", self._w, self._orig)
         self.tk.createcommand(self._w, self._proxy)
 
-    def _proxy(self, *args):
+    def set_lexer(self, lexer):
+        self.lexer = lexer
+
+    def _proxy(self, *args: list) -> object:
         try:
             # The text widget might throw an error while pasting text!
             # let the actual widget perform the requested action
@@ -107,7 +111,7 @@ class EnhancedTextFrame(ttk.Frame):
     """An enhanced text frame to put the
 text widget with linenumbers in."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         ttk.Frame.__init__(self, *args, **kwargs)
         settings_class = Settings()
         self.font = settings_class.get_settings('font')
@@ -144,15 +148,15 @@ text widget with linenumbers in."""
 
         self.text['xscrollcommand'] = xscroll.set
 
-        self.text.bind("<<Change>>", self._on_change)
+        self.text.bind("<<Change>>", self.on_change)
         self.text.bind("<Configure>", self._on_resize)
 
-    def _on_change(self, _=None):
+    def on_change(self, _=None) -> None:
         currline = self.text.index('insert')
         self.linenumbers.advancedredraw(first=self.first_line, line=currline)
-    
-    def _on_resize(self, _=None):
+
+    def _on_resize(self, _=None) -> None:
         self.linenumbers.redraw(first=self.first_line)
 
-    def set_first_line(self, line):
+    def set_first_line(self, line: int) -> None:
         self.first_line = line

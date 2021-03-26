@@ -1,9 +1,4 @@
-/* File run command settings
-Follow the instructuins, and modify it to make the editor work on your system.
-Default is MacOS.
-*/
 {
-    // Python
     "py": "autopep8",
     "pyw": "autopep8"
 }

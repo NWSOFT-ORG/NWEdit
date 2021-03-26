@@ -37,7 +37,7 @@ logger.debug('All modules imported')
 class Document:
     """Helper class, for the editor"""
 
-    def __init__(self, frame, textbox, file_dir):
+    def __init__(self, frame, textbox, file_dir) -> None:
         self.frame = frame
         self.file_dir = file_dir
         self.textbox = textbox
@@ -46,7 +46,7 @@ class Document:
 class Editor:
     """The editor class."""
 
-    def __init__(self, master):
+    def __init__(self, master) -> None:
         """The editor object, the entire thing that goes in the
 window.
 Lacks these MacOS support:
@@ -195,13 +195,8 @@ Lacks these MacOS support:
                                  accelerator=f'{MAIN_KEY}-w',
                                  compound='left',
                                  image=self.close_icon)
-            filemenu.add_command(label='Reload current file from disk',
-                                 command=lambda: self.reload(file='current'),
-                                 accelerator=f'{MAIN_KEY}-r',
-                                 compound='left',
-                                 image=self.reload_icon)
             filemenu.add_command(label='Reload all files from disk',
-                                 command=lambda: self.reload(file='all'),
+                                 command=self.reload,
                                  accelerator=f'{MAIN_KEY}-r',
                                  compound='left',
                                  image=self.reload_icon)
@@ -352,7 +347,7 @@ Lacks these MacOS support:
         except Exception:
             logger.exception('Error when initializing:')
 
-    def start_screen(self):
+    def start_screen(self) -> None:
         first_tab = tk.Canvas(self.nb, background='white')
         first_tab.create_image(20, 20, anchor='nw', image=self.icon)
         first_tab.create_text(60,
@@ -392,7 +387,7 @@ Lacks these MacOS support:
         self.nb.add(first_tab, text='Start')
         logger.debug('Start screen created')
 
-    def create_text_widget(self, frame):
+    def create_text_widget(self, frame: ttk.Frame) -> EnhancedTextFrame:
         """Creates a text widget in a frame."""
 
         def tab(event=None):
@@ -419,8 +414,7 @@ Lacks these MacOS support:
         textbox.bind(f'<{MAIN_KEY}-i>', lambda _=None: self.indent('indent'))
         textbox.bind(f'<{MAIN_KEY}-n>', self.filetree.new_file)
         textbox.bind(f'<{MAIN_KEY}-N>', self.goto)
-        textbox.bind(f'<{MAIN_KEY}-r>', lambda _=None: self.reload(file='current'))
-        textbox.bind(f'<{MAIN_KEY}-R>', lambda _=None: self.reload(file='all'))
+        textbox.bind(f'<{MAIN_KEY}-r>', self.reload)
         textbox.bind(f'<{MAIN_KEY}-S>', self.save_as)
         textbox.bind(f'<{MAIN_KEY}-u>', lambda _=None: self.indent('unindent'))
         textbox.bind(f'<{MAIN_KEY}-Z>', self.redo)
@@ -435,7 +429,7 @@ Lacks these MacOS support:
         logger.debug('Textbox created')
         return textbox
 
-    def update_title(self, _=None):
+    def update_title(self, _=None) -> str:
         try:
             if not self.tabs:
                 self.master.title('PyPlus -- No file open')
@@ -449,7 +443,7 @@ Lacks these MacOS support:
             self.master.title(f'PyPlus')
             return 'break'
 
-    def update_statusbar(self, _=None):
+    def update_statusbar(self, _=None) -> str:
         try:
             if not self.tabs:
                 self.statusbar.label2.config(text='No file open |')
@@ -469,7 +463,7 @@ Lacks these MacOS support:
             self.statusbar.config(text='')
             return 'break'
 
-    def key(self, _=None):
+    def key(self, _=None) -> None:
         """Event when a key is pressed."""
         try:
             currtext = self.tabs[self.get_tab()].textbox
@@ -486,7 +480,7 @@ Lacks these MacOS support:
             self.master.bell()
             logger.exception('Error when handling keyboard event:')
 
-    def mouse(self, _=None):
+    def mouse(self, _=None) -> None:
         """The action done when the mouse is clicked"""
         try:
             self.update_statusbar()
@@ -497,7 +491,7 @@ Lacks these MacOS support:
             self.master.bell()
             logger.exception('Error when handling mouse event:')
 
-    def create_tags(self, textbox):
+    def create_tags(self, textbox: EnhancedText) -> None:
         """
 The method creates the tags associated with each distinct style element of the
 source code 'dressing'
@@ -530,7 +524,7 @@ source code 'dressing'
                                    foreground=foreground,
                                    font=tag_font)
 
-    def recolorize(self, textbox):
+    def recolorize(self, textbox: EnhancedText) -> None:
         """
 This method colors and styles the prepared tags
 """
@@ -566,10 +560,10 @@ This method colors and styles the prepared tags
                 currtext.tag_configure('sel', foreground='black')
 
             currtext.update()  # Have to update
-        except Exception:
-            logger.exception('Error: ')
+        except Exception as e:
+            print(e)
 
-    def open_file(self, file=''):
+    def open_file(self, file='') -> None:
         """Opens a file
 If a file is not provided, a messagebox'll
 pop up to ask the user to select the path.
@@ -625,8 +619,8 @@ pop up to ask the user to select the path.
                 currtext.insert('end', file.read().replace('\t', ' ' * self.tabwidth))
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
-                currtext.lexer = self.file_settings_class.get_lexer_settings(
-                    extens)
+                currtext.set_lexer(self.file_settings_class.get_lexer_settings(
+                    extens))
                 currtext.lint_cmd = self.linter_settings_class.get_linter_settings(
                     extens)
                 currtext.cmd = self.cmd_settings_class.get_command_settings(
@@ -638,20 +632,20 @@ pop up to ask the user to select the path.
                 self.recolorize(currtext)
                 currtext.see('insert')
                 currtext.focus_set()
-                currtext.master._on_change()
+                currtext.master.on_change()
                 logging.info('File opened')
-                return 'break'
+                return
             except Exception as e:
                 if type(e).__name__ != "ValueError":
                     logger.exception('Error when opening file:')
                 else:
                     logger.warning(f'Warning! Program has ValueError: {e}')
 
-    def _open(self, _=None):
+    def _open(self, _=None) -> None:
         """This method just prompts the user to open a file when C-O is pressed"""
         self.open_file()
 
-    def save_as(self, _=None):
+    def save_as(self, _=None) -> None:
         if len(self.tabs) > 0:
             curr_tab = self.get_tab()
             file_dir = (tkinter.filedialog.asksaveasfilename(
@@ -668,9 +662,9 @@ pop up to ask the user to select the path.
             file.write(self.tabs[curr_tab].textbox.get(1.0, 'end'))
             file.close()
             self.update_title()
-            self.reload(file='current')
+            self.reload()
 
-    def save_file(self, _=None):
+    def save_file(self, _=None) -> None:
         """Saves an *existing* file"""
         try:
             curr_tab = self.get_tab()
@@ -686,7 +680,7 @@ pop up to ask the user to select the path.
         except Exception:
             pass
 
-    def copy(self):
+    def copy(self) -> None:
         try:
             sel = self.tabs[self.get_tab()].textbox.get(
                 tk.SEL_FIRST, tk.SEL_LAST)
@@ -695,14 +689,14 @@ pop up to ask the user to select the path.
         except Exception:
             pass
 
-    def delete(self):
+    def delete(self) -> None:
         try:
             self.tabs[self.get_tab()].textbox.delete(tk.SEL_FIRST, tk.SEL_LAST)
             self.key()
         except Exception:
             pass
 
-    def cut(self):
+    def cut(self) -> None:
         try:
             currtext = self.tabs[self.get_tab()].textbox
             currtext.edit_separator()
@@ -715,7 +709,7 @@ pop up to ask the user to select the path.
         except Exception as e:
             print(e)
 
-    def paste(self):
+    def paste(self) -> None:
         try:
             clipboard = self.tabs[self.get_tab()].textbox.clipboard_get()
             self.tabs[self.get_tab()].textbox.edit_separator()
@@ -727,7 +721,7 @@ pop up to ask the user to select the path.
         except Exception:
             pass
 
-    def select_all(self):
+    def select_all(self) -> None:
         try:
             curr_tab = self.get_tab()
             self.tabs[curr_tab].textbox.tag_add(tk.SEL, '1.0', tk.END)
@@ -736,7 +730,7 @@ pop up to ask the user to select the path.
         except Exception:
             pass
 
-    def duplicate_line(self):
+    def duplicate_line(self) -> None:
         if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
@@ -751,7 +745,7 @@ pop up to ask the user to select the path.
         currtext.edit_separator()
         self.key()
 
-    def run(self, _=None):
+    def run(self, _=None) -> None:
         """Runs the file
 Steps:
 1) Writes run code into the batch file.
@@ -780,10 +774,10 @@ Steps:
             messagebox.showerror('Error', 'This language is not supported.')
 
     @staticmethod
-    def system_shell():
+    def system_shell() -> None:
         open_system_shell()
 
-    def python_shell(self):
+    def python_shell(self) -> None:
         shell_frame = tk.Frame(self.master)
         ttkthemes.ThemedStyle(shell_frame).set_theme(self.theme)
         main_window = Console(shell_frame, None, shell_frame.pack_forget)
@@ -795,7 +789,7 @@ Steps:
         main_window.pack(fill='both', expand=1)
         shell_frame.pack(fill='both', expand=1)
 
-    def backspace(self, _=None):
+    def backspace(self, _=None) -> None:
         if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
@@ -810,9 +804,9 @@ Steps:
         self.key()
         currtext.edit_separator()
 
-    def close_brackets(self, _=None):
+    def close_brackets(self, _=None) -> str:
         if not self.tabs:
-            return
+            return 'notabs'
         currtext = self.tabs[self.get_tab()].textbox
         if currtext.get('insert', 'insert +1c') in [')', ']', '}', '\'', '"']:
             currtext.mark_set('insert', 'insert +1c')
@@ -821,7 +815,7 @@ Steps:
         currtext.edit_separator()
         self.key()
 
-    def autoinsert(self, event=None):
+    def autoinsert(self, event=None) -> str:
         """Auto-inserts a symbol
 * ' -> ''
 * " -> ""
@@ -829,7 +823,7 @@ Steps:
 * [ -> []
 * { -> {}"""
         if not self.tabs:
-            return
+            return 'notabs'
         currtext = self.tabs[self.get_tab()].textbox
         currtext.edit_separator()
         char = event.char
@@ -880,7 +874,7 @@ Steps:
         currtext.edit_separator()
         self.key()
 
-    def autoindent(self, _=None):
+    def autoindent(self, _=None) -> str:
         """Auto-indents the next line"""
         currtext = self.tabs[self.get_tab()].textbox
         currtext.edit_separator()
@@ -908,7 +902,7 @@ Steps:
         self.key()
         return "break"
 
-    def search(self, _=None):
+    def search(self, _=None) -> None:
         global case
         global regexp
         global start, end
@@ -1062,24 +1056,24 @@ Steps:
         ttk.Button(search_frame, text='x', command=_exit,
                    width=1).pack(side='right', anchor='ne')
 
-    def undo(self, _=None):
+    def undo(self, _=None) -> None:
         try:
             print('undo')
             self.tabs[self.get_tab()].textbox.edit_undo()
         except Exception as e:
             print(e)
 
-    def redo(self, _=None):
+    def redo(self, _=None) -> None:
         try:
             print('redo')
             self.tabs[self.get_tab()].textbox.edit_redo()
         except Exception as e:
             logger.exception(e)
 
-    def right_click(self, event):
+    def right_click(self, event: tk.EventType) -> None:
         self.right_click_menu.post(event.x_root, event.y_root)
 
-    def close_tab(self, event=None):
+    def close_tab(self, event=None) -> None:
         global selected_tab
         try:
             if self.nb.index("end"):
@@ -1103,14 +1097,11 @@ Steps:
         except Exception:
             pass
 
-    def reload(self, file='current'):
+    def reload(self) -> None:
         if not self.tabs:
             return
-        if file == 'current':
-            self.close_tab()
-            self.open_file(file)
-            return
         tabs = []
+        curr = self.nb.index(self.nb.select())
         self.nb.select(self.nb.index('end') - 1)
         for value in self.tabs.items():
             tabs.append(value[1])
@@ -1121,24 +1112,25 @@ Steps:
                 self.open_file(file)
             except Exception:
                 pass
+        self.nb.select(curr)
 
-    def exit(self, force=False):
+    def exit(self, force=False) -> None:
         if not force:
             self.master.destroy()
             logger.info('Window is destroyed')
         else:
             sys.exit(0)
 
-    def restart(self):
+    def restart(self) -> None:
         self.exit(force=False)
         newtk = tk.Tk()
         self.__init__(newtk)
         newtk.mainloop()
 
-    def get_tab(self):
+    def get_tab(self) -> tk.Misc:
         return self.nb.nametowidget(self.nb.select())
 
-    def move_tab(self, event):
+    def move_tab(self, event) -> None:
         if self.nb.index('end') > 1:
             y = self.get_tab().winfo_y() - 5
 
@@ -1148,7 +1140,7 @@ Steps:
             except tk.TclError:
                 return
 
-    def _version(self):
+    def _version(self) -> None:
         """Shows the version and related info of the editor."""
         ver = tk.Toplevel()
         ver.resizable(0, 0)
@@ -1169,7 +1161,7 @@ Steps:
             ttk.Label(ver, text='No updates available').pack(fill='both')
         ver.mainloop()
 
-    def lint_source(self):
+    def lint_source(self) -> None:
         if not self.tabs:
             return
         try:
@@ -1197,7 +1189,7 @@ Steps:
             messagebox.showerror('Error', 'This language is not supported')
             return
 
-    def autopep(self):
+    def autopep(self) -> None:
         """Auto Pretty-Format the document"""
         try:
             currtext = self.tabs[self.get_tab()].textbox
@@ -1210,12 +1202,12 @@ Steps:
             else:
                 messagebox.showerror('Error', 'Language not supported.')
                 return
-            self.reload(file='current')
+            self.reload()
             currtext.edit_separator()
         except Exception:
             logger.exception('Error when formatting:')
 
-    def goto(self, _=None):
+    def goto(self, _=None) -> None:
         if not self.tabs:
             return
         goto_frame = ttk.Frame(self.tabs[self.get_tab()].textbox.frame)
@@ -1247,27 +1239,27 @@ Steps:
         ttk.Button(goto_frame, text='x', command=_exit,
                    width=1).pack(side='right', anchor='se')
 
-    def nav_1cf(self):
+    def nav_1cf(self) -> None:
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set('insert', 'insert +1c')
 
-    def nav_1cb(self):
+    def nav_1cb(self) -> None:
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set('insert', 'insert -1c')
 
-    def nav_wordstart(self):
+    def nav_wordstart(self) -> None:
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set('insert', 'insert -1c wordstart')
 
-    def nav_wordend(self):
+    def nav_wordend(self) -> None:
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set('insert', 'insert wordend')
 
-    def sel_word(self):
+    def sel_word(self) -> None:
         currtext = self.tabs[self.get_tab()].textbox
         currtext.tag_add('sel', 'insert -1c wordstart', 'insert wordend')
 
-    def biggerview(self):
+    def biggerview(self) -> None:
         if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
@@ -1287,13 +1279,13 @@ Steps:
         self.recolorize(textframe.text)
         win.mainloop()
 
-    def check_updates(self, popup=True):
+    def check_updates(self, popup=True) -> list:
         if 'DEV' in VERSION:
             messagebox.showerror(
                 "Updates", "Updates aren't supported by develop builds,\n\
             since you're always on the latest version!"
             )  # If you're on the developer run, you don't need updates!
-            return
+            return []
         download_file(
             url="https://raw.githubusercontent.com/ZCG-coder/NWSOFT/master/PyPlusWeb/ver.json"
         )
@@ -1323,7 +1315,7 @@ Steps:
         os.remove('ver.json')
         updatewin.mainloop()
 
-    def git(self, action=None):
+    def git(self, action=None) -> None:
         if action == 'clone':
             url = simpledialog.askstring('Clone from remote', 'URL:')
             if not url:
@@ -1348,6 +1340,8 @@ Steps:
                 initialdir='/',
                 title='Select file',
                 filetypes=self.filetypes)
+            if not files:
+                return
             for x in files:
                 run_in_terminal(cwd=currdir, cmd=f'git add {x}')
         elif action == 'commit':
@@ -1362,7 +1356,7 @@ Steps:
                 return
             run_in_terminal(f'git {action}')
 
-    def indent(self, action='indent'):
+    def indent(self, action='indent') -> None:
         """Indent/unindent feature"""
         if not self.tabs:
             return

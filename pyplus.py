@@ -407,7 +407,6 @@ Lacks these MacOS support:
         # The one with line numbers and a nice dark theme
         textframe.pack(fill='both', expand=1, side='right')
         textframe.set_first_line(1)
-        textframe.set_update_command(self.key)
 
         textbox = textframe.text  # text widget
         textbox.frame = frame  # The text will be packed into the frame.

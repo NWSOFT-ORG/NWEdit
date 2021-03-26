@@ -148,26 +148,11 @@ text widget with linenumbers in."""
         self.text.bind("<Configure>", self._on_resize)
 
     def _on_change(self, _=None):
-        self.text.edit_separator()
         currline = self.text.index('insert')
         self.linenumbers.advancedredraw(first=self.first_line, line=currline)
-        try:
-            self.update_command()
-        except AttributeError:
-            pass
-        self.text.edit_separator()
     
     def _on_resize(self, _=None):
-        self.text.edit_separator()
         self.linenumbers.redraw(first=self.first_line)
-        try:
-            self.update_command()
-        except AttributeError:
-            pass
-        self.text.edit_separator()
-
-    def set_update_command(self, command):
-        self.update_command = command
 
     def set_first_line(self, line):
         self.first_line = line

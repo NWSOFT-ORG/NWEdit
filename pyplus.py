@@ -629,8 +629,8 @@ pop up to ask the user to select the path.
                     extens)
                 currtext.comment_marker = self.commet_settings_class.get_comment_settings(
                     extens)
-                self.recolorize(currtext)
                 currtext.see('insert')
+                currtext.event_generate('<<Key>>')
                 currtext.focus_set()
                 currtext.master.on_change()
                 logging.info('File opened')
@@ -639,7 +639,7 @@ pop up to ask the user to select the path.
                 if type(e).__name__ != "ValueError":
                     logger.exception('Error when opening file:')
                 else:
-                    logger.warning(f'Warning! Program has ValueError: {e}')
+                    logger.exception(f'Warning! Program has ValueError: {e}')
 
     def _open(self, _=None) -> None:
         """This method just prompts the user to open a file when C-O is pressed"""
@@ -1058,17 +1058,15 @@ Steps:
 
     def undo(self, _=None) -> None:
         try:
-            print('undo')
             self.tabs[self.get_tab()].textbox.edit_undo()
-        except Exception as e:
-            print(e)
+        except Exception:
+            pass
 
     def redo(self, _=None) -> None:
         try:
-            print('redo')
             self.tabs[self.get_tab()].textbox.edit_redo()
-        except Exception as e:
-            logger.exception(e)
+        except Exception:
+            pass
 
     def right_click(self, event: tk.EventType) -> None:
         self.right_click_menu.post(event.x_root, event.y_root)
@@ -1105,13 +1103,12 @@ Steps:
         self.nb.select(self.nb.index('end') - 1)
         for value in self.tabs.items():
             tabs.append(value[1])
+        files = []
         for tab in tabs:
-            file = tab.file_dir
-            try:
-                self.close_tab()
-                self.open_file(file)
-            except Exception:
-                pass
+            files.append(tab.file_dir)
+            self.close_tab()
+        for x in files:
+            self.open_file(x)
         self.nb.select(curr)
 
     def exit(self, force=False) -> None:

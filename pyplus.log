@@ -1,45 +1,77 @@
-2021-03-26 15:46:11,710 : INFO : <module> : Tkinter version: 8.6
-2021-03-26 15:46:11,711 : DEBUG : <module> : All modules imported
-2021-03-26 15:46:12,371 : DEBUG : __init__ : Settings loaded
-2021-03-26 15:46:12,381 : DEBUG : __init__ : Icons loaded
-2021-03-26 15:46:12,723 : DEBUG : __init__ : Theme loaded
-2021-03-26 15:46:13,068 : DEBUG : __init__ : Menu created
-2021-03-26 15:46:13,069 : DEBUG : __init__ : Right-click menu created
-2021-03-26 15:46:13,069 : DEBUG : __init__ : Bindings created
-2021-03-26 15:46:13,081 : DEBUG : start_screen : Start screen created
-2021-03-26 15:46:13,084 : DEBUG : update_title : update_title: No file open
-2021-03-26 15:46:13,084 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-03-26 15:46:14,966 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-03-26 15:46:14,966 : DEBUG : update_title : update_title: No file open
-2021-03-26 15:46:14,966 : DEBUG : mouse : update_title: OK
-2021-03-26 15:46:15,060 : DEBUG : create_text_widget : Textbox created
-2021-03-26 15:46:15,160 : WARNING : open_file : Warning! Program has ValueError: '8' is not in list
-2021-03-26 15:46:15,161 : DEBUG : update_statusbar : update_statusbar: OK
-2021-03-26 15:46:15,163 : DEBUG : update_title : update_title: OK
-2021-03-26 15:46:15,163 : DEBUG : mouse : update_title: OK
-2021-03-26 15:46:15,736 : DEBUG : update_statusbar : update_statusbar: OK
-2021-03-26 15:46:15,737 : DEBUG : update_title : update_title: OK
-2021-03-26 15:46:15,737 : DEBUG : mouse : update_title: OK
-2021-03-26 15:46:15,828 : DEBUG : create_text_widget : Textbox created
-2021-03-26 15:46:15,929 : WARNING : open_file : Warning! Program has ValueError: 'zsh_history' is not in list
-2021-03-26 15:46:15,930 : DEBUG : update_statusbar : update_statusbar: OK
-2021-03-26 15:46:15,931 : DEBUG : update_title : update_title: OK
-2021-03-26 15:46:15,931 : DEBUG : mouse : update_title: OK
-2021-03-26 15:46:17,375 : DEBUG : update_statusbar : update_statusbar: OK
-2021-03-26 15:46:17,376 : DEBUG : update_title : update_title: OK
-2021-03-26 15:46:17,377 : DEBUG : mouse : update_title: OK
-2021-03-26 15:46:19,870 : DEBUG : update_statusbar : update_statusbar: OK
-2021-03-26 15:46:19,870 : DEBUG : update_title : update_title: OK
-2021-03-26 15:46:19,870 : DEBUG : mouse : update_title: OK
-2021-03-26 15:46:19,870 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-03-26 15:46:19,872 : DEBUG : update_title : update_title: No file open
-2021-03-26 15:46:19,872 : DEBUG : mouse : update_title: OK
-2021-03-26 15:46:19,883 : DEBUG : create_text_widget : Textbox created
-2021-03-26 15:46:19,977 : WARNING : open_file : Warning! Program has ValueError: 'zsh_history' is not in list
-2021-03-26 15:46:21,551 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-03-26 15:46:21,551 : DEBUG : update_title : update_title: No file open
-2021-03-26 15:46:21,552 : DEBUG : mouse : update_title: OK
-2021-03-26 15:46:21,552 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-03-26 15:46:21,552 : DEBUG : update_title : update_title: No file open
-2021-03-26 15:46:21,552 : DEBUG : mouse : update_title: OK
-2021-03-26 15:46:22,883 : INFO : exit : Window is destroyed
+2021-03-26 09:44:17,359 : INFO : <module> : Tkinter version: 8.6
+2021-03-26 09:44:17,359 : DEBUG : <module> : All modules imported
+2021-03-26 09:44:17,631 : DEBUG : __init__ : Settings loaded
+2021-03-26 09:44:17,635 : DEBUG : __init__ : Icons loaded
+2021-03-26 09:44:18,073 : DEBUG : __init__ : Theme loaded
+2021-03-26 09:44:18,122 : DEBUG : __init__ : Menu created
+2021-03-26 09:44:18,123 : DEBUG : __init__ : Right-click menu created
+2021-03-26 09:44:18,123 : DEBUG : __init__ : Bindings created
+2021-03-26 09:44:18,126 : DEBUG : start_screen : Start screen created
+2021-03-26 09:44:18,127 : DEBUG : update_title : update_title: No file open
+2021-03-26 09:44:18,127 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-26 09:44:20,316 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-26 09:44:20,316 : DEBUG : update_title : update_title: No file open
+2021-03-26 09:44:20,316 : DEBUG : mouse : update_title: OK
+2021-03-26 09:44:20,501 : DEBUG : create_text_widget : Textbox created
+2021-03-26 09:44:20,547 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:20,547 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:20,547 : DEBUG : mouse : update_title: OK
+2021-03-26 09:44:20,582 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:20,582 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:20,582 : DEBUG : key : update_title: OK
+2021-03-26 09:44:20,583 : INFO : open_file : File opened
+2021-03-26 09:44:21,218 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:21,218 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:21,218 : DEBUG : mouse : update_title: OK
+2021-03-26 09:44:21,430 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:21,430 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:21,430 : DEBUG : mouse : update_title: OK
+2021-03-26 09:44:22,645 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:22,645 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:22,645 : DEBUG : mouse : update_title: OK
+2021-03-26 09:44:22,825 : DEBUG : create_text_widget : Textbox created
+2021-03-26 09:44:22,854 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:22,854 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:22,854 : DEBUG : mouse : update_title: OK
+2021-03-26 09:44:22,875 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:22,875 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:22,875 : DEBUG : key : update_title: OK
+2021-03-26 09:44:22,877 : INFO : open_file : File opened
+2021-03-26 09:44:23,631 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:23,632 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:23,632 : DEBUG : mouse : update_title: OK
+2021-03-26 09:44:25,870 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:25,870 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:25,870 : DEBUG : mouse : update_title: OK
+2021-03-26 09:44:25,870 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-26 09:44:25,870 : DEBUG : update_title : update_title: No file open
+2021-03-26 09:44:25,871 : DEBUG : mouse : update_title: OK
+2021-03-26 09:44:25,880 : DEBUG : create_text_widget : Textbox created
+2021-03-26 09:44:25,927 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:25,927 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:25,927 : DEBUG : key : update_title: OK
+2021-03-26 09:44:25,928 : INFO : open_file : File opened
+2021-03-26 09:44:25,939 : DEBUG : create_text_widget : Textbox created
+2021-03-26 09:44:25,986 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:25,986 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:25,986 : DEBUG : key : update_title: OK
+2021-03-26 09:44:25,988 : INFO : open_file : File opened
+2021-03-26 09:44:29,146 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:29,146 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:29,146 : DEBUG : mouse : update_title: OK
+2021-03-26 09:44:31,953 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:31,954 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:31,954 : DEBUG : mouse : update_title: OK
+2021-03-26 09:44:31,954 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-26 09:44:31,955 : DEBUG : update_title : update_title: No file open
+2021-03-26 09:44:31,955 : DEBUG : mouse : update_title: OK
+2021-03-26 09:44:31,965 : DEBUG : create_text_widget : Textbox created
+2021-03-26 09:44:32,018 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:32,018 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:32,018 : DEBUG : key : update_title: OK
+2021-03-26 09:44:32,019 : INFO : open_file : File opened
+2021-03-26 09:44:32,029 : DEBUG : create_text_widget : Textbox created
+2021-03-26 09:44:32,074 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-26 09:44:32,074 : DEBUG : update_title : update_title: OK
+2021-03-26 09:44:32,075 : DEBUG : key : update_title: OK
+2021-03-26 09:44:32,076 : INFO : open_file : File opened

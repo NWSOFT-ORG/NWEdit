@@ -96,7 +96,7 @@ class Filetype:
                 return JSONLexer
             return lexers.get_lexer_by_name(
                 self.lexers[self.extens.index(extension)])
-        except Exception:
+        except Exception as e:
             return lexers.get_lexer_by_name('Text')
 
 
@@ -115,7 +115,7 @@ class Linter:
             if self.linters[self.extens.index(extension)] == "none":
                 return None
             return self.linters[self.extens.index(extension)]
-        except IndexError:
+        except ValueError:
             return None
 
 
@@ -134,7 +134,7 @@ class FormatCommand:
             if self.format_commands[self.extens.index(extension)] == "none":
                 return None
             return self.format_commands[self.extens.index(extension)]
-        except IndexError:
+        except ValueError:
             return None
 
 
@@ -153,7 +153,7 @@ class RunCommand:
             if self.commands[self.extens.index(extension)] == "none":
                 return None
             return self.commands[self.extens.index(extension)]
-        except IndexError:
+        except ValueError:
             return None
 
 
@@ -172,5 +172,5 @@ class CommentMarker:
             if self.comments[self.extens.index(extension)] == "none":
                 return None
             return self.comments[self.extens.index(extension)]
-        except IndexError:
+        except ValueError:
             return None

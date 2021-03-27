@@ -371,6 +371,11 @@ Lacks these MacOS support:
                            compound='left',
                            image=self.new_icon)
         label3 = ttk.Label(first_tab,
+                           text='Clone',
+                           foreground='blue',
+                           background='white',
+                           cursor='hand2')
+        label4 = ttk.Label(first_tab,
                            text='Exit',
                            foreground='blue',
                            background='white',
@@ -379,11 +384,13 @@ Lacks these MacOS support:
                            image=self.close_icon_dark)
         label1.bind('<Button>', self._open)
         label2.bind('<Button>', self.filetree.new_file)
-        label3.bind('<Button>', lambda _=None: self.exit(force=True))
+        label4.bind('<Button>', lambda _=None: self.exit(force=True))
+        label3.bind('<Button>', lambda _=None: self.git('clone'))
 
         first_tab.create_window(50, 100, window=label1, anchor='nw')
         first_tab.create_window(50, 140, window=label2, anchor='nw')
         first_tab.create_window(50, 180, window=label3, anchor='nw')
+        first_tab.create_window(50, 220, window=label4, anchor='nw')
         self.nb.add(first_tab, text='Start')
         logger.debug('Start screen created')
 
@@ -397,10 +404,15 @@ Lacks these MacOS support:
             event.widget.edit_separator()
             # Quit quickly, before a char is being inserted.
             return 'break'
+            
+        panedwin = ttk.Panedwindow(frame)
+        panedwin.pack(fill='both', expand=1)
 
-        textframe = EnhancedTextFrame(frame)
+        textframe = EnhancedTextFrame(panedwin)
         # The one with line numbers and a nice dark theme
         textframe.pack(fill='both', expand=1, side='right')
+        panedwin.add(textframe)
+        textframe.panedwin = panedwin
         textframe.set_first_line(1)
 
         textbox = textframe.text  # text widget
@@ -778,7 +790,9 @@ Steps:
         open_system_shell()
 
     def python_shell(self) -> None:
-        shell_frame = tk.Frame(self.master)
+        frame = self.tabs[self.get_tab()].frame.panedwin
+        shell_frame = tk.Frame(frame)
+        frame.add(shell_frame)
         ttkthemes.ThemedStyle(shell_frame).set_theme(self.theme)
         main_window = Console(shell_frame, None, shell_frame.pack_forget)
         main_window.text.lexer = lexers.get_lexer_by_name('pycon')
@@ -1127,7 +1141,7 @@ Steps:
     def get_tab(self) -> tk.Misc:
         return self.nb.nametowidget(self.nb.select())
 
-    def move_tab(self, event) -> None:
+    def move_tab(self, event: tk.EventType) -> None:
         if self.nb.index('end') > 1:
             y = self.get_tab().winfo_y() - 5
 

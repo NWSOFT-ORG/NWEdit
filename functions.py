@@ -64,32 +64,26 @@ def run_in_terminal(cmd,
     if not cwd or not os.path.exists(cwd):
         cwd = os.getcwd()
 
-    if platform.system() == "Windows":
+    if WINDOWS:
         _run_in_terminal_in_windows(cmd, cwd, env, keep_open, title)
-    elif platform.system() == "Linux":
-        _run_in_terminal_in_linux(cmd, cwd, env, keep_open)
-    elif platform.system() == "Darwin":
+    elif OSX:
         _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open)
     else:
-        messagebox.showerror('Error', 'Cannot run this command in terminal')
-
+        _run_in_terminal_in_linux(cmd, cwd, env, keep_open)
 
 def open_system_shell(cwd=os.path.expanduser('~'), env_overrides=None):
     if env_overrides is None:
         env_overrides = {}
     env = get_environment_with_overrides(env_overrides)
 
-    if platform.system() == "Darwin":
+    if OSX:
         _run_in_terminal_in_macos([], cwd, env_overrides, True)
-    elif platform.system() == "Windows":
+    elif WINDOWS:
         cmd = "start cmd"
         subprocess.Popen(cmd, cwd=cwd, env=env, shell=True)
-    elif platform.system() == "Linux":
+    else:
         cmd = _get_linux_terminal_command()
         subprocess.Popen(cmd, cwd=cwd, env=env, shell=True)
-    else:
-        messagebox.showerror('Error', 'Cannot run this command in terminal')
-
 
 def _add_to_path(directory, path):
     # Always prepending to path may seem better, but this could mess up other things.
@@ -215,8 +209,9 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
                 """ -e '    tell application "Terminal"' """ + """ -e """ +
                 quoted_cmd2 + """ -e '        activate' """ +
                 """ -e '    end tell' """ + """ -e 'end if' """)
+    print(cmd_line)
 
-    subprocess.Popen(cmd_line, cwd=cwd, shell=True)
+    # subprocess.Popen(cmd_line, cwd=cwd, shell=True)
 
 
 def _get_linux_terminal_command():

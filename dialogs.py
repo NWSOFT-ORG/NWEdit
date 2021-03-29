@@ -1,33 +1,122 @@
-from modules import *
-from settings import *
+import tkinter as tk
+from tkinter import ttk
 
 
-class StringDialog:
-	def __init__(self, *args, **kwargs):
-		self.master = tk.Toplevel(*args, **kwargs)
-		self.master.title('Input')
-		settings = Settings()
-		ttkthemes.ThemedStyle(self.master).set_theme(settings.get_settings('theme'))
-		self.content = ''
-		self.label = ttk.Label(self.master, text='', justify='left')
-		self.entry = tk.Entry(self.master)
-		self.buttonframe = tk.Frame(self.master)
-		self.label.pack()
-		self.entry.pack(fill='x', anchor='nw', side='top', expand=1)
-		self.buttonframe.pack()
-		self.okbtn = ttk.Button(self.buttonframe, text='Ok', command=self.ok)
-		self.okbtn.pack(side='left', expand=1)
-		self.cancelbtn = ttk.Button(self.buttonframe, text='Cancel', command=self.cancel)
-		self.cancelbtn.pack(side='right', expand=1)
+class Dialog(tk.Toplevel):
+    def __init__(self, parent, title=None):
 
-	def setstring(self, string):
-		self.label.config(text=string)
+        super().__init__(parent)
+        self.transient(parent)
 
-	def ok(self):
-		if not self.entry.get():
-			return
-		self.content = self.entry.get()
-		self.master.destroy()
+        if title:
+            self.title(title)
 
-	def cancel(self):
-		self.master.destroy()
+        self.parent = parent
+
+        self.result = None
+
+        body = ttk.Frame(self)
+        self.initial_focus = self.body(body)
+        body.pack(padx=5, pady=5)
+
+        self.buttonbox()
+
+        if not self.initial_focus:
+            self.initial_focus = self
+
+        self.protocol("WM_DELETE_WINDOW", self.cancel)
+
+        self.initial_focus.focus_set()
+        self.wait_window(self)
+
+    def body(self, master):
+        # create dialog body.  return widget that should have
+        # initial focus.  this method should be overridden
+
+        pass
+
+    def buttonbox(self):
+        # add standard button box. override if you don't want the
+        # standard buttons
+
+        box = ttk.Frame(self)
+        # box.configure(bg='black')
+
+        w = ttk.Button(box, text="OK", width=10, command=self.ok, default=tk.ACTIVE)
+        w.pack(side='left', padx=5, pady=5)
+        w = ttk.Button(box, text="Cancel", width=10, command=self.cancel)
+        w.pack(side='left', padx=5, pady=5)
+
+        # self.bind("<Return>", self.ok)
+        # self.bind("<Escape>", self.cancel)
+
+        box.pack()
+
+    def ok(self, _=None):
+        if not self.validate():
+            self.initial_focus.focus_set()  # put focus back
+            return
+
+        self.withdraw()
+        self.update_idletasks()
+
+        self.apply()
+
+        self.cancel()
+
+    def cancel(self, event=None):
+
+        # put focus back to the parent window
+        self.parent.focus_set()
+        self.destroy()
+
+    @staticmethod
+    def validate():
+        return 1  # override
+
+    def apply(self):
+
+        pass  # override
+
+
+class MessageYesNoDialog(Dialog):
+    def __init__(self, parent, title, text=None):
+        self.text = text
+        super().__init__(parent, title)
+
+    def body(self, master):
+        label1 = ttk.Label(master, text=self.text)
+        label1.pack()
+
+        return label1
+
+    def buttonbox(self):
+        box = ttk.Frame(self)
+
+        b1 = ttk.Button(box, text="Yes", width=10, command=self.apply)
+        b1.pack(side='left', padx=5, pady=5)
+        b2 = ttk.Button(box, text="No", width=10, command=self.cancel)
+        b2.pack(side='left', padx=5, pady=5)
+
+        box.pack()
+
+    def apply(self, event=None):
+        self.result = 1
+        self.parent.focus_set()
+        self.destroy()
+
+    def cancel(self, event=None):
+        # put focus back to the parent window
+        self.result = 0
+        self.parent.focus_set()
+        self.destroy()
+
+
+class InputStringDialog(Dialog):
+    pass
+
+
+win = tk.Tk()
+dialog = MessageYesNoDialog(win, 'erdsjnrwdsx')
+ttk.Label(win, text=dialog.result).pack()
+win.mainloop()

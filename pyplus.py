@@ -405,7 +405,7 @@ Lacks these MacOS support:
             event.widget.edit_separator()
             # Quit quickly, before a char is being inserted.
             return 'break'
-            
+
         panedwin = ttk.Panedwindow(frame)
         panedwin.pack(fill='both', expand=1)
 
@@ -597,10 +597,8 @@ pop up to ask the user to select the path.
                         self.nb.select(tab[1].frame)
                         return
                 if is_binary_string(open(file_dir, 'rb').read()):
-                    if messagebox.askyesno(
-                            'Error', 'This file is in binary format, \n'
-                                     'which this editor does not edit. \n'
-                                     'Would you like to view it in Hex Editor?\n'):
+                    dialog = MessageYesNoDialog(self.master, 'Error', 'View in Hex?')
+                    if dialog.result:
                         logger.info('HexView: opened')
                         viewer = ttk.Frame(self.master)
                         viewer.focus_set()
@@ -1329,7 +1327,7 @@ Steps:
 
     def git(self, action=None) -> None:
         if action == 'clone':
-            dialog = StringDialog(self.master)
+            dialog = InputStringDialog(self.master)
             dialog.setstring("URL:")
             dialog.master.mainloop()
             url = dialog.content
@@ -1360,7 +1358,7 @@ Steps:
             for x in files:
                 run_in_terminal(cwd=currdir, cmd=f'git add {x}')
         elif action == 'commit':
-            dialog = StringDialog(self.master)
+            dialog = InputStringDialog(self.master)
             dialog.setstring('Commit message:')
             dialog.master.mainloop()
             message = dialog.content
@@ -1368,7 +1366,7 @@ Steps:
                 return
             run_in_terminal(f'git commit -am "{message}"')
         elif action == 'other':
-            dialog = StringDialog(self.master)
+            dialog = InputStringDialog(self.master)
             dialog.setstring('Action:')
             dialog.master.mainloop()
             action = dialog.content

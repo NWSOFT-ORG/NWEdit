@@ -21,6 +21,7 @@ from functions import *
 from hexview import *
 from tktext import *
 from treeview import *
+from dialogs import *
 
 os.chdir(APPDIR)
 logger = logging.getLogger('PyPlus')
@@ -1328,7 +1329,10 @@ Steps:
 
     def git(self, action=None) -> None:
         if action == 'clone':
-            url = simpledialog.askstring('Clone from remote', 'URL:')
+            dialog = StringDialog(self.master)
+            dialog.setstring("URL:")
+            dialog.master.mainloop()
+            url = dialog.content
             if not url:
                 return
             run_in_terminal(f'git clone {url}')
@@ -1356,13 +1360,18 @@ Steps:
             for x in files:
                 run_in_terminal(cwd=currdir, cmd=f'git add {x}')
         elif action == 'commit':
-            message = simpledialog.askstring('Commit', 'Commit message')
+            dialog = StringDialog(self.master)
+            dialog.setstring('Commit message:')
+            dialog.master.mainloop()
+            message = dialog.content
             if not message:
                 return
             run_in_terminal(f'git commit -am "{message}"')
         elif action == 'other':
-            action = simpledialog.askstring('Advanced Action',
-                                            'git <command>:')
+            dialog = StringDialog(self.master)
+            dialog.setstring('Action:')
+            dialog.master.mainloop()
+            action = dialog.content
             if not action:
                 return
             run_in_terminal(f'git {action}')

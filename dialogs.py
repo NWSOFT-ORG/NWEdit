@@ -3,7 +3,7 @@ from tkinter import ttk
 
 
 class Dialog(tk.Toplevel):
-    def __init__(self, parent, title=None):
+    def __init__(self, parent: tk.Tk, title=None):
 
         super().__init__(parent)
         self.transient(parent)
@@ -27,6 +27,7 @@ class Dialog(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.cancel)
 
         self.initial_focus.focus_set()
+        self.resizable(0, 0)
         self.wait_window(self)
 
     def body(self, master):
@@ -64,7 +65,7 @@ class Dialog(tk.Toplevel):
 
         self.cancel()
 
-    def cancel(self, event=None):
+    def cancel(self, _=None):
 
         # put focus back to the parent window
         self.parent.focus_set()
@@ -113,10 +114,35 @@ class MessageYesNoDialog(Dialog):
 
 
 class InputStringDialog(Dialog):
-    pass
+    def __init__(self, parent, title='InputString', text=None):
+        self.text = text
+        super().__init__(parent, title)
 
+    def body(self, master):
+        label1 = ttk.Label(master, text=self.text)
+        label1.pack(side='top', fill='both', expand=1)
 
-win = tk.Tk()
-dialog = MessageYesNoDialog(win, 'erdsjnrwdsx')
-ttk.Label(win, text=dialog.result).pack()
-win.mainloop()
+        return label1
+
+    def buttonbox(self):
+        self.entry = ttk.Entry(self)
+        self.entry.pack(fill='x', expand=1)
+        box = ttk.Frame(self)
+
+        b1 = ttk.Button(box, text="Ok", width=10, command=self.apply)
+        b1.pack(side='left', padx=5, pady=5)
+        b2 = ttk.Button(box, text="Cancel", width=10, command=self.cancel)
+        b2.pack(side='left', padx=5, pady=5)
+
+        box.pack()
+
+    def apply(self, event=None):
+        self.result = self.entry.get()
+        self.parent.focus_set()
+        self.destroy()
+
+    def cancel(self, event=None):
+        # put focus back to the parent window
+        self.result = 0
+        self.parent.focus_set()
+        self.destroy()

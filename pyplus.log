@@ -1,30 +1,108 @@
-2021-03-29 16:40:53,718 : INFO : <module> : Tkinter version: 8.6
-2021-03-29 16:40:53,718 : DEBUG : <module> : All modules imported
-2021-03-29 16:40:54,033 : DEBUG : __init__ : Settings loaded
-2021-03-29 16:40:54,036 : DEBUG : __init__ : Icons loaded
-2021-03-29 16:40:54,173 : DEBUG : __init__ : Theme loaded
-2021-03-29 16:40:54,357 : DEBUG : __init__ : Menu created
-2021-03-29 16:40:54,358 : DEBUG : __init__ : Right-click menu created
-2021-03-29 16:40:54,358 : DEBUG : __init__ : Bindings created
-2021-03-29 16:40:54,365 : DEBUG : start_screen : Start screen created
-2021-03-29 16:40:54,367 : DEBUG : update_title : update_title: No file open
-2021-03-29 16:40:54,367 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-03-29 16:40:58,929 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-03-29 16:40:58,929 : DEBUG : update_title : update_title: No file open
-2021-03-29 16:40:58,929 : DEBUG : mouse : update_title: OK
-2021-03-29 16:40:59,090 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-03-29 16:40:59,091 : DEBUG : update_title : update_title: No file open
-2021-03-29 16:40:59,091 : DEBUG : mouse : update_title: OK
-2021-03-29 16:41:01,712 : INFO : exit : Window is destroyed
-2021-03-29 16:41:01,723 : INFO : open_file : HexView: opened
-2021-03-29 16:41:01,723 : ERROR : open_file : Error when opening file:
-Traceback (most recent call last):
-  File "/Users/Andy/Documents/Projects/python_projects/PyPlus/pyplus.py", line 606, in open_file
-    viewer = ttk.Frame(self.master)
-  File "/usr/local/Cellar/python@3.9/3.9.2_2/Frameworks/Python.framework/Versions/3.9/lib/python3.9/tkinter/ttk.py", line 735, in __init__
-    Widget.__init__(self, master, "ttk::frame", kw)
-  File "/usr/local/Cellar/python@3.9/3.9.2_2/Frameworks/Python.framework/Versions/3.9/lib/python3.9/tkinter/ttk.py", line 552, in __init__
-    tkinter.Widget.__init__(self, master, widgetname, kw=kw)
-  File "/usr/local/Cellar/python@3.9/3.9.2_2/Frameworks/Python.framework/Versions/3.9/lib/python3.9/tkinter/__init__.py", line 2572, in __init__
-    self.tk.call(
-_tkinter.TclError: NULL main window
+2021-03-29 10:27:42,265 : INFO : <module> : Tkinter version: 8.6
+2021-03-29 10:27:42,265 : DEBUG : <module> : All modules imported
+2021-03-29 10:27:42,482 : DEBUG : __init__ : Settings loaded
+2021-03-29 10:27:42,484 : DEBUG : __init__ : Icons loaded
+2021-03-29 10:27:42,773 : DEBUG : __init__ : Theme loaded
+2021-03-29 10:27:42,815 : DEBUG : __init__ : Menu created
+2021-03-29 10:27:42,815 : DEBUG : __init__ : Right-click menu created
+2021-03-29 10:27:42,816 : DEBUG : __init__ : Bindings created
+2021-03-29 10:27:42,820 : DEBUG : start_screen : Start screen created
+2021-03-29 10:27:42,820 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:42,820 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:48,991 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:48,992 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:48,992 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:49,227 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:49,227 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:49,227 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:50,448 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:50,448 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:50,448 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:53,762 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:53,763 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:53,763 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:53,918 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:53,918 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:53,918 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:54,879 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:54,879 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:54,879 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:55,900 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:55,900 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:55,901 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:56,888 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:56,888 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:56,888 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:57,065 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:57,065 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:57,065 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:57,879 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:57,880 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:57,880 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:58,067 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:58,067 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:58,067 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:58,424 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:58,424 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:58,424 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:58,573 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:58,574 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:58,574 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:58,775 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:58,775 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:58,775 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:58,946 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:58,947 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:58,947 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:59,115 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:59,115 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:59,115 : DEBUG : mouse : update_title: OK
+2021-03-29 10:27:59,625 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:27:59,626 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:27:59,626 : DEBUG : mouse : update_title: OK
+2021-03-29 10:28:00,449 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:28:00,450 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:28:00,450 : DEBUG : mouse : update_title: OK
+2021-03-29 10:28:00,620 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:28:00,621 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:28:00,621 : DEBUG : mouse : update_title: OK
+2021-03-29 10:28:01,302 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:28:01,303 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:28:01,303 : DEBUG : mouse : update_title: OK
+2021-03-29 10:28:01,465 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:28:01,465 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:28:01,465 : DEBUG : mouse : update_title: OK
+2021-03-29 10:28:02,612 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:28:02,612 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:28:02,612 : DEBUG : mouse : update_title: OK
+2021-03-29 10:28:02,812 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-03-29 10:28:02,812 : DEBUG : update_title : update_title: No file open
+2021-03-29 10:28:02,812 : DEBUG : mouse : update_title: OK
+2021-03-29 10:28:04,336 : INFO : open_file : HexView: opened
+2021-03-29 10:29:15,815 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-29 10:29:15,815 : DEBUG : update_title : update_title: OK
+2021-03-29 10:29:15,815 : DEBUG : mouse : update_title: OK
+2021-03-29 10:29:15,982 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-29 10:29:15,982 : DEBUG : update_title : update_title: OK
+2021-03-29 10:29:15,982 : DEBUG : mouse : update_title: OK
+2021-03-29 10:29:17,088 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-29 10:29:17,088 : DEBUG : update_title : update_title: OK
+2021-03-29 10:29:17,088 : DEBUG : mouse : update_title: OK
+2021-03-29 10:29:17,234 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-29 10:29:17,234 : DEBUG : update_title : update_title: OK
+2021-03-29 10:29:17,235 : DEBUG : mouse : update_title: OK
+2021-03-29 10:29:18,090 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-29 10:29:18,091 : DEBUG : update_title : update_title: OK
+2021-03-29 10:29:18,091 : DEBUG : mouse : update_title: OK
+2021-03-29 10:29:20,231 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-29 10:29:20,232 : DEBUG : update_title : update_title: OK
+2021-03-29 10:29:20,232 : DEBUG : mouse : update_title: OK
+2021-03-29 10:29:21,622 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-29 10:29:21,623 : DEBUG : update_title : update_title: OK
+2021-03-29 10:29:21,623 : DEBUG : mouse : update_title: OK
+2021-03-29 10:29:22,589 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-29 10:29:22,589 : DEBUG : update_title : update_title: OK
+2021-03-29 10:29:22,589 : DEBUG : mouse : update_title: OK
+2021-03-29 10:29:23,630 : DEBUG : update_statusbar : update_statusbar: OK
+2021-03-29 10:29:23,630 : DEBUG : update_title : update_title: OK
+2021-03-29 10:29:23,630 : DEBUG : mouse : update_title: OK

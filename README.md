@@ -90,7 +90,7 @@ WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 General Public License for more details.
 ```
-  
+
 Thanks to overture for the phplint tool, and thanks to people who wrote greate code on Gist and stack overflow.
 
 # Installing dependencies

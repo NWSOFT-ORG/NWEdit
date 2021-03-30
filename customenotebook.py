@@ -68,25 +68,25 @@ Change the layout, makes it look like this:
             "sticky": "nswe"
         })])
         style.layout("CustomNotebook.Tab", [("CustomNotebook.tab", {
-            "sticky":
+            "sticky"  :
                 "nswe",
             "children": [("CustomNotebook.padding", {
-                "side":
+                "side"    :
                     "top",
-                "sticky":
+                "sticky"  :
                     "nswe",
                 "children": [("CustomNotebook.focus", {
-                    "side":
+                    "side"    :
                         "top",
-                    "sticky":
+                    "sticky"  :
                         "nswe",
                     "children": [
                         ("CustomNotebook.label", {
-                            "side": "left",
+                            "side"  : "left",
                             "sticky": ''
                         }),
                         ("CustomNotebook.close", {
-                            "side": "left",
+                            "side"  : "left",
                             "sticky": ''
                         }),
                     ]

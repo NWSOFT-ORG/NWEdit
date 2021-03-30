@@ -15,5 +15,6 @@ Please follow the instructions as comments.
     "theme": "black",
     // Must be a valid Pygments theme
     "pygments": "monokai",
-    "tabwidth": 4 // Test purpose
+    "tabwidth": 4
+    // Test purpose
 }

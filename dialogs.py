@@ -1,5 +1,4 @@
-import tkinter as tk
-from tkinter import ttk
+from modules import *
 
 
 class Dialog(tk.Toplevel):
@@ -146,3 +145,27 @@ class InputStringDialog(Dialog):
         self.result = 0
         self.parent.focus_set()
         self.destroy()
+
+
+class ErrorDialog(Dialog):
+    def __init__(self, parent, text=None):
+        self.text = text
+        super().__init__(parent, 'Error')
+
+    def body(self, master):
+        errorimg = tk.PhotoImage(file='Images/error.gif')
+        label1 = ttk.Label(master, text=self.text, compound='left', image=errorimg)
+        label1.pack(side='top', fill='both', expand=1)
+
+        return label1
+
+    def buttonbox(self):
+        b1 = ttk.Button(self, text="Ok", width=10, command=self.apply)
+        b1.pack(side='left', padx=5, pady=5)
+
+    def apply(self, event=None):
+        self.parent.focus_set()
+        self.destroy()
+
+    def cancel(self, event=None):
+        pass

@@ -55,7 +55,7 @@ def get_environment_with_overrides(overrides):
 def run_in_terminal(cmd,
                     cwd=os.getcwd(),
                     env_overrides=None,
-                    keep_open=False,
+                    keep_open=True,
                     title=None):
     if env_overrides is None:
         env_overrides = {}
@@ -71,6 +71,7 @@ def run_in_terminal(cmd,
     else:
         _run_in_terminal_in_linux(cmd, cwd, env, keep_open)
 
+
 def open_system_shell(cwd=os.path.expanduser('~'), env_overrides=None):
     if env_overrides is None:
         env_overrides = {}
@@ -84,6 +85,7 @@ def open_system_shell(cwd=os.path.expanduser('~'), env_overrides=None):
     else:
         cmd = _get_linux_terminal_command()
         subprocess.Popen(cmd, cwd=cwd, env=env, shell=True)
+
 
 def _add_to_path(directory, path):
     # Always prepending to path may seem better, but this could mess up other things.

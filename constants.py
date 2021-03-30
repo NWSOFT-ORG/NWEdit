@@ -4,7 +4,7 @@ from modules import *
 WINDOWS = bool(sys.platform.startswith('win'))
 OSX = bool(sys.platform.startswith('darwin'))
 APPDIR = str(Path(__file__).parent)
-VERSION = '6.0'
+VERSION = '6.0-DEV'
 RUN_BATCH = ('''#!/bin/bash
 set +v
 cd "{script_dir}"
@@ -15,7 +15,7 @@ printf "================================================\n"
 echo Program Finished With Exit Code $?
 python3 {dir}/measure.py stop
 echo Press enter to continue...
-read -s  # This will pause the script
+read -rs  # This will pause the script
 rm timertemp.txt
 ''' if not WINDOWS else '''@echo off
 title Build Results

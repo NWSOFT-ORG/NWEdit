@@ -71,10 +71,10 @@ class Settings:
                 return ('All files', '*.* *'), ('XML',
                                                 '*.xml *.plist *.iml *.rss')
             else:
-                if messagebox.showerror(
+                messagebox.showerror(
                         'Error', 'The settings aren\'t correct, \n\
-                Now using default settings.'):
-                    return ('All files', '*.* *'),
+                Now using default settings.')
+                return ('All files', '*.* *'),
         else:
             raise EditorErr('The setting is not defined')
 
@@ -96,7 +96,7 @@ class Filetype:
                 return JSONLexer
             return lexers.get_lexer_by_name(
                 self.lexers[self.extens.index(extension)])
-        except Exception as e:
+        except Exception:
             return lexers.get_lexer_by_name('Text')
 
 

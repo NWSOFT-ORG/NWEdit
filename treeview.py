@@ -12,7 +12,7 @@ class FileTree(ttk.Frame):
         self.sourceItem = None
         self.tree = ttk.Treeview(self)
         yscroll, xscroll = ttk.Scrollbar(self, command=self.tree.yview), \
-            ttk.Scrollbar(self, command=self.tree.xview, orient='horizontal')
+                           ttk.Scrollbar(self, command=self.tree.xview, orient='horizontal')
         yscroll.pack(side='right', fill='y')
         xscroll.pack(side='bottom', fill='x')
         self.tree['yscrollcommand'] = yscroll.set
@@ -103,7 +103,7 @@ class FileTree(ttk.Frame):
         ttk.Label(win, text=cdate).pack(side='top', anchor='nw', fill='x')
         if not (WINDOWS or OSX):
             ttk.Label(win,
-                      text='Note: the dates would not be the exact date of creation or modification!')\
+                      text='Note: the dates would not be the exact date of creation or modification!') \
                 .pack(side='top', anchor='nw', fill='x')
         win.mainloop()
 

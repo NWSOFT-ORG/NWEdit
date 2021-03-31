@@ -146,3 +146,7 @@ DEBUG:pyplus:Tab right-click menu created
 DEBUG:pyplus:Bindings created
 DEBUG:pyplus:Start screen created
 ```
+# What I learnt from developing it
+- Some methods look extremely tricky, but they solve the problem!
+- Sometimes it's a good idea to reference other people's code.
+

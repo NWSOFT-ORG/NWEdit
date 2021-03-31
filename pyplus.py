@@ -583,14 +583,11 @@ This method colors and styles the prepared tags
 If a file is not provided, a messagebox'll
 pop up to ask the user to select the path.
 """
-        if not file:
-            file_dir = tkinter.filedialog.askopenfilename(
-                master=self.master,
-                initialdir='/',
-                title='Select file',
-                filetypes=self.filetypes)
-        else:
+        if file:
             file_dir = file
+        else:
+            file_dir = ''
+            FileOpenDialog(self.open_file)
 
         if file_dir:
             try:  # If the file is in binary, ask the user to open in Hex editor

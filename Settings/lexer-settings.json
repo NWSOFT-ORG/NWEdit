@@ -44,5 +44,6 @@
     "js": "JavaScript",
     "javascript": "JavaScript",
     "css": "CSS",
-    "zshrc": "Bash"
+    "zshrc": "Bash",
+    "md": "markdown"
 }

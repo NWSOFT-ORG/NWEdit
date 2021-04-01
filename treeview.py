@@ -150,6 +150,7 @@ class FileTree(ttk.Frame):
         cancelbtn = ttk.Button(win, text='Cancel', command=lambda _=None: win.destroy())
         cancelbtn.pack(side='left', anchor='w', fill='x')
         win.mainloop()
+        self.init_ui()
 
     def init_ui(self, _=None):
         path = os.path.expanduser('~')
@@ -185,9 +186,9 @@ class FileTree(ttk.Frame):
         for item in sorted(files):
             self.tree.insert(parent, 'end', text=str(item), open=False, tags='row')
 
-    def on_double_click_treeview(self, event):
+    def on_double_click_treeview(self, _=None):
         try:
-            item = self.tree.identify('item', event.x, event.y)
+            item = self.tree.focus()
             tags = self.tree.item(item, "tags")[0]
             if tags == 'subfolder':
                 root = self.path

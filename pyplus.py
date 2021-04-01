@@ -111,8 +111,6 @@ Lacks these MacOS support:
             # Base64 image, this probably decreases the repo size.
             logger.debug('Theme loaded')
 
-            self.filetypes = self.settings_class.get_settings('file_type')
-
             self.tabs = {}
 
             self.pandedwin = ttk.Panedwindow(self.master, orient='horizontal')
@@ -657,24 +655,26 @@ pop up to ask the user to select the path.
         """This method just prompts the user to open a file when C-O is pressed"""
         self.open_file()
 
-    def save_as(self, _=None) -> None:
-        if len(self.tabs) > 0:
+    def save_as(self, file_dir=None) -> None:
+        if self.tabs:
+            if file_dir:
+                file_dir = file_dir
+            else:
+                file_dir = ''
+                FileSaveAsDialog(self.save_as)
             curr_tab = self.get_tab()
-            file_dir = (tkinter.filedialog.asksaveasfilename(
-                master=self.master,
-                initialdir='/',
-                title='Save As...',
-                filetypes=self.filetypes))
             if not file_dir:
                 return
 
             self.tabs[curr_tab].file_dir = file_dir
             self.nb.tab(curr_tab, text=os.path.basename(file_dir))
-            file = open(file_dir, 'w')
-            file.write(self.tabs[curr_tab].textbox.get(1.0, 'end'))
-            file.close()
+            with open(file_dir, 'w') as f:
+                f.write(self.tabs[curr_tab].textbox.get(1.0, 'end'))
             self.update_title()
             self.reload()
+    
+    def _saveas(self, _=None):
+        self.save_as()
 
     def save_file(self, _=None) -> None:
         """Saves an *existing* file"""
@@ -1354,8 +1354,7 @@ Steps:
             files = tkinter.filedialog.askopenfilenames(
                 master=self.master,
                 initialdir='/',
-                title='Select file',
-                filetypes=self.filetypes)
+                title='Select files')
             if not files:
                 return
             for x in files:

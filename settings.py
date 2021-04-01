@@ -54,27 +54,6 @@ class Settings:
             return self.tabwidth
         elif setting == 'pygments':
             return self.highlight_theme
-        elif setting == 'file_type':
-            # Always starts with ('All files', '*.* *'),
-            if self.filetype == 'all':
-                return ('All files', '*.* *'),
-            elif self.filetype == 'py':
-                # Extend this list, since Python has a lot of file types
-                return ('All files',
-                        '*.* *'), ('Python Files',
-                                   '*.py *.pyw *.pyx *.py3 *.pyi')
-            elif self.filetype == 'txt':
-                return ('All files', '*.* *'), ('Text documents',
-                                                '*.txt *.rst')
-            elif self.filetype == 'xml':
-                # Extend this, since xml has a lot of usage formats
-                return ('All files', '*.* *'), ('XML',
-                                                '*.xml *.plist *.iml *.rss')
-            else:
-                messagebox.showerror(
-                        'Error', 'The settings aren\'t correct, \n\
-                Now using default settings.')
-                return ('All files', '*.* *'),
         else:
             raise EditorErr('The setting is not defined')
 

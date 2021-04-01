@@ -6,10 +6,8 @@ class FileTree(ttk.Frame):
         Treeview to select files
     """
 
-    def __init__(self, master=None, opencommand=None, path=os.path.expanduser('~')):
+    def __init__(self, master=None, opencommand=None, path=os.path.expanduser('~'), showbuttonframe: bool = True):
         super().__init__(master)
-        self.destinationItem = None
-        self.sourceItem = None
         self.tree = ttk.Treeview(self)
         yscroll, xscroll = ttk.Scrollbar(self, command=self.tree.yview), \
                            ttk.Scrollbar(self, command=self.tree.xview, orient='horizontal')
@@ -20,14 +18,15 @@ class FileTree(ttk.Frame):
         self.master = master
         self.path = str(path)
         self.saveascommand = opencommand
-        topframe = ttk.Frame(self)
-        topframe.pack(side='top', anchor='nw')
-        self.actioncombobox = ttk.Combobox(topframe, state='readonly',
-                                           values=['Parent Directory', 'New...', 'Refresh',
-                                                   'Remove...', 'Get info...'])
-        self.actioncombobox.set('Parent Directory')
-        self.actioncombobox.pack(anchor='nw', side='left')
-        ttk.Button(topframe, text='>>', command=self.do_action).pack(side='left', anchor='nw')
+        if showbuttonframe:
+            topframe = ttk.Frame(self)
+            topframe.pack(side='top', anchor='nw')
+            self.actioncombobox = ttk.Combobox(topframe, state='readonly',
+                                               values=['Parent Directory', 'New...', 'Refresh',
+                                                       'Remove...', 'Get info...'])
+            self.actioncombobox.set('Parent Directory')
+            self.actioncombobox.pack(anchor='nw', side='left')
+            ttk.Button(topframe, text='>>', command=self.do_action).pack(side='left', anchor='nw')
 
         self.pack(side='left', fill='both', expand=1)
         self.init_ui()
@@ -152,7 +151,7 @@ class FileTree(ttk.Frame):
         win.mainloop()
         self.init_ui()
 
-    def init_ui(self, _=None):
+    def init_ui(self):
         path = os.path.expanduser('~')
 
         self.tree.delete(*self.tree.get_children())

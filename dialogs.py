@@ -171,7 +171,7 @@ class ErrorDialog(Dialog):
         self.destroy()
 
     @staticmethod
-    def cancel(_=None):
+    def cancel(_=None, **kwargs):
         pass
 
 
@@ -200,7 +200,8 @@ class FileOpenDialog(FileTree):
         self.entryframe.pack(fill='x')
         super().__init__(master=self.win,
                          opencommand=opencommand,
-                         path=os.path.expanduser('~'))
+                         path=os.path.expanduser('~'),
+                         showbuttonframe=False)
 
     def open_from_string(self, _=None):
         try:
@@ -281,7 +282,8 @@ class FileSaveAsDialog(FileTree):
 
         super().__init__(master=self.win,
                          opencommand=save,
-                         path=os.path.expanduser('~'))
+                         path=os.path.expanduser('~'),
+                         showbuttonframe=False)
 
     def saveas_from_string(self, _=None):
         try:

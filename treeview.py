@@ -19,7 +19,7 @@ class FileTree(ttk.Frame):
         self.tree['xscrollcommand'] = xscroll.set
         self.master = master
         self.path = str(path)
-        self.opencommand = opencommand
+        self.saveascommand = opencommand
         topframe = ttk.Frame(self)
         topframe.pack(side='top', anchor='nw')
         self.actioncombobox = ttk.Combobox(topframe, state='readonly',
@@ -137,11 +137,11 @@ class FileTree(ttk.Frame):
                     if messagebox.askyesno('This file already exsists!', 'Do you want to overwrite?'):
                         with open(path, 'w') as f:
                             f.write('')
-                        self.opencommand(path)
+                        self.saveascommand(path)
                 else:
                     with open(path, 'w') as f:
                         f.write('')
-                    self.opencommand(path)
+                    self.saveascommand(path)
             self.init_ui()
             win.destroy()
 
@@ -206,7 +206,7 @@ class FileTree(ttk.Frame):
                 _dir = self.path
                 _filename = os.path.join(_dir, file)
                 try:
-                    self.opencommand(_filename)
+                    self.saveascommand(_filename)
                 except Exception:
                     pass
 

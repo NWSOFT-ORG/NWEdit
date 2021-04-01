@@ -2,7 +2,7 @@ from treeview import *
 
 
 class Dialog(tk.Toplevel):
-    def __init__(self, parent: tk.Tk, title: str = None):
+    def __init__(self, parent: tk.Misc, title: str = None):
 
         super().__init__(parent)
         self.transient(parent)
@@ -180,8 +180,6 @@ class FileOpenDialog(FileTree):
         self.win = tk.Toplevel()
         self.win.title('Open a file')
         self.win.resizable(0, 0)
-        icon = tk.PhotoImage(file='Images/open-16px.gif')
-        self.win.iconphoto(False, icon)
         self.buttonframe = ttk.Frame(self.win)
         self.okbtn = ttk.Button(self.buttonframe,
                                 text='Open',
@@ -208,7 +206,7 @@ class FileOpenDialog(FileTree):
         try:
             file = self.pathentry.get()
             if os.path.isfile(file):
-                self.opencommand(file)
+                self.saveascommand(file)
                 return
             path = self.path
             file = os.path.join(path, self.pathentry.get())
@@ -216,7 +214,7 @@ class FileOpenDialog(FileTree):
                 self.path = file
                 self.refresh_tree()
             else:
-                self.opencommand(file)
+                self.saveascommand(file)
         except Exception:
             pass
 
@@ -241,7 +239,7 @@ class FileOpenDialog(FileTree):
                 _filename = os.path.join(self.path, file)
                 try:
                     self.win.destroy()
-                    self.opencommand(_filename)
+                    self.saveascommand(_filename)
                 except Exception:
                     pass
 
@@ -258,8 +256,6 @@ class FileSaveAsDialog(FileTree):
         self.win = tk.Toplevel()
         self.win.title('Save As...')
         self.win.resizable(0, 0)
-        icon = tk.PhotoImage(file='Images/saveas-16px.gif')
-        self.win.iconphoto(False, icon)
         self.buttonframe = ttk.Frame(self.win)
         self.okbtn = ttk.Button(self.buttonframe,
                                 text='Save',
@@ -274,19 +270,24 @@ class FileSaveAsDialog(FileTree):
         self.pathentry = ttk.Entry(self.entryframe)
         self.pathentry.pack(fill='x')
         self.open_from_string_btn = ttk.Button(self.pathentry,
-                                               command=self.open_from_string,
+                                               command=self.saveas_from_string,
                                                text='>> Save')
         self.open_from_string_btn.pack(side='right')
         self.entryframe.pack(fill='x')
+
+        def save(_=None):
+            savecommand()
+            self.init_ui()
+
         super().__init__(master=self.win,
-                         opencommand=savecommand,
+                         opencommand=save,
                          path=os.path.expanduser('~'))
 
-    def open_from_string(self, _=None):
+    def saveas_from_string(self, _=None):
         try:
             file = self.pathentry.get()
             if os.path.isfile(file):
-                self.opencommand(file)
+                self.saveascommand(file)
                 return
             path = self.path
             file = os.path.join(path, self.pathentry.get())
@@ -294,7 +295,7 @@ class FileSaveAsDialog(FileTree):
                 self.path = file
                 self.refresh_tree()
             else:
-                self.opencommand(file)
+                self.saveascommand(file)
         except Exception:
             pass
 
@@ -319,7 +320,7 @@ class FileSaveAsDialog(FileTree):
                 _filename = os.path.join(self.path, file)
                 try:
                     self.win.destroy()
-                    self.opencommand(_filename)
+                    self.saveascommand(_filename)
                 except Exception:
                     pass
 

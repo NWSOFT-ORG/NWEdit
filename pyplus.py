@@ -429,7 +429,7 @@ Lacks these MacOS support:
         textbox.bind(f'<{MAIN_KEY}-n>', self.filetree.new_file)
         textbox.bind(f'<{MAIN_KEY}-N>', self.goto)
         textbox.bind(f'<{MAIN_KEY}-r>', self.reload)
-        textbox.bind(f'<{MAIN_KEY}-S>', self.save_as)
+        textbox.bind(f'<{MAIN_KEY}-S>', self._saveas)
         textbox.bind(f'<{MAIN_KEY}-u>', lambda _=None: self.indent('unindent'))
         textbox.bind(f'<{MAIN_KEY}-Z>', self.redo)
         textbox.bind(f'<{MAIN_KEY}-z>', self.undo)
@@ -672,7 +672,7 @@ pop up to ask the user to select the path.
                 f.write(self.tabs[curr_tab].textbox.get(1.0, 'end'))
             self.update_title()
             self.reload()
-    
+
     def _saveas(self, _=None):
         self.save_as()
 

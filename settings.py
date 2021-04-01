@@ -13,7 +13,6 @@ class Settings:
             self.tabwidth = self.settings['tabwidth']
             self.font = self.settings['font'].split()[0]
             self.size = self.settings['font'].split()[1]
-            self.filetype = self.settings['file_types']
             return
         except Exception:
             messagebox.showerror("Error", "Setings are corrupted.")

@@ -31,7 +31,6 @@ class FileTree(ttk.Frame):
         self.pack(side='left', fill='both', expand=1)
         self.init_ui()
         self.tree.tag_configure('row', background='black', foreground='white')
-        self.tree.tag_configure('folder', background='black', foreground='yellow')
         self.tree.tag_configure('subfolder', background='black', foreground='#448dc4')
         self.tree.pack(fill='both', expand=1, anchor='nw')
 
@@ -160,8 +159,7 @@ class FileTree(ttk.Frame):
         self.tree.update()
 
         abspath = os.path.abspath(path)
-        root_node = self.tree.insert('', 'end', text=abspath, open=True, tags='folder')
-        self.process_directory(root_node, abspath)
+        self.process_directory(abspath)
 
         self.refresh_tree()
 
@@ -169,7 +167,7 @@ class FileTree(ttk.Frame):
         self.path = str(Path(os.path.abspath(self.path)).parent)
         self.refresh_tree()
 
-    def process_directory(self, parent, path):
+    def process_directory(self, path):
         ls = os.listdir(path)
         dirs = []
         files = []
@@ -180,10 +178,10 @@ class FileTree(ttk.Frame):
                 files.append(file)
 
         for item in sorted(dirs):
-            self.tree.insert(parent, 'end', text=str(item), open=False, tags='subfolder')
+            self.tree.insert('', 'end', text=str(item), open=False, tags='subfolder')
 
         for item in sorted(files):
-            self.tree.insert(parent, 'end', text=str(item), open=False, tags='row')
+            self.tree.insert('', 'end', text=str(item), open=False, tags='row')
 
     def on_double_click_treeview(self, _=None):
         try:
@@ -195,10 +193,7 @@ class FileTree(ttk.Frame):
                 _dir = os.path.join(root, sub)
                 self.path = _dir
                 self.refresh_tree()
-
-            elif tags == 'folder':
-                self.refresh_tree()
-                return
+                self.tree.update()
 
             else:
                 file = self.tree.item(item, "text")
@@ -221,9 +216,8 @@ class FileTree(ttk.Frame):
             pass
 
     def refresh_tree(self):
-        for i in self.tree.get_children():
-            self.tree.delete(i)
+        self.tree.delete(*self.tree.get_children())
+        self.tree.heading('#0', text=self.path)
         path = self.path
         abspath = os.path.abspath(path)
-        root_node = self.tree.insert('', 'end', text=abspath, open=True, tags='folder')
-        self.process_directory(root_node, abspath)
+        self.process_directory(abspath)

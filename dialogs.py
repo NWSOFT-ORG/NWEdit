@@ -1,4 +1,4 @@
-from modules import *
+from constants import *
 
 
 class Dialog(tk.Toplevel):
@@ -108,12 +108,14 @@ class MessageYesNoDialog(Dialog):
         self.result = 1
         self.parent.focus_set()
         self.destroy()
+        logger.info('apply')
 
     def cancel(self, _=None):
         # put focus back to the parent window
         self.result = 0
         self.parent.focus_set()
         self.destroy()
+        logger.info('cancel')
 
 
 class InputStringDialog(Dialog):
@@ -143,12 +145,14 @@ class InputStringDialog(Dialog):
         self.result = self.entry.get()
         self.parent.focus_set()
         self.destroy()
+        logger.info('apply')
 
     def cancel(self, _=None):
         # put focus back to the parent window
         self.result = 0
         self.parent.focus_set()
         self.destroy()
+        logger.info('cancel')
 
 
 class ErrorDialog(Dialog):
@@ -169,6 +173,7 @@ class ErrorDialog(Dialog):
     def apply(self, _=None):
         self.parent.focus_set()
         self.destroy()
+        logger.info('apply')
 
     @staticmethod
     def cancel(_=None, **kwargs):

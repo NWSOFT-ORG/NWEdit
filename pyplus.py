@@ -25,15 +25,6 @@ from tktext import *
 from treeview import *
 
 os.chdir(APPDIR)
-logger = logging.getLogger('PyPlus')
-logging.basicConfig(
-    filename='pyplus.log',
-    filemode='w',
-    level=logging.DEBUG,
-    format='%(asctime)s : %(levelname)s : %(funcName)s : %(message)s')
-
-logger.info(f'Tkinter version: {tk.TkVersion}')
-logger.debug('All modules imported')
 
 
 class Document:
@@ -347,6 +338,7 @@ Lacks these MacOS support:
             logger.exception('Error when initializing:')
             with open('recent_files.txt', 'w') as f:
                 f.write('')
+            self.restart()
 
     def start_screen(self) -> None:
         first_tab = tk.Canvas(self.nb, background='white')

@@ -1,5 +1,5 @@
 """Closable ttk.Notebook"""
-from modules import *
+from constants import *
 
 
 class ClosableNotebook(ttk.Notebook):
@@ -36,6 +36,7 @@ Change the layout, makes it look like this:
             self._active = index
         else:
             self.event_generate("<<Notebook_B1-Down>>", when="tail")
+        logger.debug('Close tab start')
 
     def on_close_release(self, event):
         try:
@@ -51,8 +52,10 @@ Change the layout, makes it look like this:
 
             self.state(["!pressed"])
             self._active = None
+            logger.debug('Close tab end')
+
         except Exception:
-            pass
+            logger.exception('Error:')
 
     def __initialize_custom_style(self):
         style = ttk.Style()
@@ -93,3 +96,4 @@ Change the layout, makes it look like this:
                 })]
             })]
         })])
+        logger.debug("Initialized custom style.")

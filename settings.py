@@ -1,4 +1,4 @@
-from constants import *
+from filedialog import *
 
 
 class Settings:
@@ -19,9 +19,7 @@ class Settings:
             sys.exit(1)
 
     @staticmethod
-    def zip_settings():
-        backupdir = tkinter.filedialog.askdirectory()
-
+    def zip_settings(backupdir):
         def zipdir(path, zip_obj):
             for root, dirs, files in os.walk(path):
                 for file in files:
@@ -29,20 +27,24 @@ class Settings:
                                   os.path.relpath(os.path.join(root, file),
                                                   os.path.join(path, '..')))
 
-        with zipfile.ZipFile(os.path.join(backupdir, f'Settings{time.time()}.zip'), 'w',
-                             zipfile.ZIP_DEFLATED) as zipobj:
+        with zipfile.ZipFile(os.path.join(backupdir, 'Settings.zip'), 'w', zipfile.ZIP_DEFLATED) as zipobj:
             zipdir('Settings/', zipobj)
         messagebox.showinfo('Done', 'Settings backed up.')
 
+    def zipsettings(self):
+        DirectoryOpenDialog(self.zip_settings)
+
     @staticmethod
-    def unzip_settings():
+    def unzip_settings(backupdir):
         try:
-            backupdir = tkinter.filedialog.askopenfilename()
             with zipfile.ZipFile(backupdir) as zipobj:
                 zipobj.extractall(path=APPDIR)
             messagebox.showinfo('Done', 'Settings extracted. Please restart to apply changes.')
         except (zipfile.BadZipFile, zipfile.BadZipfile, zipfile.LargeZipFile):
             pass
+
+    def unzipsettings(self):
+        FileOpenDialog(self.unzip_settings)
 
     def get_settings(self, setting):
         if setting == 'font':

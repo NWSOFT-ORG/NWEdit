@@ -213,7 +213,8 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
                 """ -e '    end tell' """ + """ -e 'end if' """)
     print(cmd_line)
 
-    # subprocess.Popen(cmd_line, cwd=cwd, shell=True)
+
+# subprocess.Popen(cmd_line, cwd=cwd, shell=True)
 
 
 def _get_linux_terminal_command():

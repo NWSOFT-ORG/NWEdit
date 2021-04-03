@@ -1,252 +1,255 @@
 from constants import *
+from dialogs import *
 
 
 class FileTree(ttk.Frame):
-	"""
+    """
         Treeview to select files
     """
-	def __init__(self,
-	             master=None,
-	             opencommand=None,
-	             path=os.path.expanduser('~'),
-	             showbuttonframe: bool = True):
-		super().__init__(master)
-		self.tree = ttk.Treeview(self)
-		yscroll, xscroll = ttk.Scrollbar(self, command=self.tree.yview), \
-                                       ttk.Scrollbar(self, command=self.tree.xview, orient='horizontal')
-		yscroll.pack(side='right', fill='y')
-		xscroll.pack(side='bottom', fill='x')
-		self.tree['yscrollcommand'] = yscroll.set
-		self.tree['xscrollcommand'] = xscroll.set
-		self.master = master
-		self.path = str(path)
-		self.saveascommand = opencommand
-		if showbuttonframe:
-			topframe = ttk.Frame(self)
-			topframe.pack(side='top', anchor='nw')
-			self.actioncombobox = ttk.Combobox(topframe,
-			                                   state='readonly',
-			                                   values=[
-			                                       'Rename...', 'New...',
-			                                       'Refresh', 'Remove...',
-			                                       'Get info...'
-			                                   ])
-			self.actioncombobox.set('New...')
-			self.actioncombobox.pack(anchor='nw', side='left')
-			ttk.Button(topframe, text='>>',
-			           command=self.do_action).pack(side='left', anchor='nw')
 
-		self.pack(side='left', fill='both', expand=1)
-		self.init_ui()
-		self.tree.tag_configure('row', background='black', foreground='white')
-		self.tree.tag_configure('subfolder',
-		                        background='black',
-		                        foreground='#448dc4')
-		self.tree.pack(fill='both', expand=1, anchor='nw')
+    def __init__(self,
+                 master=None,
+                 opencommand=None,
+                 path=os.path.expanduser('~'),
+                 showbuttonframe: bool = True):
+        super().__init__(master)
+        self.tree = ttk.Treeview(self)
+        yscroll, xscroll = ttk.Scrollbar(self, command=self.tree.yview), \
+            ttk.Scrollbar(self, command=self.tree.xview, orient='horizontal')
+        yscroll.pack(side='right', fill='y')
+        xscroll.pack(side='bottom', fill='x')
+        self.tree['yscrollcommand'] = yscroll.set
+        self.tree['xscrollcommand'] = xscroll.set
+        self.master = master
+        self.path = str(path)
+        self.opencommand = opencommand
+        if showbuttonframe:
+            topframe = ttk.Frame(self)
+            topframe.pack(side='top', anchor='nw')
+            self.actioncombobox = ttk.Combobox(topframe,
+                                               state='readonly',
+                                               values=[
+                                                   'Rename...', 'New...',
+                                                   'Refresh', 'Remove...',
+                                                   'Get info...'
+                                               ])
+            self.actioncombobox.set('New...')
+            self.actioncombobox.pack(anchor='nw', side='left')
+            ttk.Button(topframe, text='>>',
+                       command=self.do_action).pack(side='left', anchor='nw')
 
-	def do_action(self):
-		action = self.actioncombobox.get()
-		if action == 'New...':
-			self.new_file()
-		elif action == 'Rename...':
-			self.rename()
-		elif action == 'Refresh':
-			self.init_ui()
-		elif action == 'Remove...':
-			self.remove()
-		elif action == 'Get info...':
-			self.get_info()
+        self.pack(side='left', fill='both', expand=1)
+        self.init_ui()
+        self.tree.tag_configure('row', background='black', foreground='white')
+        self.tree.tag_configure('subfolder',
+                                background='black',
+                                foreground='#448dc4')
+        self.tree.pack(fill='both', expand=1, anchor='nw')
 
-	def remove(self):
-		path = os.path.join(self.path,
-		                    self.tree.item(self.tree.focus())['text'])
-		if messagebox.askyesno(
-		    'Warning!', 'This file/directory will be deleted immediately!'):
-			if os.path.isdir(path):
-				shutil.rmtree(path)
-			else:
-				os.remove(path)
-			self.init_ui()
+    def do_action(self):
+        action = self.actioncombobox.get()
+        if action == 'New...':
+            self.new_file()
+        elif action == 'Rename...':
+            self.rename()
+        elif action == 'Refresh':
+            self.init_ui()
+        elif action == 'Remove...':
+            self.remove()
+        elif action == 'Get info...':
+            self.get_info()
 
-	def rename(self):
-		path = os.path.join(self.path,
-		                    self.tree.item(self.tree.focus())['text'])
-		dialog = InputStringDialog(self.master)
-		os.rename(path, dialog.result)
-		self.init_ui()
+    def remove(self):
+        path = os.path.join(self.path,
+                            self.tree.item(self.tree.focus())['text'])
+        if messagebox.askyesno(
+                'Warning!', 'This file/directory will be deleted immediately!'):
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+            else:
+                os.remove(path)
+            self.init_ui()
 
-	def get_info(self):
-		path = os.path.join(self.path,
-		                    self.tree.item(self.tree.focus())['text'])
-		basename = os.path.basename(path)
-		size = str(os.path.getsize(path))
-		# Determine the correct unit
-		if int(size) / 1024 < 1:
-			size += 'Bytes'
-		elif int(size) / 1024 >= 1 <= 2:
-			size = f'{int(size) // 1024} Kilobytes'
-		elif int(size) / 1024**2 >= 1 <= 2:
-			size = f'{int(size) // 1024 ** 2} Megabytes'
-		elif int(size) / 1024**3 >= 1 <= 2:
-			size = f'{int(size) // 1024 ** 3} Gigabytes'
-		elif int(size) / 1024**4 >= 1 <= 2:
-			size = f'{int(size) // 1024 ** 4} Terrabytes'
-		# It can go on and on, but the newest PCs won't have more than a PB storage
-		#      /-------------/|
-		#     /             / /
-		#    /  SSD        / /
-		#   /   10 TB     / /
-		#  /             / /
-		# /             / /
-		# \=============\/
-		mdate = f"Last modified: {time.ctime(os.path.getmtime(path))}"
-		cdate = f"Created: {time.ctime(os.path.getctime(path))}"
-		win = tk.Toplevel(master=self.master)
-		win.title(f'Info of {basename}')
-		win.resizable(0, 0)
-		win.transient('.')
-		ttk.Label(win, text=f'Name: {basename}').pack(side='top',
-		                                              anchor='nw',
-		                                              fill='x')
-		ttk.Label(win, text=f'Path: {path}').pack(side='top',
-		                                          anchor='nw',
-		                                          fill='x')
-		ttk.Label(win, text=f'Size: {size}').pack(side='top',
-		                                          anchor='nw',
-		                                          fill='x')
-		ttk.Label(win, text=mdate).pack(side='top', anchor='nw', fill='x')
-		ttk.Label(win, text=cdate).pack(side='top', anchor='nw', fill='x')
-		if not (WINDOWS or OSX):
-			ttk.Label(win,
-			          text='Note: the dates would not be the exact date of creation or modification!') \
-                                  .pack(side='top', anchor='nw', fill='x')
-		win.mainloop()
+    def rename(self):
+        try:
+            path = os.path.join(self.path,
+                                self.tree.item(self.tree.focus())['text'])
+            dialog = InputStringDialog(self.master, 'Rename', 'New name:')
+            newdir = os.path.join(self.path, dialog.result)
+            os.rename(path, newdir)
+            self.init_ui()
+        except (IsADirectoryError, FileExistsError):
+            pass
 
-	def new_file(self, _=None):
-		global _type
-		win = tk.Toplevel(master=self.master)
-		win.title('New File/Directory')
-		win.transient('.')
-		win.resizable(0, 0)
-		ttk.Label(win, text='Name:').pack(side='top', anchor='nw')
-		filename = tk.Entry(win)
-		filename.pack(side='top', anchor='nw')
-		ttk.Label(win, text='Type:').pack(anchor='nw')
-		_type = ttk.Combobox(win,
-		                     values=['Directory', 'File'],
-		                     state='readonly')
-		_type.pack(side='top', anchor='nw')
-		_type.set('File')
+    def get_info(self):
+        path = os.path.join(self.path,
+                            self.tree.item(self.tree.focus())['text'])
+        basename = os.path.basename(path)
+        size = str(os.path.getsize(path))
+        # Determine the correct unit
+        if int(size) / 1024 < 1:
+            size += 'Bytes'
+        elif int(size) / 1024 >= 1 <= 2:
+            size = f'{int(size) // 1024} Kilobytes'
+        elif int(size) / 1024 ** 2 >= 1 <= 2:
+            size = f'{int(size) // 1024 ** 2} Megabytes'
+        elif int(size) / 1024 ** 3 >= 1 <= 2:
+            size = f'{int(size) // 1024 ** 3} Gigabytes'
+        elif int(size) / 1024 ** 4 >= 1 <= 2:
+            size = f'{int(size) // 1024 ** 4} Terrabytes'
+        # It can go on and on, but the newest PCs won't have more than a PB storage
+        #      /-------------/|
+        #     /			    / /
+        #    /  SSD		   / /
+        #   /   10 TB  	  / /
+        #  /	    	 / /
+        # /             / /
+        # \=============\/
+        mdate = f"Last modified: {time.ctime(os.path.getmtime(path))}"
+        cdate = f"Created: {time.ctime(os.path.getctime(path))}"
+        win = tk.Toplevel(master=self.master)
+        win.title(f'Info of {basename}')
+        win.resizable(0, 0)
+        win.transient('.')
+        ttk.Label(win, text=f'Name: {basename}').pack(side='top',
+                                                      anchor='nw',
+                                                      fill='x')
+        ttk.Label(win, text=f'Path: {path}').pack(side='top',
+                                                  anchor='nw',
+                                                  fill='x')
+        ttk.Label(win, text=f'Size: {size}').pack(side='top',
+                                                  anchor='nw',
+                                                  fill='x')
+        ttk.Label(win, text=mdate).pack(side='top', anchor='nw', fill='x')
+        ttk.Label(win, text=cdate).pack(side='top', anchor='nw', fill='x')
+        if not (WINDOWS or OSX):
+            ttk.Label(win,
+                      text='Note: the dates would not be the exact date of creation or modification!') \
+                .pack(side='top', anchor='nw', fill='x')
+        win.mainloop()
 
-		def create(_=None):
-			if not filename.get():
-				return
-			path = os.path.join(self.path, filename.get())
-			if _type.get() == 'Directory':
-				try:
-					os.mkdir(path)
-				except FileExistsError:
-					if messagebox.askyesno('This directory already exsists!',
-					                       'Do you want to overwrite?'):
-						shutil.rmtree(path, ignore_errors=True)
-						os.mkdir(path)
-			else:
-				if os.path.exists(path):
-					if messagebox.askyesno('This file already exsists!',
-					                       'Do you want to overwrite?'):
-						with open(path, 'w') as f:
-							f.write('')
-						self.saveascommand(path)
-				else:
-					with open(path, 'w') as f:
-						f.write('')
-					self.saveascommand(path)
-			self.init_ui()
-			win.destroy()
+    def new_file(self, _=None):
+        global _type
+        win = tk.Toplevel(master=self.master)
+        win.title('New File/Directory')
+        win.transient('.')
+        win.resizable(0, 0)
+        ttk.Label(win, text='Name:').pack(side='top', anchor='nw')
+        filename = tk.Entry(win)
+        filename.pack(side='top', anchor='nw')
+        ttk.Label(win, text='Type:').pack(anchor='nw')
+        _type = ttk.Combobox(win,
+                             values=['Directory', 'File'],
+                             state='readonly')
+        _type.pack(side='top', anchor='nw')
+        _type.set('File')
 
-		okbtn = ttk.Button(win, text='OK', command=create)
-		okbtn.pack(side='left', anchor='w', fill='x')
-		cancelbtn = ttk.Button(win,
-		                       text='Cancel',
-		                       command=lambda _=None: win.destroy())
-		cancelbtn.pack(side='left', anchor='w', fill='x')
-		win.mainloop()
-		self.init_ui()
+        def create(_=None):
+            if not filename.get():
+                return
+            path = os.path.join(self.path, filename.get())
+            if _type.get() == 'Directory':
+                try:
+                    os.mkdir(path)
+                except FileExistsError:
+                    if messagebox.askyesno('This directory already exsists!',
+                                           'Do you want to overwrite?'):
+                        shutil.rmtree(path, ignore_errors=True)
+                        os.mkdir(path)
+            else:
+                if os.path.exists(path):
+                    if messagebox.askyesno('This file already exsists!',
+                                           'Do you want to overwrite?'):
+                        with open(path, 'w') as f:
+                            f.write('')
+                        self.opencommand(path)
+                else:
+                    with open(path, 'w') as f:
+                        f.write('')
+                    self.opencommand(path)
+            self.init_ui()
+            win.destroy()
 
-	def init_ui(self):
-		path = os.path.expanduser('~')
+        okbtn = ttk.Button(win, text='OK', command=create)
+        okbtn.pack(side='left', anchor='w', fill='x')
+        cancelbtn = ttk.Button(win,
+                               text='Cancel',
+                               command=lambda _=None: win.destroy())
+        cancelbtn.pack(side='left', anchor='w', fill='x')
+        win.mainloop()
+        self.init_ui()
 
-		self.tree.delete(*self.tree.get_children())
-		self.tree.bind("<Double-1>", self.on_double_click_treeview)
-		self.tree.update()
+    def init_ui(self):
+        path = os.path.expanduser('~')
 
-		abspath = os.path.abspath(path)
-		self.process_directory(abspath)
+        self.tree.delete(*self.tree.get_children())
+        self.tree.bind("<Double-1>", self.on_double_click_treeview)
+        self.tree.update()
 
-		self.refresh_tree()
+        abspath = os.path.abspath(path)
+        self.process_directory(abspath)
 
-	def change_parent_dir(self):
-		self.path = str(Path(os.path.abspath(self.path)).parent)
-		self.refresh_tree()
+        self.refresh_tree()
 
-	def process_directory(self, path):
-		ls = os.listdir(path)
-		dirs = []
-		files = []
-		for file in ls:
-			if os.path.isdir(os.path.join(self.path, file)):
-				dirs.append(file)
-			else:
-				files.append(file)
-		dirs.append('..')
+    def process_directory(self, path: str, showdironly: bool = False):
+        ls = os.listdir(path)
+        dirs = []
+        files = []
+        for file in ls:
+            if os.path.isdir(os.path.join(self.path, file)):
+                dirs.append(file)
+            else:
+                files.append(file)
+        dirs.append('..')
 
-		for item in sorted(dirs):
-			self.tree.insert('',
-			                 'end',
-			                 text=str(item),
-			                 open=False,
-			                 tags='subfolder')
+        for item in sorted(dirs):
+            self.tree.insert('',
+                             'end',
+                             text=str(item),
+                             open=False,
+                             tags='subfolder')
 
-		for item in sorted(files):
-			self.tree.insert('', 'end', text=str(item), open=False, tags='row')
+        if not showdironly:
+            for item in sorted(files):
+                self.tree.insert('', 'end', text=str(item), open=False, tags='row')
 
-	def on_double_click_treeview(self, _=None, destroy=False):
-		try:
-			item = self.tree.focus()
-			tags = self.tree.item(item, "tags")[0]
-			if tags == 'subfolder':
-				root = self.path
-				sub = self.tree.item(item, "text")
-				_dir = os.path.join(root, sub)
-				self.path = os.path.abspath(_dir)
-				self.refresh_tree()
-				self.tree.update()
+    def on_double_click_treeview(self, _=None, destroy: bool = False):
+        try:
+            item = self.tree.focus()
+            tags = self.tree.item(item, "tags")[0]
+            if tags == 'subfolder':
+                root = self.path
+                sub = self.tree.item(item, "text")
+                _dir = os.path.join(root, sub)
+                self.path = os.path.abspath(_dir)
+                self.refresh_tree()
+                self.tree.update()
 
-			else:
-				file = self.tree.item(item, "text")
-				_dir = self.path
-				_filename = os.path.join(_dir, file)
-				try:
-					self.saveascommand(_filename)
-					if destroy:
-						self.master.destroy()
-				except Exception:
-					pass
+            else:
+                file = self.tree.item(item, "text")
+                _dir = self.path
+                _filename = os.path.join(_dir, file)
+                try:
+                    self.opencommand(_filename)
+                    if destroy:
+                        self.master.destroy()
+                except Exception:
+                    pass
 
-				self.tree.update()
+                self.tree.update()
 
-				# workaround
-				# step 2
-				self.refresh_tree()
-				self.tree.update()
+                # workaround
+                # step 2
+                self.refresh_tree()
+                self.tree.update()
 
-			self.refresh_tree()
-		except Exception:
-			pass
+            self.refresh_tree()
+        except Exception:
+            pass
 
-	def refresh_tree(self):
-		self.tree.delete(*self.tree.get_children())
-		self.tree.heading('#0', text=self.path)
-		path = self.path
-		abspath = os.path.abspath(path)
-		self.process_directory(abspath)
+    def refresh_tree(self):
+        self.tree.delete(*self.tree.get_children())
+        self.tree.heading('#0', text=self.path)
+        path = self.path
+        abspath = os.path.abspath(path)
+        self.process_directory(abspath)

@@ -2,27 +2,27 @@
 # coding: utf-8
 """
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
-| pyplus.py -- the editor's ONLY file                 |
-| The somehow-professional editor                     |
-| It's extremely small! (around 80 kB)                |
-| You can visit my site for more details!             |
-| +----------------------------------------------+    |
-| | https://ZCG-coder.github.io/NWSOFT/PyPlusWeb |    |
-| +----------------------------------------------+    |
-| You can also contribute it on github!               |
-| Note: Some parts are adapted from stack overflow.   |
+| pyplus.py -- the editor's ONLY file				 |
+| The somehow-professional editor					 |
+| It's extremely small! (around 80 kB)				|
+| You can visit my site for more details!			 |
+| +----------------------------------------------+	|
+| | https://ZCG-coder.github.io/NWSOFT/PyPlusWeb |	|
+| +----------------------------------------------+	|
+| You can also contribute it on github!				|
+| Note: Some parts are adapted from stack overflow.	|
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 Also, it's cross-compatible!
 """
 # These modules are from the base directory
 from console import *
 from customenotebook import *
-from dialogs import *
-from statusbar import *
-from treeview import *
+from filedialog import *
 from functions import *
 from hexview import *
+from statusbar import *
 from tktext import *
+from treeview import *
 
 os.chdir(APPDIR)
 logger = logging.getLogger('PyPlus')
@@ -159,9 +159,9 @@ Lacks these MacOS support:
                                                  '.json'))
             preferences.add_separator()
             preferences.add_command(label='Backup Settings to...',
-                                    command=self.settings_class.zip_settings)
+                                    command=self.settings_class.zipsettings)
             preferences.add_command(label='Load Settings from...',
-                                    command=self.settings_class.unzip_settings)
+                                    command=self.settings_class.unzipsettings)
             app_menu.add_cascade(label="Preferences", menu=preferences)
             app_menu.add_separator()
             app_menu.add_command(label='Exit Editor', command=self.exit)
@@ -1299,7 +1299,7 @@ Steps:
     def check_updates(self, popup=True) -> list:
         if 'DEV' in VERSION:
             ErrorDialog(self.master, "Updates aren't supported by develop builds,\n\
-            since you're always on the latest version!") # If you're on the developer build, you don't need updates!
+			since you're always on the latest version!")  # If you're on the developer build, you don't need updates!
             return []
         download_file(
             url=

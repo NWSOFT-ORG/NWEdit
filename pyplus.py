@@ -176,12 +176,12 @@ Lacks these MacOS support:
                                  accelerator=f'{MAIN_KEY}-n',
                                  image=self.new_icon)
             filemenu.add_command(label='Open File',
-                                 command=self.open_file,
+                                 command=self._open,
                                  accelerator=f'{MAIN_KEY}-o',
                                  compound='left',
                                  image=self.open_icon)
             filemenu.add_command(label='Save Copy to...',
-                                 command=self.save_as,
+                                 command=self._saveas,
                                  accelerator=f'{MAIN_KEY}-Shift-S',
                                  compound='left',
                                  image=self.save_as_icon)
@@ -662,6 +662,7 @@ pop up to ask the user to select the path.
             else:
                 file_dir = ''
                 FileSaveAsDialog(self.save_as)
+                return
             curr_tab = self.get_tab()
             if not file_dir:
                 return

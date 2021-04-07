@@ -1,6 +1,6 @@
 """Useful functions"""
 
-from constants import *
+from dialogs import *
 
 
 def is_binary_string(byte):
@@ -246,7 +246,7 @@ def _get_linux_terminal_command():
     elif shutil.which("xterm"):
         return "xterm"
     else:
-        messagebox.showerror('Error', 'Terminal emulator cannot be detected.')
+        ErrorInfoDialog(text='Terminal emulator cannot be detected.')
 
 
 def _normalize_path(s):

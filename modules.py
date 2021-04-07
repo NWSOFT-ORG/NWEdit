@@ -14,7 +14,6 @@ import tkinter as tk
 import tkinter.filedialog
 import tkinter.ttk as ttk
 import tkinter.font as font
-import tkinter.messagebox as messagebox
 import codecs
 import logging
 import time

@@ -15,7 +15,7 @@ class Settings:
             self.size = self.settings['font'].split()[1]
             return
         except Exception:
-            messagebox.showerror("Error", "Setings are corrupted.")
+            ErrorInfoDialog(text="Setings are corrupted.")
             sys.exit(1)
 
     @staticmethod
@@ -29,7 +29,7 @@ class Settings:
 
         with zipfile.ZipFile(os.path.join(backupdir, 'Settings.zip'), 'w', zipfile.ZIP_DEFLATED) as zipobj:
             zipdir('Settings/', zipobj)
-        messagebox.showinfo('Done', 'Settings backed up.')
+        ErrorInfoDialog(title='Done', text='Settings backed up.')
 
     def zipsettings(self):
         DirectoryOpenDialog(self.zip_settings)
@@ -39,7 +39,7 @@ class Settings:
         try:
             with zipfile.ZipFile(backupdir) as zipobj:
                 zipobj.extractall(path=APPDIR)
-            messagebox.showinfo('Done', 'Settings extracted. Please restart to apply changes.')
+            ErrorInfoDialog(title='Done', text='Settings extracted. Please restart to apply changes.')
         except (zipfile.BadZipFile, zipfile.BadZipfile, zipfile.LargeZipFile):
             pass
 

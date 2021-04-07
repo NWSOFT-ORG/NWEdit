@@ -62,8 +62,8 @@ class FileTree(ttk.Frame):
     def remove(self):
         path = os.path.join(self.path,
                             self.tree.item(self.tree.focus())['text'])
-        if messagebox.askyesno(
-                'Warning!', 'This file/directory will be deleted immediately!'):
+        if YesNoDialog(
+                title='Warning!', text='This file/directory will be deleted immediately!'):
             if os.path.isdir(path):
                 shutil.rmtree(path)
             else:
@@ -152,14 +152,14 @@ class FileTree(ttk.Frame):
                 try:
                     os.mkdir(path)
                 except FileExistsError:
-                    if messagebox.askyesno('This directory already exsists!',
-                                           'Do you want to overwrite?'):
+                    if YesNoDialog(title='This directory already exsists!',
+                                   text='Do you want to overwrite?').result:
                         shutil.rmtree(path, ignore_errors=True)
                         os.mkdir(path)
             else:
                 if os.path.exists(path):
-                    if messagebox.askyesno('This file already exsists!',
-                                           'Do you want to overwrite?'):
+                    if YesNoDialog(title='This file already exsists!',
+                                   text='Do you want to overwrite?').result:
                         with open(path, 'w') as f:
                             f.write('')
                         self.opencommand(path)

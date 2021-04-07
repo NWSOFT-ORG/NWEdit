@@ -579,7 +579,7 @@ pop up to ask the user to select the path.
                         self.nb.select(tab[1].frame)
                         return
                 if is_binary_string(open(file_dir, 'rb').read()):
-                    dialog = MessageYesNoDialog(self.master, 'Error',
+                    dialog = YesNoDialog(self.master, 'Error',
                                                 'View in Hex?')
                     if result := dialog.result:
                         logger.info(f'HexView: opened because {result=}')
@@ -675,7 +675,7 @@ pop up to ask the user to select the path.
                     file.write(self.tabs[curr_tab].textbox.get(1.0,
                                                                'end').strip())
             else:
-                ErrorDialog(self.master, 'File read only')
+                ErrorInfoDialog(self.master, 'File read only')
         except Exception:
             pass
 
@@ -769,7 +769,7 @@ Steps:
                 run_in_terminal('chmod 700 run.sh && ./run.sh && rm run.sh',
                                 cwd=APPDIR)
         except Exception:
-            ErrorDialog(self.master, 'This language is not supported.')
+            ErrorInfoDialog(self.master, 'This language is not supported.')
 
     @staticmethod
     def system_shell() -> None:
@@ -1188,7 +1188,7 @@ Steps:
                 self.open_file('results.txt')
                 os.remove('results.txt')
         except Exception:
-            ErrorDialog(self.master, 'This language is not supported')
+            ErrorInfoDialog(self.master, 'This language is not supported')
             return
 
     def autopep(self) -> None:
@@ -1203,7 +1203,7 @@ Steps:
                     shell=True
                 )  # Throw the autopep8 results into the bit bin.(/dev/null)
             else:
-                ErrorDialog(self.master, 'Language not supported.')
+                ErrorInfoDialog(self.master, 'Language not supported.')
                 return
             self.reload()
             currtext.edit_separator()
@@ -1284,7 +1284,7 @@ Steps:
 
     def check_updates(self, popup=True) -> list:
         if 'DEV' in VERSION:
-            ErrorDialog(
+            ErrorInfoDialog(
                 self.master, "Updates aren't supported by develop builds,\n\
             since you're always on the latest version!"
             )  # If you're on the developer build, you don't need updates!
@@ -1321,7 +1321,7 @@ Steps:
     def git(self, action=None) -> None:
         currdir = self.filetree.path
         if not os.path.exists(path := os.path.join(currdir, '.git')):  # Use of :=, needs Python 3.8 to run.
-            ErrorDialog(self.master, f'Not a git repository: {Path(path).parent}')
+            ErrorInfoDialog(self.master, f'Not a git repository: {Path(path).parent}')
             return
         if action == 'clone':
             dialog = InputStringDialog(self.master, 'Clone', 'Remote git url:')
@@ -1376,7 +1376,8 @@ Steps:
             committext.pack()
 
             def commit():
-                subprocess.Popen(f'git commit -am "{committext.get("1.0", "end")}"', shell=True)
+                subprocess.Popen(f'git commit -am "{committext.get("1.0", "end")}"', shell=True, cwd=currdir)
+                window.destroy()
             ttk.Button(window, text='Commit', command=commit).pack()
             window.mainloop()
 

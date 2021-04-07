@@ -100,6 +100,7 @@ I have installed a lot.
 However, to make sure that it works fully, you need to install them  
 Dependencies:
 
+- Python: 3.8 or later
 - npm -> eslint (for JavaScript)
 - autopep8
 - pylint

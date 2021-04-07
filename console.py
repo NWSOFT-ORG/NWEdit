@@ -5,6 +5,7 @@ from settings import *
 # from olisolomos's gist
 class Pipe:
     """mock stdin stdout or stderr"""
+
     def __init__(self):
         self.buffer = queue.Queue()
         self.reading = False
@@ -24,6 +25,7 @@ class Pipe:
 
 class Console(ttk.Frame):
     """A tkinter widget which behaves like an interpreter"""
+
     def __init__(self, parent: tk.Misc, _locals=None, exit_callback=None):
         super().__init__(parent)
         settings_class = Settings()
@@ -142,6 +144,7 @@ class ConsoleText(tk.Text):
 A Text widget which handles some application logic,
 e.g. having a line of input at the end with everything else being un-editable
 """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

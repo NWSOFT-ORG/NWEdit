@@ -15,7 +15,7 @@ class FileTree(ttk.Frame):
         super().__init__(master)
         self.tree = ttk.Treeview(self)
         yscroll, xscroll = ttk.Scrollbar(self, command=self.tree.yview), \
-            ttk.Scrollbar(self, command=self.tree.xview, orient='horizontal')
+                           ttk.Scrollbar(self, command=self.tree.xview, orient='horizontal')
         yscroll.pack(side='right', fill='y')
         xscroll.pack(side='bottom', fill='x')
         self.tree['yscrollcommand'] = yscroll.set

@@ -1338,34 +1338,34 @@ Steps:
 			window.title('Commit')
 			window.resizable(0, 0)
 			m = [
-			    x for x in subprocess.check_output(
+			    'M ' + x for x in subprocess.check_output(
 			        "git diff --name-only --diff-filter=M",
 			        stderr=subprocess.STDOUT,
-			        shell=True).splitlines()
+			        shell=True).decode('utf-8').splitlines()
 			]
 			r = [
-			    x for x in subprocess.check_output(
+			    'R ' + x for x in subprocess.check_output(
 			        "git diff --name-only --diff-filter=R",
 			        stderr=subprocess.STDOUT,
-			        shell=True).splitlines()
+			        shell=True).decode('utf-8').splitlines()
 			]
 			n = [
-			    x for x in subprocess.check_output(
-			        "git diff --name-only --diff-filter=A",
+			    'N ' + x for x in subprocess.check_output(
+			        "git diff --name-only --diff-filter=N",
 			        stderr=subprocess.STDOUT,
-			        shell=True).splitlines()
+			        shell=True).decode('utf-8').splitlines()
 			]
 			d = [
-			    x for x in subprocess.check_output(
+			    'D ' + x for x in subprocess.check_output(
 			        "git diff --name-only --diff-filter=D",
 			        stderr=subprocess.STDOUT,
-			        shell=True).splitlines()
+			        shell=True).decode('utf-8').splitlines()
 			]
 			c = [
-			    x for x in subprocess.check_output(
+			    'C ' + x for x in subprocess.check_output(
 			        "git diff --name-only --diff-filter=C",
 			        stderr=subprocess.STDOUT,
-			        shell=True).splitlines()
+			        shell=True).decode('utf-8').splitlines()
 			]
 			lb = tk.Listbox(window)
 			lb.insert('end', *m, *n, *r, *d, *c)

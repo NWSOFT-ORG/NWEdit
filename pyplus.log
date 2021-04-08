@@ -1,26 +1,37 @@
-2021-04-08 08:46:30,635 : INFO : <module> : Tkinter version: 8.6
-2021-04-08 08:46:30,635 : DEBUG : <module> : All modules imported
-2021-04-08 08:46:30,809 : DEBUG : __init__ : Settings loaded
-2021-04-08 08:46:30,812 : DEBUG : __init__ : Icons loaded
-2021-04-08 08:46:31,052 : DEBUG : __init__ : Theme loaded
-2021-04-08 08:46:31,054 : DEBUG : __initialize_custom_style : Initialized custom style.
-2021-04-08 08:46:31,095 : DEBUG : __init__ : Menu created
-2021-04-08 08:46:31,096 : DEBUG : __init__ : Right-click menu created
-2021-04-08 08:46:31,096 : DEBUG : __init__ : Bindings created
-2021-04-08 08:46:31,099 : DEBUG : start_screen : Start screen created
-2021-04-08 08:46:31,100 : DEBUG : update_title : update_title: No file open
-2021-04-08 08:46:31,100 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-04-08 08:46:31,100 : ERROR : open_file : Error when opening file:
+2021-04-08 22:31:53,217 : INFO : <module> : Tkinter version: 8.6
+2021-04-08 22:31:53,217 : DEBUG : <module> : All modules imported
+2021-04-08 22:31:53,548 : DEBUG : __init__ : Settings loaded
+2021-04-08 22:31:53,555 : DEBUG : __init__ : Icons loaded
+2021-04-08 22:31:54,141 : DEBUG : __init__ : Theme loaded
+2021-04-08 22:31:54,144 : DEBUG : __initialize_custom_style : Initialized custom style.
+2021-04-08 22:31:54,207 : DEBUG : __init__ : Menu created
+2021-04-08 22:31:54,207 : DEBUG : __init__ : Right-click menu created
+2021-04-08 22:31:54,208 : DEBUG : __init__ : Bindings created
+2021-04-08 22:31:54,212 : DEBUG : start_screen : Start screen created
+2021-04-08 22:31:54,212 : DEBUG : update_title : update_title: No file open
+2021-04-08 22:31:54,212 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-08 22:31:54,213 : ERROR : open_file : Error when opening file:
 Traceback (most recent call last):
-  File "/home/runner/PyPlus/pyplus.py", line 581, in open_file
-    if is_binary_string(open(file_dir, 'rb').read()):
+  File "/home/runner/PyPlus/pyplus.py", line 658, in open_file
+    if is_binary_string(open(file_dir, "rb").read()):
 FileNotFoundError: [Errno 2] No such file or directory: '/Users/Andy/Documents/Projects/python_projects/PyPlus/customenotebook.py'
-2021-04-08 08:46:53,110 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-04-08 08:46:53,110 : DEBUG : update_title : update_title: No file open
-2021-04-08 08:46:53,110 : DEBUG : mouse : update_title: OK
-2021-04-08 08:46:53,327 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-04-08 08:46:53,327 : DEBUG : update_title : update_title: No file open
-2021-04-08 08:46:53,327 : DEBUG : mouse : update_title: OK
-2021-04-08 08:48:35,133 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-04-08 08:48:35,133 : DEBUG : update_title : update_title: No file open
-2021-04-08 08:48:35,133 : DEBUG : mouse : update_title: OK
+2021-04-08 22:31:55,608 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-08 22:31:55,608 : DEBUG : update_title : update_title: No file open
+2021-04-08 22:31:55,608 : DEBUG : mouse : update_title: OK
+2021-04-08 22:31:55,769 : DEBUG : create_text_widget : Textbox created
+2021-04-08 22:31:55,831 : DEBUG : update_statusbar : update_statusbar: OK
+2021-04-08 22:31:55,831 : DEBUG : update_title : update_title: OK
+2021-04-08 22:31:55,831 : DEBUG : mouse : update_title: OK
+2021-04-08 22:31:55,889 : DEBUG : update_statusbar : update_statusbar: OK
+2021-04-08 22:31:55,890 : DEBUG : update_title : update_title: OK
+2021-04-08 22:31:55,890 : DEBUG : key : update_title: OK
+2021-04-08 22:31:55,892 : INFO : open_file : File opened
+2021-04-08 22:32:02,709 : DEBUG : update_statusbar : update_statusbar: OK
+2021-04-08 22:32:02,709 : DEBUG : update_title : update_title: OK
+2021-04-08 22:32:02,709 : DEBUG : key : update_title: OK
+2021-04-08 22:32:05,349 : DEBUG : update_statusbar : update_statusbar: OK
+2021-04-08 22:32:05,349 : DEBUG : update_title : update_title: OK
+2021-04-08 22:32:05,350 : DEBUG : key : update_title: OK
+2021-04-08 22:32:06,526 : DEBUG : update_statusbar : update_statusbar: OK
+2021-04-08 22:32:06,527 : DEBUG : update_title : update_title: OK
+2021-04-08 22:32:06,527 : DEBUG : mouse : update_title: OK

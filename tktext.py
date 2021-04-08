@@ -124,6 +124,7 @@ text widget with linenumbers in."""
                                  fg=fgcolor,
                                  selectforeground=bgcolor,
                                  selectbackground=fgcolor,
+                                 insertbackground=fgcolor,
                                  highlightthickness=0,
                                  font=self.font,
                                  wrap='none',

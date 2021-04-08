@@ -1372,13 +1372,28 @@ Steps:
             lb.insert('end', *m, *a, *r, *d, *c)
 
             lb.pack(fill='both', expand=1)
-            committext = tk.Text(window, font='Arial')
+            committext = tk.Text(window, font='Arial', height=4)
             committext.pack()
 
             def commit():
                 subprocess.Popen(f'git commit -am "{committext.get("1.0", "end")}"', shell=True, cwd=currdir)
                 window.destroy()
+            
+            def diff():
+                diffwindow = tk.Toplevel(window)
+                diffwindow.resizable(0, 0)
+                difftext = tk.Text(diffwindow, width=200, height=100)
+                difftext.pack(fill='both', expand=1)
+                difftext.lexer = lexers.get_lexer_by_name('diff')
+                subprocess.Popen(f'git diff {lb.get(lb.curselection())[2:]} > {os.path.join(APPDIR, "out.txt")}', shell=True, cwd=currdir)
+                with open(os.path.join(APPDIR, 'out.txt')) as f:
+                    message = f.read()
+                difftext.insert('end', message)
+                difftext.config(state='disabled')
+                self.recolorize(difftext)
+                diffwindow.mainloop()
             ttk.Button(window, text='Commit', command=commit).pack()
+            ttk.Button(window, text='Diff', command=diff).pack()
             window.mainloop()
 
     def indent(self, action='indent') -> None:

@@ -33,14 +33,14 @@ class TextLineNumbers(tk.Canvas):
                                  y,
                                  anchor="nw",
                                  text=linenum,
-                                 fill='black',
+                                 fill=self.textwidget['fg'],
                                  font=bold)
             else:
                 self.create_text(2,
                                  y,
                                  anchor="nw",
                                  text=linenum,
-                                 fill='black',
+                                 fill=self.textwidget['fg'],
                                  font=self.textwidget['font'])
             i = self.textwidget.index("%s+1line" % i)
 
@@ -116,12 +116,14 @@ text widget with linenumbers in."""
         settings_class = Settings()
         self.font = settings_class.get_settings('font')
         self.first_line = 1
+        style = get_style_by_name(settings_class.get_settings('pygments'))
+        bgcolor = style.background_color
+        fgcolor = style.highlight_color
         self.text = EnhancedText(self,
-                                 bg='black',
-                                 fg='white',
-                                 insertbackground='white',
-                                 selectforeground='black',
-                                 selectbackground='white',
+                                 bg=bgcolor,
+                                 fg=fgcolor,
+                                 selectforeground=bgcolor,
+                                 selectbackground=fgcolor,
                                  highlightthickness=0,
                                  font=self.font,
                                  wrap='none',
@@ -131,7 +133,7 @@ text widget with linenumbers in."""
                                  undo=True)
         self.linenumbers = TextLineNumbers(self,
                                            width=30,
-                                           bg='gray',
+                                           bg=bgcolor,
                                            bd=0,
                                            highlightthickness=0)
         self.linenumbers.attach(self.text)

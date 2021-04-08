@@ -1,0 +1,8 @@
+{
+    "python.pythonPath": "/usr/local/opt/python@3.9/bin/python3.9",
+    "python.linting.pylintEnabled": false,
+    "python.linting.pycodestyleEnabled": false,
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.linting.pylamaEnabled": false
+}

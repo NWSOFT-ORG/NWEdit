@@ -2,15 +2,15 @@
 # coding: utf-8
 """
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
-| pyplus.py -- the editor's main file				 |
-| The somehow-professional editor					 |
-| It's extremely small! (around 80 kB)				|
-| You can visit my site for more details!			 |
-| +----------------------------------------------+	|
-| | https://ZCG-coder.github.io/NWSOFT/PyPlusWeb |	|
-| +----------------------------------------------+	|
-| You can also contribute it on github!				|
-| Note: Some parts are adapted from stack overflow.	|
+| pyplus.py -- the editor's main file                |
+| The somehow-professional editor                    |
+| It's extremely small! (around 80 kB)               |
+| You can visit my site for more details!            |
+| +----------------------------------------------+	 |
+| | https://ZCG-coder.github.io/NWSOFT/PyPlusWeb |	 |
+| +----------------------------------------------+	 |
+| You can also contribute it on github!              |
+| Note: Some parts are adapted from stack overflow.  |
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 Also, it's cross-compatible!
 """
@@ -327,7 +327,7 @@ Lacks these MacOS support:
                 for line in f.read().split('\n'):
                     if line:
                         self.open_file(line)
-        except Exception:
+        except FileNotFoundError:
             logger.exception('Error when initializing:')
             with open('recent_files.txt', 'w') as f:
                 f.write('')
@@ -1320,15 +1320,15 @@ Steps:
 
     def git(self, action=None) -> None:
         currdir = self.filetree.path
-        if not os.path.exists(path := os.path.join(currdir, '.git')):  # Use of :=, needs Python 3.8 to run.
-            ErrorInfoDialog(self.master, f'Not a git repository: {Path(path).parent}')
-            return
         if action == 'clone':
             dialog = InputStringDialog(self.master, 'Clone', 'Remote git url:')
             url = dialog.result
             if not url:
                 return
             subprocess.Popen(f'git clone {url}', shell=True, cwd=currdir)
+            return
+        if not os.path.exists(path := os.path.join(currdir, '.git')):
+            ErrorInfoDialog(self.master, f'Not a git repository: {Path(path).parent}')
             return
         if action == 'init':
             subprocess.Popen(
@@ -1369,7 +1369,11 @@ Steps:
                     'utf-8').splitlines()
             ]
             lb = tk.Listbox(window)
-            lb.insert('end', *m, *a, *r, *d, *c)
+            lb.insert('end', *m)
+            lb.insert('end', *r)
+            lb.insert('end', *a)
+            lb.insert('end', *c)
+            lb.insert('end', *d)
 
             lb.pack(fill='both', expand=1)
             committext = tk.Text(window, font='Arial', height=4)
@@ -1378,7 +1382,7 @@ Steps:
             def commit():
                 subprocess.Popen(f'git commit -am "{committext.get("1.0", "end")}"', shell=True, cwd=currdir)
                 window.destroy()
-            
+
             def diff():
                 diffwindow = tk.Toplevel(window)
                 diffwindow.resizable(0, 0)
@@ -1392,8 +1396,10 @@ Steps:
                 difftext.config(state='disabled')
                 self.recolorize(difftext)
                 diffwindow.mainloop()
-            ttk.Button(window, text='Commit', command=commit).pack()
-            ttk.Button(window, text='Diff', command=diff).pack()
+            frame = ttk.Frame(window)
+            ttk.Button(frame, text='Commit', command=commit).pack(side='left')
+            ttk.Button(frame, text='Diff', command=diff).pack(side='left')
+            frame.pack()
             window.mainloop()
 
     def indent(self, action='indent') -> None:

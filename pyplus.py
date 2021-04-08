@@ -3,7 +3,7 @@
 """
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 | pyplus.py -- the editor's main file                |
-| The somehow-professional editor                    |
+| The editor                                         |
 | It's extremely small! (around 80 kB)               |
 | You can visit my site for more details!            |
 | +----------------------------------------------+	 |
@@ -1335,35 +1335,36 @@ Steps:
                 'git init && git add . && git commit -am \"Added files\"',
                 shell=True, cwd=currdir)
         elif action == 'commit':
+            subprocess.Popen('git add .', shell=True)
             window = tk.Toplevel(self.master)
             window.title('Commit')
             window.resizable(0, 0)
             m = [
-                'M ' + x for x in subprocess.Popen('git diff --name-only --diff-filter=M',
+                'M ' + x for x in subprocess.Popen('git diff --staged --name-only --diff-filter=M',
                                                    stdout=subprocess.PIPE, shell=True, cwd=currdir).communicate()[
                     0].decode(
                     'utf-8').splitlines()
             ]
             r = [
-                'R ' + x for x in subprocess.Popen('git diff --name-only --diff-filter=R',
+                'R ' + x for x in subprocess.Popen('git diff --staged --name-only --diff-filter=R',
                                                    stdout=subprocess.PIPE, shell=True, cwd=currdir).communicate()[
                     0].decode(
                     'utf-8').splitlines()
             ]
             a = [
-                'A ' + x for x in subprocess.Popen('git diff --name-only --diff-filter=A',
+                'A ' + x for x in subprocess.Popen('git diff --staged --name-only --diff-filter=A',
                                                    stdout=subprocess.PIPE, shell=True, cwd=currdir).communicate()[
                     0].decode(
                     'utf-8').splitlines()
             ]
             d = [
-                'D ' + x for x in subprocess.Popen('git diff --name-only --diff-filter=D',
+                'D ' + x for x in subprocess.Popen('git diff --staged --name-only --diff-filter=D',
                                                    stdout=subprocess.PIPE, shell=True, cwd=currdir).communicate()[
                     0].decode(
                     'utf-8').splitlines()
             ]
             c = [
-                'C ' + x for x in subprocess.Popen('git diff --name-only --diff-filter=C',
+                'C ' + x for x in subprocess.Popen('git diff --staged --name-only --diff-filter=C',
                                                    stdout=subprocess.PIPE, shell=True, cwd=currdir).communicate()[
                     0].decode(
                     'utf-8').splitlines()
@@ -1386,20 +1387,21 @@ Steps:
             def diff():
                 diffwindow = tk.Toplevel(window)
                 diffwindow.resizable(0, 0)
-                difftext = tk.Text(diffwindow, width=200, height=100)
+                difftext = tk.Text(diffwindow, width=50, height=25)
                 difftext.pack(fill='both', expand=1)
                 difftext.lexer = lexers.get_lexer_by_name('diff')
-                subprocess.Popen(f'git diff {lb.get(lb.curselection())[2:]} > {os.path.join(APPDIR, "out.txt")}', shell=True, cwd=currdir)
+                subprocess.Popen(f'git diff --staged {lb.get(lb.curselection())[2:]} > {os.path.join(APPDIR, "out.txt")}', shell=True, cwd=currdir)
                 with open(os.path.join(APPDIR, 'out.txt')) as f:
                     message = f.read()
+                os.remove('out.txt')
                 difftext.insert('end', message)
-                difftext.config(state='disabled')
+                difftext.config(state='disabled', wrap='none')
                 self.recolorize(difftext)
                 diffwindow.mainloop()
             frame = ttk.Frame(window)
             ttk.Button(frame, text='Commit', command=commit).pack(side='left')
             ttk.Button(frame, text='Diff', command=diff).pack(side='left')
-            frame.pack()
+            frame.pack(anchor='nw')
             window.mainloop()
 
     def indent(self, action='indent') -> None:

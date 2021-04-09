@@ -12,7 +12,8 @@
             "console": "internalConsole",
             "cwd": "${workspaceFolder}",
             "internalConsoleOptions": "openOnSessionStart",
-            "subProcess": true
+            "subProcess": true,
+            "redirectOutput": true
         }
     ]
 }

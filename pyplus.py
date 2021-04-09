@@ -1648,14 +1648,9 @@ class Editor:
                     return
                 for line in currtext.get(start_index, end_index).splitlines():
                     if line.startswith(comment_start) and line.endswith(comment_end):
-                        if line.startswith(comment_start) and line.endswith(comment_end):
-                            currtext.insert(
-                                "insert", f"{line[len(comment_start) + 1:-len(comment_end) + 1]}\n"
-                            )
-                        else:
-                            currtext.insert(
-                                "insert", f"{line[len(comment_start):]}\n"
-                            )
+                        currtext.insert(
+                            "insert", f"{line[len(comment_start) + 1:len(comment_end) + 1]}\n"
+                        )
                     else:
                         currtext.insert("insert", f"{comment_start}{line}{comment_end}\n")
             else:
@@ -1665,7 +1660,7 @@ class Editor:
                 if line.startswith(comment_start) and line.endswith(comment_end):
                     print(f"{line[len(comment_start):len(comment_end)]}\n", flush=True)
                     currtext.insert(
-                        "insert", f"{line[len(comment_start):-len(comment_end)]}\n"
+                        "insert", f"{line[len(comment_start):len(comment_end)]}\n"
                     )
                 else:
                     currtext.insert("insert", f"{comment_start}{line}{comment_end}\n")

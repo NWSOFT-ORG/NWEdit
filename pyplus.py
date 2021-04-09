@@ -25,9 +25,11 @@ from filedialog import FileOpenDialog, FileSaveAsDialog
 from functions import (download_file, is_binary_string, open_system_shell,
                        run_in_terminal)
 from hexview import HexView
-from modules import (EditorErr, Path, PyTouchBar, ThemedStyle, font,
+from modules import (EditorErr, Path, ThemedStyle, font,
                      get_style_by_name, json, lexers, logging, os, subprocess,
                      sys, tk, ttk, ttkthemes, webbrowser)
+if OSX:
+    from modules import PyTouchBar
 from settings import (CommentMarker, Filetype, FormatCommand, Linter,
                       RunCommand, Settings)
 from statusbar import Statusbar
@@ -1460,17 +1462,7 @@ class Editor:
                 cwd=currdir,
             )
         elif action == "commit":
-            if (
-                not subprocess.Popen(
-                    "git diff --staged --name-only",
-                    stdout=subprocess.PIPE,
-                    shell=True,
-                    cwd=currdir,
-                )
-                .communicate()[0]
-                .decode("utf-8")
-            ):
-                subprocess.Popen("git add .", shell=True, cwd=currdir)
+            subprocess.Popen("git add .", shell=True, cwd=currdir)
             window = tk.Toplevel(self.master)
             window.title("Commit")
             window.resizable(0, 0)

@@ -118,8 +118,7 @@ General Public License for more details.
     def open(self, filename):
         if filename and os.path.exists(filename):
             size = os.path.getsize(filename)
-            size = (size - BLOCK_SIZE if size > BLOCK_SIZE else size -
-                                                                BLOCK_WIDTH)
+            size = (size - BLOCK_SIZE if size > BLOCK_SIZE else size - BLOCK_WIDTH)
             self.offset_spinbox.config(to=max(size, 0))
             self.filename = filename
             self.show_block()

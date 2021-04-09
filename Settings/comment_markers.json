@@ -28,9 +28,10 @@
     "zsh": "# ",
     "bashrc": "# ",
     "PKGBUILD": "# ",
-    "json": "// ",
-    "js": "// ",
-    "javascript": "// ",
-    "css": "// ",
-    "zshrc": "# "
+    "json": "/* */",
+    "js": "/* */",
+    "javascript": "/* */",
+    "css": "/* */",
+    "zshrc": "# ",
+    "html": "<!-- -->"
 }

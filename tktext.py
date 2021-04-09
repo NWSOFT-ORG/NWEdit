@@ -1,6 +1,6 @@
 """A modded version of tkinter.Text"""
 
-from settings import *
+from settings import Settings, font, get_style_by_name, tk, ttk
 
 
 class TextLineNumbers(tk.Canvas):

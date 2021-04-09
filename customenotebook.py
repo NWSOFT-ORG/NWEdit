@@ -4,12 +4,12 @@ from constants import *
 
 class ClosableNotebook(ttk.Notebook):
     """A ttk Notebook with close buttons on each tab
-images drawn by me using the mspaint app (the rubbish in many people's opinion)
+    images drawn by me using the mspaint app (the rubbish in many people's opinion)
 
-Change the layout, makes it look like this:
-+------------+
-| title   [X]|
-+-------------------------"""
+    Change the layout, makes it look like this:
+    +------------+
+    | title   [X]|
+    +-------------------------"""
 
     __initialized = False
 
@@ -17,7 +17,7 @@ Change the layout, makes it look like this:
         if not self.__initialized:
             self.__initialize_custom_style()
             self.__inititialized = True
-        ttk.Notebook.__init__(self, master=master, style='CustomNotebook')
+        ttk.Notebook.__init__(self, master=master, style="CustomNotebook")
         self.cmd = cmd
 
         self._active = None
@@ -32,16 +32,16 @@ Change the layout, makes it look like this:
 
         if "close" in element:
             index = self.index("@%d,%d" % (event.x, event.y))
-            self.state(['pressed'])
+            self.state(["pressed"])
             self._active = index
         else:
             self.event_generate("<<Notebook_B1-Down>>", when="tail")
-        logger.debug('Close tab start')
+        logger.debug("Close tab start")
 
     def on_close_release(self, event):
         try:
             """Called when the button is released over the close button"""
-            if not self.instate(['pressed']):
+            if not self.instate(["pressed"]):
                 return
 
             element = self.identify(event.x, event.y)
@@ -52,48 +52,54 @@ Change the layout, makes it look like this:
 
             self.state(["!pressed"])
             self._active = None
-            logger.debug('Close tab end')
+            logger.debug("Close tab end")
 
         except Exception:
-            logger.exception('Error:')
+            logger.exception("Error:")
 
     def __initialize_custom_style(self):
         style = ttk.Style()
-        self.image = tk.PhotoImage("img_close", file='Images/close.gif')
+        self.image = tk.PhotoImage("img_close", file="Images/close.gif")
 
-        style.element_create(
-            "close",
-            "image",
-            "img_close",
-            border=10,
-            sticky='')
-        style.layout("CustomNotebook", [("CustomNotebook.client", {
-            "sticky": "nswe"
-        })])
-        style.layout("CustomNotebook.Tab", [("CustomNotebook.tab", {
-            "sticky"  :
-                "nswe",
-            "children": [("CustomNotebook.padding", {
-                "side"    :
-                    "top",
-                "sticky"  :
-                    "nswe",
-                "children": [("CustomNotebook.focus", {
-                    "side"    :
-                        "top",
-                    "sticky"  :
-                        "nswe",
-                    "children": [
-                        ("CustomNotebook.label", {
-                            "side"  : "left",
-                            "sticky": ''
-                        }),
-                        ("CustomNotebook.close", {
-                            "side"  : "left",
-                            "sticky": ''
-                        }),
-                    ]
-                })]
-            })]
-        })])
+        style.element_create("close", "image", "img_close", border=10, sticky="")
+        style.layout("CustomNotebook", [("CustomNotebook.client", {"sticky": "nswe"})])
+        style.layout(
+            "CustomNotebook.Tab",
+            [
+                (
+                    "CustomNotebook.tab",
+                    {
+                        "sticky": "nswe",
+                        "children": [
+                            (
+                                "CustomNotebook.padding",
+                                {
+                                    "side": "top",
+                                    "sticky": "nswe",
+                                    "children": [
+                                        (
+                                            "CustomNotebook.focus",
+                                            {
+                                                "side": "top",
+                                                "sticky": "nswe",
+                                                "children": [
+                                                    (
+                                                        "CustomNotebook.label",
+                                                        {"side": "left", "sticky": ""},
+                                                    ),
+                                                    (
+                                                        "CustomNotebook.close",
+                                                        {"side": "left", "sticky": ""},
+                                                    ),
+                                                ],
+                                            },
+                                        )
+                                    ],
+                                },
+                            )
+                        ],
+                    },
+                )
+            ],
+        )
         logger.debug("Initialized custom style.")

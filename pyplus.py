@@ -1,6 +1,7 @@
 #!/usr/local/bin/python3.9
 # coding: utf-8
 """
+
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 | pyplus.py -- the editor's main file                |
 | The editor                                         |
@@ -15,19 +16,29 @@
 Also, it's cross-compatible!
 """
 # These modules are from the base directory
-from console import *
-from customenotebook import *
-from functions import *
-from hexview import *
-from statusbar import *
-from tktext import *
-from treeview import *
+from console import Console
+from constants import (APPDIR, LINT_BATCH, MAIN_KEY, OSX, RUN_BATCH, VERSION,
+                       WINDOWS, logger)
+from customenotebook import ClosableNotebook
+from dialogs import ErrorInfoDialog, InputStringDialog, YesNoDialog
+from filedialog import FileOpenDialog, FileSaveAsDialog
+from functions import (download_file, is_binary_string, open_system_shell,
+                       run_in_terminal)
+from hexview import HexView
+from modules import (EditorErr, Path, PyTouchBar, ThemedStyle, font,
+                     get_style_by_name, json, lexers, logging, os, subprocess,
+                     sys, tk, ttk, ttkthemes, webbrowser)
+from settings import (CommentMarker, Filetype, FormatCommand, Linter,
+                      RunCommand, Settings)
+from statusbar import Statusbar
+from tktext import EnhancedText, EnhancedTextFrame
+from treeview import FileTree
 
 os.chdir(APPDIR)
 
 
 class Document:
-    """Helper class, for the editor"""
+    """Helper class, for the editor."""
 
     def __init__(self, frame, textbox, file_dir) -> None:
         self.frame = frame
@@ -263,30 +274,20 @@ class Editor:
                 compound="left",
                 image=self.sel_all_icon,
             )
+            editmenu.add_command(label="Select Word", command=self.sel_word)
             editmenu.add_command(
-                label="Select Word",
-                command=self.sel_word
+                label="Select Word on the left", command=self.sel_word_left
             )
             editmenu.add_command(
-                label="Select Word on the left",
-                command=self.sel_word_left
-            )
-            editmenu.add_command(
-                label="Select Word on the right",
-                command=self.sel_word_right
+                label="Select Word on the right", command=self.sel_word_right
             )
             editmenu.add_separator()
+            editmenu.add_command(label="Delete Word", command=self.del_word)
             editmenu.add_command(
-                label="Delete Word",
-                command=self.del_word
+                label="Delete Word on the left", command=self.del_word_left
             )
             editmenu.add_command(
-                label="Delete Word on the left",
-                command=self.del_word_left
-            )
-            editmenu.add_command(
-                label="Delete Word on the Right",
-                command=self.del_word_right
+                label="Delete Word on the Right", command=self.del_word_right
             )
 
             self.codemenu = tk.Menu(menubar, tearoff=0)
@@ -522,7 +523,7 @@ class Editor:
             logger.debug("update_title: OK")
             return "break"
         except Exception:
-            self.master.title(f"PyPlus")
+            self.master.title("PyPlus")
             return "break"
 
     def update_statusbar(self, _=None) -> str:
@@ -657,8 +658,8 @@ class Editor:
                         return
                 if is_binary_string(open(file_dir, "rb").read()):
                     dialog = YesNoDialog(self.master, "Error", "View in Hex?")
-                    if result := dialog.result:
-                        logger.info(f"HexView: opened because {result=}")
+                    if dialog.result:
+                        logger.info("HexView: opened")
                         viewer = ttk.Frame(self.master)
                         viewer.focus_set()
                         window = HexView(viewer)
@@ -668,10 +669,8 @@ class Editor:
                         self.nb.select(viewer)
                         self.update_title()
                         self.update_statusbar()
-                        return
-                    else:
-                        logging.info("User pressed No.")
-                        return
+                    logging.info("User pressed No.")
+                    return
                 file = open(file_dir)
                 extens = file_dir.split(".")[-1]
 
@@ -711,16 +710,17 @@ class Editor:
                 if type(e).__name__ != "ValueError":
                     logger.exception("Error when opening file:")
                 else:
-                    logger.exception(f"Warning! Program has ValueError: {e}")
+                    logger.exception("Warning! Program has ValueError.")
 
     def _open(self, _=None) -> None:
-        """This method just prompts the user to open a file when C-O is pressed"""
+        """Prompt the user to open a file when C-O is pressed"""
         self.open_file()
 
-    def save_as(self, file_dir=None) -> None:
+    def save_as(self, file: str = None) -> None:
+        """Save the document as a different name."""
         if self.tabs:
-            if file_dir:
-                file_dir = file_dir
+            if file:
+                file_dir = file
             else:
                 FileSaveAsDialog(self.save_as)
                 return
@@ -739,7 +739,7 @@ class Editor:
         self.save_as()
 
     def save_file(self, _=None) -> None:
-        """Saves an *existing* file"""
+        """Save an *existing* file"""
         try:
             curr_tab = self.get_tab()
             if not os.path.exists(self.tabs[curr_tab].file_dir):
@@ -1355,9 +1355,9 @@ class Editor:
 
     def sel_word(self) -> None:
         currtext = self.tabs[self.get_tab()].textbox
-        currtext.tag_remove('sel', '1.0', 'end')
+        currtext.tag_remove("sel", "1.0", "end")
         currtext.tag_add("sel", "insert -1c wordstart", "insert wordend")
-    
+
     def sel_word_left(self) -> None:
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set("insert", "insert wordstart -2c")
@@ -1474,7 +1474,7 @@ class Editor:
             window = tk.Toplevel(self.master)
             window.title("Commit")
             window.resizable(0, 0)
-            m = [
+            modified_files = [
                 "M " + x
                 for x in subprocess.Popen(
                     "git diff --staged --name-only --diff-filter=M",
@@ -1486,7 +1486,7 @@ class Editor:
                 .decode("utf-8")
                 .splitlines()
             ]
-            r = [
+            renamed_files = [
                 "R " + x
                 for x in subprocess.Popen(
                     "git diff --staged --name-only --diff-filter=R",
@@ -1498,7 +1498,7 @@ class Editor:
                 .decode("utf-8")
                 .splitlines()
             ]
-            a = [
+            added_files = [
                 "A " + x
                 for x in subprocess.Popen(
                     "git diff --staged --name-only --diff-filter=A",
@@ -1510,7 +1510,7 @@ class Editor:
                 .decode("utf-8")
                 .splitlines()
             ]
-            d = [
+            deleted_files = [
                 "D " + x
                 for x in subprocess.Popen(
                     "git diff --staged --name-only --diff-filter=D",
@@ -1522,7 +1522,7 @@ class Editor:
                 .decode("utf-8")
                 .splitlines()
             ]
-            c = [
+            copied_files = [
                 "C " + x
                 for x in subprocess.Popen(
                     "git diff --staged --name-only --diff-filter=C",
@@ -1534,14 +1534,14 @@ class Editor:
                 .decode("utf-8")
                 .splitlines()
             ]
-            lb = tk.Listbox(window)
-            lb.insert("end", *m)
-            lb.insert("end", *r)
-            lb.insert("end", *a)
-            lb.insert("end", *c)
-            lb.insert("end", *d)
+            files_listbox = tk.Listbox(window)
+            files_listbox.insert("end", *modified_files)
+            files_listbox.insert("end", *renamed_files)
+            files_listbox.insert("end", *added_files)
+            files_listbox.insert("end", *copied_files)
+            files_listbox.insert("end", *deleted_files)
 
-            lb.pack(fill="both", expand=1)
+            files_listbox.pack(fill="both", expand=1)
             committext = tk.Text(window, font="Arial", height=4)
             committext.pack()
 
@@ -1560,7 +1560,8 @@ class Editor:
                 difftext.pack(fill="both", expand=1)
                 difftext.lexer = lexers.get_lexer_by_name("diff")
                 subprocess.Popen(
-                    f'git diff --staged {lb.get(lb.curselection())[2:]} > {os.path.join(APPDIR, "out.txt")}',
+                    f'git diff --staged {files_listbox.get(files_listbox.curselection())[2:]} > \
+                        {os.path.join(APPDIR, "out.txt")}',
                     shell=True,
                     cwd=currdir,
                 )
@@ -1579,7 +1580,7 @@ class Editor:
             window.mainloop()
 
     def indent(self, action="indent") -> None:
-        """Indent/unindent feature"""
+        """Indent/unindent feature."""
         if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
@@ -1618,30 +1619,57 @@ class Editor:
         currtext.edit_separator()
 
     def comment_lines(self, _=None):
+        """Comments the selection or line"""
         try:
             currtext = self.tabs[self.get_tab()].textbox
             if not currtext.comment_marker:
                 return
+            comment_markers = currtext.comment_marker.split(' ')
+            block = len(comment_markers) == 2
+            if block and comment_markers[1] != '':
+                comment_start = comment_markers[0]
+                comment_end = comment_markers[1]
+            else:
+                comment_start = currtext.comment_marker
+                comment_end = ''
             if currtext.tag_ranges("sel"):
                 start_index, end_index = "sel.first linestart", "sel.last lineend"
-                for line in currtext.get(start_index, end_index).splitlines():
-                    currtext.delete(start_index, end_index)
-                    if line.startswith(currtext.comment_marker):
+                text = currtext.get(start_index, end_index)
+                currtext.delete(start_index, end_index)
+                if block:
+                    if text.startswith(comment_start):
                         currtext.insert(
-                            "insert", f"{line[len(currtext.comment_marker):]}\n"
+                            "insert", text[len(comment_start):-len(comment_end)]
                         )
+                        self.key()
+                        return
+                    currtext.insert("insert", f"{comment_start} {text} {comment_end}")
+                    self.key()
+                    return
+                for line in currtext.get(start_index, end_index).splitlines():
+                    if line.startswith(comment_start) and line.endswith(comment_end):
+                        if line.startswith(comment_start) and line.endswith(comment_end):
+                            currtext.insert(
+                                "insert", f"{line[len(comment_start) + 1:-len(comment_end) + 1]}\n"
+                            )
+                        else:
+                            currtext.insert(
+                                "insert", f"{line[len(comment_start):]}\n"
+                            )
                     else:
-                        currtext.insert("insert", f"{currtext.comment_marker}{line}\n")
+                        currtext.insert("insert", f"{comment_start}{line}{comment_end}\n")
             else:
                 start_index, end_index = "insert linestart", "insert lineend"
                 line = currtext.get(start_index, end_index)
                 currtext.delete(start_index, end_index)
-                if line.startswith(currtext.comment_marker):
+                if line.startswith(comment_start) and line.endswith(comment_end):
+                    print(f"{line[len(comment_start):len(comment_end)]}\n", flush=True)
                     currtext.insert(
-                        "insert", f"{line[len(currtext.comment_marker):]}\n"
+                        "insert", f"{line[len(comment_start):-len(comment_end)]}\n"
                     )
                 else:
-                    currtext.insert("insert", f"{currtext.comment_marker}{line}\n")
+                    currtext.insert("insert", f"{comment_start}{line}{comment_end}\n")
+            self.key()
         except (KeyError, AttributeError):
             return
 

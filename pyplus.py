@@ -17,21 +17,54 @@ Also, it's cross-compatible!
 """
 # These modules are from the base directory
 from console import Console
-from constants import (APPDIR, LINT_BATCH, MAIN_KEY, OSX, RUN_BATCH, VERSION,
-                       WINDOWS, logger)
+from constants import (
+    APPDIR,
+    LINT_BATCH,
+    MAIN_KEY,
+    OSX,
+    RUN_BATCH,
+    VERSION,
+    WINDOWS,
+    logger,
+)
 from customenotebook import ClosableNotebook
 from dialogs import ErrorInfoDialog, InputStringDialog, YesNoDialog
 from filedialog import FileOpenDialog, FileSaveAsDialog
-from functions import (download_file, is_binary_string, open_system_shell,
-                       run_in_terminal)
+from functions import (
+    download_file,
+    is_binary_string,
+    open_system_shell,
+    run_in_terminal,
+)
 from hexview import HexView
-from modules import (EditorErr, Path, ThemedStyle, font,
-                     get_style_by_name, json, lexers, logging, os, subprocess,
-                     sys, tk, ttk, ttkthemes, webbrowser)
+from modules import (
+    EditorErr,
+    Path,
+    ThemedStyle,
+    font,
+    get_style_by_name,
+    json,
+    lexers,
+    logging,
+    os,
+    subprocess,
+    sys,
+    tk,
+    ttk,
+    ttkthemes,
+    webbrowser,
+)
+
 if OSX:
     from modules import PyTouchBar
-from settings import (CommentMarker, Filetype, FormatCommand, Linter,
-                      RunCommand, Settings)
+from settings import (
+    CommentMarker,
+    Filetype,
+    FormatCommand,
+    Linter,
+    RunCommand,
+    Settings,
+)
 from statusbar import Statusbar
 from tktext import EnhancedText, EnhancedTextFrame
 from treeview import FileTree
@@ -269,6 +302,8 @@ class Editor:
             editmenu.add_command(
                 label="Duplicate Line or Selected", command=self.duplicate_line
             )
+            editmenu.add_command(label="Join lines", command=self.join_lines)
+            editmenu.add_separator()
             editmenu.add_command(
                 label="Select All",
                 command=self.select_all,
@@ -276,6 +311,7 @@ class Editor:
                 compound="left",
                 image=self.sel_all_icon,
             )
+            editmenu.add_command(label="Select Line", command=self.sel_line)
             editmenu.add_command(label="Select Word", command=self.sel_word)
             editmenu.add_command(
                 label="Select Word on the left", command=self.sel_word_left
@@ -291,6 +327,8 @@ class Editor:
             editmenu.add_command(
                 label="Delete Word on the Right", command=self.del_word_right
             )
+            editmenu.add_command(label="Move line up", command=self.mv_line_up)
+            editmenu.add_command(label="Move line down", command=self.mv_line_dn)
 
             self.codemenu = tk.Menu(menubar, tearoff=0)
             self.codemenu.add_command(
@@ -899,7 +937,7 @@ class Editor:
         currtext.edit_separator()
         self.key()
 
-    def autoinsert(self, event=None) -> str:
+    def autoinsert(self, event=None) -> None:
         """Auto-inserts a symbol
         * ' -> ''
         * " -> ""
@@ -907,7 +945,7 @@ class Editor:
         * [ -> []
         * { -> {}"""
         if not self.tabs:
-            return "notabs"
+            return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.edit_separator()
         char = event.char
@@ -916,40 +954,40 @@ class Editor:
             if char == "'":
                 currtext.delete("sel.first", "sel.last")
                 currtext.insert("insert", f"'{selected}'")
-                return "break"
+                return
             if char == '"':
                 currtext.delete("sel.first", "sel.last")
                 currtext.insert("insert", f'"{selected}"')
-                return "break"
+                return
             if char == "(":
                 currtext.delete("sel.first", "sel.last")
                 currtext.insert("insert", f"({selected})")
-                return "break"
+                return
             if char == "[":
                 currtext.delete("sel.first", "sel.last")
                 currtext.insert("insert", f"[{selected}]")
-                return "break"
+                return
             if char == "{":
                 currtext.delete("sel.first", "sel.last")
                 currtext.insert(
                     "insert", "{" + selected + "}"
                 )  # Can't use f-string for this!
-                return "break"
+                return
 
         if char == "'":
             if currtext.get("insert", "insert +1c") == "'":
                 currtext.mark_set("insert", "insert +1c")
-                return "break"
+                return
             currtext.insert("insert", "''")
             currtext.mark_set("insert", "insert -1c")
-            return "break"
+            return
         elif char == '"':
             if currtext.get("insert", "insert +1c") == '"':
                 currtext.mark_set("insert", "insert +1c")
-                return "break"
+                return
             currtext.insert("insert", '""')
             currtext.mark_set("insert", "insert -1c")
-            return "break"
+            return
         elif char == "(":
             currtext.insert("insert", ")")
         elif char == "[":
@@ -1340,50 +1378,108 @@ class Editor:
         )
 
     def nav_1cf(self) -> None:
+        if not self.tabs:
+            return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set("insert", "insert +1c")
 
     def nav_1cb(self) -> None:
+        if not self.tabs:
+            return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set("insert", "insert -1c")
 
     def nav_wordstart(self) -> None:
+        if not self.tabs:
+            return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set("insert", "insert -1c wordstart")
 
     def nav_wordend(self) -> None:
+        if not self.tabs:
+            return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set("insert", "insert wordend")
 
     def sel_word(self) -> None:
+        if not self.tabs:
+            return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.tag_remove("sel", "1.0", "end")
         currtext.tag_add("sel", "insert -1c wordstart", "insert wordend")
 
     def sel_word_left(self) -> None:
+        if not self.tabs:
+            return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set("insert", "insert wordstart -2c")
         self.sel_word()
 
     def sel_word_right(self) -> None:
+        if not self.tabs:
+            return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set("insert", "insert wordend +2c")
         self.sel_word()
 
+    def sel_line(self) -> None:
+        if not self.tabs:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        currtext.tag_add("sel", "insert linestart", "insert +1l linestart")
+
     def del_word(self) -> None:
+        if not self.tabs:
+            return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.delete("insert -1c wordstart", "insert wordend")
         self.key()
 
     def del_word_left(self) -> None:
+        if not self.tabs:
+            return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set("insert", "insert wordstart -2c")
         self.del_word()
 
     def del_word_right(self) -> None:
+        if not self.tabs:
+            return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.mark_set("insert", "insert wordend +2c")
         self.del_word()
+
+    def join_lines(self) -> None:
+        if not self.tabs:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        if not currtext.tag_ranges("sel"):
+            return
+        sel = currtext.get("sel.first", "sel.last").splitlines()
+        if len(sel) < 2:
+            return
+        sel = "".join(sel)
+        currtext.delete("sel.first", "sel.last")
+        currtext.insert("insert", sel)
+        self.key()
+
+    def mv_line_up(self) -> None:
+        if not self.tabs:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        text = currtext.get("insert -1l lineend", "insert lineend")
+        currtext.delete("insert -1l lineend", "insert lineend")
+        currtext.mark_set("insert", "insert -1l")
+        currtext.insert("insert", text)
+
+    def mv_line_dn(self) -> None:
+        if not self.tabs:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        text = currtext.get("insert -1l lineend", "insert lineend")
+        currtext.delete("insert -1l lineend", "insert lineend")
+        currtext.mark_set("insert", "insert +1l")
+        currtext.insert("insert", text)
 
     def biggerview(self) -> None:
         if not self.tabs:
@@ -1616,14 +1712,14 @@ class Editor:
             currtext = self.tabs[self.get_tab()].textbox
             if not currtext.comment_marker:
                 return
-            comment_markers = currtext.comment_marker.split(' ')
+            comment_markers = currtext.comment_marker.split(" ")
             block = len(comment_markers) == 2
-            if block and comment_markers[1] != '':
+            if block and comment_markers[1] != "":
                 comment_start = comment_markers[0]
                 comment_end = comment_markers[1]
             else:
                 comment_start = currtext.comment_marker
-                comment_end = ''
+                comment_end = ""
             if currtext.tag_ranges("sel"):
                 start_index, end_index = "sel.first linestart", "sel.last lineend"
                 text = currtext.get(start_index, end_index)
@@ -1631,7 +1727,7 @@ class Editor:
                 if block:
                     if text.startswith(comment_start):
                         currtext.insert(
-                            "insert", text[len(comment_start):-len(comment_end)]
+                            "insert", text[len(comment_start) : -len(comment_end)]
                         )
                         self.key()
                         return
@@ -1641,10 +1737,13 @@ class Editor:
                 for line in currtext.get(start_index, end_index).splitlines():
                     if line.startswith(comment_start) and line.endswith(comment_end):
                         currtext.insert(
-                            "insert", f"{line[len(comment_start) + 1:len(comment_end) + 1]}\n"
+                            "insert",
+                            f"{line[len(comment_start) + 1:len(comment_end) + 1]}\n",
                         )
                     else:
-                        currtext.insert("insert", f"{comment_start}{line}{comment_end}\n")
+                        currtext.insert(
+                            "insert", f"{comment_start}{line}{comment_end}\n"
+                        )
             else:
                 start_index, end_index = "insert linestart", "insert lineend"
                 line = currtext.get(start_index, end_index)

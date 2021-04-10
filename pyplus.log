@@ -1,18 +1,38 @@
-2021-04-09 23:05:14,146 : INFO : <module> : Tkinter version: 8.6
-2021-04-09 23:05:14,146 : DEBUG : <module> : All modules imported
-2021-04-09 23:05:14,417 : DEBUG : __init__ : Settings loaded
-2021-04-09 23:05:14,422 : DEBUG : __init__ : Icons loaded
-2021-04-09 23:05:14,887 : DEBUG : __init__ : Theme loaded
-2021-04-09 23:05:14,889 : DEBUG : __initialize_custom_style : Initialized custom style.
-2021-04-09 23:05:14,962 : DEBUG : __init__ : Menu created
-2021-04-09 23:05:14,963 : DEBUG : __init__ : Right-click menu created
-2021-04-09 23:05:14,963 : DEBUG : __init__ : Bindings created
-2021-04-09 23:05:14,967 : DEBUG : start_screen : Start screen created
-2021-04-09 23:05:14,968 : DEBUG : update_title : update_title: No file open
-2021-04-09 23:05:14,968 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-04-09 23:05:16,184 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-04-09 23:05:16,184 : DEBUG : update_title : update_title: No file open
-2021-04-09 23:05:16,184 : DEBUG : mouse : update_title: OK
-2021-04-09 23:05:16,480 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-04-09 23:05:16,481 : DEBUG : update_title : update_title: No file open
-2021-04-09 23:05:16,481 : DEBUG : mouse : update_title: OK
+2021-04-10 22:46:19,840 : INFO : <module> : Tkinter version: 8.6
+2021-04-10 22:46:19,840 : DEBUG : <module> : All modules imported
+2021-04-10 22:46:20,446 : DEBUG : __init__ : Settings loaded
+2021-04-10 22:46:20,452 : DEBUG : __init__ : Icons loaded
+2021-04-10 22:46:21,257 : DEBUG : __init__ : Theme loaded
+2021-04-10 22:46:21,262 : DEBUG : __initialize_custom_style : Initialized custom style.
+2021-04-10 22:46:21,382 : DEBUG : __init__ : Menu created
+2021-04-10 22:46:21,383 : DEBUG : __init__ : Right-click menu created
+2021-04-10 22:46:21,383 : DEBUG : __init__ : Bindings created
+2021-04-10 22:46:21,390 : DEBUG : start_screen : Start screen created
+2021-04-10 22:46:21,390 : DEBUG : update_title : update_title: No file open
+2021-04-10 22:46:21,391 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-10 22:46:23,476 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-10 22:46:23,476 : DEBUG : update_title : update_title: No file open
+2021-04-10 22:46:23,477 : DEBUG : mouse : update_title: OK
+2021-04-10 22:46:24,237 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-10 22:46:24,237 : DEBUG : update_title : update_title: No file open
+2021-04-10 22:46:24,238 : DEBUG : mouse : update_title: OK
+2021-04-10 22:46:24,439 : DEBUG : create_text_widget : Textbox created
+2021-04-10 22:46:24,485 : DEBUG : update_statusbar : update_statusbar: OK
+2021-04-10 22:46:24,486 : DEBUG : update_title : update_title: OK
+2021-04-10 22:46:24,486 : DEBUG : mouse : update_title: OK
+2021-04-10 22:46:24,553 : DEBUG : update_statusbar : update_statusbar: OK
+2021-04-10 22:46:24,554 : DEBUG : update_title : update_title: OK
+2021-04-10 22:46:24,554 : DEBUG : key : update_title: OK
+2021-04-10 22:46:24,561 : INFO : open_file : File opened
+2021-04-10 22:46:25,655 : DEBUG : update_statusbar : update_statusbar: OK
+2021-04-10 22:46:25,655 : DEBUG : update_title : update_title: OK
+2021-04-10 22:46:25,656 : DEBUG : mouse : update_title: OK
+2021-04-10 22:46:30,204 : DEBUG : update_statusbar : update_statusbar: OK
+2021-04-10 22:46:30,204 : DEBUG : update_title : update_title: OK
+2021-04-10 22:46:30,204 : DEBUG : key : update_title: OK
+2021-04-10 22:46:33,708 : DEBUG : update_statusbar : update_statusbar: OK
+2021-04-10 22:46:33,708 : DEBUG : update_title : update_title: OK
+2021-04-10 22:46:33,709 : DEBUG : key : update_title: OK
+2021-04-10 22:47:17,968 : DEBUG : update_statusbar : update_statusbar: OK
+2021-04-10 22:47:17,969 : DEBUG : update_title : update_title: OK
+2021-04-10 22:47:17,969 : DEBUG : mouse : update_title: OK

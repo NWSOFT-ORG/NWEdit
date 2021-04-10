@@ -8,7 +8,7 @@ class Dialog(tk.Toplevel):
             self.transient(parent)
         else:
             super().__init__()
-            self.transient('.')
+            self.transient(".")
 
         if title:
             self.title(title)
@@ -42,13 +42,10 @@ class Dialog(tk.Toplevel):
 
         box = ttk.Frame(self)
 
-        w = ttk.Button(box,
-                       text="OK",
-                       width=10,
-                       command=self.ok)
-        w.pack(side='left', padx=5, pady=5)
+        w = ttk.Button(box, text="OK", width=10, command=self.ok)
+        w.pack(side="left", padx=5, pady=5)
         w = ttk.Button(box, text="Cancel", width=10, command=self.cancel)
-        w.pack(side='left', padx=5, pady=5)
+        w.pack(side="left", padx=5, pady=5)
 
         box.pack()
 
@@ -77,7 +74,7 @@ class Dialog(tk.Toplevel):
 
 
 class YesNoDialog(Dialog):
-    def __init__(self, parent: tk.Misc = None, title: str = '', text: str = None):
+    def __init__(self, parent: tk.Misc = None, title: str = "", text: str = None):
         self.text = text
         super().__init__(parent, title)
 
@@ -91,77 +88,77 @@ class YesNoDialog(Dialog):
         box = ttk.Frame(self)
 
         b1 = ttk.Button(box, text="Yes", width=10, command=self.apply)
-        b1.pack(side='left', padx=5, pady=5)
+        b1.pack(side="left", padx=5, pady=5)
         b2 = ttk.Button(box, text="No", width=10, command=self.cancel)
-        b2.pack(side='left', padx=5, pady=5)
+        b2.pack(side="left", padx=5, pady=5)
 
         box.pack()
 
     def apply(self, _=None):
         self.result = 1
         self.destroy()
-        logger.info('apply')
+        logger.info("apply")
 
     def cancel(self, _=None):
         # put focus back to the parent window
         self.result = 0
         self.destroy()
-        logger.info('cancel')
+        logger.info("cancel")
 
 
 class InputStringDialog(Dialog):
-    def __init__(self, parent=None, title='InputString', text=None):
+    def __init__(self, parent=None, title="InputString", text=None):
         self.text = text
         super().__init__(parent, title)
 
     def body(self, master: tk.Misc):
         label1 = ttk.Label(master, text=self.text)
-        label1.pack(side='top', fill='both', expand=1)
+        label1.pack(side="top", fill="both", expand=1)
 
         return label1
 
     def buttonbox(self):
         self.entry = ttk.Entry(self)
-        self.entry.pack(fill='x', expand=1)
+        self.entry.pack(fill="x", expand=1)
         box = ttk.Frame(self)
 
         b1 = ttk.Button(box, text="Ok", width=10, command=self.apply)
-        b1.pack(side='left', padx=5, pady=5)
+        b1.pack(side="left", padx=5, pady=5)
         b2 = ttk.Button(box, text="Cancel", width=10, command=self.cancel)
-        b2.pack(side='left', padx=5, pady=5)
+        b2.pack(side="left", padx=5, pady=5)
 
         box.pack()
 
     def apply(self, _=None):
         self.result = self.entry.get()
         self.destroy()
-        logger.info('apply')
+        logger.info("apply")
 
     def cancel(self, _=None):
         # put focus back to the parent window
         self.result = 0
         self.destroy()
-        logger.info('cancel')
+        logger.info("cancel")
 
 
 class ErrorInfoDialog(Dialog):
-    def __init__(self, parent: tk.Misc = None, text: str = None, title: str = 'Error'):
+    def __init__(self, parent: tk.Misc = None, text: str = None, title: str = "Error"):
         self.text = text
         super().__init__(parent, title)
 
     def body(self, master):
         label1 = ttk.Label(master, text=self.text)
-        label1.pack(side='top', fill='both', expand=1)
+        label1.pack(side="top", fill="both", expand=1)
 
         return label1
 
     def buttonbox(self):
         b1 = ttk.Button(self, text="Ok", width=10, command=self.apply)
-        b1.pack(side='left', padx=5, pady=5)
+        b1.pack(side="left", padx=5, pady=5)
 
     def apply(self, _=None):
         self.destroy()
-        logger.info('apply')
+        logger.info("apply")
 
     @staticmethod
     def cancel(_=None, **kwargs):

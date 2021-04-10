@@ -28,7 +28,8 @@ from pygments.styles import get_style_by_name
 from pygson.json_lexer import JSONLexer
 from ttkthemes import ThemedStyle
 import zipfile
-if sys.platform == 'darwin':
+
+if sys.platform == "darwin":
     import PyTouchBar
 
 
@@ -37,5 +38,4 @@ class EditorErr(Exception):
 
     def __init__(self, message):
         # The error (e+m)
-        super().__init__(
-            'An editor error is occurred.' if not message else message)
+        super().__init__("An editor error is occurred." if not message else message)

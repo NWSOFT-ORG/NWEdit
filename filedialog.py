@@ -2,32 +2,32 @@ from treeview import *
 
 
 class FileOpenDialog(FileTree):
-    def __init__(self, opencommand: callable, action: str = 'Open'):
+    def __init__(self, opencommand: callable, action: str = "Open"):
         self.win = tk.Toplevel()
-        self.win.title(f'{action}')
+        self.win.title(f"{action}")
         self.win.resizable(0, 0)
         self.buttonframe = ttk.Frame(self.win)
-        self.okbtn = ttk.Button(self.buttonframe,
-                                text=action,
-                                command=self.open)
-        self.okbtn.pack(side='left')
-        self.cancelbtn = ttk.Button(self.buttonframe,
-                                    text='Cancel',
-                                    command=self.win.destroy)
-        self.cancelbtn.pack(side='right')
-        self.buttonframe.pack(side='bottom', anchor='nw')
+        self.okbtn = ttk.Button(self.buttonframe, text=action, command=self.open)
+        self.okbtn.pack(side="left")
+        self.cancelbtn = ttk.Button(
+            self.buttonframe, text="Cancel", command=self.win.destroy
+        )
+        self.cancelbtn.pack(side="right")
+        self.buttonframe.pack(side="bottom", anchor="nw")
         self.entryframe = ttk.Frame(self.win)
         self.pathentry = ttk.Entry(self.entryframe)
-        self.pathentry.pack(fill='x')
-        self.open_from_string_btn = ttk.Button(self.pathentry,
-                                               command=self.open_from_string,
-                                               text=action)
-        self.open_from_string_btn.pack(side='right')
-        self.entryframe.pack(fill='x')
-        super().__init__(master=self.win,
-                         opencommand=opencommand,
-                         path=os.path.expanduser('~'),
-                         showbuttonframe=False)
+        self.pathentry.pack(fill="x")
+        self.open_from_string_btn = ttk.Button(
+            self.pathentry, command=self.open_from_string, text=action
+        )
+        self.open_from_string_btn.pack(side="right")
+        self.entryframe.pack(fill="x")
+        super().__init__(
+            master=self.win,
+            opencommand=opencommand,
+            path=os.path.expanduser("~"),
+            showbuttonframe=False,
+        )
 
     def open(self):
         super().on_double_click_treeview(destroy=True)
@@ -54,7 +54,7 @@ class FileOpenDialog(FileTree):
 
 class FileSaveAsDialog(FileOpenDialog):
     def __init__(self, savecommand: callable):
-        super().__init__(savecommand, 'Save')
+        super().__init__(savecommand, "Save")
 
 
 class DirectoryOpenDialog(FileOpenDialog):
@@ -67,5 +67,6 @@ class DirectoryOpenDialog(FileOpenDialog):
 
     def open(self):
         self.opencommand(
-            os.path.join(self.path, self.tree.item(self.tree.focus(), 'text')))
+            os.path.join(self.path, self.tree.item(self.tree.focus(), "text"))
+        )
         self.master.destroy()

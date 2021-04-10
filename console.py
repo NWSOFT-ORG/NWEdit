@@ -30,27 +30,27 @@ class Console(ttk.Frame):
         super().__init__(parent)
         settings_class = Settings()
         self.command_history = []
-        self.font = settings_class.get_settings('font')
-        self.text = ConsoleText(self,
-                                wrap='none',
-                                bg='black',
-                                fg='white',
-                                insertbackground='white',
-                                selectforeground='black',
-                                selectbackground='white',
-                                highlightthickness=0,
-                                font=self.font,
-                                insertwidth=3)
+        self.font = settings_class.get_settings("font")
+        self.text = ConsoleText(
+            self,
+            wrap="none",
+            bg="black",
+            fg="white",
+            insertbackground="white",
+            selectforeground="black",
+            selectbackground="white",
+            highlightthickness=0,
+            font=self.font,
+            insertwidth=3,
+        )
         vbar = ttk.Scrollbar(self, command=self.text.yview)
-        vbar.pack(side='right', fill='y', anchor='ne')
-        xbar = ttk.Scrollbar(self,
-                             command=self.text.xview,
-                             orient='horizontal')
-        xbar.pack(side='bottom', fill='x', anchor='sw')
-        self.text.pack(fill='both', expand=True, side='left', anchor='nw')
+        vbar.pack(side="right", fill="y", anchor="ne")
+        xbar = ttk.Scrollbar(self, command=self.text.xview, orient="horizontal")
+        xbar.pack(side="bottom", fill="x", anchor="sw")
+        self.text.pack(fill="both", expand=True, side="left", anchor="nw")
         self.text.config(yscrollcommand=vbar.set)
         self.text.config(xscrollcommand=xbar.set)
-        self.text.insert('insert', 'Python ' + sys.version + '\n')
+        self.text.insert("insert", "Python " + sys.version + "\n")
 
         self.shell = code.InteractiveConsole(_locals)
 
@@ -66,7 +66,7 @@ class Console(ttk.Frame):
         sys.stdin = Pipe()
 
         self.read_from_pipe(sys.stdout, "stdout")
-        self.read_from_pipe(sys.stderr, "stderr", foreground='red')
+        self.read_from_pipe(sys.stderr, "stderr", foreground="red")
 
     def prompt(self):
         """Add a '>>> ' to the console"""
@@ -100,7 +100,7 @@ class Console(ttk.Frame):
         if sys.stdin.reading:
             # if stdin requested, then put data in stdin instead of running a new command
             line = self.text.consume_last_line()
-            line = line[1:] + '\n'
+            line = line[1:] + "\n"
             sys.stdin.buffer.put(line)
             return
 
@@ -141,9 +141,8 @@ class Console(ttk.Frame):
 
 class ConsoleText(tk.Text):
     """
-A Text widget which handles some application logic,
-e.g. having a line of input at the end with everything else being un-editable
-"""
+    A Text widget which handles some application logic,
+    e.g. having a line of input at the end with everything else being un-editable"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -172,14 +171,14 @@ e.g. having a line of input at the end with everything else being un-editable
 
     def prompt(self):
         """Insert a prompt"""
-        self.mark_set("prompt_end", 'end-1c')
+        self.mark_set("prompt_end", "end-1c")
         self.mark_gravity("prompt_end", tk.LEFT)
         self.write(">>> ")
         self.mark_gravity("prompt_end", tk.RIGHT)
 
     def commit_all(self):
         """Mark all text as committed"""
-        self.commit_to('end-1c')
+        self.commit_to("end-1c")
 
     def commit_to(self, pos):
         """Mark all text up to a certain position as committed"""
@@ -190,12 +189,10 @@ e.g. having a line of input at the end with everything else being un-editable
         else:
             # if text is added before the last prompt (">>> "),
             # update the stored position of the tag
-            for i, (tag_name, _,
-                    _) in reversed(list(enumerate(self.console_tags))):
+            for i, (tag_name, _, _) in reversed(list(enumerate(self.console_tags))):
                 if tag_name == "prompt":
                     tag_ranges = self.tag_ranges("prompt")
-                    self.console_tags[i] = ("prompt", tag_ranges[-2],
-                                            tag_ranges[-1])
+                    self.console_tags[i] = ("prompt", tag_ranges[-2], tag_ranges[-1])
                     break
 
         # update the hash and backup
@@ -204,26 +201,26 @@ e.g. having a line of input at the end with everything else being un-editable
 
     def get_committed_text_hash(self):
         """Get the hash of the committed area -
-used for detecting an attempt to edit it"""
+        used for detecting an attempt to edit it"""
         return hashlib.md5(self.get_committed_text().encode()).digest()
 
     def get_committed_text(self):
         """Get all text marked as committed"""
         return self.get(1.0, "committed_text")
 
-    def write(self, string, pos='end-1c'):
+    def write(self, string, pos="end-1c"):
         """Write some text to the console"""
 
         # insert the text
         self.insert(pos, string)
-        self.see('end')
+        self.see("end")
 
         # commit text
         self.commit_to(pos)
 
     def on_text_change(self, _):
         """If the text is changed, check if the change is part of the committed
-text, and if it is revert the change"""
+        text, and if it is revert the change"""
         if self.get_committed_text_hash() != self.committed_hash:
             # revert change
             self.mark_gravity("committed_text", tk.RIGHT)

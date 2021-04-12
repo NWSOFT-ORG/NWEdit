@@ -1,5 +1,6 @@
 """Python console for the editor."""
-from settings import *
+from modules import queue, ttk, tk, code, io, sys, threading, hashlib
+from settings import Settings
 
 
 # from olisolomos's gist

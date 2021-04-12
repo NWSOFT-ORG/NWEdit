@@ -1,6 +1,9 @@
 """Useful functions"""
 
-from dialogs import *
+import shlex
+from constants import OSX, WINDOWS, textchars
+from dialogs import ErrorInfoDialog
+from modules import requests, platform, os, subprocess, sys, shutil
 
 
 def is_binary_string(byte):
@@ -176,10 +179,10 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
 
     common_prefix = os.path.normpath(sys.prefix).rstrip("/")
     cmds = (
-        "export PYPR="
+        "export PYPLUSPREFIX="
         + common_prefix
         + " ; "
-        + cmds.replace(common_prefix + "/", "$PYPR" + "/")
+        + cmds.replace(common_prefix + "/", "$PYPLUSPREFIX" + "/")
     )
 
     # The script will be sent to Terminal with 'do script' command, which takes a string.
@@ -220,10 +223,7 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
         + """ -e '    end tell' """
         + """ -e 'end if' """
     )
-    print(cmd_line)
-
-
-# subprocess.Popen(cmd_line, cwd=cwd, shell=True)
+    subprocess.Popen(cmd_line, shell=True)
 
 
 def _get_linux_terminal_command():

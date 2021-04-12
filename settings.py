@@ -1,4 +1,7 @@
-from filedialog import *
+from modules import sys, json, os, lexers, EditorErr, JSONLexer, zipfile, Path
+from dialogs import ErrorInfoDialog
+from filedialog import DirectoryOpenDialog, FileOpenDialog
+from constants import APPDIR
 
 
 class Settings:
@@ -21,13 +24,11 @@ class Settings:
     @staticmethod
     def zip_settings(backupdir):
         def zipdir(path, zip_obj):
-            for root, dirs, files in os.walk(path):
+            for root, _, files in os.walk(path):
                 for file in files:
                     zip_obj.write(
                         os.path.join(root, file),
-                        os.path.relpath(
-                            os.path.join(root, file), os.path.join(path, "..")
-                        ),
+                        os.path.relpath(os.path.join(root, file), Path(path).parent),
                     )
 
         with zipfile.ZipFile(

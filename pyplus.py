@@ -7,9 +7,9 @@
 | The editor                                         |
 | It's extremely small! (around 80 kB)               |
 | You can visit my site for more details!            |
-| +----------------------------------------------+	 |
-| | https://ZCG-coder.github.io/NWSOFT/PyPlusWeb |	 |
-| +----------------------------------------------+	 |
+| +----------------------------------------------+     |
+| | https://ZCG-coder.github.io/NWSOFT/PyPlusWeb |     |
+| +----------------------------------------------+     |
 | You can also contribute it on github!              |
 | Note: Some parts are adapted from stack overflow.  |
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
@@ -55,8 +55,6 @@ from modules import (
     webbrowser,
 )
 
-if OSX:
-    from modules import PyTouchBar
 from settings import (
     CommentMarker,
     Filetype,
@@ -68,6 +66,9 @@ from settings import (
 from statusbar import Statusbar
 from tktext import EnhancedText, EnhancedTextFrame
 from treeview import FileTree
+
+if OSX:
+    from modules import PyTouchBar
 
 os.chdir(APPDIR)
 
@@ -550,6 +551,7 @@ class Editor:
         for char in [")", "]", "}"]:
             textbox.bind(char, self.close_brackets)
         textbox.focus_set()
+        self.create_tags(textbox)
         logger.debug("Textbox created")
         return textbox
 
@@ -646,7 +648,6 @@ class Editor:
         """
         This method colors and styles the prepared tags"""
         try:
-            self.create_tags(textbox)
             currtext = textbox
             _code = currtext.get("1.0", "end-1c")
             tokensource = currtext.lexer.get_tokens(_code)
@@ -674,7 +675,6 @@ class Editor:
 
                 start_line = end_line
                 start_index = end_index
-                currtext.tag_configure("sel", foreground="black")
 
             currtext.update()  # Have to update
         except Exception:
@@ -802,11 +802,8 @@ class Editor:
             pass
 
     def delete(self) -> None:
-        try:
-            self.tabs[self.get_tab()].textbox.delete(tk.SEL_FIRST, tk.SEL_LAST)
-            self.key()
-        except Exception:
-            pass
+        self.tabs[self.get_tab()].textbox.delete(tk.SEL_FIRST, tk.SEL_LAST)
+        self.key()
 
     def cut(self) -> None:
         try:
@@ -818,8 +815,8 @@ class Editor:
             currtext.delete(tk.SEL_FIRST, tk.SEL_LAST)
             currtext.edit_separator()
             self.key()
-        except Exception as e:
-            print(e)
+        except tk.TclError:
+            pass
 
     def paste(self) -> None:
         try:
@@ -926,14 +923,14 @@ class Editor:
         self.key()
         currtext.edit_separator()
 
-    def close_brackets(self, _=None) -> str:
+    def close_brackets(self, _=None) -> None:
         if not self.tabs:
-            return "notabs"
+            return
         currtext = self.tabs[self.get_tab()].textbox
         if currtext.get("insert", "insert +1c") in [")", "]", "}", "'", '"']:
             currtext.mark_set("insert", "insert +1c")
             self.key()
-            return "break"
+            return
         currtext.edit_separator()
         self.key()
 
@@ -1749,7 +1746,6 @@ class Editor:
                 line = currtext.get(start_index, end_index)
                 currtext.delete(start_index, end_index)
                 if line.startswith(comment_start) and line.endswith(comment_end):
-                    print(f"{line[len(comment_start):len(comment_end)]}\n", flush=True)
                     currtext.insert(
                         "insert", f"{line[len(comment_start):len(comment_end)]}\n"
                     )
@@ -1758,9 +1754,3 @@ class Editor:
             self.key()
         except (KeyError, AttributeError):
             return
-
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = Editor(master=root)
-    root.mainloop()

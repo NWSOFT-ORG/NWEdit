@@ -40,7 +40,6 @@ from hexview import HexView
 from modules import (
     EditorErr,
     Path,
-    ThemedStyle,
     font,
     get_style_by_name,
     json,
@@ -219,8 +218,7 @@ class Editor:
             app_menu.add_separator()
             app_menu.add_command(label="Exit Editor", command=self.exit)
             app_menu.add_command(label="Restart app", command=self.restart)
-            app_menu.add_command(label="Check for updates",
-                                 command=self.check_updates)
+            app_menu.add_command(label="Check for updates", command=self.check_updates)
 
             filemenu = tk.Menu(menubar, tearoff=0)
             filemenu.add_command(
@@ -332,8 +330,7 @@ class Editor:
                 label="Delete Word on the Right", command=self.del_word_right
             )
             editmenu.add_command(label="Move line up", command=self.mv_line_up)
-            editmenu.add_command(label="Move line down",
-                                 command=self.mv_line_dn)
+            editmenu.add_command(label="Move line down", command=self.mv_line_dn)
 
             self.codemenu = tk.Menu(menubar, tearoff=0)
             self.codemenu.add_command(
@@ -382,8 +379,7 @@ class Editor:
                 compound="left",
                 image=self.search_icon,
             )
-            self.codemenu.add_command(
-                label="Bigger view", command=self.biggerview)
+            self.codemenu.add_command(label="Bigger view", command=self.biggerview)
             self.codemenu.add_separator()
             self.codemenu.add_command(
                 label="Open Python Shell",
@@ -408,12 +404,9 @@ class Editor:
             navmenu.add_command(label="Word start", command=self.nav_wordstart)
 
             gitmenu = tk.Menu(menubar, tearoff=0)
-            gitmenu.add_command(label="Initialize",
-                                command=lambda: self.git("init"))
-            gitmenu.add_command(
-                label="Commit", command=lambda: self.git("commit"))
-            gitmenu.add_command(
-                label="Clone", command=lambda: self.git("clone"))
+            gitmenu.add_command(label="Initialize", command=lambda: self.git("init"))
+            gitmenu.add_command(label="Commit", command=lambda: self.git("commit"))
+            gitmenu.add_command(label="Clone", command=lambda: self.git("clone"))
 
             menubar.add_cascade(label="PyPlus", menu=app_menu)  # App menu
             menubar.add_cascade(label="File", menu=filemenu)
@@ -429,10 +422,8 @@ class Editor:
             self.right_click_menu.add_separator()
             self.right_click_menu.add_command(label="Cut", command=self.cut)
             self.right_click_menu.add_command(label="Copy", command=self.copy)
-            self.right_click_menu.add_command(
-                label="Paste", command=self.paste)
-            self.right_click_menu.add_command(
-                label="Delete", command=self.delete)
+            self.right_click_menu.add_command(label="Paste", command=self.paste)
+            self.right_click_menu.add_command(label="Delete", command=self.delete)
             self.right_click_menu.add_separator()
             self.right_click_menu.add_command(
                 label="Select All", command=self.select_all
@@ -572,8 +563,7 @@ class Editor:
                 self.master.title("PyPlus -- No file open")
                 logger.debug("update_title: No file open")
                 return "break"
-            self.master.title(
-                f"PyPlus -- {self.tabs[self.get_tab()].file_dir}")
+            self.master.title(f"PyPlus -- {self.tabs[self.get_tab()].file_dir}")
             logger.debug("update_title: OK")
             return "break"
         except Exception:
@@ -591,8 +581,7 @@ class Editor:
             index = currtext.index("insert")
             ln = index.split(".")[0]
             col = index.split(".")[1]
-            self.statusbar.label2.config(
-                text=f"{self.tabs[self.get_tab()].file_dir} |")
+            self.statusbar.label2.config(text=f"{self.tabs[self.get_tab()].file_dir} |")
             self.statusbar.label3.config(text=f"Line {ln} Col {col}")
             logger.debug("update_statusbar: OK")
             return "break"
@@ -655,8 +644,7 @@ class Editor:
             else:
                 foreground = None
 
-            currtext.tag_configure(
-                str(ttype), foreground=foreground, font=tag_font)
+            currtext.tag_configure(str(ttype), foreground=foreground, font=tag_font)
 
     def recolorize(self, textbox: EnhancedText) -> None:
         """
@@ -718,8 +706,7 @@ class Editor:
                         viewer.focus_set()
                         window = HexView(viewer)
                         window.open(file_dir)
-                        self.tabs[viewer] = Document(
-                            viewer, window.textbox, file_dir)
+                        self.tabs[viewer] = Document(viewer, window.textbox, file_dir)
                         self.nb.add(viewer, text=f"Hex -- {file_dir}")
                         self.nb.select(viewer)
                         self.update_title()
@@ -741,17 +728,14 @@ class Editor:
 
                 # Puts the contents of the file into the text widget.
                 currtext = self.tabs[new_tab].textbox
-                currtext.insert("end", file.read().replace(
-                    "\t", " " * self.tabwidth))
+                currtext.insert("end", file.read().replace("\t", " " * self.tabwidth))
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
-                currtext.set_lexer(
-                    self.file_settings_class.get_lexer_settings(extens))
+                currtext.set_lexer(self.file_settings_class.get_lexer_settings(extens))
                 currtext.lint_cmd = self.linter_settings_class.get_linter_settings(
                     extens
                 )
-                currtext.cmd = self.cmd_settings_class.get_command_settings(
-                    extens)
+                currtext.cmd = self.cmd_settings_class.get_command_settings(extens)
                 currtext.format_command = (
                     self.format_settings_class.get_command_settings(extens)
                 )
@@ -808,8 +792,7 @@ class Editor:
                 return
             if os.access(self.tabs[curr_tab].file_dir, os.W_OK):
                 with open(self.tabs[curr_tab].file_dir, "w") as file:
-                    file.write(self.tabs[curr_tab].textbox.get(
-                        1.0, "end").strip())
+                    file.write(self.tabs[curr_tab].textbox.get(1.0, "end").strip())
             else:
                 ErrorInfoDialog(self.master, "File read only")
         except Exception:
@@ -817,8 +800,7 @@ class Editor:
 
     def copy(self) -> None:
         try:
-            sel = self.tabs[self.get_tab()].textbox.get(
-                tk.SEL_FIRST, tk.SEL_LAST)
+            sel = self.tabs[self.get_tab()].textbox.get(tk.SEL_FIRST, tk.SEL_LAST)
             self.tabs[self.get_tab()].textbox.clipboard_clear()
             self.tabs[self.get_tab()].textbox.clipboard_append(sel)
         except Exception:
@@ -911,32 +893,35 @@ class Editor:
                             )
                         )
                     )
-                threading.Thread(target=run_in_terminal,
-                                 args="chmod 700 run.sh && ./run.sh && rm run.sh", kwargs={"cwd": APPDIR}).start()
+                threading.Thread(
+                    target=run_in_terminal,
+                    args="chmod 700 run.sh && ./run.sh && rm run.sh",
+                    kwargs={"cwd": APPDIR},
+                ).start()
         except Exception:
             ErrorInfoDialog(self.master, "This language is not supported.")
 
-    @ staticmethod
+    @staticmethod
     def system_shell() -> None:
         open_system_shell()
 
     def python_shell(self) -> None:
-        shell_frame=tk.Toplevel(self.master)
+        shell_frame = tk.Toplevel(self.master)
         ttkthemes.ThemedStyle(shell_frame).set_theme(self.theme)
-        main_window=Console(shell_frame, None, shell_frame.destroy)
-        main_window.text.lexer=lexers.get_lexer_by_name("pycon")
+        main_window = Console(shell_frame, None, shell_frame.destroy)
+        main_window.text.lexer = lexers.get_lexer_by_name("pycon")
         main_window.text.focus_set()
         self.recolorize(main_window.text)
         main_window.text.bind(
             "<KeyRelease>", lambda _=None: self.recolorize(main_window.text)
         )
-        main_window.pack(fill = "both", expand = 1)
+        main_window.pack(fill="both", expand=1)
         shell_frame.mainloop()
 
-    def backspace(self, _ = None) -> None:
+    def backspace(self, _=None) -> None:
         if not self.tabs:
             return
-        currtext=self.tabs[self.get_tab()].textbox
+        currtext = self.tabs[self.get_tab()].textbox
         currtext.edit_separator()
         # Backchar
         if currtext.get("insert -1c", "insert +1c") in ["''", '""', "[]", "{}", "()"]:
@@ -947,10 +932,10 @@ class Editor:
         self.key()
         currtext.edit_separator()
 
-    def close_brackets(self, _ = None) -> None:
+    def close_brackets(self, _=None) -> None:
         if not self.tabs:
             return
-        currtext=self.tabs[self.get_tab()].textbox
+        currtext = self.tabs[self.get_tab()].textbox
         if currtext.get("insert", "insert +1c") in [")", "]", "}", "'", '"']:
             currtext.mark_set("insert", "insert +1c")
             self.key()
@@ -958,7 +943,7 @@ class Editor:
         currtext.edit_separator()
         self.key()
 
-    def autoinsert(self, event = None) -> None:
+    def autoinsert(self, event=None) -> None:
         """Auto-inserts a symbol
         * ' -> ''
         * " -> ""
@@ -967,11 +952,11 @@ class Editor:
         * { -> {}"""
         if not self.tabs:
             return
-        currtext=self.tabs[self.get_tab()].textbox
+        currtext = self.tabs[self.get_tab()].textbox
         currtext.edit_separator()
-        char=event.char
+        char = event.char
         if currtext.tag_ranges("sel"):
-            selected=currtext.get("sel.first", "sel.last")
+            selected = currtext.get("sel.first", "sel.last")
             if char == "'":
                 currtext.delete("sel.first", "sel.last")
                 currtext.insert("insert", f"'{selected}'")
@@ -1002,18 +987,18 @@ class Editor:
             currtext.insert("insert", "''")
             currtext.mark_set("insert", "insert -1c")
             return
-        elif char == '"':
+        if char == '"':
             if currtext.get("insert", "insert +1c") == '"':
                 currtext.mark_set("insert", "insert +1c")
                 return
             currtext.insert("insert", '""')
             currtext.mark_set("insert", "insert -1c")
             return
-        elif char == "(":
+        if char == "(":
             currtext.insert("insert", ")")
-        elif char == "[":
+        if char == "[":
             currtext.insert("insert", "]")
-        elif char == "{":
+        if char == "{":
             currtext.insert("insert", "}")
         currtext.mark_set("insert", "insert -1c")
         currtext.edit_separator()
@@ -1378,7 +1363,7 @@ class Editor:
         version = newest["version"]
         if not popup:
             os.remove("ver.json")
-            return [bool(version != VERSION), newest["url"]]
+            return [version != VERSION, newest["url"]]
         updatewin = tk.Toplevel(self.master)
         updatewin.title("Updates")
         updatewin.resizable(0, 0)

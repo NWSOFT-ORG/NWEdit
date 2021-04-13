@@ -58,14 +58,13 @@ class Settings:
     def get_settings(self, setting):
         if setting == "font":
             return f"{self.font} {self.size}"
-        elif setting == "theme":
+        if setting == "theme":
             return self.theme
-        elif setting == "tab":
+        if setting == "tab":
             return self.tabwidth
-        elif setting == "pygments":
+        if setting == "pygments":
             return self.highlight_theme
-        else:
-            raise EditorErr("The setting is not defined")
+        raise EditorErr("The setting is not defined")
 
 
 class Filetype:

@@ -2,6 +2,7 @@
 from modules import tk, ttk
 from constants import logger
 
+
 class ClosableNotebook(ttk.Notebook):
     """A ttk Notebook with close buttons on each tab
     images drawn by me using the mspaint app (the rubbish in many people's opinion)

@@ -80,7 +80,7 @@ class EnhancedText(tk.Text):
 
     def __init__(self, *args: any, **kwargs: any) -> None:
         tk.Text.__init__(self, *args, **kwargs)
-        self.lexer = None
+        self.searchable = False
 
         # create a proxy for the underlying widget
         self._orig = self._w + "_orig"

@@ -2,18 +2,22 @@
 
 
 class Search:
-    def __init__(self, master: tk.Tk, tabwidget: ttk.Notebook, tablist: dict):
+    def __init__(
+        self, master: tk.Tk, tabwidget: ttk.Notebook, tablist: dict
+    ):  # TODO: reduce args
         self.master = master
         self.case = tk.BooleanVar()
         self.regexp = tk.BooleanVar()
-        self.start = tk.SEL_FIRST
-        self.end = tk.SEL_LAST
-        self.currtext = tablist[tabwidget.nametowidget(tabwidget.select())].textbox
-        if not self.currtext.tag_ranges("sel"):
-            self.start = tk.FIRST
-            self.end = tk.END
+        self.start = "sel.first"
+        self.end = "sel.last"
+        self.text = tablist[tabwidget.nametowidget(tabwidget.select())].textbox
+        if self.text.searchable:
+            return
+        if not self.text.tag_ranges("sel"):
+            self.start = "1.0"
+            self.end = "end"
         self.starts = []
-        self.search_frame = ttk.Frame(self.currtext.frame)
+        self.search_frame = ttk.Frame(self.text.frame)
 
         self.search_frame.pack(anchor="nw", side="bottom")
         ttk.Label(self.search_frame, text="Search: ").pack(
@@ -28,11 +32,11 @@ class Search:
         )
         self.content.pack(side="left", fill="both")
 
-        forward = ttk.Button(self.search_frame, text="<", width=1)
-        forward.pack(side="left")
+        self.forward = ttk.Button(self.search_frame, text="<", width=1)
+        self.forward.pack(side="left")
 
-        backward = ttk.Button(self.search_frame, text=">", width=1)
-        backward.pack(side="left")
+        self.backward = ttk.Button(self.search_frame, text=">", width=1)
+        self.backward.pack(side="left")
 
         ttk.Label(self.search_frame, text="Replacement: ").pack(
             side="left", anchor="nw", fill="y"
@@ -51,10 +55,14 @@ class Search:
         self.clear_button = ttk.Button(self.search_frame, text="Clear All")
         self.clear_button.pack(side="left")
 
-        self.case_yn = ttk.Checkbutton(self.search_frame, text="Case Sensitive", variable=self.case)
+        self.case_yn = ttk.Checkbutton(
+            self.search_frame, text="Case Sensitive", variable=self.case
+        )
         self.case_yn.pack(side="left")
 
-        self.reg_button = ttk.Checkbutton(self.search_frame, text="Regexp", variable=self.regexp)
+        self.reg_button = ttk.Checkbutton(
+            self.search_frame, text="Regexp", variable=self.regexp
+        )
         self.reg_button.pack(side="left")
 
         self.clear_button.config(command=self.clear)
@@ -63,14 +71,14 @@ class Search:
         self.backward.config(command=self.nav_backward)
         self.content.bind("<KeyRelease>", self.find)
         closeicon = tk.PhotoImage(file="Images/close.gif")
-        ttk.Button(self.search_frame, image=closeicon, command=self._exit, width=1).pack(
-            side="right", anchor="ne"
-        )
-
+        ttk.Button(
+            self.search_frame, image=closeicon, command=self._exit, width=1
+        ).pack(side="right", anchor="ne")
+        self.text.searchable = True
 
     def find(self, _=None):
         found = tk.IntVar()
-        text = self.currtext
+        text = self.text
         text.tag_remove("found", "1.0", "end")
         s = self.content.get()
         self.starts.clear()
@@ -80,7 +88,7 @@ class Search:
                 idx = text.search(
                     s,
                     idx,
-                    noscase=not (self.case.get()),
+                    nocase=not (self.case.get()),
                     stopindex="end",
                     regexp=self.regexp.get(),
                     count=found,
@@ -91,13 +99,11 @@ class Search:
                 text.tag_add("found", idx, lastidx)
                 self.starts.append(idx)
                 text.mark_set("insert", idx)
-                text.focus_set()
                 idx = lastidx
             text.tag_config("found", foreground="red", background="yellow")
-        text.see("insert")
 
     def replace(self):
-        text = self.currtext
+        text = self.text
         text.tag_remove("found", "1.0", "end")
         s = self.content.get()
         r = self.repl.get()
@@ -119,34 +125,33 @@ class Search:
                 idx = lastidx
 
     def clear(self):
-        text = self.currtext
+        text = self.text
         text.tag_remove("found", "1.0", "end")
 
     def nav_forward(self):
         try:
-            text = self.currtext
+            text = self.text
             curpos = text.index("insert")
             if curpos in self.starts:
                 prev = self.starts.index(curpos) - 1
                 text.mark_set("insert", self.starts[prev])
                 text.see("insert")
-                text.focus_set()
         except Exception:
             pass
 
     def nav_backward(self):
         try:
-            text = self.currtext
+            text = self.text
             curpos = text.index("insert")
             if curpos in self.starts:
                 prev = self.starts.index(curpos) + 1
                 text.mark_set("insert", self.starts[prev])
                 text.see("insert")
-                text.focus_set()
         except Exception:
             pass
 
     def _exit(self):
+        self.text.searchable = False
         self.search_frame.pack_forget()
         self.clear()
-        self.currtext.focus_set()
+        self.text.focus_set()

@@ -53,6 +53,7 @@ from modules import (
     ttk,
     ttkthemes,
     webbrowser,
+    threading,
 )
 
 from settings import (
@@ -66,6 +67,7 @@ from settings import (
 from statusbar import Statusbar
 from tktext import EnhancedText, EnhancedTextFrame
 from treeview import FileTree
+from search import Search
 
 if OSX:
     from modules import PyTouchBar
@@ -217,7 +219,8 @@ class Editor:
             app_menu.add_separator()
             app_menu.add_command(label="Exit Editor", command=self.exit)
             app_menu.add_command(label="Restart app", command=self.restart)
-            app_menu.add_command(label="Check for updates", command=self.check_updates)
+            app_menu.add_command(label="Check for updates",
+                                 command=self.check_updates)
 
             filemenu = tk.Menu(menubar, tearoff=0)
             filemenu.add_command(
@@ -329,7 +332,8 @@ class Editor:
                 label="Delete Word on the Right", command=self.del_word_right
             )
             editmenu.add_command(label="Move line up", command=self.mv_line_up)
-            editmenu.add_command(label="Move line down", command=self.mv_line_dn)
+            editmenu.add_command(label="Move line down",
+                                 command=self.mv_line_dn)
 
             self.codemenu = tk.Menu(menubar, tearoff=0)
             self.codemenu.add_command(
@@ -378,7 +382,8 @@ class Editor:
                 compound="left",
                 image=self.search_icon,
             )
-            self.codemenu.add_command(label="Bigger view", command=self.biggerview)
+            self.codemenu.add_command(
+                label="Bigger view", command=self.biggerview)
             self.codemenu.add_separator()
             self.codemenu.add_command(
                 label="Open Python Shell",
@@ -403,9 +408,12 @@ class Editor:
             navmenu.add_command(label="Word start", command=self.nav_wordstart)
 
             gitmenu = tk.Menu(menubar, tearoff=0)
-            gitmenu.add_command(label="Initialize", command=lambda: self.git("init"))
-            gitmenu.add_command(label="Commit", command=lambda: self.git("commit"))
-            gitmenu.add_command(label="Clone", command=lambda: self.git("clone"))
+            gitmenu.add_command(label="Initialize",
+                                command=lambda: self.git("init"))
+            gitmenu.add_command(
+                label="Commit", command=lambda: self.git("commit"))
+            gitmenu.add_command(
+                label="Clone", command=lambda: self.git("clone"))
 
             menubar.add_cascade(label="PyPlus", menu=app_menu)  # App menu
             menubar.add_cascade(label="File", menu=filemenu)
@@ -421,8 +429,10 @@ class Editor:
             self.right_click_menu.add_separator()
             self.right_click_menu.add_command(label="Cut", command=self.cut)
             self.right_click_menu.add_command(label="Copy", command=self.copy)
-            self.right_click_menu.add_command(label="Paste", command=self.paste)
-            self.right_click_menu.add_command(label="Delete", command=self.delete)
+            self.right_click_menu.add_command(
+                label="Paste", command=self.paste)
+            self.right_click_menu.add_command(
+                label="Delete", command=self.delete)
             self.right_click_menu.add_separator()
             self.right_click_menu.add_command(
                 label="Select All", command=self.select_all
@@ -512,7 +522,8 @@ class Editor:
 
         def tab(event=None):
             event.widget.edit_separator()
-            event.widget.insert("insert", " " * self.tabwidth)  # Convert tabs to spaces
+            # Convert tabs to spaces
+            event.widget.insert("insert", " " * self.tabwidth)
             self.key()
             event.widget.edit_separator()
             # Quit quickly, before a char is being inserted.
@@ -561,7 +572,8 @@ class Editor:
                 self.master.title("PyPlus -- No file open")
                 logger.debug("update_title: No file open")
                 return "break"
-            self.master.title(f"PyPlus -- {self.tabs[self.get_tab()].file_dir}")
+            self.master.title(
+                f"PyPlus -- {self.tabs[self.get_tab()].file_dir}")
             logger.debug("update_title: OK")
             return "break"
         except Exception:
@@ -579,7 +591,8 @@ class Editor:
             index = currtext.index("insert")
             ln = index.split(".")[0]
             col = index.split(".")[1]
-            self.statusbar.label2.config(text=f"{self.tabs[self.get_tab()].file_dir} |")
+            self.statusbar.label2.config(
+                text=f"{self.tabs[self.get_tab()].file_dir} |")
             self.statusbar.label3.config(text=f"Line {ln} Col {col}")
             logger.debug("update_statusbar: OK")
             return "break"
@@ -642,7 +655,8 @@ class Editor:
             else:
                 foreground = None
 
-            currtext.tag_configure(str(ttype), foreground=foreground, font=tag_font)
+            currtext.tag_configure(
+                str(ttype), foreground=foreground, font=tag_font)
 
     def recolorize(self, textbox: EnhancedText) -> None:
         """
@@ -704,7 +718,8 @@ class Editor:
                         viewer.focus_set()
                         window = HexView(viewer)
                         window.open(file_dir)
-                        self.tabs[viewer] = Document(viewer, window.textbox, file_dir)
+                        self.tabs[viewer] = Document(
+                            viewer, window.textbox, file_dir)
                         self.nb.add(viewer, text=f"Hex -- {file_dir}")
                         self.nb.select(viewer)
                         self.update_title()
@@ -726,14 +741,17 @@ class Editor:
 
                 # Puts the contents of the file into the text widget.
                 currtext = self.tabs[new_tab].textbox
-                currtext.insert("end", file.read().replace("\t", " " * self.tabwidth))
+                currtext.insert("end", file.read().replace(
+                    "\t", " " * self.tabwidth))
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
-                currtext.set_lexer(self.file_settings_class.get_lexer_settings(extens))
+                currtext.set_lexer(
+                    self.file_settings_class.get_lexer_settings(extens))
                 currtext.lint_cmd = self.linter_settings_class.get_linter_settings(
                     extens
                 )
-                currtext.cmd = self.cmd_settings_class.get_command_settings(extens)
+                currtext.cmd = self.cmd_settings_class.get_command_settings(
+                    extens)
                 currtext.format_command = (
                     self.format_settings_class.get_command_settings(extens)
                 )
@@ -755,6 +773,9 @@ class Editor:
     def _open(self, _=None) -> None:
         """Prompt the user to open a file when C-O is pressed"""
         self.open_file()
+
+    def search(self, _=None) -> None:
+        Search(self.master, self.nb, self.tabs)
 
     def save_as(self, file: str = None) -> None:
         """Save the document as a different name."""
@@ -787,7 +808,8 @@ class Editor:
                 return
             if os.access(self.tabs[curr_tab].file_dir, os.W_OK):
                 with open(self.tabs[curr_tab].file_dir, "w") as file:
-                    file.write(self.tabs[curr_tab].textbox.get(1.0, "end").strip())
+                    file.write(self.tabs[curr_tab].textbox.get(
+                        1.0, "end").strip())
             else:
                 ErrorInfoDialog(self.master, "File read only")
         except Exception:
@@ -795,7 +817,8 @@ class Editor:
 
     def copy(self) -> None:
         try:
-            sel = self.tabs[self.get_tab()].textbox.get(tk.SEL_FIRST, tk.SEL_LAST)
+            sel = self.tabs[self.get_tab()].textbox.get(
+                tk.SEL_FIRST, tk.SEL_LAST)
             self.tabs[self.get_tab()].textbox.clipboard_clear()
             self.tabs[self.get_tab()].textbox.clipboard_append(sel)
         except Exception:
@@ -888,31 +911,32 @@ class Editor:
                             )
                         )
                     )
-                run_in_terminal("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
+                threading.Thread(target=run_in_terminal,
+                                 args="chmod 700 run.sh && ./run.sh && rm run.sh", kwargs={"cwd": APPDIR}).start()
         except Exception:
             ErrorInfoDialog(self.master, "This language is not supported.")
 
-    @staticmethod
+    @ staticmethod
     def system_shell() -> None:
         open_system_shell()
 
     def python_shell(self) -> None:
-        shell_frame = tk.Toplevel(self.master)
+        shell_frame=tk.Toplevel(self.master)
         ttkthemes.ThemedStyle(shell_frame).set_theme(self.theme)
-        main_window = Console(shell_frame, None, shell_frame.destroy)
-        main_window.text.lexer = lexers.get_lexer_by_name("pycon")
+        main_window=Console(shell_frame, None, shell_frame.destroy)
+        main_window.text.lexer=lexers.get_lexer_by_name("pycon")
         main_window.text.focus_set()
         self.recolorize(main_window.text)
         main_window.text.bind(
             "<KeyRelease>", lambda _=None: self.recolorize(main_window.text)
         )
-        main_window.pack(fill="both", expand=1)
+        main_window.pack(fill = "both", expand = 1)
         shell_frame.mainloop()
 
-    def backspace(self, _=None) -> None:
+    def backspace(self, _ = None) -> None:
         if not self.tabs:
             return
-        currtext = self.tabs[self.get_tab()].textbox
+        currtext=self.tabs[self.get_tab()].textbox
         currtext.edit_separator()
         # Backchar
         if currtext.get("insert -1c", "insert +1c") in ["''", '""', "[]", "{}", "()"]:
@@ -923,10 +947,10 @@ class Editor:
         self.key()
         currtext.edit_separator()
 
-    def close_brackets(self, _=None) -> None:
+    def close_brackets(self, _ = None) -> None:
         if not self.tabs:
             return
-        currtext = self.tabs[self.get_tab()].textbox
+        currtext=self.tabs[self.get_tab()].textbox
         if currtext.get("insert", "insert +1c") in [")", "]", "}", "'", '"']:
             currtext.mark_set("insert", "insert +1c")
             self.key()
@@ -934,7 +958,7 @@ class Editor:
         currtext.edit_separator()
         self.key()
 
-    def autoinsert(self, event=None) -> None:
+    def autoinsert(self, event = None) -> None:
         """Auto-inserts a symbol
         * ' -> ''
         * " -> ""
@@ -943,11 +967,11 @@ class Editor:
         * { -> {}"""
         if not self.tabs:
             return
-        currtext = self.tabs[self.get_tab()].textbox
+        currtext=self.tabs[self.get_tab()].textbox
         currtext.edit_separator()
-        char = event.char
+        char=event.char
         if currtext.tag_ranges("sel"):
-            selected = currtext.get("sel.first", "sel.last")
+            selected=currtext.get("sel.first", "sel.last")
             if char == "'":
                 currtext.delete("sel.first", "sel.last")
                 currtext.insert("insert", f"'{selected}'")
@@ -1021,165 +1045,6 @@ class Editor:
         currtext.edit_separator()
         self.key()
         return "break"
-
-    def search(self, _=None) -> None:
-        global case
-        global regexp
-        global start, end
-        global starts
-        if not self.tabs:
-            return
-        case = tk.BooleanVar()
-        regexp = tk.BooleanVar()
-        start = tk.SEL_FIRST
-        end = tk.SEL_LAST
-        currtext = self.tabs[self.get_tab()].textbox
-        if not currtext.tag_ranges("sel"):
-            start = tk.FIRST
-            end = tk.END
-        starts = []
-        search_frame = ttk.Frame(self.tabs[self.get_tab()].textbox.frame)
-        style = ThemedStyle(search_frame)
-        style.set_theme(self.theme)
-
-        search_frame.pack(anchor="nw", side="bottom")
-        ttk.Label(search_frame, text="Search: ").pack(
-            side="left", anchor="nw", fill="y"
-        )
-        content = tk.Entry(
-            search_frame,
-            background="black",
-            foreground="white",
-            insertbackground="white",
-            highlightthickness=0,
-        )
-        content.pack(side="left", fill="both")
-
-        forward = ttk.Button(search_frame, text="<", width=1)
-        forward.pack(side="left")
-
-        backward = ttk.Button(search_frame, text=">", width=1)
-        backward.pack(side="left")
-
-        ttk.Label(search_frame, text="Replacement: ").pack(
-            side="left", anchor="nw", fill="y"
-        )
-        repl = tk.Entry(
-            search_frame,
-            background="black",
-            foreground="white",
-            insertbackground="white",
-            highlightthickness=0,
-        )
-        repl.pack(side="left", fill="both")
-
-        repl_button = ttk.Button(search_frame, text="Replace all")
-        repl_button.pack(side="left")
-        clear_button = ttk.Button(search_frame, text="Clear All")
-        clear_button.pack(side="left")
-
-        case_yn = ttk.Checkbutton(search_frame, text="Case Sensitive", variable=case)
-        case_yn.pack(side="left")
-
-        reg_button = ttk.Checkbutton(search_frame, text="RegExp", variable=regexp)
-        reg_button.pack(side="left")
-
-        def find(_=None):
-            global starts
-            found = tk.IntVar()
-            text = self.tabs[self.get_tab()].textbox
-            text.tag_remove("found", "1.0", "end")
-            s = content.get()
-            starts.clear()
-            if s != "\\" and s:
-                idx = "1.0"
-                while 1:
-                    idx = text.search(
-                        s,
-                        idx,
-                        nocase=not (case.get()),
-                        stopindex="end",
-                        regexp=regexp.get(),
-                        count=found,
-                    )
-                    if not idx:
-                        break
-                    lastidx = "%s+%dc" % (idx, len(s))
-                    text.tag_add("found", idx, lastidx)
-                    starts.append(idx)
-                    text.mark_set("insert", idx)
-                    text.focus_set()
-                    idx = lastidx
-                text.tag_config("found", foreground="red", background="yellow")
-            text.see("insert")
-            text.statusbar.config(text=f"Found {found.get()} matches")
-
-        def replace():
-            text = self.tabs[self.get_tab()].textbox
-            text.tag_remove("found", "1.0", "end")
-            s = content.get()
-            r = repl.get()
-            if s != "\\" and s:
-                idx = "1.0"
-                while 1:
-                    idx = text.search(
-                        s,
-                        idx,
-                        nocase=not (case.get()),
-                        stopindex="end",
-                        regexp=regexp.get(),
-                    )
-                    if not idx:
-                        break
-                    lastidx = "%s+%dc" % (idx, len(s))
-                    text.delete(idx, lastidx)
-                    text.insert(idx, r)
-                    idx = lastidx
-
-        def clear():
-            text = self.tabs[self.get_tab()].textbox
-            text.tag_remove("found", "1.0", "end")
-
-        def nav_forward():
-            try:
-                global starts
-                text = self.tabs[self.get_tab()].textbox
-                curpos = text.index("insert")
-                if curpos in starts:
-                    prev = starts.index(curpos) - 1
-                    text.mark_set("insert", starts[prev])
-                    text.see("insert")
-                    text.focus_set()
-            except Exception:
-                pass
-
-        def nav_backward():
-            try:
-                global starts
-                text = self.tabs[self.get_tab()].textbox
-                curpos = text.index("insert")
-                if curpos in starts:
-                    prev = starts.index(curpos) + 1
-                    text.mark_set("insert", starts[prev])
-                    text.see("insert")
-                    text.focus_set()
-            except Exception:
-                pass
-
-        clear_button.config(command=clear)
-        repl_button.config(command=replace)
-        forward.config(command=nav_forward)
-        backward.config(command=nav_backward)
-        content.bind("<KeyRelease>", find)
-
-        def _exit():
-            search_frame.pack_forget()
-            clear()
-            self.tabs[self.get_tab()].textbox.focus_set()
-
-        ttk.Button(search_frame, text="x", command=_exit, width=1).pack(
-            side="right", anchor="ne"
-        )
 
     def undo(self, _=None) -> None:
         try:
@@ -1543,7 +1408,7 @@ class Editor:
             url = dialog.result
             if not url:
                 return
-            subprocess.Popen(f"git clone {url}", shell=True, cwd=currdir)
+            subprocess.Popen(f"git clone {url} > {os.devnull}", shell=True, cwd=currdir)
             return
         if not os.path.exists(path := os.path.join(currdir, ".git")):
             ErrorInfoDialog(self.master, f"Not a git repository: {Path(path).parent}")

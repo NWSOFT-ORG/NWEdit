@@ -1,4 +1,5 @@
-from constants import *
+from modules import tk, ttk
+from constants import logger
 
 
 class Dialog(tk.Toplevel):
@@ -34,7 +35,7 @@ class Dialog(tk.Toplevel):
         # create dialog body.  return widget that should have
         # initial focus.  this method should be overridden
 
-        pass
+        return master
 
     def buttonbox(self):
         # add standard button box. override if you don't want the
@@ -65,11 +66,11 @@ class Dialog(tk.Toplevel):
         self.destroy()
 
     @staticmethod
-    def validate():
+    def validate(_=None):
         return 1  # override
 
     @staticmethod
-    def apply():
+    def apply(_=None):
         pass  # override
 
 

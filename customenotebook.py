@@ -1,6 +1,6 @@
 """Closable ttk.Notebook"""
-from constants import *
-
+from modules import tk, ttk
+from constants import logger
 
 class ClosableNotebook(ttk.Notebook):
     """A ttk Notebook with close buttons on each tab
@@ -39,8 +39,8 @@ class ClosableNotebook(ttk.Notebook):
         logger.debug("Close tab start")
 
     def on_close_release(self, event):
+        """Called when the button is released over the close button"""
         try:
-            """Called when the button is released over the close button"""
             if not self.instate(["pressed"]):
                 return
 

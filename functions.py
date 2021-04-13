@@ -56,7 +56,7 @@ def get_environment_with_overrides(overrides):
 
 
 def run_in_terminal(
-    cmd, cwd=os.getcwd(), env_overrides=None, keep_open=True, title=None
+    cmd, cwd=os.getcwd(), env_overrides=None, keep_open=False, title=None
 ):
     if env_overrides is None:
         env_overrides = {}

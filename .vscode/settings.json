@@ -7,5 +7,6 @@
     "python.linting.pylamaEnabled": false,
     "python.linting.mypyEnabled": false,
     "python.linting.prospectorEnabled": true,
-    "python.linting.pydocstyleEnabled": false
+    "python.linting.pydocstyleEnabled": false,
+    "git.ignoreLimitWarning": true
 }

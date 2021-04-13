@@ -16,6 +16,7 @@
 Also, it's cross-compatible!
 """
 # These modules are from the base directory
+from goto import Navigate
 from console import Console
 from constants import (
     APPDIR,
@@ -1193,36 +1194,7 @@ class Editor:
     def goto(self, _=None) -> None:
         if not self.tabs:
             return
-        goto_frame = ttk.Frame(self.tabs[self.get_tab()].textbox.frame)
-        style = ttkthemes.ThemedStyle(goto_frame)
-        style.set_theme(self.theme)
-        goto_frame.pack(anchor="nw")
-        ttk.Label(goto_frame, text="Go to place: [Ln].[Col] ").pack(side="left")
-        place = tk.Entry(
-            goto_frame,
-            background="black",
-            foreground="white",
-            insertbackground="white",
-            highlightthickness=0,
-        )
-        place.focus_set()
-        place.pack(side="left")
-
-        def _goto():
-            currtext = self.tabs[self.get_tab()].textbox
-            currtext.mark_set("insert", place.get())
-            currtext.see("insert")
-            _exit()
-
-        def _exit():
-            goto_frame.pack_forget()
-            self.tabs[self.get_tab()].textbox.focus_set()
-
-        goto_button = ttk.Button(goto_frame, command=_goto, text=">> Go to")
-        goto_button.pack(side="left")
-        ttk.Button(goto_frame, text="x", command=_exit, width=1).pack(
-            side="right", anchor="se"
-        )
+        Navigate(self.nb, self.tabs)
 
     def nav_1cf(self) -> None:
         if not self.tabs:

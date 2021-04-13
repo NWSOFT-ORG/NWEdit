@@ -73,7 +73,7 @@ class Search:
         closeicon = tk.PhotoImage(file="Images/close.gif")
         ttk.Button(
             self.search_frame, image=closeicon, command=self._exit, width=1
-        ).pack(side="right", anchor="ne")
+        ).pack(side="right")
         self.text.searchable = True
 
     def find(self, _=None):

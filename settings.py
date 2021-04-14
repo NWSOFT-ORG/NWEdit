@@ -1,7 +1,7 @@
-from modules import sys, json, os, lexers, EditorErr, JSONLexer, zipfile, Path
+from constants import APPDIR
 from dialogs import ErrorInfoDialog
 from filedialog import DirectoryOpenDialog, FileOpenDialog
-from constants import APPDIR
+from modules import EditorErr, JSONLexer, Path, json, lexers, os, sys, zipfile
 
 
 class Settings:

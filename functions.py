@@ -1,9 +1,10 @@
 """Useful functions"""
 
 import shlex
+
 from constants import OSX, WINDOWS, textchars
 from dialogs import ErrorInfoDialog
-from modules import requests, platform, os, subprocess, sys, shutil
+from modules import os, platform, requests, shutil, subprocess, sys
 
 
 def is_binary_string(byte):

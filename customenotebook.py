@@ -1,6 +1,6 @@
 """Closable ttk.Notebook"""
-from modules import tk, ttk
 from constants import logger
+from modules import tk, ttk
 
 
 class ClosableNotebook(ttk.Notebook):

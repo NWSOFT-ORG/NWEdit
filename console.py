@@ -1,5 +1,5 @@
 """Python console for the editor."""
-from modules import queue, ttk, tk, code, io, sys, threading, hashlib
+from modules import code, hashlib, io, queue, sys, threading, tk, ttk
 from settings import Settings
 
 

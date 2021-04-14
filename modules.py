@@ -1,7 +1,9 @@
 """All the nessasary modules"""
 import code
+import codecs
 import hashlib
 import io
+import logging
 import os
 import platform
 import queue
@@ -10,14 +12,13 @@ import shutil
 import subprocess
 import sys
 import threading
+import time
 import tkinter as tk
 import tkinter.filedialog
-import tkinter.ttk as ttk
 import tkinter.font as font
-import codecs
-import logging
-import time
+import tkinter.ttk as ttk
 import webbrowser
+import zipfile
 from pathlib import Path
 
 import json5 as json
@@ -27,7 +28,6 @@ from pygments import lexers
 from pygments.styles import get_style_by_name
 from pygson.json_lexer import JSONLexer
 from ttkthemes import ThemedStyle
-import zipfile
 
 if sys.platform == "darwin":
     import PyTouchBar

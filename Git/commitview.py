@@ -1,5 +1,5 @@
 ﻿from constants import APPDIR
-from modules import subprocess, tk, ttk, os, lexers
+from modules import lexers, os, subprocess, tk, ttk
 
 
 class CommitView:
@@ -83,15 +83,16 @@ class CommitView:
         )
 
         self.files_listbox.pack(fill="both")
-        ttk.Button(diff_frame, text='Diff', command=self.diff).pack()
-        diff_frame.pack(fill='both')
-
+        ttk.Button(diff_frame, text="Diff", command=self.diff).pack()
+        diff_frame.pack(fill="both")
 
         commit_frame = ttk.Frame(self.window)
         commit_frame.pack(anchor="nw")
         self.committext = tk.Text(commit_frame, font="Arial", height=4)
         self.committext.pack()
-        ttk.Button(commit_frame, text="Commit >>", command=self.commit).pack(side="bottom", fill='x')
+        ttk.Button(commit_frame, text="Commit >>", command=self.commit).pack(
+            side="bottom", fill="x"
+        )
         self.window.mainloop()
 
     def commit(self, _=None):

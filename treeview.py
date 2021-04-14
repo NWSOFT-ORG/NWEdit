@@ -1,6 +1,6 @@
-from modules import os, ttk, shutil, time, tk
-from dialogs import YesNoDialog, InputStringDialog
-from constants import WINDOWS, OSX
+from constants import OSX, WINDOWS
+from dialogs import InputStringDialog, YesNoDialog
+from modules import os, shutil, time, tk, ttk
 
 
 class FileTree(ttk.Frame):

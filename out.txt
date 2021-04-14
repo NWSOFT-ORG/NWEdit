@@ -1,144 +1,76 @@
-diff --git a/pyplus.py b/pyplus.py
-index 9818b488..1a242c22 100755
---- a/pyplus.py
-+++ b/pyplus.py
-@@ -16,6 +16,7 @@
- Also, it's cross-compatible!
- """
- # These modules are from the base directory
-+from Git.commitview import CommitView
- from goto import Navigate
- from console import Console
- from constants import (
-@@ -912,6 +913,7 @@ class Editor:
-         main_window = Console(shell_frame, None, shell_frame.destroy)
-         main_window.text.lexer = lexers.get_lexer_by_name("pycon")
-         main_window.text.focus_set()
-+        self.create_tags(main_window.text)
-         self.recolorize(main_window.text)
-         main_window.text.bind(
-             "<KeyRelease>", lambda _=None: self.recolorize(main_window.text)
-@@ -1316,6 +1318,7 @@ class Editor:
-         textframe.text["state"] = "disabled"
-         textframe.text.lexer = currtext.lexer
-         textframe.pack(fill="both", expand=1)
-+        self.create_tags(textframe.text)
-         self.recolorize(textframe.text)
-         win.mainloop()
- 
-@@ -1377,114 +1380,7 @@ class Editor:
-                 cwd=currdir,
-             )
-         elif action == "commit":
--            subprocess.Popen("git add .", shell=True, cwd=currdir)
--            window = tk.Toplevel(self.master)
--            window.title("Commit")
--            window.resizable(0, 0)
--            modified_files = [
--                "M " + x
--                for x in subprocess.Popen(
--                    "git diff --staged --name-only --diff-filter=M",
--                    stdout=subprocess.PIPE,
--                    shell=True,
--                    cwd=currdir,
--                )
--                .communicate()[0]
--                .decode("utf-8")
--                .splitlines()
--            ]
--            renamed_files = [
--                "R " + x
--                for x in subprocess.Popen(
--                    "git diff --staged --name-only --diff-filter=R",
--                    stdout=subprocess.PIPE,
--                    shell=True,
--                    cwd=currdir,
--                )
--                .communicate()[0]
--                .decode("utf-8")
--                .splitlines()
--            ]
--            added_files = [
--                "A " + x
--                for x in subprocess.Popen(
--                    "git diff --staged --name-only --diff-filter=A",
--                    stdout=subprocess.PIPE,
--                    shell=True,
--                    cwd=currdir,
--                )
--                .communicate()[0]
--                .decode("utf-8")
--                .splitlines()
--            ]
--            deleted_files = [
--                "D " + x
--                for x in subprocess.Popen(
--                    "git diff --staged --name-only --diff-filter=D",
--                    stdout=subprocess.PIPE,
--                    shell=True,
--                    cwd=currdir,
--                )
--                .communicate()[0]
--                .decode("utf-8")
--                .splitlines()
--            ]
--            copied_files = [
--                "C " + x
--                for x in subprocess.Popen(
--                    "git diff --staged --name-only --diff-filter=C",
--                    stdout=subprocess.PIPE,
--                    shell=True,
--                    cwd=currdir,
--                )
--                .communicate()[0]
--                .decode("utf-8")
--                .splitlines()
--            ]
--            files_listbox = tk.Listbox(window)
--            files_listbox.insert("end", *modified_files)
--            files_listbox.insert("end", *renamed_files)
--            files_listbox.insert("end", *added_files)
--            files_listbox.insert("end", *copied_files)
--            files_listbox.insert("end", *deleted_files)
--
--            files_listbox.pack(fill="both", expand=1)
--            committext = tk.Text(window, font="Arial", height=4)
--            committext.pack()
--
--            def commit():
--                subprocess.Popen(
--                    f'git commit -am "{committext.get("1.0", "end")}"',
--                    shell=True,
--                    cwd=currdir,
--                )
--                window.destroy()
--
--            def diff():
--                diffwindow = tk.Toplevel(window)
--                diffwindow.resizable(0, 0)
--                difftext = tk.Text(diffwindow, width=50, height=25)
--                difftext.pack(fill="both", expand=1)
--                difftext.lexer = lexers.get_lexer_by_name("diff")
--                subprocess.Popen(
--                    f'git diff --staged {files_listbox.get(files_listbox.curselection())[2:]} > \
--                        {os.path.join(APPDIR, "out.txt")}',
--                    shell=True,
--                    cwd=currdir,
--                )
--                with open(os.path.join(APPDIR, "out.txt")) as f:
--                    message = f.read()
--                os.remove("out.txt")
--                difftext.insert("end", message)
--                difftext.config(state="disabled", wrap="none")
--                self.recolorize(difftext)
--                diffwindow.mainloop()
--
--            frame = ttk.Frame(window)
--            ttk.Button(frame, text="Commit", command=commit).pack(side="left")
--            ttk.Button(frame, text="Diff", command=diff).pack(side="left")
--            frame.pack(anchor="nw")
--            window.mainloop()
-+            CommitView(self.master, currdir)
- 
-     def indent(self, action="indent") -> None:
-         """Indent/unindent feature."""
+diff --git a/pyplus.log b/pyplus.log
+index 6b4892f7..b4417c96 100644
+--- a/pyplus.log
++++ b/pyplus.log
+@@ -1,30 +1,41 @@
+-2021-04-13 16:09:47,352 : INFO : <module> : Tkinter version: 8.6
+-2021-04-13 16:09:47,353 : DEBUG : <module> : All modules imported
+-2021-04-13 16:09:48,177 : DEBUG : __init__ : Settings loaded
+-2021-04-13 16:09:48,181 : DEBUG : __init__ : Icons loaded
+-2021-04-13 16:09:48,308 : DEBUG : __init__ : Theme loaded
+-2021-04-13 16:09:48,309 : DEBUG : __initialize_custom_style : Initialized custom style.
+-2021-04-13 16:09:48,497 : DEBUG : __init__ : Menu created
+-2021-04-13 16:09:48,497 : DEBUG : __init__ : Right-click menu created
+-2021-04-13 16:09:48,498 : DEBUG : __init__ : Bindings created
+-2021-04-13 16:09:48,506 : DEBUG : start_screen : Start screen created
+-2021-04-13 16:09:48,508 : DEBUG : update_title : update_title: No file open
+-2021-04-13 16:09:48,508 : DEBUG : update_statusbar : update_statusbar: No file open
+-2021-04-13 16:09:48,552 : DEBUG : create_text_widget : Textbox created
+-2021-04-13 16:09:51,470 : DEBUG : update_statusbar : update_statusbar: OK
+-2021-04-13 16:09:51,472 : DEBUG : update_title : update_title: OK
+-2021-04-13 16:09:51,472 : DEBUG : key : update_title: OK
+-2021-04-13 16:09:51,489 : INFO : open_file : File opened
+-2021-04-13 16:09:53,852 : DEBUG : update_statusbar : update_statusbar: OK
+-2021-04-13 16:09:53,852 : DEBUG : update_title : update_title: OK
+-2021-04-13 16:09:53,852 : DEBUG : mouse : update_title: OK
+-2021-04-13 16:09:54,634 : DEBUG : update_statusbar : update_statusbar: OK
+-2021-04-13 16:09:54,634 : DEBUG : update_title : update_title: OK
+-2021-04-13 16:09:54,634 : DEBUG : key : update_title: OK
+-2021-04-13 16:09:54,663 : DEBUG : update_statusbar : update_statusbar: OK
+-2021-04-13 16:09:54,663 : DEBUG : update_title : update_title: OK
+-2021-04-13 16:09:54,663 : DEBUG : key : update_title: OK
+-2021-04-13 16:09:59,111 : DEBUG : update_statusbar : update_statusbar: OK
+-2021-04-13 16:09:59,111 : DEBUG : update_title : update_title: OK
+-2021-04-13 16:09:59,111 : DEBUG : mouse : update_title: OK
+-2021-04-13 16:10:00,568 : INFO : exit : Window is destroyed
++2021-04-14 15:48:28,799 : INFO : <module> : Tkinter version: 8.6
++2021-04-14 15:48:28,800 : DEBUG : <module> : All modules imported
++2021-04-14 15:48:29,716 : DEBUG : __init__ : Settings loaded
++2021-04-14 15:48:29,721 : DEBUG : __init__ : Icons loaded
++2021-04-14 15:48:29,860 : DEBUG : __init__ : Theme loaded
++2021-04-14 15:48:29,862 : DEBUG : __initialize_custom_style : Initialized custom style.
++2021-04-14 15:48:30,040 : DEBUG : __init__ : Menu created
++2021-04-14 15:48:30,041 : DEBUG : __init__ : Right-click menu created
++2021-04-14 15:48:30,041 : DEBUG : __init__ : Bindings created
++2021-04-14 15:48:30,048 : DEBUG : start_screen : Start screen created
++2021-04-14 15:48:30,049 : DEBUG : update_title : update_title: No file open
++2021-04-14 15:48:30,050 : DEBUG : update_statusbar : update_statusbar: No file open
++2021-04-14 15:48:30,087 : DEBUG : create_text_widget : Textbox created
++2021-04-14 15:48:30,665 : DEBUG : update_statusbar : update_statusbar: OK
++2021-04-14 15:48:30,666 : DEBUG : update_title : update_title: OK
++2021-04-14 15:48:30,666 : DEBUG : key : update_title: OK
++2021-04-14 15:48:30,672 : INFO : open_file : File opened
++2021-04-14 15:48:32,062 : DEBUG : update_statusbar : update_statusbar: OK
++2021-04-14 15:48:32,063 : DEBUG : update_title : update_title: OK
++2021-04-14 15:48:32,063 : DEBUG : mouse : update_title: OK
++2021-04-14 15:48:32,223 : DEBUG : update_statusbar : update_statusbar: OK
++2021-04-14 15:48:32,223 : DEBUG : update_title : update_title: OK
++2021-04-14 15:48:32,223 : DEBUG : mouse : update_title: OK
++2021-04-14 15:48:33,052 : DEBUG : update_statusbar : update_statusbar: OK
++2021-04-14 15:48:33,053 : DEBUG : update_title : update_title: OK
++2021-04-14 15:48:33,053 : DEBUG : mouse : update_title: OK
++2021-04-14 15:48:33,213 : DEBUG : update_statusbar : update_statusbar: OK
++2021-04-14 15:48:33,213 : DEBUG : update_title : update_title: OK
++2021-04-14 15:48:33,214 : DEBUG : mouse : update_title: OK
++2021-04-14 15:48:33,888 : DEBUG : update_statusbar : update_statusbar: OK
++2021-04-14 15:48:33,888 : DEBUG : update_title : update_title: OK
++2021-04-14 15:48:33,889 : DEBUG : mouse : update_title: OK
++2021-04-14 15:48:34,057 : DEBUG : update_statusbar : update_statusbar: OK
++2021-04-14 15:48:34,058 : DEBUG : update_title : update_title: OK
++2021-04-14 15:48:34,058 : DEBUG : mouse : update_title: OK
++2021-04-14 15:48:35,143 : DEBUG : update_statusbar : update_statusbar: OK
++2021-04-14 15:48:35,144 : DEBUG : update_title : update_title: OK
++2021-04-14 15:48:35,144 : DEBUG : mouse : update_title: OK
++2021-04-14 15:48:35,287 : DEBUG : update_statusbar : update_statusbar: OK
++2021-04-14 15:48:35,287 : DEBUG : update_title : update_title: OK
++2021-04-14 15:48:35,287 : DEBUG : mouse : update_title: OK

@@ -444,7 +444,10 @@ class Editor:
             self.update_title()
             self.update_statusbar()
             with open("recent_files.txt") as f:
-                for line in f.read().split("\n"):
+                if f.read():
+                    self.filetree.path = f.read().split("\n")[0]
+                    self.filetree.init_ui()
+                for line in f.read().split("\n")[1:]:
                     if line:
                         self.open_file(line)
         except FileNotFoundError:
@@ -1092,7 +1095,7 @@ class Editor:
     def exit(self, force=False) -> None:
         if not force:
             with open("recent_files.txt", "w") as f:
-                file_list = ""
+                file_list = self.filetree.path + '\n'
                 for tab in self.tabs.values():
                     file_list += tab.file_dir + "\n"
                 f.write(file_list)

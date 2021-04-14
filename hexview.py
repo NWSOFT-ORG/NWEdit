@@ -3,6 +3,7 @@
 from modules import tk, ttk
 from constants import ENCODINGS, BLOCK_HEIGHT, BLOCK_SIZE, BLOCK_WIDTH, os, codecs
 
+
 class HexView:
     """
     Copyright © 2016-20 Qtrac Ltd. All rights reserved.

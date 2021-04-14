@@ -16,6 +16,7 @@
 Also, it's cross-compatible!
 """
 # These modules are from the base directory
+from Git.commitview import CommitView
 from goto import Navigate
 from console import Console
 from constants import (
@@ -912,6 +913,7 @@ class Editor:
         main_window = Console(shell_frame, None, shell_frame.destroy)
         main_window.text.lexer = lexers.get_lexer_by_name("pycon")
         main_window.text.focus_set()
+        self.create_tags(main_window.text)
         self.recolorize(main_window.text)
         main_window.text.bind(
             "<KeyRelease>", lambda _=None: self.recolorize(main_window.text)
@@ -1316,6 +1318,7 @@ class Editor:
         textframe.text["state"] = "disabled"
         textframe.text.lexer = currtext.lexer
         textframe.pack(fill="both", expand=1)
+        self.create_tags(textframe.text)
         self.recolorize(textframe.text)
         win.mainloop()
 
@@ -1377,114 +1380,7 @@ class Editor:
                 cwd=currdir,
             )
         elif action == "commit":
-            subprocess.Popen("git add .", shell=True, cwd=currdir)
-            window = tk.Toplevel(self.master)
-            window.title("Commit")
-            window.resizable(0, 0)
-            modified_files = [
-                "M " + x
-                for x in subprocess.Popen(
-                    "git diff --staged --name-only --diff-filter=M",
-                    stdout=subprocess.PIPE,
-                    shell=True,
-                    cwd=currdir,
-                )
-                .communicate()[0]
-                .decode("utf-8")
-                .splitlines()
-            ]
-            renamed_files = [
-                "R " + x
-                for x in subprocess.Popen(
-                    "git diff --staged --name-only --diff-filter=R",
-                    stdout=subprocess.PIPE,
-                    shell=True,
-                    cwd=currdir,
-                )
-                .communicate()[0]
-                .decode("utf-8")
-                .splitlines()
-            ]
-            added_files = [
-                "A " + x
-                for x in subprocess.Popen(
-                    "git diff --staged --name-only --diff-filter=A",
-                    stdout=subprocess.PIPE,
-                    shell=True,
-                    cwd=currdir,
-                )
-                .communicate()[0]
-                .decode("utf-8")
-                .splitlines()
-            ]
-            deleted_files = [
-                "D " + x
-                for x in subprocess.Popen(
-                    "git diff --staged --name-only --diff-filter=D",
-                    stdout=subprocess.PIPE,
-                    shell=True,
-                    cwd=currdir,
-                )
-                .communicate()[0]
-                .decode("utf-8")
-                .splitlines()
-            ]
-            copied_files = [
-                "C " + x
-                for x in subprocess.Popen(
-                    "git diff --staged --name-only --diff-filter=C",
-                    stdout=subprocess.PIPE,
-                    shell=True,
-                    cwd=currdir,
-                )
-                .communicate()[0]
-                .decode("utf-8")
-                .splitlines()
-            ]
-            files_listbox = tk.Listbox(window)
-            files_listbox.insert("end", *modified_files)
-            files_listbox.insert("end", *renamed_files)
-            files_listbox.insert("end", *added_files)
-            files_listbox.insert("end", *copied_files)
-            files_listbox.insert("end", *deleted_files)
-
-            files_listbox.pack(fill="both", expand=1)
-            committext = tk.Text(window, font="Arial", height=4)
-            committext.pack()
-
-            def commit():
-                subprocess.Popen(
-                    f'git commit -am "{committext.get("1.0", "end")}"',
-                    shell=True,
-                    cwd=currdir,
-                )
-                window.destroy()
-
-            def diff():
-                diffwindow = tk.Toplevel(window)
-                diffwindow.resizable(0, 0)
-                difftext = tk.Text(diffwindow, width=50, height=25)
-                difftext.pack(fill="both", expand=1)
-                difftext.lexer = lexers.get_lexer_by_name("diff")
-                subprocess.Popen(
-                    f'git diff --staged {files_listbox.get(files_listbox.curselection())[2:]} > \
-                        {os.path.join(APPDIR, "out.txt")}',
-                    shell=True,
-                    cwd=currdir,
-                )
-                with open(os.path.join(APPDIR, "out.txt")) as f:
-                    message = f.read()
-                os.remove("out.txt")
-                difftext.insert("end", message)
-                difftext.config(state="disabled", wrap="none")
-                self.recolorize(difftext)
-                diffwindow.mainloop()
-
-            frame = ttk.Frame(window)
-            ttk.Button(frame, text="Commit", command=commit).pack(side="left")
-            ttk.Button(frame, text="Diff", command=diff).pack(side="left")
-            frame.pack(anchor="nw")
-            window.mainloop()
+            CommitView(self.master, currdir)
 
     def indent(self, action="indent") -> None:
         """Indent/unindent feature."""

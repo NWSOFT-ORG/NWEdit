@@ -1,24 +1,30 @@
-2021-04-15 17:41:58,147 : INFO : <module> : Tkinter version: 8.6
-2021-04-15 17:41:58,148 : DEBUG : <module> : All modules imported
-2021-04-15 17:41:58,620 : DEBUG : __init__ : Settings loaded
-2021-04-15 17:41:58,627 : DEBUG : __init__ : Icons loaded
-2021-04-15 17:41:59,738 : DEBUG : __init__ : Theme loaded
-2021-04-15 17:41:59,743 : DEBUG : __initialize_custom_style : Initialized custom style.
-2021-04-15 17:41:59,933 : DEBUG : __init__ : Menu created
-2021-04-15 17:41:59,934 : DEBUG : __init__ : Right-click menu created
-2021-04-15 17:41:59,935 : DEBUG : __init__ : Bindings created
-2021-04-15 17:41:59,943 : DEBUG : start_screen : Start screen created
-2021-04-15 17:41:59,945 : DEBUG : update_title : update_title: No file open
-2021-04-15 17:41:59,946 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-04-15 17:42:01,814 : INFO : exit : Window is destroyed
-2021-04-15 17:42:02,478 : DEBUG : __init__ : Settings loaded
-2021-04-15 17:42:02,515 : DEBUG : __init__ : Icons loaded
-2021-04-15 17:42:03,495 : DEBUG : __init__ : Theme loaded
-2021-04-15 17:42:03,497 : DEBUG : __initialize_custom_style : Initialized custom style.
-2021-04-15 17:42:03,618 : DEBUG : __init__ : Menu created
-2021-04-15 17:42:03,618 : DEBUG : __init__ : Right-click menu created
-2021-04-15 17:42:03,619 : DEBUG : __init__ : Bindings created
-2021-04-15 17:42:03,647 : DEBUG : start_screen : Start screen created
-2021-04-15 17:42:03,647 : DEBUG : update_title : update_title: No file open
-2021-04-15 17:42:03,648 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-04-15 17:42:05,702 : INFO : exit : Window is destroyed
+2021-04-15 18:02:36,605 : INFO : <module> : Tkinter version: 8.6
+2021-04-15 18:02:36,605 : DEBUG : <module> : All modules imported
+2021-04-15 18:02:37,137 : DEBUG : __init__ : Settings loaded
+2021-04-15 18:02:37,152 : DEBUG : __init__ : Icons loaded
+2021-04-15 18:02:38,033 : DEBUG : __init__ : Theme loaded
+2021-04-15 18:02:38,042 : DEBUG : __initialize_custom_style : Initialized custom style.
+2021-04-15 18:02:38,178 : DEBUG : __init__ : Menu created
+2021-04-15 18:02:38,179 : DEBUG : __init__ : Right-click menu created
+2021-04-15 18:02:38,180 : DEBUG : __init__ : Bindings created
+2021-04-15 18:02:38,190 : DEBUG : start_screen : Start screen created
+2021-04-15 18:02:38,191 : DEBUG : update_title : update_title: No file open
+2021-04-15 18:02:38,191 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-15 18:02:39,701 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-15 18:02:39,702 : DEBUG : update_title : update_title: No file open
+2021-04-15 18:02:39,706 : DEBUG : mouse : update_title: OK
+2021-04-15 18:02:39,861 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-15 18:02:39,862 : DEBUG : update_title : update_title: No file open
+2021-04-15 18:02:39,862 : DEBUG : mouse : update_title: OK
+2021-04-15 18:02:41,154 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-15 18:02:41,154 : DEBUG : update_title : update_title: No file open
+2021-04-15 18:02:41,162 : DEBUG : mouse : update_title: OK
+2021-04-15 18:02:41,387 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-15 18:02:41,387 : DEBUG : update_title : update_title: No file open
+2021-04-15 18:02:41,388 : DEBUG : mouse : update_title: OK
+2021-04-15 18:04:40,828 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-15 18:04:40,828 : DEBUG : update_title : update_title: No file open
+2021-04-15 18:04:40,828 : DEBUG : mouse : update_title: OK
+2021-04-15 18:04:40,893 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-15 18:04:40,893 : DEBUG : update_title : update_title: No file open
+2021-04-15 18:04:40,894 : DEBUG : mouse : update_title: OK

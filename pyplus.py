@@ -16,59 +16,27 @@
 Also, it's cross-compatible!
 """
 from console import Console
-from constants import (
-    APPDIR,
-    LINT_BATCH,
-    MAIN_KEY,
-    OSX,
-    RUN_BATCH,
-    VERSION,
-    WINDOWS,
-    logger,
-)
+from constants import (APPDIR, LINT_BATCH, MAIN_KEY, OSX, RUN_BATCH, VERSION,
+                       WINDOWS, logger)
 from customenotebook import ClosableNotebook
 from dialogs import ErrorInfoDialog, InputStringDialog, YesNoDialog
 from filedialog import FileOpenDialog, FileSaveAsDialog
-from functions import (
-    download_file,
-    is_binary_string,
-    open_system_shell,
-    run_in_terminal,
-)
-
+from functions import (download_file, is_binary_string, open_system_shell,
+                       run_in_terminal)
 # These modules are from the base directory
 from Git.commitview import CommitView
 from goto import Navigate
 from hexview import HexView
-from modules import (
-    EditorErr,
-    Path,
-    font,
-    get_style_by_name,
-    json,
-    lexers,
-    logging,
-    os,
-    subprocess,
-    sys,
-    threading,
-    tk,
-    ttk,
-    ttkthemes,
-    webbrowser,
-)
+from modules import (EditorErr, Path, font, get_style_by_name, json, lexers,
+                     logging, os, subprocess, sys, threading, tk, ttk,
+                     ttkthemes, webbrowser)
 from search import Search
-from settings import (
-    CommentMarker,
-    Lexer,
-    FormatCommand,
-    Linter,
-    RunCommand,
-    Settings,
-)
+from settings import (CommentMarker, FormatCommand, Lexer, Linter, RunCommand,
+                      Settings)
 from statusbar import Statusbar
 from tktext import EnhancedText, EnhancedTextFrame
 from treeview import FileTree
+from testdialog import TestDialog
 
 if OSX:
     from modules import PyTouchBar
@@ -394,6 +362,11 @@ class Editor:
                 command=self.system_shell,
                 compound="left",
                 image=self.term_icon,
+            )
+            self.codemenu.add_separator()
+            self.codemenu.add_command(
+                label="Unit tests",
+                command=self.test,
             )
 
             navmenu = tk.Menu(menubar, tearoff=0)
@@ -1322,6 +1295,11 @@ class Editor:
         self.create_tags(textframe.text)
         self.recolorize(textframe.text)
         win.mainloop()
+    
+    def test(self):
+        if not self.tabs:
+            return
+        TestDialog(self.master)
 
     def check_updates(self, popup=True) -> list:
         if "DEV" in VERSION:

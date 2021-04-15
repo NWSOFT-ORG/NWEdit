@@ -1,4 +1,4 @@
-﻿from constants import APPDIR
+from constants import APPDIR
 from modules import lexers, os, subprocess, tk, ttk
 
 
@@ -83,7 +83,7 @@ class CommitView:
         )
 
         self.files_listbox.pack(fill="both")
-        ttk.Button(diff_frame, text="Diff", command=self.diff).pack()
+        ttk.Button(diff_frame, text="Diff", command=self.diff).pack(side="left")
         diff_frame.pack(fill="both")
 
         commit_frame = ttk.Frame(self.window)

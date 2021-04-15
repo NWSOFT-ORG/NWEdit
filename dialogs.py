@@ -108,7 +108,7 @@ class YesNoDialog(Dialog):
 
 
 class InputStringDialog(Dialog):
-    def __init__(self, parent=None, title="InputString", text=None):
+    def __init__(self, parent=None, title="InputString", text=""):
         self.text = text
         super().__init__(parent, title)
 

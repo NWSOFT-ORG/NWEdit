@@ -16,23 +16,56 @@
 Also, it's cross-compatible!
 """
 from console import Console
-from constants import (APPDIR, LINT_BATCH, MAIN_KEY, OSX, RUN_BATCH, VERSION,
-                       WINDOWS, logger)
+from constants import (
+    APPDIR,
+    LINT_BATCH,
+    MAIN_KEY,
+    OSX,
+    RUN_BATCH,
+    VERSION,
+    WINDOWS,
+    logger,
+)
 from customenotebook import ClosableNotebook
 from dialogs import ErrorInfoDialog, InputStringDialog, YesNoDialog
 from filedialog import FileOpenDialog, FileSaveAsDialog
-from functions import (download_file, is_binary_string, open_system_shell,
-                       run_in_terminal)
+from functions import (
+    download_file,
+    is_binary_string,
+    open_system_shell,
+    run_in_terminal,
+)
+
 # These modules are from the base directory
 from Git.commitview import CommitView
 from goto import Navigate
 from hexview import HexView
-from modules import (EditorErr, Path, font, get_style_by_name, json, lexers,
-                     logging, os, subprocess, sys, threading, tk, ttk,
-                     ttkthemes, webbrowser)
+from modules import (
+    EditorErr,
+    Path,
+    font,
+    get_style_by_name,
+    json,
+    lexers,
+    logging,
+    os,
+    subprocess,
+    sys,
+    threading,
+    tk,
+    ttk,
+    ttkthemes,
+    webbrowser,
+)
 from search import Search
-from settings import (CommentMarker, Filetype, FormatCommand, Linter,
-                      RunCommand, Settings)
+from settings import (
+    CommentMarker,
+    Lexer,
+    FormatCommand,
+    Linter,
+    RunCommand,
+    Settings,
+)
 from statusbar import Statusbar
 from tktext import EnhancedText, EnhancedTextFrame
 from treeview import FileTree
@@ -62,7 +95,7 @@ class Editor:
         * The file selector does not work."""
         try:
             self.settings_class = Settings()
-            self.file_settings_class = Filetype()
+            self.file_settings_class = Lexer()
             self.linter_settings_class = Linter()
             self.cmd_settings_class = RunCommand()
             self.format_settings_class = FormatCommand()
@@ -703,16 +736,14 @@ class Editor:
                 currtext.insert("end", file.read().replace("\t", " " * self.tabwidth))
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
-                currtext.set_lexer(self.file_settings_class.get_lexer_settings(extens))
-                currtext.lint_cmd = self.linter_settings_class.get_linter_settings(
+                currtext.set_lexer(self.file_settings_class.get_settings(extens))
+                currtext.lint_cmd = self.linter_settings_class.get_settings(extens)
+                currtext.cmd = self.cmd_settings_class.get_settings(extens)
+                currtext.format_command = self.format_settings_class.get_settings(
                     extens
                 )
-                currtext.cmd = self.cmd_settings_class.get_command_settings(extens)
-                currtext.format_command = (
-                    self.format_settings_class.get_command_settings(extens)
-                )
-                currtext.comment_marker = (
-                    self.commet_settings_class.get_comment_settings(extens)
+                currtext.comment_marker = self.commet_settings_class.get_settings(
+                    extens
                 )
                 currtext.see("insert")
                 currtext.event_generate("<<Key>>")

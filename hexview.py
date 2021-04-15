@@ -1,7 +1,6 @@
 """A Hex Viewer to view non-text documents."""
 
-from constants import (BLOCK_HEIGHT, BLOCK_SIZE, BLOCK_WIDTH, ENCODINGS,
-                       codecs, os)
+from constants import BLOCK_HEIGHT, BLOCK_SIZE, BLOCK_WIDTH, ENCODINGS, codecs, os
 from modules import tk, ttk
 
 

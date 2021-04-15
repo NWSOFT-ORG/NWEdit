@@ -67,17 +67,30 @@ class Settings:
         raise EditorErr("The setting is not defined")
 
 
-class Filetype:
-    def __init__(self):
-        with open(os.path.join(APPDIR, "Settings/lexer-settings.json")) as f:
+class ExtensionSettings:
+    def __init__(self, path):
+        with open(path) as f:
             all_settings = json.load(f)
         self.extens = []
-        self.lexers = []
+        self.items = []
         for key, value in all_settings.items():
             self.extens.append(key)
-            self.lexers.append(value)
+            self.items.append(value)
 
-    def get_lexer_settings(self, extension: str):
+    def get_settings(self, extension):
+        try:
+            if self.items[self.extens.index(extension)] == "none":
+                return None
+            return self.items[self.extens.index(extension)]
+        except ValueError:
+            return None
+
+
+class Lexer(ExtensionSettings):
+    def __init__(self):
+        super().__init__(os.path.join(APPDIR, "Settings/lexer-settings.json"))
+
+    def get_settings(self, extension: str):
         try:
             if lexers.get_lexer_by_name(
                 self.lexers[self.extens.index(extension)]
@@ -88,77 +101,21 @@ class Filetype:
             return lexers.get_lexer_by_name("Text")
 
 
-class Linter:
+class Linter(ExtensionSettings):
     def __init__(self):
-        with open(os.path.join(APPDIR, "Settings/linter-settings.json")) as f:
-            all_settings = json.load(f)
-        self.extens = []
-        self.linters = []
-        for key, value in all_settings.items():
-            self.extens.append(key)
-            self.linters.append(value)
-
-    def get_linter_settings(self, extension: str):
-        try:
-            if self.linters[self.extens.index(extension)] == "none":
-                return None
-            return self.linters[self.extens.index(extension)]
-        except ValueError:
-            return None
+        super().__init__(os.path.join(APPDIR, "Settings/linter-settings.json"))
 
 
 class FormatCommand:
     def __init__(self):
-        with open(os.path.join(APPDIR, "Settings/format-settings.json")) as f:
-            all_settings = json.load(f)
-        self.extens = []
-        self.format_commands = []
-        for key, value in all_settings.items():
-            self.extens.append(key)
-            self.format_commands.append(value)
-
-    def get_command_settings(self, extension: str):
-        try:
-            if self.format_commands[self.extens.index(extension)] == "none":
-                return None
-            return self.format_commands[self.extens.index(extension)]
-        except ValueError:
-            return None
+        super().__init__(os.path.join(APPDIR, "Settings/format-settings.json"))
 
 
 class RunCommand:
     def __init__(self):
-        with open(os.path.join(APPDIR, "Settings/cmd-settings.json")) as f:
-            all_settings = json.load(f)
-        self.extens = []
-        self.commands = []
-        for key, value in all_settings.items():
-            self.extens.append(key)
-            self.commands.append(value)
-
-    def get_command_settings(self, extension: str):
-        try:
-            if self.commands[self.extens.index(extension)] == "none":
-                return None
-            return self.commands[self.extens.index(extension)]
-        except ValueError:
-            return None
+        super().__init__(os.path.join(APPDIR, "Settings/cmd-settings.json"))
 
 
-class CommentMarker:
+class CommentMarker(ExtensionSettings):
     def __init__(self):
-        with open(os.path.join(APPDIR, "Settings/comment_markers.json")) as f:
-            all_settings = json.load(f)
-        self.extens = []
-        self.comments = []
-        for key, value in all_settings.items():
-            self.extens.append(key)
-            self.comments.append(value)
-
-    def get_comment_settings(self, extension: str):
-        try:
-            if self.comments[self.extens.index(extension)] == "none":
-                return None
-            return self.comments[self.extens.index(extension)]
-        except ValueError:
-            return None
+        super().__init__(os.path.join(APPDIR, "Settings/comment-markers.json"))

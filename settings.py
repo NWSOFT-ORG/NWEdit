@@ -93,11 +93,11 @@ class Lexer(ExtensionSettings):
     def get_settings(self, extension: str):
         try:
             if lexers.get_lexer_by_name(
-                self.lexers[self.extens.index(extension)]
+                self.items[self.extens.index(extension)]
             ) == lexers.get_lexer_by_name("JSON"):
                 return JSONLexer
-            return lexers.get_lexer_by_name(self.lexers[self.extens.index(extension)])
-        except Exception:
+            return lexers.get_lexer_by_name(self.items[self.extens.index(extension)])
+        except ValueError as e:
             return lexers.get_lexer_by_name("Text")
 
 
@@ -106,12 +106,12 @@ class Linter(ExtensionSettings):
         super().__init__(os.path.join(APPDIR, "Settings/linter-settings.json"))
 
 
-class FormatCommand:
+class FormatCommand(ExtensionSettings):
     def __init__(self):
         super().__init__(os.path.join(APPDIR, "Settings/format-settings.json"))
 
 
-class RunCommand:
+class RunCommand(ExtensionSettings):
     def __init__(self):
         super().__init__(os.path.join(APPDIR, "Settings/cmd-settings.json"))
 

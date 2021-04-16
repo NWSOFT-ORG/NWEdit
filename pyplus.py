@@ -207,6 +207,13 @@ class Editor:
                 image=self.open_icon,
             )
             filemenu.add_command(
+                label="Open File in Hex",
+                command=self.openhex,
+                accelerator=f"{MAIN_KEY}-Shift-o",
+                compound="left",
+                image=self.open_icon,
+            )
+            filemenu.add_command(
                 label="Save Copy to...",
                 command=self._saveas,
                 accelerator=f"{MAIN_KEY}-Shift-S",
@@ -420,14 +427,15 @@ class Editor:
 
             self.master.bind("<<MouseEvent>>", self.mouse)
             self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
-            self.start_screen()
             self.master.focus_force()
             self.update_title()
             self.update_statusbar()
             with open("Backups/recent_files.txt") as f:
-                for line in f.read().split("\n")[1:]:
+                for line in f.read().split("\n"):
                     if line:
                         self.open_file(line, askhex=False)
+                if not f.read():
+                    self.start_screen()
             with open("Backups/recent_dir.txt") as f:
                 self.filetree.path = f.read().strip()
                 self.filetree.init_ui()
@@ -668,6 +676,28 @@ class Editor:
             currtext.update()  # Have to update
         except Exception:
             pass
+    
+    def open_hex(self, file=''):
+        if file:
+            file_dir = file
+        else:
+            file_dir = ""
+            FileOpenDialog(self.open_hex)
+        if file_dir:
+            logger.info("HexView: opened")
+            viewer = ttk.Frame(self.master)
+            viewer.focus_set()
+            window = HexView(viewer)
+            window.open(file_dir)
+            self.tabs[viewer] = Document(
+                viewer, window.textbox, file_dir)
+            self.nb.add(viewer, text=f"Hex -- {os.path.basename(file_dir)}")
+            self.nb.select(viewer)
+            self.update_title()
+            self.update_statusbar()
+    
+    def openhex(self):
+        self.open_hex()
 
     def open_file(self, file: str = "", askhex: bool = True) -> None:
         """Opens a file
@@ -690,29 +720,11 @@ class Editor:
                         dialog = YesNoDialog(
                             self.master, "Error", "View in Hex?")
                         if dialog.result:
-                            logger.info("HexView: opened")
-                            viewer = ttk.Frame(self.master)
-                            viewer.focus_set()
-                            window = HexView(viewer)
-                            window.open(file_dir)
-                            self.tabs[viewer] = Document(
-                                viewer, window.textbox, file_dir)
-                            self.nb.add(viewer, text=f"Hex -- {file_dir}")
-                            self.nb.select(viewer)
-                            self.update_title()
-                            self.update_statusbar()
+                            self.open_hex(file_dir)
                         logging.info("User pressed No.")
                         return
-                    viewer = ttk.Frame(self.master)
-                    viewer.focus_set()
-                    window = HexView(viewer)
-                    window.open(file_dir)
-                    self.tabs[viewer] = Document(
-                        viewer, window.textbox, file_dir)
-                    self.nb.add(viewer, text=f"Hex -- {file_dir}")
-                    self.nb.select(viewer)
-                    self.update_title()
-                    self.update_statusbar()
+                    self.open_hex(file_dir)
+                    return
 
                 file = open(file_dir)
                 extens = file_dir.split(".")[-1]
@@ -722,10 +734,6 @@ class Editor:
                 self.tabs[new_tab] = Document(new_tab, textbox, file_dir)
                 self.nb.add(new_tab, text=os.path.basename(file_dir))
                 self.nb.select(new_tab)
-                shell_frame = ttk.Frame(new_tab)
-                ttkthemes.ThemedStyle(shell_frame).set_theme(self.theme)
-                main_window = Console(shell_frame, None, shell_frame.destroy)
-                main_window.pack(fill="both", expand=True)
 
                 # Puts the contents of the file into the text widget.
                 currtext = self.tabs[new_tab].textbox

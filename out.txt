@@ -1,5 +1,5 @@
 diff --git a/pyplus.log b/pyplus.log
-index 883f7561..3cbc6a55 100644
+index 883f7561..4ed506b1 100644
 --- a/pyplus.log
 +++ b/pyplus.log
 @@ -1,30 +1,24 @@
@@ -33,27 +33,27 @@ index 883f7561..3cbc6a55 100644
 -2021-04-15 18:04:40,893 : DEBUG : update_statusbar : update_statusbar: No file open
 -2021-04-15 18:04:40,893 : DEBUG : update_title : update_title: No file open
 -2021-04-15 18:04:40,894 : DEBUG : mouse : update_title: OK
-+2021-04-16 13:32:33,331 : INFO : <module> : Tkinter version: 8.6
-+2021-04-16 13:32:33,331 : DEBUG : <module> : All modules imported
-+2021-04-16 13:32:33,774 : DEBUG : __init__ : Settings loaded
-+2021-04-16 13:32:33,799 : DEBUG : __init__ : Icons loaded
-+2021-04-16 13:32:34,212 : DEBUG : __init__ : Theme loaded
-+2021-04-16 13:32:34,213 : DEBUG : __initialize_custom_style : Initialized custom style.
-+2021-04-16 13:32:34,439 : DEBUG : __init__ : Menu created
-+2021-04-16 13:32:34,440 : DEBUG : __init__ : Right-click menu created
-+2021-04-16 13:32:34,440 : DEBUG : __init__ : Bindings created
-+2021-04-16 13:32:34,447 : DEBUG : start_screen : Start screen created
-+2021-04-16 13:32:34,448 : DEBUG : update_title : update_title: No file open
-+2021-04-16 13:32:34,449 : DEBUG : update_statusbar : update_statusbar: No file open
-+2021-04-16 13:32:44,300 : DEBUG : update_statusbar : update_statusbar: No file open
-+2021-04-16 13:32:44,300 : DEBUG : update_title : update_title: No file open
-+2021-04-16 13:32:44,300 : DEBUG : mouse : update_title: OK
-+2021-04-16 13:32:44,468 : DEBUG : update_statusbar : update_statusbar: No file open
-+2021-04-16 13:32:44,468 : DEBUG : update_title : update_title: No file open
-+2021-04-16 13:32:44,469 : DEBUG : mouse : update_title: OK
-+2021-04-16 13:32:45,924 : DEBUG : update_statusbar : update_statusbar: No file open
-+2021-04-16 13:32:45,924 : DEBUG : update_title : update_title: No file open
-+2021-04-16 13:32:45,924 : DEBUG : mouse : update_title: OK
-+2021-04-16 13:32:46,077 : DEBUG : update_statusbar : update_statusbar: No file open
-+2021-04-16 13:32:46,077 : DEBUG : update_title : update_title: No file open
-+2021-04-16 13:32:46,077 : DEBUG : mouse : update_title: OK
++2021-04-16 13:35:22,619 : INFO : <module> : Tkinter version: 8.6
++2021-04-16 13:35:22,619 : DEBUG : <module> : All modules imported
++2021-04-16 13:35:23,184 : DEBUG : __init__ : Settings loaded
++2021-04-16 13:35:23,195 : DEBUG : __init__ : Icons loaded
++2021-04-16 13:35:23,517 : DEBUG : __init__ : Theme loaded
++2021-04-16 13:35:23,518 : DEBUG : __initialize_custom_style : Initialized custom style.
++2021-04-16 13:35:23,701 : DEBUG : __init__ : Menu created
++2021-04-16 13:35:23,701 : DEBUG : __init__ : Right-click menu created
++2021-04-16 13:35:23,701 : DEBUG : __init__ : Bindings created
++2021-04-16 13:35:23,707 : DEBUG : start_screen : Start screen created
++2021-04-16 13:35:23,709 : DEBUG : update_title : update_title: No file open
++2021-04-16 13:35:23,709 : DEBUG : update_statusbar : update_statusbar: No file open
++2021-04-16 13:35:25,967 : DEBUG : update_statusbar : update_statusbar: No file open
++2021-04-16 13:35:25,967 : DEBUG : update_title : update_title: No file open
++2021-04-16 13:35:25,967 : DEBUG : mouse : update_title: OK
++2021-04-16 13:35:26,128 : DEBUG : update_statusbar : update_statusbar: No file open
++2021-04-16 13:35:26,128 : DEBUG : update_title : update_title: No file open
++2021-04-16 13:35:26,128 : DEBUG : mouse : update_title: OK
++2021-04-16 13:35:27,527 : DEBUG : update_statusbar : update_statusbar: No file open
++2021-04-16 13:35:27,528 : DEBUG : update_title : update_title: No file open
++2021-04-16 13:35:27,528 : DEBUG : mouse : update_title: OK
++2021-04-16 13:35:27,688 : DEBUG : update_statusbar : update_statusbar: No file open
++2021-04-16 13:35:27,689 : DEBUG : update_title : update_title: No file open
++2021-04-16 13:35:27,689 : DEBUG : mouse : update_title: OK

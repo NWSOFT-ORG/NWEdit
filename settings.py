@@ -97,7 +97,7 @@ class Lexer(ExtensionSettings):
             ) == lexers.get_lexer_by_name("JSON"):
                 return JSONLexer
             return lexers.get_lexer_by_name(self.items[self.extens.index(extension)])
-        except ValueError as e:
+        except ValueError:
             return lexers.get_lexer_by_name("Text")
 
 

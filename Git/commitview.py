@@ -1,5 +1,6 @@
 from constants import APPDIR
 from modules import lexers, os, subprocess, tk, ttk
+from tktext import EnhancedTextFrame
 
 
 class CommitView:
@@ -106,8 +107,8 @@ class CommitView:
     def diff(self, _=None):
         diffwindow = tk.Toplevel(self.window)
         diffwindow.resizable(0, 0)
-        difftext = tk.Text(diffwindow, width=50, height=25)
-        difftext.pack(fill="both", expand=1)
+        textframe = EnhancedTextFrame(diffwindow)
+        difftext = textframe.text
         difftext.lexer = lexers.get_lexer_by_name("diff")
         subprocess.Popen(
             f'git diff --staged {self.files_listbox.get(self.files_listbox.index("active"))[2:]} > \
@@ -120,4 +121,5 @@ class CommitView:
         os.remove("out.txt")
         difftext.insert("end", message)
         difftext.config(state="disabled", wrap="none")
+        textframe.pack(fill='both')
         diffwindow.mainloop()

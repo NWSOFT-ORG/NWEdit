@@ -1,0 +1,29 @@
+[run-system]
+requires = ["poetry>=0.12"]
+run-backend = "poetry.masonry.api"
+
+[tool]
+[tool.poetry]
+authors = ["ZCG-coder z-c-ge@outlook.com"]
+description = ""
+name = "PyPlusSource"
+version = "0.1.0"
+[tool.poetry.dependencies]
+PyTouchBar = "^0.2.0"
+autopep8 = "^1.5.5"
+html-linter = "^0.4.0"
+json5 = "^0.9.5"
+pygments = "^2.8.0"
+pygments-json = "^0.1"
+python = "^3.8"
+requests = "^2.25.1"
+setuptools = "^54.1.2"
+ttkthemes = "^3.2.0"
+py2app = "^0.23"
+pyclean = "^2.0.0"
+python-pydebug = "^0.6"
+art = "^5.1"
+[tool.poetry.dev-dependencies]
+pylint = "^2.7.4"
+rope = "^0.18.0"
+flake8 = "^3.9.0"

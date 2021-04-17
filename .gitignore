@@ -1,7 +1,6 @@
 .DS_STORE
-pyplus.log
-build/
-dist/
+src/pyplus.log
+compiled/
 __pycache__/
 *.pyc
-node_modules
+src/node_modules/

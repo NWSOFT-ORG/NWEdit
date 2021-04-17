@@ -37,7 +37,7 @@ from statusbar import Statusbar
 from tktext import EnhancedText, EnhancedTextFrame
 from treeview import FileTree
 from testdialog import TestDialog
-import atexit
+from menubar import CustomMenubar
 
 if OSX:
     from modules import PyTouchBar
@@ -124,6 +124,14 @@ class Editor:
 
             self.tabs = {}
 
+            self.master.protocol(
+                "WM_DELETE_WINDOW", lambda: self.exit(force=False)
+            )  # When the window is closed, or quit from Mac, do exit action
+            self.master.createcommand(
+                '::tk::mac::Quit', self.exit)
+
+            menubar = CustomMenubar(self.master)
+            menubar.pack(fill='x', side='top')
             self.pandedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.pandedwin.pack(fill="both", expand=1)
             self.nb = ClosableNotebook(self.master, self.close_tab)
@@ -133,14 +141,6 @@ class Editor:
             self.pandedwin.add(self.filetree)
             self.pandedwin.add(self.nb)
             self.nb.enable_traversal()
-
-            self.master.protocol(
-                "WM_DELETE_WINDOW", lambda: self.exit(force=False)
-            )  # When the window is closed, or quit from Mac, do exit action
-            self.master.createcommand(
-                '::tk::mac::Quit', self.exit)
-
-            menubar = tk.Menu(self.master)
             self.statusbar = Statusbar()
             # Name can be apple only, don't really know why!
             app_menu = tk.Menu(menubar, name="apple", tearoff=0)
@@ -402,7 +402,6 @@ class Editor:
             menubar.add_cascade(label="Code", menu=self.codemenu)
             menubar.add_cascade(label="Navigate", menu=navmenu)
             menubar.add_cascade(label="Git", menu=gitmenu)
-            self.master.config(menu=menubar)
             logger.debug("Menu created")
             self.right_click_menu = tk.Menu(self.master, tearoff=0)
             self.right_click_menu.add_command(label="Undo", command=self.undo)

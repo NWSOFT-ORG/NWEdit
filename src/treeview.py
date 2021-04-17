@@ -16,7 +16,11 @@ class FileTree(ttk.Frame):
         showbuttonframe: bool = True,
     ):
         super().__init__(master)
-        self.tree = ttk.Treeview(self)
+        style = ttk.Style()
+        style.configure("style.Treeview", font=('Arial', 11))
+        style.configure("style.Treeview.Heading", font=('Arial', 13,'bold'))
+        style.configure('style.Treeview', rowheight=25)
+        self.tree = ttk.Treeview(self, style="style.Treeview")
         yscroll, xscroll = ttk.Scrollbar(self, command=self.tree.yview), ttk.Scrollbar(
             self, command=self.tree.xview, orient="horizontal"
         )
@@ -43,8 +47,8 @@ class FileTree(ttk.Frame):
 
         self.pack(side="left", fill="both", expand=1)
         self.init_ui()
-        self.tree.tag_configure("row", foreground="white")
-        self.tree.tag_configure("subfolder", foreground="#448dc4")
+        self.tree.tag_configure("row", foreground="white", font='Arial 10')
+        self.tree.tag_configure("subfolder", foreground="#448dc4", font='Arial 10')
         self.tree.pack(fill="both", expand=1, anchor="nw")
 
     def do_action(self):

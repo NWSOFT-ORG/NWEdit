@@ -1,0 +1,7 @@
+setup.py
+src/pyplus.py
+src/pyplus.egg-info/PKG-INFO
+src/pyplus.egg-info/SOURCES.txt
+src/pyplus.egg-info/dependency_links.txt
+src/pyplus.egg-info/requires.txt
+src/pyplus.egg-info/top_level.txt

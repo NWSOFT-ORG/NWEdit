@@ -10,4 +10,5 @@ class Statusbar(ttk.Frame):
         self.label2.pack(side="left")
         self.label3 = ttk.Label(self)
         self.label3.pack(side="left")
+        ttk.Sizegrip(self).pack(side='right')
         self.pack(side="bottom", anchor="nw", fill='x')

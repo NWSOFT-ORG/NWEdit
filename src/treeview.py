@@ -17,7 +17,7 @@ class FileTree(ttk.Frame):
     ):
         super().__init__(master)
         style = ttk.Style()
-        style.configure("style.Treeview", font=('Arial', 11))
+        style.configure("style.Treeview", font=('Arial', 8))
         style.configure("style.Treeview.Heading", font=('Arial', 13,'bold'))
         style.configure('style.Treeview', rowheight=25)
         self.tree = ttk.Treeview(self, style="style.Treeview")

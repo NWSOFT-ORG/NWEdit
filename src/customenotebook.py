@@ -1,6 +1,8 @@
 """Closable ttk.Notebook"""
 from constants import logger
-from modules import tk, ttk
+from modules import tk, ttk, ttkthemes
+from settings import Settings
+from functions import is_dark_color
 
 
 class ClosableNotebook(ttk.Notebook):
@@ -15,6 +17,15 @@ class ClosableNotebook(ttk.Notebook):
     __initialized = False
 
     def __init__(self, master, cmd):
+        self.style = ttkthemes.ThemedStyle()
+        settings = Settings()
+        self.style.set_theme(settings.get_settings('theme'))
+        self.bg = self.style.lookup("TLabel", "background")
+        self.fg = self.style.lookup("TLabel", "foreground")
+        if is_dark_color(self.bg):
+            self.close_icon = tk.PhotoImage('img_close', file="Images/close.gif")
+        else:
+            self.close_icon = tk.PhotoImage('img_close', file="Images/close-dark.gif")
         if not self.__initialized:
             self.__initialize_custom_style()
             self.__inititialized = True
@@ -60,7 +71,6 @@ class ClosableNotebook(ttk.Notebook):
 
     def __initialize_custom_style(self):
         style = ttk.Style()
-        self.image = tk.PhotoImage("img_close", file="Images/close.gif")
 
         style.element_create("close", "image", "img_close", border=10, sticky="")
         style.layout("CustomNotebook", [("CustomNotebook.client", {"sticky": "nswe"})])

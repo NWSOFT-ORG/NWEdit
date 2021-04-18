@@ -10,5 +10,4 @@ Please follow the instructions as comments.
     // Must be a valid Pygments theme
     "pygments": "monokai",
     "tabwidth": 4
-    // Test purpose
 }

@@ -34,6 +34,7 @@ from functions import (
     is_binary_string,
     open_system_shell,
     run_in_terminal,
+    is_dark_color
 )
 
 # These modules are from the base directory
@@ -101,8 +102,15 @@ class Editor:
 
             self.master = master
             self.master.geometry("900x600")
-            self.close_icon = tk.PhotoImage(file="Images/close.gif")
-            self.close_icon_dark = tk.PhotoImage(file="Images/close-dark.gif")
+            self.style = ttkthemes.ThemedStyle(self.master)
+            self.style.set_theme(self.theme)
+            self.bg = self.style.lookup("TLabel", "background")
+            self.fg = self.style.lookup("TLabel", "foreground")
+            if is_dark_color(self.bg):
+                self.close_icon = tk.PhotoImage(file="Images/close.gif")
+            else:
+                self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
+
             self.copy_icon = tk.PhotoImage(file="Images/copy.gif")
             self.cut_icon = tk.PhotoImage(file="Images/cut.gif")
             self.cut_icon = tk.PhotoImage(file="Images/cut.gif")
@@ -142,10 +150,6 @@ class Editor:
                 PyTouchBar.set_touchbar(
                     [open_button, save_as_button, close_button, space, run_button]
                 )
-            self.style = ttkthemes.ThemedStyle(self.master)
-            self.style.set_theme(self.theme)
-            self.bg = self.style.lookup("TLabel", "background")
-            self.fg = self.style.lookup("TLabel", "foreground")
             self.icon = tk.PhotoImage(file="Images/pyplus.gif")
             self.master.iconphoto(True, self.icon)
             # Base64 image, this probably decreases the repo size.
@@ -474,6 +478,7 @@ class Editor:
     def start_screen(self) -> None:
         first_tab = tk.Canvas(self.nb, background=self.bg, highlightthickness=0)
         first_tab.create_image(20, 20, anchor="nw", image=self.icon)
+        fg = '#8dd9f7' if is_dark_color(self.bg) else 'blue'
         first_tab.create_text(
             60,
             10,
@@ -485,7 +490,7 @@ class Editor:
         label1 = ttk.Label(
             first_tab,
             text="Open file",
-            foreground="blue",
+            foreground=fg,
             background=self.bg,
             cursor="hand2",
             compound="left",
@@ -494,7 +499,7 @@ class Editor:
         label2 = ttk.Label(
             first_tab,
             text="New...",
-            foreground="blue",
+            foreground=fg,
             background=self.bg,
             cursor="hand2",
             compound="left",
@@ -503,18 +508,18 @@ class Editor:
         label3 = ttk.Label(
             first_tab,
             text="Clone",
-            foreground="blue",
+            foreground=fg,
             background=self.bg,
             cursor="hand2",
         )
         label4 = ttk.Label(
             first_tab,
             text="Exit",
-            foreground="blue",
+            foreground=fg,
             background=self.bg,
             cursor="hand2",
             compound="left",
-            image=self.close_icon_dark,
+            image=self.close_icon,
         )
         label1.bind("<Button>", self._open)
         label2.bind("<Button>", self.filetree.new_file)

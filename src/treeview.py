@@ -50,7 +50,7 @@ class FileTree(ttk.Frame):
 
         self.pack(side="left", fill="both", expand=1)
         self.init_ui()
-        self.tree.tag_configure("row", foreground="white", font="Arial 10")
+        self.tree.tag_configure("row", font="Arial 10")
         self.tree.tag_configure("subfolder", foreground="#448dc4", font="Arial 10")
         self.tree.pack(fill="both", expand=1, anchor="nw")
 

@@ -16,23 +16,49 @@
 Also, it's cross-compatible!
 """
 from console import Console
-from constants import (APPDIR, LINT_BATCH, MAIN_KEY, OSX, RUN_BATCH, VERSION,
-                       WINDOWS, logger)
+from constants import (
+    APPDIR,
+    LINT_BATCH,
+    MAIN_KEY,
+    OSX,
+    RUN_BATCH,
+    VERSION,
+    WINDOWS,
+    logger,
+)
 from customenotebook import ClosableNotebook
 from dialogs import ErrorInfoDialog, InputStringDialog, YesNoDialog
 from filedialog import FileOpenDialog, FileSaveAsDialog
-from functions import (download_file, is_binary_string, open_system_shell,
-                       run_in_terminal)
+from functions import (
+    download_file,
+    is_binary_string,
+    open_system_shell,
+    run_in_terminal,
+)
+
 # These modules are from the base directory
 from Git.commitview import CommitView
 from goto import Navigate
 from hexview import HexView
-from modules import (EditorErr, Path, font, get_style_by_name, json, lexers,
-                     logging, os, subprocess, sys, threading, tk, ttk,
-                     ttkthemes, webbrowser)
+from modules import (
+    EditorErr,
+    Path,
+    font,
+    get_style_by_name,
+    json,
+    lexers,
+    logging,
+    os,
+    subprocess,
+    sys,
+    threading,
+    tk,
+    ttk,
+    ttkthemes,
+    webbrowser,
+)
 from search import Search
-from settings import (CommentMarker, FormatCommand, Lexer, Linter, RunCommand,
-                      Settings)
+from settings import CommentMarker, FormatCommand, Lexer, Linter, RunCommand, Settings
 from statusbar import Statusbar
 from tktext import EnhancedText, EnhancedTextFrame
 from treeview import FileTree
@@ -116,7 +142,10 @@ class Editor:
                 PyTouchBar.set_touchbar(
                     [open_button, save_as_button, close_button, space, run_button]
                 )
-            ttkthemes.ThemedStyle(self.master).set_theme(self.theme)
+            self.style = ttkthemes.ThemedStyle(self.master)
+            self.style.set_theme(self.theme)
+            self.bg = self.style.lookup("TLabel", "background")
+            self.fg = self.style.lookup("TLabel", "foreground")
             self.icon = tk.PhotoImage(file="Images/pyplus.gif")
             self.master.iconphoto(True, self.icon)
             # Base64 image, this probably decreases the repo size.
@@ -127,11 +156,10 @@ class Editor:
             self.master.protocol(
                 "WM_DELETE_WINDOW", lambda: self.exit(force=False)
             )  # When the window is closed, or quit from Mac, do exit action
-            self.master.createcommand(
-                '::tk::mac::Quit', self.exit)
+            self.master.createcommand("::tk::mac::Quit", self.exit)
 
             menubar = CustomMenubar(self.master)
-            menubar.pack(fill='x', side='top')
+            menubar.pack(fill="x", side="top")
             self.pandedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.pandedwin.pack(fill="both", expand=1)
             self.nb = ClosableNotebook(self.master, self.close_tab)
@@ -146,7 +174,16 @@ class Editor:
             app_menu = tk.Menu(menubar, name="apple", tearoff=0)
 
             app_menu.add_command(label="About PyPlus", command=self._version)
-            preferences = tk.Menu(app_menu, tearoff=0)
+            preferences = tk.Menu(
+                app_menu,
+                tearoff=0,
+                cursor="left_ptr",
+                activebackground=self.fg,
+                activeforeground=self.bg,
+                bg=self.bg,
+                fg=self.fg,
+                relief="ridge",
+            )
             preferences.add_command(
                 label="General Settings",
                 command=lambda: self.open_file(
@@ -188,8 +225,7 @@ class Editor:
             app_menu.add_separator()
             app_menu.add_command(label="Exit Editor", command=self.exit)
             app_menu.add_command(label="Restart app", command=self.restart)
-            app_menu.add_command(label="Check for updates",
-                                 command=self.check_updates)
+            app_menu.add_command(label="Check for updates", command=self.check_updates)
 
             filemenu = tk.Menu(menubar, tearoff=0)
             filemenu.add_command(
@@ -308,8 +344,7 @@ class Editor:
                 label="Delete Word on the Right", command=self.del_word_right
             )
             editmenu.add_command(label="Move line up", command=self.mv_line_up)
-            editmenu.add_command(label="Move line down",
-                                 command=self.mv_line_dn)
+            editmenu.add_command(label="Move line down", command=self.mv_line_dn)
 
             self.codemenu = tk.Menu(menubar, tearoff=0)
             self.codemenu.add_command(
@@ -358,8 +393,7 @@ class Editor:
                 compound="left",
                 image=self.search_icon,
             )
-            self.codemenu.add_command(
-                label="Bigger view", command=self.biggerview)
+            self.codemenu.add_command(label="Bigger view", command=self.biggerview)
             self.codemenu.add_separator()
             self.codemenu.add_command(
                 label="Open Python Shell",
@@ -389,12 +423,9 @@ class Editor:
             navmenu.add_command(label="Word start", command=self.nav_wordstart)
 
             gitmenu = tk.Menu(menubar, tearoff=0)
-            gitmenu.add_command(label="Initialize",
-                                command=lambda: self.git("init"))
-            gitmenu.add_command(
-                label="Commit", command=lambda: self.git("commit"))
-            gitmenu.add_command(
-                label="Clone", command=lambda: self.git("clone"))
+            gitmenu.add_command(label="Initialize", command=lambda: self.git("init"))
+            gitmenu.add_command(label="Commit", command=lambda: self.git("commit"))
+            gitmenu.add_command(label="Clone", command=lambda: self.git("clone"))
 
             menubar.add_cascade(label="PyPlus", menu=app_menu)  # App menu
             menubar.add_cascade(label="File", menu=filemenu)
@@ -409,10 +440,8 @@ class Editor:
             self.right_click_menu.add_separator()
             self.right_click_menu.add_command(label="Cut", command=self.cut)
             self.right_click_menu.add_command(label="Copy", command=self.copy)
-            self.right_click_menu.add_command(
-                label="Paste", command=self.paste)
-            self.right_click_menu.add_command(
-                label="Delete", command=self.delete)
+            self.right_click_menu.add_command(label="Paste", command=self.paste)
+            self.right_click_menu.add_command(label="Delete", command=self.delete)
             self.right_click_menu.add_separator()
             self.right_click_menu.add_command(
                 label="Select All", command=self.select_all
@@ -443,7 +472,7 @@ class Editor:
             self.restart()
 
     def start_screen(self) -> None:
-        first_tab = tk.Canvas(self.nb, background="white")
+        first_tab = tk.Canvas(self.nb, background=self.bg, highlightthickness=0)
         first_tab.create_image(20, 20, anchor="nw", image=self.icon)
         first_tab.create_text(
             60,
@@ -451,13 +480,13 @@ class Editor:
             anchor="nw",
             text="Welcome to PyPlus!",
             font="Arial 50",
-            fill="black",
+            fill=self.fg,
         )
         label1 = ttk.Label(
             first_tab,
             text="Open file",
             foreground="blue",
-            background="white",
+            background=self.bg,
             cursor="hand2",
             compound="left",
             image=self.open_icon,
@@ -466,7 +495,7 @@ class Editor:
             first_tab,
             text="New...",
             foreground="blue",
-            background="white",
+            background=self.bg,
             cursor="hand2",
             compound="left",
             image=self.new_icon,
@@ -475,14 +504,14 @@ class Editor:
             first_tab,
             text="Clone",
             foreground="blue",
-            background="white",
+            background=self.bg,
             cursor="hand2",
         )
         label4 = ttk.Label(
             first_tab,
             text="Exit",
             foreground="blue",
-            background="white",
+            background=self.bg,
             cursor="hand2",
             compound="left",
             image=self.close_icon_dark,
@@ -554,8 +583,7 @@ class Editor:
                 self.master.title("PyPlus -- No file open")
                 logger.debug("update_title: No file open")
                 return "break"
-            self.master.title(
-                f"PyPlus -- {self.tabs[self.get_tab()].file_dir}")
+            self.master.title(f"PyPlus -- {self.tabs[self.get_tab()].file_dir}")
             logger.debug("update_title: OK")
             return "break"
         except Exception:
@@ -573,8 +601,7 @@ class Editor:
             index = currtext.index("insert")
             ln = index.split(".")[0]
             col = index.split(".")[1]
-            self.statusbar.label2.config(
-                text=f"{self.tabs[self.get_tab()].file_dir} |")
+            self.statusbar.label2.config(text=f"{self.tabs[self.get_tab()].file_dir} |")
             self.statusbar.label3.config(text=f"Line {ln} Col {col}")
             logger.debug("update_statusbar: OK")
             return "break"
@@ -637,8 +664,7 @@ class Editor:
             else:
                 foreground = None
 
-            currtext.tag_configure(
-                str(ttype), foreground=foreground, font=tag_font)
+            currtext.tag_configure(str(ttype), foreground=foreground, font=tag_font)
 
     def recolorize(self, textbox: EnhancedText) -> None:
         """
@@ -675,8 +701,8 @@ class Editor:
             currtext.update()  # Have to update
         except Exception:
             pass
-    
-    def open_hex(self, file=''):
+
+    def open_hex(self, file=""):
         if file:
             file_dir = file
         else:
@@ -688,13 +714,12 @@ class Editor:
             viewer.focus_set()
             window = HexView(viewer)
             window.open(file_dir)
-            self.tabs[viewer] = Document(
-                viewer, window.textbox, file_dir)
+            self.tabs[viewer] = Document(viewer, window.textbox, file_dir)
             self.nb.add(viewer, text=f"Hex -- {os.path.basename(file_dir)}")
             self.nb.select(viewer)
             self.update_title()
             self.update_statusbar()
-    
+
     def openhex(self):
         self.open_hex()
 
@@ -716,8 +741,7 @@ class Editor:
                         return
                 if is_binary_string(open(file_dir, "rb").read()):
                     if askhex:
-                        dialog = YesNoDialog(
-                            self.master, "Error", "View in Hex?")
+                        dialog = YesNoDialog(self.master, "Error", "View in Hex?")
                         if dialog.result:
                             self.open_hex(file_dir)
                         logging.info("User pressed No.")
@@ -736,14 +760,11 @@ class Editor:
 
                 # Puts the contents of the file into the text widget.
                 currtext = self.tabs[new_tab].textbox
-                currtext.insert("end", file.read().replace(
-                    "\t", " " * self.tabwidth))
+                currtext.insert("end", file.read().replace("\t", " " * self.tabwidth))
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
-                currtext.set_lexer(
-                    self.file_settings_class.get_settings(extens))
-                currtext.lint_cmd = self.linter_settings_class.get_settings(
-                    extens)
+                currtext.set_lexer(self.file_settings_class.get_settings(extens))
+                currtext.lint_cmd = self.linter_settings_class.get_settings(extens)
                 currtext.cmd = self.cmd_settings_class.get_settings(extens)
                 currtext.format_command = self.format_settings_class.get_settings(
                     extens
@@ -801,8 +822,7 @@ class Editor:
                 return
             if os.access(self.tabs[curr_tab].file_dir, os.W_OK):
                 with open(self.tabs[curr_tab].file_dir, "w") as file:
-                    file.write(self.tabs[curr_tab].textbox.get(
-                        1.0, "end").strip())
+                    file.write(self.tabs[curr_tab].textbox.get(1.0, "end").strip())
             else:
                 ErrorInfoDialog(self.master, "File read only")
         except Exception:
@@ -810,8 +830,7 @@ class Editor:
 
     def copy(self) -> None:
         try:
-            sel = self.tabs[self.get_tab()].textbox.get(
-                tk.SEL_FIRST, tk.SEL_LAST)
+            sel = self.tabs[self.get_tab()].textbox.get(tk.SEL_FIRST, tk.SEL_LAST)
             self.tabs[self.get_tab()].textbox.clipboard_clear()
             self.tabs[self.get_tab()].textbox.clipboard_append(sel)
         except Exception:
@@ -1071,10 +1090,8 @@ class Editor:
                 # Otherwise close the tab based on coordinates of center-click.
                 else:
                     try:
-                        index = event.widget.index(
-                            "@%d,%d" % (event.x, event.y))
-                        selected_tab = self.nb.nametowidget(
-                            self.nb.tabs()[index])
+                        index = event.widget.index("@%d,%d" % (event.x, event.y))
+                        selected_tab = self.nb.nametowidget(self.nb.tabs()[index])
                     except tk.TclError:
                         return
 
@@ -1129,8 +1146,7 @@ class Editor:
 
             try:
                 self.nb.insert(
-                    event.widget.index("@%d,%d" %
-                                       (event.x, y)), self.nb.select()
+                    event.widget.index("@%d,%d" % (event.x, y)), self.nb.select()
                 )
             except tk.TclError:
                 return
@@ -1151,8 +1167,7 @@ class Editor:
             update.pack(fill="both")
             update.bind(
                 "<Button-1>",
-                lambda e: webbrowser.open_new_tab(
-                    self.check_updates(popup=False)[1]),
+                lambda e: webbrowser.open_new_tab(self.check_updates(popup=False)[1]),
             )
         else:
             ttk.Label(ver, text="No updates available").pack(fill="both")
@@ -1323,8 +1338,7 @@ class Editor:
         currtext = self.tabs[self.get_tab()].textbox
         if not currtext.tag_ranges("sel"):
             return
-        selected_text = currtext.get(
-            "sel.first -1c linestart", "sel.last lineend")
+        selected_text = currtext.get("sel.first -1c linestart", "sel.last lineend")
         win = tk.Toplevel(self.master)
         win.resizable(0, 0)
         win.transient(self.master)
@@ -1389,12 +1403,10 @@ class Editor:
             url = dialog.result
             if not url:
                 return
-            subprocess.Popen(
-                f"git clone {url} > {os.devnull}", shell=True, cwd=currdir)
+            subprocess.Popen(f"git clone {url} > {os.devnull}", shell=True, cwd=currdir)
             return
         if not os.path.exists(path := os.path.join(currdir, ".git")):
-            ErrorInfoDialog(
-                self.master, f"Not a git repository: {Path(path).parent}")
+            ErrorInfoDialog(self.master, f"Not a git repository: {Path(path).parent}")
             return
         if action == "init":
             subprocess.Popen(
@@ -1465,12 +1477,11 @@ class Editor:
                 if block:
                     if text.startswith(comment_start):
                         currtext.insert(
-                            "insert", text[len(comment_start): -len(comment_end)]
+                            "insert", text[len(comment_start) : -len(comment_end)]
                         )
                         self.key()
                         return
-                    currtext.insert(
-                        "insert", f"{comment_start} {text} {comment_end}")
+                    currtext.insert("insert", f"{comment_start} {text} {comment_end}")
                     self.key()
                     return
                 for line in currtext.get(start_index, end_index).splitlines():
@@ -1492,8 +1503,7 @@ class Editor:
                         "insert", f"{line[len(comment_start):len(comment_end)]}\n"
                     )
                 else:
-                    currtext.insert(
-                        "insert", f"{comment_start}{line}{comment_end}\n")
+                    currtext.insert("insert", f"{comment_start}{line}{comment_end}\n")
             self.key()
         except (KeyError, AttributeError):
             return

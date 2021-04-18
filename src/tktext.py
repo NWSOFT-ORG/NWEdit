@@ -67,7 +67,7 @@ class TextLineNumbers(tk.Canvas):
                 y,
                 anchor="nw",
                 text=linenum,
-                fill=self.textwidget['fg'],
+                fill=self.textwidget["fg"],
                 font=self.textwidget["font"],
             )
             i = self.textwidget.index("%s+1line" % i)

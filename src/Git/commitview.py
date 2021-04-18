@@ -121,5 +121,5 @@ class CommitView:
         os.remove("out.txt")
         difftext.insert("end", message)
         difftext.config(state="disabled", wrap="none")
-        textframe.pack(fill='both')
+        textframe.pack(fill="both")
         diffwindow.mainloop()

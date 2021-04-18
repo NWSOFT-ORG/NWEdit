@@ -1,5 +1,11 @@
-from constants import logger
-from modules import tk, ttk
+from constants import logger, APPDIR
+from modules import tk, ttk, json, ttkthemes
+
+
+def get_theme():
+    with open(APPDIR + "/Settings/general-settings.json") as f:
+        settings = json.load(f)
+    return settings["theme"]
 
 
 class Dialog(tk.Toplevel):
@@ -15,10 +21,15 @@ class Dialog(tk.Toplevel):
             self.title(title)
 
         self.result = None
+        self._style = ttkthemes.ThemedStyle()
+        self._style.set_theme(get_theme())
+        bg = self._style.lookup("TLabel", "background")
+
+        self.config(background=bg)
 
         body = ttk.Frame(self)
         self.initial_focus = self.body(body)
-        body.pack(padx=5, pady=5)
+        body.pack(fill="x", padx=5, pady=5)
 
         self.buttonbox()
 
@@ -48,7 +59,7 @@ class Dialog(tk.Toplevel):
         w = ttk.Button(box, text="Cancel", width=10, command=self.cancel)
         w.pack(side="left", padx=5, pady=5)
 
-        box.pack()
+        box.pack(fill="x")
 
     def ok(self, _=None):
         if not self.validate():
@@ -81,7 +92,7 @@ class YesNoDialog(Dialog):
 
     def body(self, master):
         label1 = ttk.Label(master, text=self.text)
-        label1.pack()
+        label1.pack(fill="both")
 
         return label1
 
@@ -93,7 +104,7 @@ class YesNoDialog(Dialog):
         b2 = ttk.Button(box, text="No", width=10, command=self.cancel)
         b2.pack(side="left", padx=5, pady=5)
 
-        box.pack()
+        box.pack(fill="x")
 
     def apply(self, _=None):
         self.result = 1
@@ -128,7 +139,7 @@ class InputStringDialog(Dialog):
         b2 = ttk.Button(box, text="Cancel", width=10, command=self.cancel)
         b2.pack(side="left", padx=5, pady=5)
 
-        box.pack()
+        box.pack(fill="x")
 
     def apply(self, _=None):
         self.result = self.entry.get()

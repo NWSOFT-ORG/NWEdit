@@ -1,6 +1,6 @@
 from constants import OSX, WINDOWS
-from dialogs import InputStringDialog, YesNoDialog
-from modules import os, shutil, time, tk, ttk
+from dialogs import InputStringDialog, YesNoDialog, get_theme
+from modules import os, shutil, time, tk, ttk, ttkthemes
 
 
 class FileTree(ttk.Frame):
@@ -15,15 +15,18 @@ class FileTree(ttk.Frame):
         path=os.path.expanduser("~"),
         showbuttonframe: bool = True,
     ):
-        super().__init__(master)
         style = ttk.Style()
-        style.configure("style.Treeview", font=('Arial', 8))
-        style.configure("style.Treeview.Heading", font=('Arial', 13,'bold'))
-        style.configure('style.Treeview', rowheight=25)
+        self._style = ttkthemes.ThemedStyle()
+        self._style.set_theme(get_theme())
+        self.bg = self._style.lookup("TLabel", "background")
+        super().__init__(master)
+        style.configure("style.Treeview", font=("Arial", 8))
+        style.configure("style.Treeview.Heading", font=("Arial", 13, "bold"))
         self.tree = ttk.Treeview(self, style="style.Treeview")
         yscroll, xscroll = ttk.Scrollbar(self, command=self.tree.yview), ttk.Scrollbar(
             self, command=self.tree.xview, orient="horizontal"
         )
+        style.configure("style.Treeview", rowheight=25, background=self.bg)
         yscroll.pack(side="right", fill="y")
         xscroll.pack(side="bottom", fill="x")
         self.tree["yscrollcommand"] = yscroll.set
@@ -47,8 +50,8 @@ class FileTree(ttk.Frame):
 
         self.pack(side="left", fill="both", expand=1)
         self.init_ui()
-        self.tree.tag_configure("row", foreground="white", font='Arial 10')
-        self.tree.tag_configure("subfolder", foreground="#448dc4", font='Arial 10')
+        self.tree.tag_configure("row", foreground="white", font="Arial 10")
+        self.tree.tag_configure("subfolder", foreground="#448dc4", font="Arial 10")
         self.tree.pack(fill="both", expand=1, anchor="nw")
 
     def do_action(self):
@@ -132,6 +135,7 @@ class FileTree(ttk.Frame):
         win.title("New File/Directory")
         win.transient(".")
         win.resizable(0, 0)
+        win.config(background=self.bg)
         ttk.Label(win, text="Name:").pack(side="top", anchor="nw")
         filename = tk.Entry(win)
         filename.pack(side="top", anchor="nw")

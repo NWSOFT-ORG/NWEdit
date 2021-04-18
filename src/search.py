@@ -1,9 +1,10 @@
-﻿from modules import tk, ttk
+from modules import tk, ttk, ttkthemes
+from dialogs import get_theme
 
 
 class Search:
     def __init__(
-        self, master: tk.Tk, tabwidget: ttk.Notebook, tablist: dict
+        self, master: tk.Misc, tabwidget: ttk.Notebook, tablist: dict
     ):  # TODO: reduce args
         self.master = master
         self.case = tk.BooleanVar()
@@ -11,6 +12,12 @@ class Search:
         self.start = "sel.first"
         self.end = "sel.last"
         self.text = tablist[tabwidget.nametowidget(tabwidget.select())].textbox
+        self.result = None
+        self._style = ttkthemes.ThemedStyle()
+        self._style.set_theme(get_theme())
+        bg = self._style.lookup("Entry", "background")
+        fg = self._style.lookup("TLabel", "foreground")
+
         if self.text.searchable:
             return
         if not self.text.tag_ranges("sel"):
@@ -25,9 +32,9 @@ class Search:
         )
         self.content = tk.Entry(
             self.search_frame,
-            background="black",
-            foreground="white",
-            insertbackground="white",
+            background=bg,
+            foreground=fg,
+            insertbackground=fg,
             highlightthickness=0,
         )
         self.content.pack(side="left", fill="both")
@@ -43,9 +50,9 @@ class Search:
         )
         self.repl = tk.Entry(
             self.search_frame,
-            background="black",
-            foreground="white",
-            insertbackground="white",
+            background=bg,
+            foreground=fg,
+            insertbackground=fg,
             highlightthickness=0,
         )
         self.repl.pack(side="left", fill="both")

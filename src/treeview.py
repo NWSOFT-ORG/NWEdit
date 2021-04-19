@@ -1,6 +1,6 @@
-from constants import OSX, WINDOWS
-from dialogs import InputStringDialog, YesNoDialog, get_theme
-from modules import os, shutil, time, tk, ttk, ttkthemes
+from src.constants import OSX, WINDOWS
+from src.dialogs import InputStringDialog, YesNoDialog, get_theme
+from src.modules import os, shutil, time, tk, ttk, ttkthemes
 
 
 class FileTree(ttk.Frame):
@@ -233,8 +233,6 @@ class FileTree(ttk.Frame):
                         self.master.destroy()
                 except Exception:
                     pass
-
-                self.tree.update()
 
                 # workaround
                 # step 2

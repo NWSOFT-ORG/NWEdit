@@ -15,8 +15,8 @@
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 Also, it's cross-compatible!
 """
-from console import Console
-from constants import (
+from src.console import Console
+from src.constants import (
     APPDIR,
     LINT_BATCH,
     MAIN_KEY,
@@ -26,10 +26,10 @@ from constants import (
     WINDOWS,
     logger,
 )
-from customenotebook import ClosableNotebook
-from dialogs import ErrorInfoDialog, InputStringDialog, YesNoDialog
-from filedialog import FileOpenDialog, FileSaveAsDialog
-from functions import (
+from src.customenotebook import ClosableNotebook
+from src.dialogs import ErrorInfoDialog, InputStringDialog, YesNoDialog
+from src.filedialog import FileOpenDialog, FileSaveAsDialog
+from src.functions import (
     download_file,
     is_binary_string,
     open_system_shell,
@@ -38,10 +38,10 @@ from functions import (
 )
 
 # These modules are from the base directory
-from Git.commitview import CommitView
-from goto import Navigate
-from hexview import HexView
-from modules import (
+from src.Git.commitview import CommitView
+from src.goto import Navigate
+from src.hexview import HexView
+from src.modules import (
     EditorErr,
     Path,
     font,
@@ -58,19 +58,19 @@ from modules import (
     ttkthemes,
     webbrowser,
 )
-from search import Search
-from settings import CommentMarker, FormatCommand, Lexer, Linter, RunCommand, Settings
-from statusbar import Statusbar
-from tktext import EnhancedText, EnhancedTextFrame
-from treeview import FileTree
-from testdialog import TestDialog
-from menubar import CustomMenubar
+from src.search import Search
+from src.settings import CommentMarker, FormatCommand, Lexer, Linter, RunCommand, Settings
+from src.statusbar import Statusbar
+from src.tktext import EnhancedText, EnhancedTextFrame
+from src.treeview import FileTree
+from src.testdialog import TestDialog
+from src.menubar import CustomMenubar
+from src.highlighter import create_tags, recolorize
 
 if OSX:
-    from modules import PyTouchBar
+    from src.modules import PyTouchBar
 
 os.chdir(APPDIR)
-
 
 class Document:
     """Helper class, for the editor."""
@@ -161,9 +161,11 @@ class Editor:
                 "WM_DELETE_WINDOW", lambda: self.exit(force=False)
             )  # When the window is closed, or quit from Mac, do exit action
             self.master.createcommand("::tk::mac::Quit", self.exit)
-
-            menubar = CustomMenubar(self.master)
-            menubar.pack(fill="x", side="top")
+            if not OSX:
+                menubar = CustomMenubar(self.master)
+                menubar.pack(fill="x", side="top")
+            else:
+                menubar = tk.Menu(self.master)
             self.pandedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.pandedwin.pack(fill="both", expand=1)
             self.nb = ClosableNotebook(self.master, self.close_tab)
@@ -175,11 +177,11 @@ class Editor:
             self.nb.enable_traversal()
             self.statusbar = Statusbar()
             # Name can be apple only, don't really know why!
-            app_menu = tk.Menu(menubar, name="apple", tearoff=0)
+            appmenu = tk.Menu(menubar, name="apple", tearoff=0)
 
-            app_menu.add_command(label="About PyPlus", command=self._version)
+            appmenu.add_command(label="About PyPlus", command=self._version)
             preferences = tk.Menu(
-                app_menu,
+                appmenu,
                 tearoff=0,
                 cursor="left_ptr",
                 activebackground=self.fg,
@@ -225,11 +227,11 @@ class Editor:
             preferences.add_command(
                 label="Load Settings from...", command=self.settings_class.unzipsettings
             )
-            app_menu.add_cascade(label="Preferences", menu=preferences)
-            app_menu.add_separator()
-            app_menu.add_command(label="Exit Editor", command=self.exit)
-            app_menu.add_command(label="Restart app", command=self.restart)
-            app_menu.add_command(label="Check for updates", command=self.check_updates)
+            appmenu.add_cascade(label="Preferences", menu=preferences)
+            appmenu.add_separator()
+            appmenu.add_command(label="Exit Editor", command=self.exit)
+            appmenu.add_command(label="Restart app", command=self.restart)
+            appmenu.add_command(label="Check for updates", command=self.check_updates)
 
             filemenu = tk.Menu(menubar, tearoff=0)
             filemenu.add_command(
@@ -431,12 +433,14 @@ class Editor:
             gitmenu.add_command(label="Commit", command=lambda: self.git("commit"))
             gitmenu.add_command(label="Clone", command=lambda: self.git("clone"))
 
-            menubar.add_cascade(label="PyPlus", menu=app_menu)  # App menu
+            menubar.add_cascade(label="PyPlus", menu=appmenu)  # App menu
             menubar.add_cascade(label="File", menu=filemenu)
             menubar.add_cascade(label="Edit", menu=editmenu)
             menubar.add_cascade(label="Code", menu=self.codemenu)
             menubar.add_cascade(label="Navigate", menu=navmenu)
             menubar.add_cascade(label="Git", menu=gitmenu)
+            if OSX:
+                self.master.config(menu=menubar)
             logger.debug("Menu created")
             self.right_click_menu = tk.Menu(self.master, tearoff=0)
             self.right_click_menu.add_command(label="Undo", command=self.undo)
@@ -578,7 +582,7 @@ class Editor:
         for char in [")", "]", "}"]:
             textbox.bind(char, self.close_brackets)
         textbox.focus_set()
-        self.create_tags(textbox)
+        create_tags(textbox)
         logger.debug("Textbox created")
         return textbox
 
@@ -617,7 +621,7 @@ class Editor:
         """Event when a key is pressed."""
         try:
             currtext = self.tabs[self.get_tab()].textbox
-            self.recolorize(currtext)
+            recolorize(currtext)
             currtext.edit_separator()
             currtext.see("insert")
             # Auto-save
@@ -640,72 +644,6 @@ class Editor:
         except KeyError:
             self.master.bell()
             logger.exception("Error when handling mouse event:")
-
-    def create_tags(self, textbox: EnhancedText) -> None:
-        """
-        The method creates the tags associated with each distinct style element of the
-        source code 'dressing'"""
-        currtext = textbox
-        bold_font = font.Font(currtext, currtext.cget("font"))
-        bold_font.configure(weight=font.BOLD)
-        italic_font = font.Font(currtext, currtext.cget("font"))
-        italic_font.configure(slant=font.ITALIC)
-        bold_italic_font = font.Font(currtext, currtext.cget("font"))
-        bold_italic_font.configure(weight=font.BOLD, slant=font.ITALIC)
-        style = get_style_by_name(self.settings_class.get_settings("pygments"))
-
-        for ttype, ndef in style:
-            tag_font = None
-
-            if ndef["bold"] and ndef["italic"]:
-                tag_font = bold_italic_font
-            elif ndef["bold"]:
-                tag_font = bold_font
-            elif ndef["italic"]:
-                tag_font = italic_font
-
-            if ndef["color"]:
-                foreground = "#%s" % ndef["color"]
-            else:
-                foreground = None
-
-            currtext.tag_configure(str(ttype), foreground=foreground, font=tag_font)
-
-    def recolorize(self, textbox: EnhancedText) -> None:
-        """
-        This method colors and styles the prepared tags"""
-        try:
-            currtext = textbox
-            _code = currtext.get("1.0", "end-1c")
-            tokensource = currtext.lexer.get_tokens(_code)
-            start_line = 1
-            start_index = 0
-            end_line = 1
-            end_index = 0
-
-            for ttype, value in tokensource:
-                if "\n" in value:
-                    end_line += value.count("\n")
-                    end_index = len(value.rsplit("\n", 1)[1])
-                else:
-                    end_index += len(value)
-
-                if value not in (" ", "\n"):
-                    index1 = f"{start_line}.{start_index}"
-                    index2 = f"{end_line}.{end_index}"
-
-                    for tagname in currtext.tag_names(index1):
-                        if tagname not in ["sel", "found"]:
-                            currtext.tag_remove(tagname, index1, index2)
-
-                    currtext.tag_add(str(ttype), index1, index2)
-
-                start_line = end_line
-                start_index = end_index
-
-            currtext.update()  # Have to update
-        except Exception:
-            pass
 
     def open_hex(self, file=""):
         if file:
@@ -946,10 +884,10 @@ class Editor:
         main_window = Console(shell_frame, None, shell_frame.destroy)
         main_window.text.lexer = lexers.get_lexer_by_name("pycon")
         main_window.text.focus_set()
-        self.create_tags(main_window.text)
-        self.recolorize(main_window.text)
+        create_tags(main_window.text)
+        recolorize(main_window.text)
         main_window.text.bind(
-            "<KeyRelease>", lambda _=None: self.recolorize(main_window.text)
+            "<KeyRelease>", lambda _=None: recolorize(main_window.text)
         )
         main_window.pack(fill="both", expand=1)
         shell_frame.mainloop()
@@ -1082,7 +1020,7 @@ class Editor:
             return
 
     def right_click(self, event: tk.EventType) -> None:
-        self.right_click_menu.post(event.x_root, event.y_root)
+        self.right_click_menu.tk_popup(event.x_root, event.y_root)
 
     def close_tab(self, event=None) -> None:
         global selected_tab
@@ -1353,8 +1291,8 @@ class Editor:
         textframe.text["state"] = "disabled"
         textframe.text.lexer = currtext.lexer
         textframe.pack(fill="both", expand=1)
-        self.create_tags(textframe.text)
-        self.recolorize(textframe.text)
+        create_tags(textframe.text)
+        recolorize(textframe.text)
         win.mainloop()
 
     def test(self):

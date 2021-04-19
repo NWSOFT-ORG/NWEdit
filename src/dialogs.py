@@ -1,5 +1,5 @@
-from constants import logger, APPDIR
-from modules import tk, ttk, json, ttkthemes
+from src.constants import logger, APPDIR
+from src.modules import tk, ttk, json, ttkthemes
 
 
 def get_theme():

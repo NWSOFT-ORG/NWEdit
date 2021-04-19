@@ -1,8 +1,8 @@
 """Closable ttk.Notebook"""
-from constants import logger
-from modules import tk, ttk, ttkthemes
-from settings import Settings
-from functions import is_dark_color
+from src.constants import logger
+from src.modules import tk, ttk, ttkthemes
+from src.settings import Settings
+from src.functions import is_dark_color
 
 
 class ClosableNotebook(ttk.Notebook):

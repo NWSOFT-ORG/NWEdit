@@ -1,6 +1,6 @@
-from modules import tk, ttk, ttkthemes, os
-from dialogs import get_theme
-from treeview import FileTree
+from src.modules import tk, ttk, ttkthemes, os
+from src.dialogs import get_theme
+from src.treeview import FileTree
 
 
 class FileOpenDialog(FileTree):
@@ -57,7 +57,7 @@ class FileOpenDialog(FileTree):
         except Exception:
             pass
 
-    def on_double_click_treeview(self, _=None, **kwargs):
+    def on_double_click_treeview(self, _=None):
         super().on_double_click_treeview(destroy=True)
 
 
@@ -71,7 +71,7 @@ class DirectoryOpenDialog(FileOpenDialog):
         self.opencommand = opencommand
         super().__init__(opencommand=opencommand)
 
-    def process_directory(self, path: str, **kwargs):
+    def process_directory(self, path: str):
         super().process_directory(path, True)
 
     def open(self):

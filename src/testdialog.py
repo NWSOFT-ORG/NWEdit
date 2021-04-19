@@ -1,5 +1,5 @@
-from modules import tk, ttk
-from tktext import EnhancedTextFrame
+from src.modules import tk, ttk
+from src.tktext import EnhancedTextFrame
 
 
 class TestDialog(tk.Toplevel):

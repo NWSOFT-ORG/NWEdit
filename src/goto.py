@@ -1,4 +1,4 @@
-﻿from modules import tk, ttk
+﻿from src.modules import tk, ttk
 
 
 class Navigate:

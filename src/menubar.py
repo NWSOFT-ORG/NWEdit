@@ -1,5 +1,5 @@
-from modules import tk, ttk, ttkthemes
-from settings import Settings
+from src.modules import ttk, ttkthemes
+from src.settings import Settings
 
 
 class CustomMenubar(ttk.Frame):
@@ -42,7 +42,7 @@ class CustomMenubar(ttk.Frame):
         def leave(_):
             label_widget.state(("!active",))
 
-        def click(event):
+        def click(_):
             try:
                 self._opened_menu = menu
                 menu.tk_popup(

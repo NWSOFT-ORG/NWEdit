@@ -1,5 +1,5 @@
-from modules import tk, ttk, ttkthemes
-from dialogs import get_theme
+from src.modules import tk, ttk, ttkthemes
+from src.dialogs import get_theme
 
 
 class Search:

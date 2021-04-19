@@ -1,6 +1,6 @@
-from modules import tk, ttk, ttkthemes, os
-from dialogs import get_theme
-from treeview import FileTree
+from src.dialogs import get_theme
+from src.modules import os, tk, ttk, ttkthemes
+from src.treeview import FileTree
 
 
 class FileOpenDialog(FileTree):

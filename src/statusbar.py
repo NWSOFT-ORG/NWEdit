@@ -1,4 +1,4 @@
-from modules import ttk
+from src.modules import ttk
 
 
 class Statusbar(ttk.Frame):

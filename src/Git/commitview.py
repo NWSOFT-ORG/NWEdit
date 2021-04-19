@@ -1,6 +1,6 @@
-from constants import APPDIR
-from modules import lexers, os, subprocess, tk, ttk
-from tktext import EnhancedTextFrame
+from src.constants import APPDIR
+from src.modules import lexers, os, subprocess, tk, ttk
+from src.tktext import EnhancedTextFrame
 
 
 class CommitView:

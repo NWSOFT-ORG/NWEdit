@@ -1,8 +1,8 @@
 """Closable ttk.Notebook"""
-from constants import logger
-from modules import tk, ttk, ttkthemes
-from settings import Settings
-from functions import is_dark_color
+from src.constants import logger
+from src.functions import is_dark_color, lighten_color
+from src.modules import tk, ttk, ttkthemes
+from src.settings import Settings
 
 
 class ClosableNotebook(ttk.Notebook):
@@ -19,13 +19,13 @@ class ClosableNotebook(ttk.Notebook):
     def __init__(self, master, cmd):
         self.style = ttkthemes.ThemedStyle()
         settings = Settings()
-        self.style.set_theme(settings.get_settings('theme'))
+        self.style.set_theme(settings.get_settings("theme"))
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
         if is_dark_color(self.bg):
-            self.close_icon = tk.PhotoImage('img_close', file="Images/close.gif")
+            self.close_icon = tk.PhotoImage("img_close", file="Images/close.gif")
         else:
-            self.close_icon = tk.PhotoImage('img_close', file="Images/close-dark.gif")
+            self.close_icon = tk.PhotoImage("img_close", file="Images/close-dark.gif")
         if not self.__initialized:
             self.__initialize_custom_style()
             self.__inititialized = True
@@ -73,6 +73,7 @@ class ClosableNotebook(ttk.Notebook):
         style = ttk.Style()
 
         style.element_create("close", "image", "img_close", border=10, sticky="")
+        style.configure("CustomNotebook.Tab", background=lighten_color(self.bg, 20, 20, 20))
         style.layout("CustomNotebook", [("CustomNotebook.client", {"sticky": "nswe"})])
         style.layout(
             "CustomNotebook.Tab",

@@ -1,7 +1,7 @@
 """A modded version of tkinter.Text"""
 
-from modules import font, get_style_by_name, tk, ttk
-from settings import Settings
+from src.modules import font, get_style_by_name, tk, ttk
+from src.settings import Settings
 
 
 class TextLineNumbers(tk.Canvas):
@@ -81,6 +81,7 @@ class EnhancedText(tk.Text):
     def __init__(self, *args: any, **kwargs: any) -> None:
         tk.Text.__init__(self, *args, **kwargs)
         self.searchable = False
+        self.navigate = False
 
         # create a proxy for the underlying widget
         self._orig = self._w + "_orig"

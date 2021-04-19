@@ -15,59 +15,32 @@
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 Also, it's cross-compatible!
 """
-from console import Console
-from constants import (
-    APPDIR,
-    LINT_BATCH,
-    MAIN_KEY,
-    OSX,
-    RUN_BATCH,
-    VERSION,
-    WINDOWS,
-    logger,
-)
-from customenotebook import ClosableNotebook
-from dialogs import ErrorInfoDialog, InputStringDialog, YesNoDialog
-from filedialog import FileOpenDialog, FileSaveAsDialog
-from functions import (
-    download_file,
-    is_binary_string,
-    open_system_shell,
-    run_in_terminal,
-    is_dark_color
-)
-
+from src.console import Console
+from src.constants import (APPDIR, LINT_BATCH, MAIN_KEY, OSX, RUN_BATCH,
+                           VERSION, WINDOWS, logger)
+from src.customenotebook import ClosableNotebook
+from src.dialogs import ErrorInfoDialog, InputStringDialog, YesNoDialog
+from src.filedialog import FileOpenDialog, FileSaveAsDialog
+from src.functions import (download_file, is_binary_string, is_dark_color,
+                           open_system_shell, run_in_terminal)
 # These modules are from the base directory
-from Git.commitview import CommitView
-from goto import Navigate
-from hexview import HexView
-from modules import (
-    EditorErr,
-    Path,
-    font,
-    get_style_by_name,
-    json,
-    lexers,
-    logging,
-    os,
-    subprocess,
-    sys,
-    threading,
-    tk,
-    ttk,
-    ttkthemes,
-    webbrowser,
-)
-from search import Search
-from settings import CommentMarker, FormatCommand, Lexer, Linter, RunCommand, Settings
-from statusbar import Statusbar
-from tktext import EnhancedText, EnhancedTextFrame
-from treeview import FileTree
-from testdialog import TestDialog
-from menubar import CustomMenubar
+from src.Git.commitview import CommitView
+from src.goto import Navigate
+from src.hexview import HexView
+from src.menubar import CustomMenubar
+from src.modules import (EditorErr, Path, font, get_style_by_name, json,
+                         lexers, logging, os, subprocess, sys, threading, tk,
+                         ttk, ttkthemes, webbrowser)
+from src.search import Search
+from src.settings import (CommentMarker, FormatCommand, Lexer, Linter,
+                          RunCommand, Settings)
+from src.statusbar import Statusbar
+from src.testdialog import TestDialog
+from src.tktext import EnhancedText, EnhancedTextFrame
+from src.treeview import FileTree
 
 if OSX:
-    from modules import PyTouchBar
+    from src.modules import PyTouchBar
 
 os.chdir(APPDIR)
 
@@ -108,29 +81,39 @@ class Editor:
             self.fg = self.style.lookup("TLabel", "foreground")
             if is_dark_color(self.bg):
                 self.close_icon = tk.PhotoImage(file="Images/close.gif")
+                self.copy_icon = tk.PhotoImage(file="Images/copy-light.gif")
+                self.lint_icon = tk.PhotoImage(file="Images/lint-light.gif")
+                self.delete_icon = tk.PhotoImage(file="Images/delete-light.gif")
+                self.indent_icon = tk.PhotoImage(file="Images/indent-light.gif")
+                self.paste_icon = tk.PhotoImage(file="Images/paste-light.gif")
+                self.unindent_icon = tk.PhotoImage(file="Images/unindent-light.gif")
+                self.search_icon = tk.PhotoImage(file="Images/search-light.gif")
+                self.pyterm_icon = tk.PhotoImage(file="Images/py-term-light.gif")
+                self.term_icon = tk.PhotoImage(file="Images/term-light.gif")
+                self.format_icon = tk.PhotoImage(file="Images/format-light.gif")
+                self.sel_all_icon = tk.PhotoImage(file="Images/sel-all-light.gif")
             else:
                 self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
+                self.lint_icon = tk.PhotoImage(file="Images/lint.gif")
+                self.copy_icon = tk.PhotoImage(file="Images/copy.gif")
+                self.delete_icon = tk.PhotoImage(file="Images/delete.gif")
+                self.indent_icon = tk.PhotoImage(file="Images/indent.gif")
+                self.paste_icon = tk.PhotoImage(file="Images/paste.gif")
+                self.unindent_icon = tk.PhotoImage(file="Images/unindent.gif")
+                self.search_icon = tk.PhotoImage(file="Images/search.gif")
+                self.pyterm_icon = tk.PhotoImage(file="Images/py-term.gif")
+                self.term_icon = tk.PhotoImage(file="Images/term.gif")
+                self.format_icon = tk.PhotoImage(file="Images/format.gif")
+                self.sel_all_icon = tk.PhotoImage(file="Images/sel-all.gif")
 
-            self.copy_icon = tk.PhotoImage(file="Images/copy.gif")
             self.cut_icon = tk.PhotoImage(file="Images/cut.gif")
-            self.cut_icon = tk.PhotoImage(file="Images/cut.gif")
-            self.delete_icon = tk.PhotoImage(file="Images/delete.gif")
-            self.indent_icon = tk.PhotoImage(file="Images/indent.gif")
-            self.lint_icon = tk.PhotoImage(file="Images/lint.gif")
             self.new_icon = tk.PhotoImage(file="Images/new.gif")
             self.open_icon = tk.PhotoImage(file="Images/open-16px.gif")
-            self.paste_icon = tk.PhotoImage(file="Images/paste.gif")
-            self.pyterm_icon = tk.PhotoImage(file="Images/py-term.gif")
             self.redo_icon = tk.PhotoImage(file="Images/redo.gif")
             self.reload_icon = tk.PhotoImage(file="Images/reload.gif")
             self.run_icon = tk.PhotoImage(file="Images/run-16px.gif")
             self.save_as_icon = tk.PhotoImage(file="Images/saveas-16px.gif")
-            self.search_icon = tk.PhotoImage(file="Images/search.gif")
-            self.term_icon = tk.PhotoImage(file="Images/term.gif")
             self.undo_icon = tk.PhotoImage(file="Images/undo.gif")
-            self.unindent_icon = tk.PhotoImage(file="Images/unindent.gif")
-            self.sel_all_icon = tk.PhotoImage(file="Images/sel-all.gif")
-            self.format_icon = tk.PhotoImage(file="Images/format.gif")
             logger.debug("Icons loaded")
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
@@ -324,6 +307,10 @@ class Editor:
             )
             editmenu.add_command(label="Join lines", command=self.join_lines)
             editmenu.add_separator()
+            editmenu.add_command(label="Swap case", command=self.swap_case)
+            editmenu.add_command(label="Upper case", command=self.upper_case)
+            editmenu.add_command(label="Lower case", command=self.lower_case)
+            editmenu.add_separator()
             editmenu.add_command(
                 label="Select All",
                 command=self.select_all,
@@ -334,18 +321,18 @@ class Editor:
             editmenu.add_command(label="Select Line", command=self.sel_line)
             editmenu.add_command(label="Select Word", command=self.sel_word)
             editmenu.add_command(
-                label="Select Word on the left", command=self.sel_word_left
+                label="Select Prev Word", command=self.sel_word_left
             )
             editmenu.add_command(
-                label="Select Word on the right", command=self.sel_word_right
+                label="Select Next Word", command=self.sel_word_right
             )
             editmenu.add_separator()
             editmenu.add_command(label="Delete Word", command=self.del_word)
             editmenu.add_command(
-                label="Delete Word on the left", command=self.del_word_left
+                label="Delete Prev Word", command=self.del_word_left
             )
             editmenu.add_command(
-                label="Delete Word on the Right", command=self.del_word_right
+                label="Delete Next Word", command=self.del_word_right
             )
             editmenu.add_command(label="Move line up", command=self.mv_line_up)
             editmenu.add_command(label="Move line down", command=self.mv_line_dn)
@@ -478,7 +465,7 @@ class Editor:
     def start_screen(self) -> None:
         first_tab = tk.Canvas(self.nb, background=self.bg, highlightthickness=0)
         first_tab.create_image(20, 20, anchor="nw", image=self.icon)
-        fg = '#8dd9f7' if is_dark_color(self.bg) else 'blue'
+        fg = "#8dd9f7" if is_dark_color(self.bg) else "blue"
         first_tab.create_text(
             60,
             10,
@@ -875,8 +862,8 @@ class Editor:
         try:
             curr_tab = self.get_tab()
             self.tabs[curr_tab].textbox.tag_add(tk.SEL, "1.0", tk.END)
-            self.tabs[curr_tab].textbox.mark_set(tk.INSERT, tk.END)
-            self.tabs[curr_tab].textbox.see(tk.INSERT)
+            self.tabs[curr_tab].textbox.mark_set('insert', 'end')
+            self.tabs[curr_tab].textbox.see('insert')
         except Exception:
             pass
 
@@ -885,7 +872,7 @@ class Editor:
             return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.edit_separator()
-        sel = currtext.get(tk.SEL_FIRST, tk.SEL_LAST)
+        sel = currtext.get('sel.first', 'sel.last')
         if currtext.tag_ranges("sel"):
             currtext.tag_remove("sel", "1.0", "end")
             currtext.insert("insert", sel)
@@ -928,11 +915,9 @@ class Editor:
                             )
                         )
                     )
-                threading.Thread(
-                    target=run_in_terminal,
-                    args="chmod 700 run.sh && ./run.sh && rm run.sh",
-                    kwargs={"cwd": APPDIR},
-                ).start()
+                    run_in_terminal(
+                    "chmod 700 run.sh && ./run.sh && rm run.sh",
+                    cwd=APPDIR)
         except Exception:
             ErrorInfoDialog(self.master, "This language is not supported.")
 
@@ -1336,6 +1321,42 @@ class Editor:
         currtext.delete("insert -1l lineend", "insert lineend")
         currtext.mark_set("insert", "insert +1l")
         currtext.insert("insert", text)
+
+    def swap_case(self):
+        if not self.tabs:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        if not currtext.tag_ranges('sel'):
+            return
+        text = currtext.get("sel.first", "sel.last")
+        currtext.delete("sel.first", "sel.last")
+        text = text.swapcase()
+        currtext.insert("insert", text)
+        self.key()
+    
+    def upper_case(self):
+        if not self.tabs:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        if not currtext.tag_ranges('sel'):
+            return
+        text = currtext.get("sel.first", "sel.last")
+        currtext.delete("sel.first", "sel.last")
+        text = text.upper()
+        currtext.insert("insert", text)
+        self.key()
+    
+    def lower_case(self):
+        if not self.tabs:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        if not currtext.tag_ranges('sel'):
+            return
+        text = currtext.get("sel.first", "sel.last")
+        currtext.delete("sel.first", "sel.last")
+        text = text.lower()
+        currtext.insert("insert", text)
+        self.key()
 
     def biggerview(self) -> None:
         if not self.tabs:

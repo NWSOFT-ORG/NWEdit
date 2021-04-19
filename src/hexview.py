@@ -1,12 +1,7 @@
 """A Hex Viewer to view non-text documents."""
 
-from constants import (
-    BLOCK_HEIGHT,
-    BLOCK_SIZE,
-    BLOCK_WIDTH,
-    ENCODINGS,
-)
-from modules import tk, ttk, codecs, os
+from src.constants import BLOCK_HEIGHT, BLOCK_SIZE, BLOCK_WIDTH, ENCODINGS
+from src.modules import codecs, os, tk, ttk
 
 
 class HexView:
@@ -69,26 +64,6 @@ class HexView:
 
         self.parent.bind("<Alt-f>", lambda *args: self.offset_spinbox.focus())
         self.parent.bind("<Alt-e>", lambda *args: self.encoding_combobox.focus())
-        for variable in (self.offset, self.encoding):
-            variable.trace_variable("w", self.show_block)
-
-    def show_block(self, *_):
-        self.textbox.config(state="normal")
-        self.textbox.delete("1.0", "end")
-        if not self.filename:
-            return
-        with open(self.filename, "rb") as file:
-            try:
-                file.seek(self.offset.get(), os.SEEK_SET)
-                block = file.read(BLOCK_SIZE)
-            except Exception:  # Empty offsetSpinbox
-                return
-        rows = [block[i : i + BLOCK_WIDTH] for i in range(0, len(block), BLOCK_WIDTH)]
-        for row in rows:
-            self.show_bytes(row)
-            self.show_line(row)
-        self.textbox.insert("end", "\n")
-        self.textbox.config(state="disabled")
 
     def show_bytes(self, row):
         self.textbox.config(state="normal")

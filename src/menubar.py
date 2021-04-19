@@ -1,5 +1,5 @@
-from modules import tk, ttk, ttkthemes
-from settings import Settings
+from src.modules import tk, ttk, ttkthemes
+from src.settings import Settings
 
 
 class CustomMenubar(ttk.Frame):

@@ -14,15 +14,15 @@ class CommitView:
         self.window.resizable(0, 0)
 
         diff_frame = ttk.Frame(self.window)
-        self.files_listbox = ttk.Treeview(diff_frame)
+        self.files_listbox = ttk.Treeview(diff_frame, show="tree")
         self.refresh_files()
 
         self.files_listbox.pack(fill="both")
-        self.files_listbox.tag_configure('added', foreground='green')
-        self.files_listbox.tag_configure('modified', foreground='brown')
-        self.files_listbox.tag_configure('deleted', foreground='red')
-        self.files_listbox.bind('<1>', self.click_files)
-        self.files_listbox.bind('<Double-1>', self.diff)
+        self.files_listbox.tag_configure("added", foreground="green")
+        self.files_listbox.tag_configure("modified", foreground="brown")
+        self.files_listbox.tag_configure("deleted", foreground="red")
+        self.files_listbox.bind("<1>", self.click_files)
+        self.files_listbox.bind("<Double-1>", self.diff)
         diff_frame.pack(fill="both")
 
         commit_frame = ttk.Frame(self.window)
@@ -136,35 +136,12 @@ class CommitView:
             .splitlines()
         ]
         for x in added_files:
-            self.files_listbox.insert(
-                "",
-                "end",
-                text=x,
-                tags='added'
-            )
+            self.files_listbox.insert("", "end", text=x, tags="added")
         for x in copied_files:
-            self.files_listbox.insert(
-                "",
-                "end",
-                text=x
-            )
+            self.files_listbox.insert("", "end", text=x)
         for x in renamed_files:
-            self.files_listbox.insert(
-                "",
-                "end",
-                text=x
-            )
+            self.files_listbox.insert("", "end", text=x)
         for x in deleted_files:
-            self.files_listbox.insert(
-                "",
-                "end",
-                text=x,
-                tags='deleted'
-            )
+            self.files_listbox.insert("", "end", text=x, tags="deleted")
         for x in modified_files:
-            self.files_listbox.insert(
-                "",
-                "end",
-                text=x,
-                tags='modified'
-            )
+            self.files_listbox.insert("", "end", text=x, tags="modified")

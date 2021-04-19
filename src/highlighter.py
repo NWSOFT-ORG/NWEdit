@@ -1,6 +1,7 @@
 ﻿from src.modules import font, get_style_by_name, tk
 from src.settings import Settings
 
+
 def create_tags(textbox: tk.Text) -> None:
     """
     The method creates the tags associated with each distinct style element of the
@@ -30,8 +31,7 @@ def create_tags(textbox: tk.Text) -> None:
         else:
             foreground = None
 
-        currtext.tag_configure(
-            str(ttype), foreground=foreground, font=tag_font)
+        currtext.tag_configure(str(ttype), foreground=foreground, font=tag_font)
 
 
 def recolorize(textbox: tk.Text) -> None:

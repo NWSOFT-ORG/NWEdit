@@ -3,7 +3,7 @@
 """
 
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
-| pyplus.py -- the editor's main file                 |
+| editor.py -- the editor's main file                 |
 | The editor                                          |
 | It's extremely small! (around 80 kB)                |
 | You can visit my site for more details!             |
@@ -34,7 +34,7 @@ from src.functions import (
     is_binary_string,
     open_system_shell,
     run_in_terminal,
-    is_dark_color
+    is_dark_color,
 )
 
 # These modules are from the base directory
@@ -59,9 +59,16 @@ from src.modules import (
     webbrowser,
 )
 from src.search import Search
-from src.settings import CommentMarker, FormatCommand, Lexer, Linter, RunCommand, Settings
+from src.settings import (
+    CommentMarker,
+    FormatCommand,
+    Lexer,
+    Linter,
+    RunCommand,
+    Settings,
+)
 from src.statusbar import Statusbar
-from src.tktext import EnhancedText, EnhancedTextFrame
+from src.tktext import EnhancedTextFrame
 from src.treeview import FileTree
 from src.testdialog import TestDialog
 from src.menubar import CustomMenubar
@@ -71,6 +78,7 @@ if OSX:
     from src.modules import PyTouchBar
 
 os.chdir(APPDIR)
+
 
 class Document:
     """Helper class, for the editor."""
@@ -482,7 +490,7 @@ class Editor:
     def start_screen(self) -> None:
         first_tab = tk.Canvas(self.nb, background=self.bg, highlightthickness=0)
         first_tab.create_image(20, 20, anchor="nw", image=self.icon)
-        fg = '#8dd9f7' if is_dark_color(self.bg) else 'blue'
+        fg = "#8dd9f7" if is_dark_color(self.bg) else "blue"
         first_tab.create_text(
             60,
             10,
@@ -866,11 +874,7 @@ class Editor:
                             )
                         )
                     )
-                threading.Thread(
-                    target=run_in_terminal,
-                    args="chmod 700 run.sh && ./run.sh && rm run.sh",
-                    kwargs={"cwd": APPDIR},
-                ).start()
+                run_in_terminal("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
         except Exception:
             ErrorInfoDialog(self.master, "This language is not supported.")
 

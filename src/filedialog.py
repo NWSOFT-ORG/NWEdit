@@ -1,5 +1,5 @@
-from src.modules import tk, ttk, ttkthemes, os
 from src.dialogs import get_theme
+from src.modules import os, tk, ttk, ttkthemes
 from src.treeview import FileTree
 
 

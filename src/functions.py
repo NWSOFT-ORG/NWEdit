@@ -9,18 +9,23 @@ from src.modules import os, platform, requests, shutil, subprocess, sys
 DARK_COLOR = 128
 
 
-def is_binary_string(byte):
+def is_binary_string(byte) -> bool:
     return bool(byte.translate(None, textchars))
 
 
-def hex2dec(hex_code):
+def hex2dec(hex_code) -> int:
     hex_code = str(hex_code)
     if hex_code.startswith("#"):
         hex_code = hex_code[1:]
     return int(hex_code, 16)
 
+def dec2hex(dec, color_code: bool = False) -> str:
+    dec = hex(dec)
+    if color_code:
+        dec = '#' + dec[2:]
+    return dec
 
-def is_dark_color(hex_code):
+def is_dark_color(hex_code) -> bool:
     if hex_code.startswith("#"):
         hex_code = hex_code[1:]
     if (
@@ -31,8 +36,27 @@ def is_dark_color(hex_code):
         return True
     return False
 
+def darken_color(hex_code, red, green, blue) -> bool:
+    hex_code = hex_code[1:]
+    rgb = (hex2dec(hex_code[:2]) - red,
+    hex2dec(hex_code[2:4]) - green,
+    hex2dec(hex_code[4:]) - blue)
+    value = '#'
+    for x in rgb:
+        value += dec2hex(x)[2:]
+    return value
 
-def download_file(url, localfile=None):
+def lighten_color(hex_code, red, green, blue) -> bool:
+    hex_code = hex_code[1:]
+    rgb = (hex2dec(hex_code[:2]) + red,
+    hex2dec(hex_code[2:4]) + green,
+    hex2dec(hex_code[4:]) + blue)
+    value = '#'
+    for x in rgb:
+        value += dec2hex(x)[2:]
+    return value
+
+def download_file(url, localfile=None) -> str:
     """Downloads a file from remote path"""
     local_filename = url.split("/")[-1] if not localfile else localfile
     # NOTE the stream=True parameter below
@@ -126,8 +150,7 @@ def _add_to_path(directory, path):
 def _run_in_terminal_in_windows(cmd, cwd, env, keep_open, title="Command Prompt"):
     if keep_open:
         # Yes, the /K argument has weird quoting. Can't explain this, but it works
-        quoted_args = " ".join(
-            map(lambda s: s if s == "&" else '"' + s + '"', cmd))
+        quoted_args = " ".join(map(lambda s: s if s == "&" else '"' + s + '"', cmd))
         cmd_line = """start {title} /D "{cwd}" /W cmd /K "{quoted_args}" """.format(
             cwd=cwd, quoted_args=quoted_args, title='"' + title + '"' if title else ""
         )
@@ -151,8 +174,7 @@ def _run_in_terminal_in_linux(cmd, cwd, env, keep_open):
     if keep_open:
         # http://stackoverflow.com/a/4466566/261181
         core_cmd = "{cmd}; exec bash -i".format(cmd=cmd)
-        in_term_cmd = "bash -c {core_cmd}".format(
-            core_cmd=_shellquote(core_cmd))
+        in_term_cmd = "bash -c {core_cmd}".format(core_cmd=_shellquote(core_cmd))
     else:
         in_term_cmd = cmd
 
@@ -189,8 +211,7 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
             if key == "PATH":
                 value = _normalize_path(value)
 
-            cmds += "; export {key}={value}".format(
-                key=key, value=_shellquote(value))
+            cmds += "; export {key}={value}".format(key=key, value=_shellquote(value))
 
     if cmd:
         if isinstance(cmd, list):
@@ -214,8 +235,7 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
     # We'll prepare an AppleScript string literal for this
     # (http://stackoverflow.com/questions/10667800/using-quotes-in-a-applescript-string):
     cmd_as_apple_script_string_literal = (
-        '"' + cmds.replace("\\", "\\\\").replace('"',
-                                                 '\\"').replace("$", "\\$") + '"'
+        '"' + cmds.replace("\\", "\\\\").replace('"', '\\"').replace("$", "\\$") + '"'
     )
 
     # When Terminal is not open, then do script opens two windows.

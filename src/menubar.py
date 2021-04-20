@@ -1,4 +1,4 @@
-from src.modules import ttk, ttkthemes
+from src.modules import tk, ttk, ttkthemes
 from src.settings import Settings
 
 

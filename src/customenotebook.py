@@ -1,8 +1,8 @@
 """Closable ttk.Notebook"""
 from src.constants import logger
+from src.functions import is_dark_color, lighten_color
 from src.modules import tk, ttk, ttkthemes
 from src.settings import Settings
-from src.functions import is_dark_color
 
 
 class ClosableNotebook(ttk.Notebook):
@@ -73,6 +73,7 @@ class ClosableNotebook(ttk.Notebook):
         style = ttk.Style()
 
         style.element_create("close", "image", "img_close", border=10, sticky="")
+        style.configure("CustomNotebook.Tab", background=lighten_color(self.bg, 20, 20, 20))
         style.layout("CustomNotebook", [("CustomNotebook.client", {"sticky": "nswe"})])
         style.layout(
             "CustomNotebook.Tab",

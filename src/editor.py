@@ -41,38 +41,17 @@ from src.functions import (
 from src.Git.commitview import CommitView
 from src.goto import Navigate
 from src.hexview import HexView
-from src.modules import (
-    EditorErr,
-    Path,
-    font,
-    get_style_by_name,
-    json,
-    lexers,
-    logging,
-    os,
-    subprocess,
-    sys,
-    threading,
-    tk,
-    ttk,
-    ttkthemes,
-    webbrowser,
-)
-from src.search import Search
-from src.settings import (
-    CommentMarker,
-    FormatCommand,
-    Lexer,
-    Linter,
-    RunCommand,
-    Settings,
-)
-from src.statusbar import Statusbar
-from src.tktext import EnhancedTextFrame
-from src.treeview import FileTree
-from src.testdialog import TestDialog
 from src.menubar import CustomMenubar
-from src.highlighter import create_tags, recolorize
+from src.modules import (EditorErr, Path, font, get_style_by_name, json,
+                         lexers, logging, os, subprocess, sys, threading, tk,
+                         ttk, ttkthemes, webbrowser)
+from src.search import Search
+from src.settings import (CommentMarker, FormatCommand, Lexer, Linter,
+                          RunCommand, Settings)
+from src.statusbar import Statusbar
+from src.testdialog import TestDialog
+from src.tktext import EnhancedText, EnhancedTextFrame
+from src.treeview import FileTree
 
 if OSX:
     from src.modules import PyTouchBar
@@ -87,6 +66,75 @@ class Document:
         self.frame = frame
         self.file_dir = file_dir
         self.textbox = textbox
+
+
+def create_tags(textbox: EnhancedText) -> None:
+        """
+        The method creates the tags associated with each distinct style element of the
+        source code 'dressing'"""
+        currtext = textbox
+        bold_font = font.Font(currtext, currtext.cget("font"))
+        bold_font.configure(weight=font.BOLD)
+        italic_font = font.Font(currtext, currtext.cget("font"))
+        italic_font.configure(slant=font.ITALIC)
+        bold_italic_font = font.Font(currtext, currtext.cget("font"))
+        bold_italic_font.configure(weight=font.BOLD, slant=font.ITALIC)
+        settings = Settings()
+        style = get_style_by_name(settings.get_settings('pygments'))
+
+        for ttype, ndef in style:
+            tag_font = None
+
+            if ndef["bold"] and ndef["italic"]:
+                tag_font = bold_italic_font
+            elif ndef["bold"]:
+                tag_font = bold_font
+            elif ndef["italic"]:
+                tag_font = italic_font
+
+            if ndef["color"]:
+                foreground = "#%s" % ndef["color"]
+            else:
+                foreground = None
+
+            currtext.tag_configure(
+                str(ttype), foreground=foreground, font=tag_font)
+
+def recolorize(textbox: EnhancedText) -> None:
+    """
+    This method colors and styles the prepared tags"""
+    try:
+        currtext = textbox
+        _code = currtext.get("1.0", "end-1c")
+        tokensource = currtext.lexer.get_tokens(_code)
+        start_line = 1
+        start_index = 0
+        end_line = 1
+        end_index = 0
+
+        for ttype, value in tokensource:
+            if "\n" in value:
+                end_line += value.count("\n")
+                end_index = len(value.rsplit("\n", 1)[1])
+            else:
+                end_index += len(value)
+
+            if value not in (" ", "\n"):
+                index1 = f"{start_line}.{start_index}"
+                index2 = f"{end_line}.{end_index}"
+
+                for tagname in currtext.tag_names(index1):
+                    if tagname not in ["sel", "found"]:
+                        currtext.tag_remove(tagname, index1, index2)
+
+                currtext.tag_add(str(ttype), index1, index2)
+
+            start_line = end_line
+            start_index = end_index
+
+        currtext.update()  # Have to update
+    except Exception:
+        pass
 
 
 class Editor:
@@ -116,29 +164,39 @@ class Editor:
             self.fg = self.style.lookup("TLabel", "foreground")
             if is_dark_color(self.bg):
                 self.close_icon = tk.PhotoImage(file="Images/close.gif")
+                self.copy_icon = tk.PhotoImage(file="Images/copy-light.gif")
+                self.lint_icon = tk.PhotoImage(file="Images/lint-light.gif")
+                self.delete_icon = tk.PhotoImage(file="Images/delete-light.gif")
+                self.indent_icon = tk.PhotoImage(file="Images/indent-light.gif")
+                self.paste_icon = tk.PhotoImage(file="Images/paste-light.gif")
+                self.unindent_icon = tk.PhotoImage(file="Images/unindent-light.gif")
+                self.search_icon = tk.PhotoImage(file="Images/search-light.gif")
+                self.pyterm_icon = tk.PhotoImage(file="Images/py-term-light.gif")
+                self.term_icon = tk.PhotoImage(file="Images/term-light.gif")
+                self.format_icon = tk.PhotoImage(file="Images/format-light.gif")
+                self.sel_all_icon = tk.PhotoImage(file="Images/sel-all-light.gif")
             else:
                 self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
+                self.lint_icon = tk.PhotoImage(file="Images/lint.gif")
+                self.copy_icon = tk.PhotoImage(file="Images/copy.gif")
+                self.delete_icon = tk.PhotoImage(file="Images/delete.gif")
+                self.indent_icon = tk.PhotoImage(file="Images/indent.gif")
+                self.paste_icon = tk.PhotoImage(file="Images/paste.gif")
+                self.unindent_icon = tk.PhotoImage(file="Images/unindent.gif")
+                self.search_icon = tk.PhotoImage(file="Images/search.gif")
+                self.pyterm_icon = tk.PhotoImage(file="Images/py-term.gif")
+                self.term_icon = tk.PhotoImage(file="Images/term.gif")
+                self.format_icon = tk.PhotoImage(file="Images/format.gif")
+                self.sel_all_icon = tk.PhotoImage(file="Images/sel-all.gif")
 
-            self.copy_icon = tk.PhotoImage(file="Images/copy.gif")
             self.cut_icon = tk.PhotoImage(file="Images/cut.gif")
-            self.cut_icon = tk.PhotoImage(file="Images/cut.gif")
-            self.delete_icon = tk.PhotoImage(file="Images/delete.gif")
-            self.indent_icon = tk.PhotoImage(file="Images/indent.gif")
-            self.lint_icon = tk.PhotoImage(file="Images/lint.gif")
             self.new_icon = tk.PhotoImage(file="Images/new.gif")
             self.open_icon = tk.PhotoImage(file="Images/open-16px.gif")
-            self.paste_icon = tk.PhotoImage(file="Images/paste.gif")
-            self.pyterm_icon = tk.PhotoImage(file="Images/py-term.gif")
             self.redo_icon = tk.PhotoImage(file="Images/redo.gif")
             self.reload_icon = tk.PhotoImage(file="Images/reload.gif")
             self.run_icon = tk.PhotoImage(file="Images/run-16px.gif")
             self.save_as_icon = tk.PhotoImage(file="Images/saveas-16px.gif")
-            self.search_icon = tk.PhotoImage(file="Images/search.gif")
-            self.term_icon = tk.PhotoImage(file="Images/term.gif")
             self.undo_icon = tk.PhotoImage(file="Images/undo.gif")
-            self.unindent_icon = tk.PhotoImage(file="Images/unindent.gif")
-            self.sel_all_icon = tk.PhotoImage(file="Images/sel-all.gif")
-            self.format_icon = tk.PhotoImage(file="Images/format.gif")
             logger.debug("Icons loaded")
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
@@ -334,6 +392,10 @@ class Editor:
             )
             editmenu.add_command(label="Join lines", command=self.join_lines)
             editmenu.add_separator()
+            editmenu.add_command(label="Swap case", command=self.swap_case)
+            editmenu.add_command(label="Upper case", command=self.upper_case)
+            editmenu.add_command(label="Lower case", command=self.lower_case)
+            editmenu.add_separator()
             editmenu.add_command(
                 label="Select All",
                 command=self.select_all,
@@ -344,18 +406,18 @@ class Editor:
             editmenu.add_command(label="Select Line", command=self.sel_line)
             editmenu.add_command(label="Select Word", command=self.sel_word)
             editmenu.add_command(
-                label="Select Word on the left", command=self.sel_word_left
+                label="Select Prev Word", command=self.sel_word_left
             )
             editmenu.add_command(
-                label="Select Word on the right", command=self.sel_word_right
+                label="Select Next Word", command=self.sel_word_right
             )
             editmenu.add_separator()
             editmenu.add_command(label="Delete Word", command=self.del_word)
             editmenu.add_command(
-                label="Delete Word on the left", command=self.del_word_left
+                label="Delete Prev Word", command=self.del_word_left
             )
             editmenu.add_command(
-                label="Delete Word on the Right", command=self.del_word_right
+                label="Delete Next Word", command=self.del_word_right
             )
             editmenu.add_command(label="Move line up", command=self.mv_line_up)
             editmenu.add_command(label="Move line down", command=self.mv_line_dn)
@@ -821,8 +883,8 @@ class Editor:
         try:
             curr_tab = self.get_tab()
             self.tabs[curr_tab].textbox.tag_add(tk.SEL, "1.0", tk.END)
-            self.tabs[curr_tab].textbox.mark_set(tk.INSERT, tk.END)
-            self.tabs[curr_tab].textbox.see(tk.INSERT)
+            self.tabs[curr_tab].textbox.mark_set('insert', 'end')
+            self.tabs[curr_tab].textbox.see('insert')
         except Exception:
             pass
 
@@ -831,7 +893,7 @@ class Editor:
             return
         currtext = self.tabs[self.get_tab()].textbox
         currtext.edit_separator()
-        sel = currtext.get(tk.SEL_FIRST, tk.SEL_LAST)
+        sel = currtext.get('sel.first', 'sel.last')
         if currtext.tag_ranges("sel"):
             currtext.tag_remove("sel", "1.0", "end")
             currtext.insert("insert", sel)
@@ -1278,6 +1340,42 @@ class Editor:
         currtext.delete("insert -1l lineend", "insert lineend")
         currtext.mark_set("insert", "insert +1l")
         currtext.insert("insert", text)
+
+    def swap_case(self):
+        if not self.tabs:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        if not currtext.tag_ranges('sel'):
+            return
+        text = currtext.get("sel.first", "sel.last")
+        currtext.delete("sel.first", "sel.last")
+        text = text.swapcase()
+        currtext.insert("insert", text)
+        self.key()
+
+    def upper_case(self):
+        if not self.tabs:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        if not currtext.tag_ranges('sel'):
+            return
+        text = currtext.get("sel.first", "sel.last")
+        currtext.delete("sel.first", "sel.last")
+        text = text.upper()
+        currtext.insert("insert", text)
+        self.key()
+
+    def lower_case(self):
+        if not self.tabs:
+            return
+        currtext = self.tabs[self.get_tab()].textbox
+        if not currtext.tag_ranges('sel'):
+            return
+        text = currtext.get("sel.first", "sel.last")
+        currtext.delete("sel.first", "sel.last")
+        text = text.lower()
+        currtext.insert("insert", text)
+        self.key()
 
     def biggerview(self) -> None:
         if not self.tabs:

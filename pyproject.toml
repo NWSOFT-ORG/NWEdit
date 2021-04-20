@@ -24,6 +24,7 @@ pyclean = "^2.0.0"
 python-pydebug = "^0.6"
 art = "^5.1"
 pygments-agentspeak = "^1.0"
+black = "^20.8b1"
 [tool.poetry.dev-dependencies]
 pylint = "^2.7.4"
 rope = "^0.18.0"

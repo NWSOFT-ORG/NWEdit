@@ -1,5 +1,6 @@
-from src.modules import tk, ttk, ttkthemes
 from src.dialogs import get_theme
+from src.modules import tk, ttk, ttkthemes
+from src.functions import darken_color
 
 
 class Search:
@@ -15,7 +16,7 @@ class Search:
         self.result = None
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
-        bg = self._style.lookup("Entry", "background")
+        bg = self._style.lookup("TLabel", "background")
         fg = self._style.lookup("TLabel", "foreground")
 
         if self.text.searchable:
@@ -32,7 +33,7 @@ class Search:
         )
         self.content = tk.Entry(
             self.search_frame,
-            background=bg,
+            background=darken_color(bg, 30, 30, 30),
             foreground=fg,
             insertbackground=fg,
             highlightthickness=0,
@@ -50,7 +51,7 @@ class Search:
         )
         self.repl = tk.Entry(
             self.search_frame,
-            background=bg,
+            background=darken_color(bg, 30, 30, 30),
             foreground=fg,
             insertbackground=fg,
             highlightthickness=0,

@@ -1,5 +1,5 @@
 """Constants for the editor."""
-from src.modules import sys, Path, tk, logging
+from src.modules import Path, logging, sys, tk
 
 WINDOWS = bool(sys.platform.startswith("win"))
 OSX = bool(sys.platform.startswith("darwin"))

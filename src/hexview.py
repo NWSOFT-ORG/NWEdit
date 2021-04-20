@@ -1,6 +1,6 @@
 """A Hex Viewer to view non-text documents."""
 
-from src.constants import BLOCK_HEIGHT, BLOCK_SIZE, BLOCK_WIDTH, ENCODINGS
+from src.constants import BLOCK_HEIGHT, BLOCK_WIDTH, ENCODINGS
 from src.modules import codecs, os, tk, ttk
 
 
@@ -27,15 +27,7 @@ class HexView:
 
         self.frame = ttk.Frame(self.parent)
         buttonframe = ttk.Frame(self.parent)
-        self.offset_label = ttk.Label(buttonframe, text="Offset")
-        self.offset_spinbox = ttk.Spinbox(
-            buttonframe,
-            from_=0,
-            textvariable=self.offset,
-            increment=BLOCK_SIZE,
-            foreground="black",
-        )
-        self.encoding_label = ttk.Label(buttonframe, text="Encoding", underline=0)
+        self.encoding_label = ttk.Label(buttonframe, text="Encoding")
         self.encoding_combobox = ttk.Combobox(
             buttonframe, values=ENCODINGS, textvariable=self.encoding, state="readonly"
         )
@@ -55,15 +47,11 @@ class HexView:
         self.textbox["yscrollcommand"] = yscroll.set
         buttonframe.pack(side="top")
         yscroll.pack(side="right", fill="y")
-        self.offset_label.pack(side="left", anchor="nw")
-        self.offset_spinbox.pack(side="left", anchor="nw")
         self.encoding_label.pack(side="left", anchor="nw")
         self.encoding_combobox.pack(side="left", anchor="nw")
         self.textbox.pack(fill="both", expand=1)
         self.frame.pack(fill="both", expand=1)
-
-        self.parent.bind("<Alt-f>", lambda *args: self.offset_spinbox.focus())
-        self.parent.bind("<Alt-e>", lambda *args: self.encoding_combobox.focus())
+        self.encoding.trace_variable("w", self.show_block)
 
     def show_bytes(self, row):
         self.textbox.config(state="normal")
@@ -97,8 +85,19 @@ class HexView:
 
     def open(self, filename):
         if filename and os.path.exists(filename):
-            size = os.path.getsize(filename)
-            size = size - BLOCK_SIZE if size > BLOCK_SIZE else size - BLOCK_WIDTH
-            self.offset_spinbox.config(to=max(size, 0))
             self.filename = filename
             self.show_block()
+
+    def show_block(self, *_):
+        self.textbox.config(state="normal")
+        self.textbox.delete("1.0", "end")
+        if not self.filename:
+            return
+        with open(self.filename, "rb") as file:
+            block = file.read()
+        rows = [block[i : i + BLOCK_WIDTH] for i in range(0, len(block), BLOCK_WIDTH)]
+        for row in rows:
+            self.show_bytes(row)
+            self.show_line(row)
+        self.textbox.insert("end", "\n")
+        self.textbox.config(state="disabled")

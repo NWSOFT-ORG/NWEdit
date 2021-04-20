@@ -50,7 +50,6 @@ MAIN_KEY = "Command" if OSX else "Control"  # MacOS uses Cmd, but others uses Ct
 TK_VERSION = int(float(tk.TkVersion) * 10)  # Gets tkinter's version
 BLOCK_WIDTH = 16
 BLOCK_HEIGHT = 32
-BLOCK_SIZE = BLOCK_WIDTH * BLOCK_HEIGHT
 ENCODINGS = (
     "ascii",
     "big5",

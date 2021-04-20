@@ -42,16 +42,17 @@ from src.Git.commitview import CommitView
 from src.goto import Navigate
 from src.hexview import HexView
 from src.menubar import CustomMenubar
-from src.modules import (EditorErr, Path, font, get_style_by_name, json,
-                         lexers, logging, os, subprocess, sys, threading, tk,
+from src.modules import (EditorErr, Path, json,
+                         lexers, logging, os, subprocess, sys, tk,
                          ttk, ttkthemes, webbrowser)
 from src.search import Search
 from src.settings import (CommentMarker, FormatCommand, Lexer, Linter,
                           RunCommand, Settings)
 from src.statusbar import Statusbar
 from src.testdialog import TestDialog
-from src.tktext import EnhancedText, EnhancedTextFrame
+from src.tktext import EnhancedTextFrame
 from src.treeview import FileTree
+from src.highlighter import recolorize, create_tags
 
 if OSX:
     from src.modules import PyTouchBar
@@ -66,76 +67,6 @@ class Document:
         self.frame = frame
         self.file_dir = file_dir
         self.textbox = textbox
-
-
-def create_tags(textbox: EnhancedText) -> None:
-        """
-        The method creates the tags associated with each distinct style element of the
-        source code 'dressing'"""
-        currtext = textbox
-        bold_font = font.Font(currtext, currtext.cget("font"))
-        bold_font.configure(weight=font.BOLD)
-        italic_font = font.Font(currtext, currtext.cget("font"))
-        italic_font.configure(slant=font.ITALIC)
-        bold_italic_font = font.Font(currtext, currtext.cget("font"))
-        bold_italic_font.configure(weight=font.BOLD, slant=font.ITALIC)
-        settings = Settings()
-        style = get_style_by_name(settings.get_settings('pygments'))
-
-        for ttype, ndef in style:
-            tag_font = None
-
-            if ndef["bold"] and ndef["italic"]:
-                tag_font = bold_italic_font
-            elif ndef["bold"]:
-                tag_font = bold_font
-            elif ndef["italic"]:
-                tag_font = italic_font
-
-            if ndef["color"]:
-                foreground = "#%s" % ndef["color"]
-            else:
-                foreground = None
-
-            currtext.tag_configure(
-                str(ttype), foreground=foreground, font=tag_font)
-
-def recolorize(textbox: EnhancedText) -> None:
-    """
-    This method colors and styles the prepared tags"""
-    try:
-        currtext = textbox
-        _code = currtext.get("1.0", "end-1c")
-        tokensource = currtext.lexer.get_tokens(_code)
-        start_line = 1
-        start_index = 0
-        end_line = 1
-        end_index = 0
-
-        for ttype, value in tokensource:
-            if "\n" in value:
-                end_line += value.count("\n")
-                end_index = len(value.rsplit("\n", 1)[1])
-            else:
-                end_index += len(value)
-
-            if value not in (" ", "\n"):
-                index1 = f"{start_line}.{start_index}"
-                index2 = f"{end_line}.{end_index}"
-
-                for tagname in currtext.tag_names(index1):
-                    if tagname not in ["sel", "found"]:
-                        currtext.tag_remove(tagname, index1, index2)
-
-                currtext.tag_add(str(ttype), index1, index2)
-
-            start_line = end_line
-            start_index = end_index
-
-        currtext.update()  # Have to update
-    except Exception:
-        pass
-
 
 class Editor:
     """The editor class."""
@@ -166,15 +97,22 @@ class Editor:
                 self.close_icon = tk.PhotoImage(file="Images/close.gif")
                 self.copy_icon = tk.PhotoImage(file="Images/copy-light.gif")
                 self.lint_icon = tk.PhotoImage(file="Images/lint-light.gif")
-                self.delete_icon = tk.PhotoImage(file="Images/delete-light.gif")
-                self.indent_icon = tk.PhotoImage(file="Images/indent-light.gif")
+                self.delete_icon = tk.PhotoImage(
+                    file="Images/delete-light.gif")
+                self.indent_icon = tk.PhotoImage(
+                    file="Images/indent-light.gif")
                 self.paste_icon = tk.PhotoImage(file="Images/paste-light.gif")
-                self.unindent_icon = tk.PhotoImage(file="Images/unindent-light.gif")
-                self.search_icon = tk.PhotoImage(file="Images/search-light.gif")
-                self.pyterm_icon = tk.PhotoImage(file="Images/py-term-light.gif")
+                self.unindent_icon = tk.PhotoImage(
+                    file="Images/unindent-light.gif")
+                self.search_icon = tk.PhotoImage(
+                    file="Images/search-light.gif")
+                self.pyterm_icon = tk.PhotoImage(
+                    file="Images/py-term-light.gif")
                 self.term_icon = tk.PhotoImage(file="Images/term-light.gif")
-                self.format_icon = tk.PhotoImage(file="Images/format-light.gif")
-                self.sel_all_icon = tk.PhotoImage(file="Images/sel-all-light.gif")
+                self.format_icon = tk.PhotoImage(
+                    file="Images/format-light.gif")
+                self.sel_all_icon = tk.PhotoImage(
+                    file="Images/sel-all-light.gif")
             else:
                 self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
                 self.lint_icon = tk.PhotoImage(file="Images/lint.gif")
@@ -297,7 +235,8 @@ class Editor:
             appmenu.add_separator()
             appmenu.add_command(label="Exit Editor", command=self.exit)
             appmenu.add_command(label="Restart app", command=self.restart)
-            appmenu.add_command(label="Check for updates", command=self.check_updates)
+            appmenu.add_command(label="Check for updates",
+                                command=self.check_updates)
 
             filemenu = tk.Menu(menubar, tearoff=0)
             filemenu.add_command(
@@ -420,7 +359,8 @@ class Editor:
                 label="Delete Next Word", command=self.del_word_right
             )
             editmenu.add_command(label="Move line up", command=self.mv_line_up)
-            editmenu.add_command(label="Move line down", command=self.mv_line_dn)
+            editmenu.add_command(label="Move line down",
+                                 command=self.mv_line_dn)
 
             self.codemenu = tk.Menu(menubar, tearoff=0)
             self.codemenu.add_command(
@@ -469,7 +409,8 @@ class Editor:
                 compound="left",
                 image=self.search_icon,
             )
-            self.codemenu.add_command(label="Bigger view", command=self.biggerview)
+            self.codemenu.add_command(
+                label="Bigger view", command=self.biggerview)
             self.codemenu.add_separator()
             self.codemenu.add_command(
                 label="Open Python Shell",
@@ -499,9 +440,12 @@ class Editor:
             navmenu.add_command(label="Word start", command=self.nav_wordstart)
 
             gitmenu = tk.Menu(menubar, tearoff=0)
-            gitmenu.add_command(label="Initialize", command=lambda: self.git("init"))
-            gitmenu.add_command(label="Commit", command=lambda: self.git("commit"))
-            gitmenu.add_command(label="Clone", command=lambda: self.git("clone"))
+            gitmenu.add_command(label="Initialize",
+                                command=lambda: self.git("init"))
+            gitmenu.add_command(
+                label="Commit", command=lambda: self.git("commit"))
+            gitmenu.add_command(
+                label="Clone", command=lambda: self.git("clone"))
 
             menubar.add_cascade(label="PyPlus", menu=appmenu)  # App menu
             menubar.add_cascade(label="File", menu=filemenu)
@@ -518,8 +462,10 @@ class Editor:
             self.right_click_menu.add_separator()
             self.right_click_menu.add_command(label="Cut", command=self.cut)
             self.right_click_menu.add_command(label="Copy", command=self.copy)
-            self.right_click_menu.add_command(label="Paste", command=self.paste)
-            self.right_click_menu.add_command(label="Delete", command=self.delete)
+            self.right_click_menu.add_command(
+                label="Paste", command=self.paste)
+            self.right_click_menu.add_command(
+                label="Delete", command=self.delete)
             self.right_click_menu.add_separator()
             self.right_click_menu.add_command(
                 label="Select All", command=self.select_all
@@ -550,7 +496,8 @@ class Editor:
             self.restart()
 
     def start_screen(self) -> None:
-        first_tab = tk.Canvas(self.nb, background=self.bg, highlightthickness=0)
+        first_tab = tk.Canvas(self.nb, background=self.bg,
+                              highlightthickness=0)
         first_tab.create_image(20, 20, anchor="nw", image=self.icon)
         fg = "#8dd9f7" if is_dark_color(self.bg) else "blue"
         first_tab.create_text(
@@ -662,7 +609,8 @@ class Editor:
                 self.master.title("PyPlus -- No file open")
                 logger.debug("update_title: No file open")
                 return "break"
-            self.master.title(f"PyPlus -- {self.tabs[self.get_tab()].file_dir}")
+            self.master.title(
+                f"PyPlus -- {self.tabs[self.get_tab()].file_dir}")
             logger.debug("update_title: OK")
             return "break"
         except Exception:
@@ -680,7 +628,8 @@ class Editor:
             index = currtext.index("insert")
             ln = index.split(".")[0]
             col = index.split(".")[1]
-            self.statusbar.label2.config(text=f"{self.tabs[self.get_tab()].file_dir} |")
+            self.statusbar.label2.config(
+                text=f"{self.tabs[self.get_tab()].file_dir} |")
             self.statusbar.label3.config(text=f"Line {ln} Col {col}")
             logger.debug("update_statusbar: OK")
             return "break"
@@ -754,7 +703,8 @@ class Editor:
                         return
                 if is_binary_string(open(file_dir, "rb").read()):
                     if askhex:
-                        dialog = YesNoDialog(self.master, "Error", "View in Hex?")
+                        dialog = YesNoDialog(
+                            self.master, "Error", "View in Hex?")
                         if dialog.result:
                             self.open_hex(file_dir)
                         logging.info("User pressed No.")
@@ -773,11 +723,14 @@ class Editor:
 
                 # Puts the contents of the file into the text widget.
                 currtext = self.tabs[new_tab].textbox
-                currtext.insert("end", file.read().replace("\t", " " * self.tabwidth))
+                currtext.insert("end", file.read().replace(
+                    "\t", " " * self.tabwidth))
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
-                currtext.set_lexer(self.file_settings_class.get_settings(extens))
-                currtext.lint_cmd = self.linter_settings_class.get_settings(extens)
+                currtext.set_lexer(
+                    self.file_settings_class.get_settings(extens))
+                currtext.lint_cmd = self.linter_settings_class.get_settings(
+                    extens)
                 currtext.cmd = self.cmd_settings_class.get_settings(extens)
                 currtext.format_command = self.format_settings_class.get_settings(
                     extens
@@ -835,7 +788,8 @@ class Editor:
                 return
             if os.access(self.tabs[curr_tab].file_dir, os.W_OK):
                 with open(self.tabs[curr_tab].file_dir, "w") as file:
-                    file.write(self.tabs[curr_tab].textbox.get(1.0, "end").strip())
+                    file.write(self.tabs[curr_tab].textbox.get(
+                        1.0, "end").strip())
             else:
                 ErrorInfoDialog(self.master, "File read only")
         except Exception:
@@ -843,7 +797,8 @@ class Editor:
 
     def copy(self) -> None:
         try:
-            sel = self.tabs[self.get_tab()].textbox.get(tk.SEL_FIRST, tk.SEL_LAST)
+            sel = self.tabs[self.get_tab()].textbox.get(
+                tk.SEL_FIRST, tk.SEL_LAST)
             self.tabs[self.get_tab()].textbox.clipboard_clear()
             self.tabs[self.get_tab()].textbox.clipboard_append(sel)
         except Exception:
@@ -936,7 +891,8 @@ class Editor:
                             )
                         )
                     )
-                run_in_terminal("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
+                run_in_terminal(
+                    "chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
         except Exception:
             ErrorInfoDialog(self.master, "This language is not supported.")
 
@@ -1099,8 +1055,10 @@ class Editor:
                 # Otherwise close the tab based on coordinates of center-click.
                 else:
                     try:
-                        index = event.widget.index("@%d,%d" % (event.x, event.y))
-                        selected_tab = self.nb.nametowidget(self.nb.tabs()[index])
+                        index = event.widget.index(
+                            "@%d,%d" % (event.x, event.y))
+                        selected_tab = self.nb.nametowidget(
+                            self.nb.tabs()[index])
                     except tk.TclError:
                         return
 
@@ -1155,7 +1113,8 @@ class Editor:
 
             try:
                 self.nb.insert(
-                    event.widget.index("@%d,%d" % (event.x, y)), self.nb.select()
+                    event.widget.index("@%d,%d" %
+                                       (event.x, y)), self.nb.select()
                 )
             except tk.TclError:
                 return
@@ -1176,7 +1135,8 @@ class Editor:
             update.pack(fill="both")
             update.bind(
                 "<Button-1>",
-                lambda e: webbrowser.open_new_tab(self.check_updates(popup=False)[1]),
+                lambda e: webbrowser.open_new_tab(
+                    self.check_updates(popup=False)[1]),
             )
         else:
             ttk.Label(ver, text="No updates available").pack(fill="both")
@@ -1383,7 +1343,8 @@ class Editor:
         currtext = self.tabs[self.get_tab()].textbox
         if not currtext.tag_ranges("sel"):
             return
-        selected_text = currtext.get("sel.first -1c linestart", "sel.last lineend")
+        selected_text = currtext.get(
+            "sel.first -1c linestart", "sel.last lineend")
         win = tk.Toplevel(self.master)
         win.resizable(0, 0)
         win.transient(self.master)
@@ -1448,10 +1409,12 @@ class Editor:
             url = dialog.result
             if not url:
                 return
-            subprocess.Popen(f"git clone {url} > {os.devnull}", shell=True, cwd=currdir)
+            subprocess.Popen(
+                f"git clone {url} > {os.devnull}", shell=True, cwd=currdir)
             return
         if not os.path.exists(path := os.path.join(currdir, ".git")):
-            ErrorInfoDialog(self.master, f"Not a git repository: {Path(path).parent}")
+            ErrorInfoDialog(
+                self.master, f"Not a git repository: {Path(path).parent}")
             return
         if action == "init":
             subprocess.Popen(
@@ -1522,11 +1485,12 @@ class Editor:
                 if block:
                     if text.startswith(comment_start):
                         currtext.insert(
-                            "insert", text[len(comment_start) : -len(comment_end)]
+                            "insert", text[len(comment_start): -len(comment_end)]
                         )
                         self.key()
                         return
-                    currtext.insert("insert", f"{comment_start} {text} {comment_end}")
+                    currtext.insert(
+                        "insert", f"{comment_start} {text} {comment_end}")
                     self.key()
                     return
                 for line in currtext.get(start_index, end_index).splitlines():
@@ -1548,7 +1512,8 @@ class Editor:
                         "insert", f"{line[len(comment_start):len(comment_end)]}\n"
                     )
                 else:
-                    currtext.insert("insert", f"{comment_start}{line}{comment_end}\n")
+                    currtext.insert(
+                        "insert", f"{comment_start}{line}{comment_end}\n")
             self.key()
         except (KeyError, AttributeError):
             return

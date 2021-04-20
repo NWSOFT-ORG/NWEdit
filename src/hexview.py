@@ -1,7 +1,8 @@
 """A Hex Viewer to view non-text documents."""
 
 from src.constants import BLOCK_HEIGHT, BLOCK_WIDTH, ENCODINGS
-from src.modules import codecs, os, tk, ttk
+from src.modules import codecs, os, tk, ttk, ttkthemes
+from src.dialogs import get_theme
 
 
 class HexView:
@@ -27,6 +28,10 @@ class HexView:
 
         self.frame = ttk.Frame(self.parent)
         buttonframe = ttk.Frame(self.parent)
+        self._style = ttkthemes.ThemedStyle()
+        self._style.set_theme(get_theme())
+        bg = self._style.lookup("TLabel", "background")
+        fg = self._style.lookup("TLabel", "foreground")
         self.encoding_label = ttk.Label(buttonframe, text="Encoding")
         self.encoding_combobox = ttk.Combobox(
             buttonframe, values=ENCODINGS, textvariable=self.encoding, state="readonly"
@@ -37,6 +42,11 @@ class HexView:
             width=2 + (BLOCK_WIDTH * 4),
             state="disabled",
             wrap="none",
+            bg=bg,
+            fg=fg,
+            selectbackground=fg,
+            selectforeground=bg,
+            highlightthickness=0
         )
 
         self.textbox.tag_configure("ascii", foreground="green")

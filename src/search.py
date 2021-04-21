@@ -19,7 +19,7 @@ class Search:
         bg = self._style.lookup("TLabel", "background")
         fg = self._style.lookup("TLabel", "foreground")
 
-        if self.text.searchable:
+        if self.text.searchable or self.text.navigate:
             return
         if not self.text.tag_ranges("sel"):
             self.start = "1.0"

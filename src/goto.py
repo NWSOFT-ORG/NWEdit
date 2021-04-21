@@ -6,7 +6,7 @@ from src.functions import darken_color
 class Navigate:
     def __init__(self, tabwidget: ttk.Notebook, tablist: dict):
         self.text: tk.Text = tablist[tabwidget.nametowidget(tabwidget.select())].textbox
-        if self.text.navigate:
+        if self.text.navigate or self.text.searchable:
             return
         self.text.navigate = True
         self.goto_frame = ttk.Frame(self.text.frame)

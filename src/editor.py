@@ -41,7 +41,7 @@ from src.functions import (
 from src.Git.commitview import CommitView
 from src.goto import Navigate
 from src.hexview import HexView
-from src.menubar import CustomMenubar
+from src.menubar import MenuItem, Menubar
 from src.modules import (EditorErr, Path, json,
                          lexers, logging, os, subprocess, sys, tk,
                          ttk, ttkthemes, webbrowser)
@@ -88,7 +88,7 @@ class Editor:
             logger.debug("Settings loaded")
 
             self.master = master
-            self.master.geometry("900x600")
+            self.master.geometry("1200x800")
             self.style = ttkthemes.ThemedStyle(self.master)
             self.style.set_theme(self.theme)
             self.bg = self.style.lookup("TLabel", "background")
@@ -165,11 +165,8 @@ class Editor:
                 "WM_DELETE_WINDOW", lambda: self.exit(force=False)
             )  # When the window is closed, or quit from Mac, do exit action
             self.master.createcommand("::tk::mac::Quit", self.exit)
-            if not OSX:
-                menubar = CustomMenubar(self.master)
-                menubar.pack(fill="x", side="top")
-            else:
-                menubar = tk.Menu(self.master)
+            menubar = Menubar(self.master)
+            menubar.pack(fill="x", side="top")
             self.pandedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.pandedwin.pack(fill="both", expand=1)
             self.nb = ClosableNotebook(self.master, self.close_tab)
@@ -181,148 +178,110 @@ class Editor:
             self.nb.enable_traversal()
             self.statusbar = Statusbar()
             # Name can be apple only, don't really know why!
-            appmenu = tk.Menu(menubar, name="apple", tearoff=0)
+            appmenu = MenuItem()
 
             appmenu.add_command(label="About PyPlus", command=self._version)
-            preferences = tk.Menu(
-                appmenu,
-                tearoff=0,
-                cursor="left_ptr",
-                activebackground=self.fg,
-                activeforeground=self.bg,
-                bg=self.bg,
-                fg=self.fg,
-                relief="ridge",
-            )
-            preferences.add_command(
+            appmenu.add_command(
                 label="General Settings",
                 command=lambda: self.open_file(
                     APPDIR + "/Settings/general-settings" ".json"
                 ),
             )
-            preferences.add_command(
+            appmenu.add_command(
                 label="Format Command Settings",
                 command=lambda: self.open_file(
                     APPDIR + "/Settings/format-settings" ".json"
                 ),
             )
-            preferences.add_command(
+            appmenu.add_command(
                 label="Lexer Settings",
                 command=lambda: self.open_file(
                     APPDIR + "/Settings/lexer-settings" ".json"
                 ),
             )
-            preferences.add_command(
+            appmenu.add_command(
                 label="Linter Settings",
                 command=lambda: self.open_file(
                     APPDIR + "/Settings/linter-settings" ".json"
                 ),
             )
-            preferences.add_command(
+            appmenu.add_command(
                 label="Run Command Settings",
                 command=lambda: self.open_file(
                     APPDIR + "/Settings/cmd-settings" ".json"
                 ),
             )
-            preferences.add_separator()
-            preferences.add_command(
+            appmenu.add_command(
                 label="Backup Settings to...", command=self.settings_class.zipsettings
             )
-            preferences.add_command(
+            appmenu.add_command(
                 label="Load Settings from...", command=self.settings_class.unzipsettings
             )
-            appmenu.add_cascade(label="Preferences", menu=preferences)
-            appmenu.add_separator()
             appmenu.add_command(label="Exit Editor", command=self.exit)
             appmenu.add_command(label="Restart app", command=self.restart)
             appmenu.add_command(label="Check for updates",
                                 command=self.check_updates)
 
-            filemenu = tk.Menu(menubar, tearoff=0)
+            filemenu = MenuItem()
             filemenu.add_command(
                 label="New...",
                 command=self.filetree.new_file,
-                compound="left",
-                accelerator=f"{MAIN_KEY}-n",
                 image=self.new_icon,
             )
             filemenu.add_command(
                 label="Open File",
                 command=self._open,
-                accelerator=f"{MAIN_KEY}-o",
-                compound="left",
                 image=self.open_icon,
             )
             filemenu.add_command(
                 label="Open File in Hex",
                 command=self.openhex,
-                accelerator=f"{MAIN_KEY}-Shift-o",
-                compound="left",
                 image=self.open_icon,
             )
             filemenu.add_command(
                 label="Save Copy to...",
                 command=self._saveas,
-                accelerator=f"{MAIN_KEY}-Shift-S",
-                compound="left",
                 image=self.save_as_icon,
             )
             filemenu.add_command(
                 label="Close Tab",
                 command=self.close_tab,
-                accelerator=f"{MAIN_KEY}-w",
-                compound="left",
                 image=self.close_icon,
             )
             filemenu.add_command(
                 label="Reload all files from disk",
                 command=self.reload,
-                accelerator=f"{MAIN_KEY}-r",
-                compound="left",
                 image=self.reload_icon,
             )
 
-            editmenu = tk.Menu(menubar, tearoff=0)
+            editmenu = MenuItem()
             editmenu.add_command(
                 label="Undo",
                 command=self.undo,
-                accelerator=f"{MAIN_KEY}-z",
-                compound="left",
                 image=self.undo_icon,
             )
             editmenu.add_command(
                 label="Redo",
                 command=self.redo,
-                accelerator=f"{MAIN_KEY}-Shift-z",
-                compound="left",
                 image=self.redo_icon,
             )
-            editmenu.add_separator()
             editmenu.add_command(
                 label="Cut",
                 command=self.cut,
-                accelerator=f"{MAIN_KEY}-x",
-                compound="left",
                 image=self.cut_icon,
             )
             editmenu.add_command(
                 label="Copy",
                 command=self.copy,
-                accelerator=f"{MAIN_KEY}-c",
-                compound="left",
                 image=self.copy_icon,
             )
             editmenu.add_command(
                 label="Paste",
                 command=self.paste,
-                accelerator=f"{MAIN_KEY}-v",
-                compound="left",
                 image=self.paste_icon,
             )
-            editmenu.add_separator()
             editmenu.add_command(
                 label="Delete Selected",
-                compound="left",
                 image=self.delete_icon,
                 command=self.delete,
             )
@@ -330,16 +289,12 @@ class Editor:
                 label="Duplicate Line or Selected", command=self.duplicate_line
             )
             editmenu.add_command(label="Join lines", command=self.join_lines)
-            editmenu.add_separator()
             editmenu.add_command(label="Swap case", command=self.swap_case)
             editmenu.add_command(label="Upper case", command=self.upper_case)
             editmenu.add_command(label="Lower case", command=self.lower_case)
-            editmenu.add_separator()
             editmenu.add_command(
                 label="Select All",
                 command=self.select_all,
-                accelerator=f"{MAIN_KEY}-a",
-                compound="left",
                 image=self.sel_all_icon,
             )
             editmenu.add_command(label="Select Line", command=self.sel_line)
@@ -350,7 +305,6 @@ class Editor:
             editmenu.add_command(
                 label="Select Next Word", command=self.sel_word_right
             )
-            editmenu.add_separator()
             editmenu.add_command(label="Delete Word", command=self.del_word)
             editmenu.add_command(
                 label="Delete Prev Word", command=self.del_word_left
@@ -362,84 +316,67 @@ class Editor:
             editmenu.add_command(label="Move line down",
                                  command=self.mv_line_dn)
 
-            self.codemenu = tk.Menu(menubar, tearoff=0)
+            self.codemenu = MenuItem()
             self.codemenu.add_command(
                 label="Indent",
                 command=lambda: self.indent("indent"),
-                accelerator=f"{MAIN_KEY}-i",
-                compound="left",
                 image=self.indent_icon,
             )
             self.codemenu.add_command(
                 label="Unident",
                 command=lambda: self.indent("unindent"),
-                accelerator=f"{MAIN_KEY}-u",
-                compound="left",
                 image=self.unindent_icon,
             )
-            self.codemenu.add_separator()
             self.codemenu.add_command(
                 label="Comment/Uncomment Line or Selected", command=self.comment_lines
             )
-            self.codemenu.add_separator()
             self.codemenu.add_command(
                 label="Run",
                 command=self.run,
-                accelerator=f"{MAIN_KEY}-b",
-                compound="left",
                 image=self.run_icon,
             )
             self.codemenu.add_command(
                 label="Lint",
                 command=self.lint_source,
-                compound="left",
                 image=self.lint_icon,
             )
             self.codemenu.add_command(
                 label="Auto-format",
                 command=self.autopep,
-                compound="left",
                 image=self.format_icon,
             )
-            self.codemenu.add_separator()
             self.codemenu.add_command(
                 label="Find and replace",
                 command=self.search,
-                accelerator=f"{MAIN_KEY}-f",
-                compound="left",
                 image=self.search_icon,
             )
             self.codemenu.add_command(
                 label="Bigger view", command=self.biggerview)
-            self.codemenu.add_separator()
             self.codemenu.add_command(
                 label="Open Python Shell",
                 command=self.python_shell,
-                compound="left",
                 image=self.pyterm_icon,
             )
             self.codemenu.add_command(
                 label="Open System Shell",
                 command=self.system_shell,
-                compound="left",
                 image=self.term_icon,
             )
-            self.codemenu.add_separator()
             self.codemenu.add_command(
                 label="Unit tests",
                 command=self.test,
             )
 
-            navmenu = tk.Menu(menubar, tearoff=0)
+            navmenu = MenuItem()
             navmenu.add_command(
-                label="Go to ...", command=self.goto, accelerator=f"{MAIN_KEY}-Shift-N"
+                label="Go to ...", command=self.goto
             )
             navmenu.add_command(label="-1 char", command=self.nav_1cb)
             navmenu.add_command(label="+1 char", command=self.nav_1cf)
             navmenu.add_command(label="Word end", command=self.nav_wordend)
             navmenu.add_command(label="Word start", command=self.nav_wordstart)
 
-            gitmenu = tk.Menu(menubar, tearoff=0)
+            gitmenu = MenuItem()
             gitmenu.add_command(label="Initialize",
                                 command=lambda: self.git("init"))
             gitmenu.add_command(
@@ -454,19 +391,18 @@ class Editor:
             menubar.add_cascade(label="Navigate", menu=navmenu)
             menubar.add_cascade(label="Git", menu=gitmenu)
             if OSX:
-                self.master.config(menu=menubar)
+                menu = tk.Menu(self.master)
+                self.master.config(menu=menu)
             logger.debug("Menu created")
-            self.right_click_menu = tk.Menu(self.master, tearoff=0)
+            self.right_click_menu = tk.Menu()
             self.right_click_menu.add_command(label="Undo", command=self.undo)
             self.right_click_menu.add_command(label="Redo", command=self.redo)
-            self.right_click_menu.add_separator()
             self.right_click_menu.add_command(label="Cut", command=self.cut)
             self.right_click_menu.add_command(label="Copy", command=self.copy)
             self.right_click_menu.add_command(
                 label="Paste", command=self.paste)
             self.right_click_menu.add_command(
                 label="Delete", command=self.delete)
-            self.right_click_menu.add_separator()
             self.right_click_menu.add_command(
                 label="Select All", command=self.select_all
             )

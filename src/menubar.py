@@ -1,57 +1,28 @@
-from src.modules import tk, ttk, ttkthemes
-from src.settings import Settings
+from src.modules import ttk, tk
 
 
-class CustomMenubar(ttk.Frame):
-    def __init__(self, *args, **kwargs):
-        ttk.Frame.__init__(self, *args, **kwargs)
-        self._opened_menu = None
-        self._opened_menu = None
-        settings = Settings()
-        theme = settings.get_settings("theme")
-        self._style = ttkthemes.ThemedStyle()
-        self._style.set_theme(theme)
+class MenuItem:
+    def __init__(self) -> None:
+        self.items = []
+        self.commands = []
+        self.images = []
 
-    def add_cascade(self, label, menu):
-        label_widget = ttk.Label(
-            self,
-            text=label,
-            padding=[6, 1, 1, 1],
-            font="Arial 10",
-        )
-        bg = self._style.lookup("TLabel", "background")
-        fg = self._style.lookup("TLabel", "foreground")
+    def add_command(self, label: str = None, command: callable = None, image: tk.PhotoImage = None) -> None:
+        self.items.append(label)
+        self.commands.append(command)
+        self.images.append(image)
 
-        menu.config(
-            cursor="left_ptr",
-            activebackground=fg,
-            activeforeground=bg,
-            bg=bg,
-            fg=fg,
-            relief="ridge",
-        )
 
-        label_widget.pack(side="left")
+class Menubar(ttk.Notebook):
+    def __init__(self, *args, **kwargs) -> None:
+        ttk.Notebook.__init__(self, *args, **kwargs)
 
-        def enter(event):
-            label_widget.state(("active",))
-            if self._opened_menu is not None:
-                self._opened_menu.unpost()
-                click(event)
-
-        def leave(_):
-            label_widget.state(("!active",))
-
-        def click(_):
-            try:
-                self._opened_menu = menu
-                menu.tk_popup(
-                    label_widget.winfo_rootx(),
-                    label_widget.winfo_rooty() + label_widget.winfo_height(),
-                )
-            finally:
-                self._opened_menu = None
-
-        label_widget.bind("<Enter>", enter, True)
-        label_widget.bind("<Leave>", leave, True)
-        label_widget.bind("<1>", click, True)
+    def add_cascade(self, label: str, menu: MenuItem) -> None:
+        frame = ttk.Frame(self)
+        for index, item in enumerate(menu.items):
+            image = menu.images[index]
+            command = menu.commands[index]
+            btn = ttk.Button(frame, text=item, compound='top',
+                       image=image, command=command)
+            btn.pack(side='left', fill='both')
+        self.add(text=label, child=frame)

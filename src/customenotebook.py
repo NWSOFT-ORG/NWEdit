@@ -76,7 +76,17 @@ class ClosableNotebook(ttk.Notebook):
         style.configure(
             "CustomNotebook.Tab", background=lighten_color(self.bg, 20, 20, 20)
         )
-        style.layout("CustomNotebook", [("CustomNotebook.client", {"sticky": "nswe"})])
+        style.layout(
+            "CustomNotebook",
+            [
+                (
+                    "CustomNotebook.client",
+                    {
+                        "sticky": "nswe",
+                    },
+                )
+            ],
+        )
         style.layout(
             "CustomNotebook.Tab",
             [
@@ -92,22 +102,13 @@ class ClosableNotebook(ttk.Notebook):
                                     "sticky": "nswe",
                                     "children": [
                                         (
-                                            "CustomNotebook.focus",
-                                            {
-                                                "side": "top",
-                                                "sticky": "nswe",
-                                                "children": [
-                                                    (
-                                                        "CustomNotebook.label",
-                                                        {"side": "left", "sticky": ""},
-                                                    ),
-                                                    (
-                                                        "CustomNotebook.close",
-                                                        {"side": "left", "sticky": ""},
-                                                    ),
-                                                ],
-                                            },
-                                        )
+                                            "CustomNotebook.label",
+                                            {"side": "left", "sticky": ""},
+                                        ),
+                                        (
+                                            "CustomNotebook.close",
+                                            {"side": "left", "sticky": ""},
+                                        ),
                                     ],
                                 },
                             )

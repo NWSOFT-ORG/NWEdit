@@ -46,7 +46,7 @@ class HexView:
             fg=fg,
             selectbackground=fg,
             selectforeground=bg,
-            highlightthickness=0
+            highlightthickness=0,
         )
 
         self.textbox.tag_configure("ascii", foreground="green")

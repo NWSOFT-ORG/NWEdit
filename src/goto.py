@@ -36,7 +36,7 @@ class Navigate:
 
     def check(self) -> bool:
         index = self.place.get().split(".")
-        lines = int(float(self.text.index('end')))
+        lines = int(float(self.text.index("end")))
         if (not len(index) == 2) or index[0] > lines:
             self.statuslabel.config(text=f'Error: invalid index: {".".join(index)}')
             return False

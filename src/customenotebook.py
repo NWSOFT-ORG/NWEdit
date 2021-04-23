@@ -73,7 +73,9 @@ class ClosableNotebook(ttk.Notebook):
         style = ttk.Style()
 
         style.element_create("close", "image", "img_close", border=10, sticky="")
-        style.configure("CustomNotebook.Tab", background=lighten_color(self.bg, 20, 20, 20))
+        style.configure(
+            "CustomNotebook.Tab", background=lighten_color(self.bg, 20, 20, 20)
+        )
         style.layout("CustomNotebook", [("CustomNotebook.client", {"sticky": "nswe"})])
         style.layout(
             "CustomNotebook.Tab",

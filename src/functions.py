@@ -19,11 +19,13 @@ def hex2dec(hex_code) -> int:
         hex_code = hex_code[1:]
     return int(hex_code, 16)
 
+
 def dec2hex(dec, color_code: bool = False) -> str:
     dec = hex(dec)
     if color_code:
-        dec = '#' + dec[2:]
+        dec = "#" + dec[2:]
     return dec
+
 
 def is_dark_color(hex_code) -> bool:
     if hex_code.startswith("#"):
@@ -36,25 +38,32 @@ def is_dark_color(hex_code) -> bool:
         return True
     return False
 
+
 def darken_color(hex_code, red, green, blue) -> bool:
     hex_code = hex_code[1:]
-    rgb = (hex2dec(hex_code[:2]) - red,
-    hex2dec(hex_code[2:4]) - green,
-    hex2dec(hex_code[4:]) - blue)
-    value = '#'
+    rgb = (
+        hex2dec(hex_code[:2]) - red,
+        hex2dec(hex_code[2:4]) - green,
+        hex2dec(hex_code[4:]) - blue,
+    )
+    value = "#"
     for x in rgb:
         value += dec2hex(x)[2:]
     return value
 
+
 def lighten_color(hex_code, red, green, blue) -> bool:
     hex_code = hex_code[1:]
-    rgb = (hex2dec(hex_code[:2]) + red,
-    hex2dec(hex_code[2:4]) + green,
-    hex2dec(hex_code[4:]) + blue)
-    value = '#'
+    rgb = (
+        hex2dec(hex_code[:2]) + red,
+        hex2dec(hex_code[2:4]) + green,
+        hex2dec(hex_code[4:]) + blue,
+    )
+    value = "#"
     for x in rgb:
         value += dec2hex(x)[2:]
     return value
+
 
 def download_file(url, localfile=None) -> str:
     """Downloads a file from remote path"""

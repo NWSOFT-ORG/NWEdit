@@ -1,8 +1,7 @@
 from src.constants import APPDIR
 from src.dialogs import ErrorInfoDialog
 from src.filedialog import DirectoryOpenDialog, FileOpenDialog
-from src.modules import (EditorErr, JSONLexer, Path, json, lexers, os, sys,
-                         zipfile)
+from src.modules import EditorErr, JSONLexer, Path, json, lexers, os, sys, zipfile
 
 
 class Settings:

@@ -1,166 +1,131 @@
-diff --git a/node_modules/table/node_modules/@typescript-eslint/eslint-plugin/dist/configs/all.js b/node_modules/table/node_modules/@typescript-eslint/eslint-plugin/dist/configs/all.js
-new file mode 100644
-index 00000000..a0448530
---- /dev/null
-+++ b/node_modules/table/node_modules/@typescript-eslint/eslint-plugin/dist/configs/all.js
-@@ -0,0 +1,159 @@
-+"use strict";
-+// THIS CODE WAS AUTOMATICALLY GENERATED
-+// DO NOT EDIT THIS CODE BY HAND
-+// YOU CAN REGENERATE IT USING yarn generate:configs
-+module.exports = {
-+    extends: ['./configs/base', './configs/eslint-recommended'],
-+    rules: {
-+        '@typescript-eslint/adjacent-overload-signatures': 'error',
-+        '@typescript-eslint/array-type': 'error',
-+        '@typescript-eslint/await-thenable': 'error',
-+        '@typescript-eslint/ban-ts-comment': 'error',
-+        '@typescript-eslint/ban-tslint-comment': 'error',
-+        '@typescript-eslint/ban-types': 'error',
-+        'brace-style': 'off',
-+        '@typescript-eslint/brace-style': 'error',
-+        '@typescript-eslint/class-literal-property-style': 'error',
-+        'comma-dangle': 'off',
-+        '@typescript-eslint/comma-dangle': 'error',
-+        'comma-spacing': 'off',
-+        '@typescript-eslint/comma-spacing': 'error',
-+        '@typescript-eslint/consistent-indexed-object-style': 'error',
-+        '@typescript-eslint/consistent-type-assertions': 'error',
-+        '@typescript-eslint/consistent-type-definitions': 'error',
-+        '@typescript-eslint/consistent-type-imports': 'error',
-+        'default-param-last': 'off',
-+        '@typescript-eslint/default-param-last': 'error',
-+        'dot-notation': 'off',
-+        '@typescript-eslint/dot-notation': 'error',
-+        '@typescript-eslint/explicit-function-return-type': 'error',
-+        '@typescript-eslint/explicit-member-accessibility': 'error',
-+        '@typescript-eslint/explicit-module-boundary-types': 'error',
-+        'func-call-spacing': 'off',
-+        '@typescript-eslint/func-call-spacing': 'error',
-+        indent: 'off',
-+        '@typescript-eslint/indent': 'error',
-+        'init-declarations': 'off',
-+        '@typescript-eslint/init-declarations': 'error',
-+        'keyword-spacing': 'off',
-+        '@typescript-eslint/keyword-spacing': 'error',
-+        'lines-between-class-members': 'off',
-+        '@typescript-eslint/lines-between-class-members': 'error',
-+        '@typescript-eslint/member-delimiter-style': 'error',
-+        '@typescript-eslint/member-ordering': 'error',
-+        '@typescript-eslint/method-signature-style': 'error',
-+        '@typescript-eslint/naming-convention': 'error',
-+        'no-array-constructor': 'off',
-+        '@typescript-eslint/no-array-constructor': 'error',
-+        '@typescript-eslint/no-base-to-string': 'error',
-+        '@typescript-eslint/no-confusing-non-null-assertion': 'error',
-+        '@typescript-eslint/no-confusing-void-expression': 'error',
-+        'no-dupe-class-members': 'off',
-+        '@typescript-eslint/no-dupe-class-members': 'error',
-+        'no-duplicate-imports': 'off',
-+        '@typescript-eslint/no-duplicate-imports': 'error',
-+        '@typescript-eslint/no-dynamic-delete': 'error',
-+        'no-empty-function': 'off',
-+        '@typescript-eslint/no-empty-function': 'error',
-+        '@typescript-eslint/no-empty-interface': 'error',
-+        '@typescript-eslint/no-explicit-any': 'error',
-+        '@typescript-eslint/no-extra-non-null-assertion': 'error',
-+        'no-extra-parens': 'off',
-+        '@typescript-eslint/no-extra-parens': 'error',
-+        'no-extra-semi': 'off',
-+        '@typescript-eslint/no-extra-semi': 'error',
-+        '@typescript-eslint/no-extraneous-class': 'error',
-+        '@typescript-eslint/no-floating-promises': 'error',
-+        '@typescript-eslint/no-for-in-array': 'error',
-+        '@typescript-eslint/no-implicit-any-catch': 'error',
-+        'no-implied-eval': 'off',
-+        '@typescript-eslint/no-implied-eval': 'error',
-+        '@typescript-eslint/no-inferrable-types': 'error',
-+        'no-invalid-this': 'off',
-+        '@typescript-eslint/no-invalid-this': 'error',
-+        '@typescript-eslint/no-invalid-void-type': 'error',
-+        'no-loop-func': 'off',
-+        '@typescript-eslint/no-loop-func': 'error',
-+        'no-loss-of-precision': 'off',
-+        '@typescript-eslint/no-loss-of-precision': 'error',
-+        'no-magic-numbers': 'off',
-+        '@typescript-eslint/no-magic-numbers': 'error',
-+        '@typescript-eslint/no-misused-new': 'error',
-+        '@typescript-eslint/no-misused-promises': 'error',
-+        '@typescript-eslint/no-namespace': 'error',
-+        '@typescript-eslint/no-non-null-asserted-optional-chain': 'error',
-+        '@typescript-eslint/no-non-null-assertion': 'error',
-+        '@typescript-eslint/no-parameter-properties': 'error',
-+        'no-redeclare': 'off',
-+        '@typescript-eslint/no-redeclare': 'error',
-+        '@typescript-eslint/no-require-imports': 'error',
-+        'no-shadow': 'off',
-+        '@typescript-eslint/no-shadow': 'error',
-+        '@typescript-eslint/no-this-alias': 'error',
-+        'no-throw-literal': 'off',
-+        '@typescript-eslint/no-throw-literal': 'error',
-+        '@typescript-eslint/no-type-alias': 'error',
-+        '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
-+        '@typescript-eslint/no-unnecessary-condition': 'error',
-+        '@typescript-eslint/no-unnecessary-qualifier': 'error',
-+        '@typescript-eslint/no-unnecessary-type-arguments': 'error',
-+        '@typescript-eslint/no-unnecessary-type-assertion': 'error',
-+        '@typescript-eslint/no-unnecessary-type-constraint': 'error',
-+        '@typescript-eslint/no-unsafe-assignment': 'error',
-+        '@typescript-eslint/no-unsafe-call': 'error',
-+        '@typescript-eslint/no-unsafe-member-access': 'error',
-+        '@typescript-eslint/no-unsafe-return': 'error',
-+        'no-unused-expressions': 'off',
-+        '@typescript-eslint/no-unused-expressions': 'error',
-+        'no-unused-vars': 'off',
-+        '@typescript-eslint/no-unused-vars': 'error',
-+        'no-use-before-define': 'off',
-+        '@typescript-eslint/no-use-before-define': 'error',
-+        'no-useless-constructor': 'off',
-+        '@typescript-eslint/no-useless-constructor': 'error',
-+        '@typescript-eslint/no-var-requires': 'error',
-+        '@typescript-eslint/non-nullable-type-assertion-style': 'error',
-+        'object-curly-spacing': 'off',
-+        '@typescript-eslint/object-curly-spacing': 'error',
-+        '@typescript-eslint/prefer-as-const': 'error',
-+        '@typescript-eslint/prefer-enum-initializers': 'error',
-+        '@typescript-eslint/prefer-for-of': 'error',
-+        '@typescript-eslint/prefer-function-type': 'error',
-+        '@typescript-eslint/prefer-includes': 'error',
-+        '@typescript-eslint/prefer-literal-enum-member': 'error',
-+        '@typescript-eslint/prefer-namespace-keyword': 'error',
-+        '@typescript-eslint/prefer-nullish-coalescing': 'error',
-+        '@typescript-eslint/prefer-optional-chain': 'error',
-+        '@typescript-eslint/prefer-readonly': 'error',
-+        '@typescript-eslint/prefer-readonly-parameter-types': 'error',
-+        '@typescript-eslint/prefer-reduce-type-parameter': 'error',
-+        '@typescript-eslint/prefer-regexp-exec': 'error',
-+        '@typescript-eslint/prefer-string-starts-ends-with': 'error',
-+        '@typescript-eslint/prefer-ts-expect-error': 'error',
-+        '@typescript-eslint/promise-function-async': 'error',
-+        quotes: 'off',
-+        '@typescript-eslint/quotes': 'error',
-+        '@typescript-eslint/require-array-sort-compare': 'error',
-+        'require-await': 'off',
-+        '@typescript-eslint/require-await': 'error',
-+        '@typescript-eslint/restrict-plus-operands': 'error',
-+        '@typescript-eslint/restrict-template-expressions': 'error',
-+        'no-return-await': 'off',
-+        '@typescript-eslint/return-await': 'error',
-+        semi: 'off',
-+        '@typescript-eslint/semi': 'error',
-+        '@typescript-eslint/sort-type-union-intersection-members': 'error',
-+        'space-before-function-paren': 'off',
-+        '@typescript-eslint/space-before-function-paren': 'error',
-+        'space-infix-ops': 'off',
-+        '@typescript-eslint/space-infix-ops': 'error',
-+        '@typescript-eslint/strict-boolean-expressions': 'error',
-+        '@typescript-eslint/switch-exhaustiveness-check': 'error',
-+        '@typescript-eslint/triple-slash-reference': 'error',
-+        '@typescript-eslint/type-annotation-spacing': 'error',
-+        '@typescript-eslint/typedef': 'error',
-+        '@typescript-eslint/unbound-method': 'error',
-+        '@typescript-eslint/unified-signatures': 'error',
-+    },
-+};
-+//# sourceMappingURL=all.js.map
-\ No newline at end of file
+diff --git a/src/highlighter.py b/src/highlighter.py
+index 23879e34..97689e5d 100644
+--- a/src/highlighter.py
++++ b/src/highlighter.py
+@@ -1,73 +1,72 @@
+ from src.modules import font, get_style_by_name, tk
+ from src.settings import Settings
+-import numba
+ 
+ 
+ def create_tags(textbox: tk.Text) -> None:
+-    """
++	"""
+     The method creates the tags associated with each distinct style element of the
+     source code 'dressing'"""
+-    currtext = textbox
+-    bold_font = font.Font(currtext, currtext.cget("font"))
+-    bold_font.configure(weight=font.BOLD)
+-    italic_font = font.Font(currtext, currtext.cget("font"))
+-    italic_font.configure(slant=font.ITALIC)
+-    bold_italic_font = font.Font(currtext, currtext.cget("font"))
+-    bold_italic_font.configure(weight=font.BOLD, slant=font.ITALIC)
+-    settings = Settings()
+-    style = get_style_by_name(settings.get_settings("pygments"))
++	currtext = textbox
++	bold_font = font.Font(currtext, currtext.cget("font"))
++	bold_font.configure(weight=font.BOLD)
++	italic_font = font.Font(currtext, currtext.cget("font"))
++	italic_font.configure(slant=font.ITALIC)
++	bold_italic_font = font.Font(currtext, currtext.cget("font"))
++	bold_italic_font.configure(weight=font.BOLD, slant=font.ITALIC)
++	settings = Settings()
++	style = get_style_by_name(settings.get_settings("pygments"))
+ 
+-    for ttype, ndef in style:
+-        tag_font = None
++	for ttype, ndef in style:
++		tag_font = None
+ 
+-        if ndef["bold"] and ndef["italic"]:
+-            tag_font = bold_italic_font
+-        elif ndef["bold"]:
+-            tag_font = bold_font
+-        elif ndef["italic"]:
+-            tag_font = italic_font
++		if ndef["bold"] and ndef["italic"]:
++			tag_font = bold_italic_font
++		elif ndef["bold"]:
++			tag_font = bold_font
++		elif ndef["italic"]:
++			tag_font = italic_font
+ 
+-        if ndef["color"]:
+-            foreground = "#%s" % ndef["color"]
+-        else:
+-            foreground = None
++		if ndef["color"]:
++			foreground = "#%s" % ndef["color"]
++		else:
++			foreground = None
+ 
+-        currtext.tag_configure(str(ttype), foreground=foreground, font=tag_font)
++		currtext.tag_configure(str(ttype),
++		                       foreground=foreground,
++		                       font=tag_font)
+ 
+-
+-@numba.njit
+-def recolorize(textbox: tk.Text) -> None:
+-    """
++def recolorize(textbox):
++	"""
+     This method colors and styles the prepared tags"""
+-    try:
+-        currtext = textbox
+-        _code = currtext.get("1.0", "end-1c")
+-        tokensource = currtext.lexer.get_tokens(_code)
+-        start_line = 1
+-        start_index = 0
+-        end_line = 1
+-        end_index = 0
++	try:
++		currtext = textbox
++		_code = currtext.get("1.0", "end-1c")
++		tokensource = currtext.lexer.get_tokens(_code)
++		start_line = 1
++		start_index = 0
++		end_line = 1
++		end_index = 0
+ 
+-        for ttype, value in tokensource:
+-            if "\n" in value:
+-                end_line += value.count("\n")
+-                end_index = len(value.rsplit("\n", 1)[1])
+-            else:
+-                end_index += len(value)
++		for ttype, value in tokensource:
++			if "\n" in value:
++				end_line += value.count("\n")
++				end_index = len(value.rsplit("\n", 1)[1])
++			else:
++				end_index += len(value)
+ 
+-            if value not in (" ", "\n"):
+-                index1 = f"{start_line}.{start_index}"
+-                index2 = f"{end_line}.{end_index}"
++			if value not in (" ", "\n"):
++				index1 = str(start_line) + '.' + str(start_index)
++				index2 = str(end_line) + '.' + str(end_index)
+ 
+-                for tagname in currtext.tag_names(index1):
+-                    if tagname not in ["sel", "found"]:
+-                        currtext.tag_remove(tagname, index1, index2)
++				for tagname in currtext.tag_names(index1):
++					if tagname not in ["sel", "found"]:
++						currtext.tag_remove(tagname, index1, index2)
+ 
+-                currtext.tag_add(str(ttype), index1, index2)
++				currtext.tag_add(str(ttype), index1, index2)
+ 
+-            start_line = end_line
+-            start_index = end_index
++			start_line = end_line
++			start_index = end_index
+ 
+-        currtext.update()  # Have to update
+-    except Exception:
+-        pass
++		currtext.update()  # Have to update
++	except Exception:
++		pass

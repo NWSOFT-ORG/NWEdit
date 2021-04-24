@@ -15,13 +15,13 @@ class CommitView:
 
         diff_frame = ttk.Frame(self.window)
         self.files_listbox = ttk.Treeview(diff_frame, show="tree")
-        self.refresh_files()
 
         self.files_listbox.pack(fill="both")
         self.files_listbox.tag_configure("added", foreground="green")
         self.files_listbox.tag_configure("modified", foreground="brown")
         self.files_listbox.tag_configure("deleted", foreground="red")
-        self.files_listbox.bind("<1>", self.click_files)
+        self.files_listbox.event_add('<<Click>>', '<1>')
+        self.files_listbox.bind("<<Click>>", self.click_files)
         self.files_listbox.bind("<Double-1>", self.diff)
         diff_frame.pack(fill="both")
 
@@ -29,51 +29,6 @@ class CommitView:
         commit_frame.pack(anchor="nw")
         self.committext = tk.Text(commit_frame, font="Arial", height=4)
         self.committext.pack()
-        ttk.Button(commit_frame, text="Commit >>", command=self.commit).pack(
-            side="bottom", fill="x"
-        )
-        self.window.mainloop()
-
-    def click_files(self, _=None):
-        item = self.files_listbox.focus()
-        self.selected = self.files_listbox.item(item, "text")[2:]
-
-    def commit(self, _=None):
-        if commit_msg := self.committext.get("1.0", "end"):
-            subprocess.Popen(
-                f'git commit -am "{commit_msg}"',
-                shell=True,
-                cwd=self.dir,
-            )
-            self.window.destroy()
-
-    def diff(self, _=None):
-        try:
-            diffwindow = tk.Toplevel(self.window)
-            diffwindow.resizable(0, 0)
-            textframe = EnhancedTextFrame(diffwindow)
-            difftext = textframe.text
-            difftext.lexer = lexers.get_lexer_by_name("diff")
-            create_tags(difftext)
-            recolorize(difftext)
-            difftext.update()
-            subprocess.Popen(
-                f'git diff --staged {self.selected} > \
-                            {os.path.join(APPDIR, "out.txt")}',
-                shell=True,
-                cwd=self.dir,
-            )
-            with open(os.path.join(APPDIR, "out.txt")) as f:
-                message = f.read()
-            os.remove("out.txt")
-            difftext.insert("end", message)
-            difftext.config(state="disabled", wrap="none")
-            textframe.pack(fill="both")
-            diffwindow.mainloop()
-        except Exception as e:
-            print(e, flush=True)
-
-    def refresh_files(self):
         self.files_listbox.delete(*self.files_listbox.get_children())
         modified_files = [
             "M " + x
@@ -145,3 +100,47 @@ class CommitView:
             self.files_listbox.insert("", "end", text=x, tags="deleted")
         for x in modified_files:
             self.files_listbox.insert("", "end", text=x, tags="modified")
+
+        ttk.Button(commit_frame, text="Commit >>", command=self.commit).pack(
+            side="bottom", fill="x"
+        )
+        self.window.mainloop()
+
+    def click_files(self, _=None):
+        item = self.files_listbox.focus()
+        self.selected = self.files_listbox.item(item, "text")[2:]
+
+    def commit(self, _=None):
+        if commit_msg := self.committext.get("1.0", "end"):
+            subprocess.Popen(
+                f'git commit -am "{commit_msg}"',
+                shell=True,
+                cwd=self.dir,
+            )
+            self.window.destroy()
+
+    def diff(self, _=None):
+        try:
+            diffwindow = tk.Toplevel(self.window)
+            diffwindow.resizable(0, 0)
+            textframe = EnhancedTextFrame(diffwindow)
+            difftext = textframe.text
+            difftext.lexer = lexers.get_lexer_by_name("diff")
+            create_tags(difftext)
+            recolorize(difftext)
+            difftext.update()
+            subprocess.Popen(
+                f'git diff --staged {self.selected} > \
+                            {os.path.join(APPDIR, "out.txt")}',
+                shell=True,
+                cwd=self.dir,
+            )
+            with open(os.path.join(APPDIR, "out.txt")) as f:
+                message = f.read()
+            os.remove("out.txt")
+            difftext.insert("end", message)
+            difftext.config(state="disabled", wrap="none")
+            textframe.pack(fill="both")
+            diffwindow.mainloop()
+        except Exception as e:
+            print(e, flush=True)

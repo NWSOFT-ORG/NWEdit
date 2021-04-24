@@ -1,0 +1,3 @@
+run="python3 main.py"
+[packager]
+ignoredPaths=["src"]

@@ -1,5 +1,6 @@
-﻿from src.modules import font, get_style_by_name, tk
+from src.modules import font, get_style_by_name, tk
 from src.settings import Settings
+import numba
 
 
 def create_tags(textbox: tk.Text) -> None:
@@ -34,6 +35,7 @@ def create_tags(textbox: tk.Text) -> None:
         currtext.tag_configure(str(ttype), foreground=foreground, font=tag_font)
 
 
+@numba.njit
 def recolorize(textbox: tk.Text) -> None:
     """
     This method colors and styles the prepared tags"""

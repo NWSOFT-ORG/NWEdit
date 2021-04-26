@@ -21,7 +21,7 @@ class CommitView:
         self.files_listbox.tag_configure("modified", foreground="brown")
         self.files_listbox.tag_configure("deleted", foreground="red")
         self.files_listbox.bind("<<DoubleClick>>", self.diff)
-        self.files_listbox.event_add('<<DoubleClick>>', "<Double-1>")
+        self.files_listbox.event_add("<<DoubleClick>>", "<Double-1>")
         diff_frame.pack(fill="both")
 
         commit_frame = ttk.Frame(self.window)

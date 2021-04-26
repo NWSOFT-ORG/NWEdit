@@ -198,7 +198,7 @@ class ViewDialog(tk.Toplevel):
 
         body = ttk.Frame(self)
         self.initial_focus = self.body(body)
-        body.pack(fill='both', expand=1)
+        body.pack(fill="both", expand=1)
 
         self.buttonbox()
 
@@ -216,20 +216,18 @@ class ViewDialog(tk.Toplevel):
 
     def body(self, master):
         self.treeview = ttk.Treeview(self)
-        self.treeview.pack(fill='both', expand=1)
+        self.treeview.pack(fill="both", expand=1)
         self.treeview.bind("<Double-1>", self.double_click)
 
         self.treeview.tag_configure("class", foreground="yellow")
-        self.treeview.tag_configure(
-            "function", foreground="#448dc4"
-        )
+        self.treeview.tag_configure("function", foreground="#448dc4")
 
     def buttonbox(self):
         box = ttk.Frame(self)
 
         w = ttk.Button(box, text="OK", width=10, command=self.cancel)
         w.pack(side="left")
-        box.pack(fill='both', expand=1)
+        box.pack(fill="both", expand=1)
 
     def cancel(self, event=None):
         # put focus back to the parent window
@@ -241,7 +239,7 @@ class ViewDialog(tk.Toplevel):
         filename = self.file
 
         self.treeview.heading("#0", text=filename)
-        self.treeview.column("#0", stretch='yes', minwidth=350, width=350)
+        self.treeview.column("#0", stretch="yes", minwidth=350, width=350)
         self.i = 0
 
         text_lines = self.text.get("1.0", "end-1c")
@@ -262,9 +260,7 @@ class ViewDialog(tk.Toplevel):
                 self.find_line[key] = x
 
                 for second_line in text[x:]:
-                    whitespaces_second = len(second_line) - len(
-                        second_line.lstrip()
-                    )
+                    whitespaces_second = len(second_line) - len(second_line.lstrip())
                     y += 1
                     new_class = False
                     if not new_class:

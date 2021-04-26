@@ -1294,9 +1294,7 @@ class Editor:
         win.mainloop()
 
     def test(self):
-        if not self.tabs:
-            return
-        TestDialog(self.master)
+        TestDialog(self.master, self.filetree.path)
 
     def check_updates(self, popup=True) -> list:
         if "DEV" in VERSION:

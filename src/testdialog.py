@@ -1,13 +1,16 @@
-from src.modules import tk, ttk
+from src.modules import tk, ttk, os
 from src.tktext import EnhancedTextFrame
 from src.dialogs import InputStringDialog
 
 
 class TestDialog(tk.Toplevel):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if args:
-            self.transient(args[0])
+    def __init__(self, parent, path):
+        if parent:
+            super().__init__(parent)
+            self.transient(parent)
+        if not os.path.exists(os.path.join(path, 'test.py')):
+            with open(os.path.join(path, 'test.py'), 'w') as f:
+                f.write('')
         self.title("Unit Tests")
         self.resizable(0, 0)
         self.tests_listbox = ttk.Treeview(self, show="tree")
@@ -26,10 +29,17 @@ class TestDialog(tk.Toplevel):
             return
         name = "test_" + name
         codewin = tk.Toplevel(self)
+        codewin.geometry('500x300')
         codewin.resizable(0, 0)
         codewin.transient(self)
         textframe = EnhancedTextFrame(codewin)
         textframe.pack(fill="both")
+        button_frame = ttk.Frame(codewin)
+        okbtn = ttk.Button(button_frame, text='OK')
+        okbtn.pack()
+        cancelbtn = ttk.Button(button_frame, text='Cancel')
+        cancelbtn.pack()
+        button_frame.pack()
         codewin.mainloop()
 
     def delete(self):

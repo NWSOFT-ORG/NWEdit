@@ -1,29 +1,37 @@
-2021-04-26 07:59:46,689 : INFO : <module> : Tkinter version: 8.6
-2021-04-26 07:59:46,689 : DEBUG : <module> : All modules imported
-2021-04-26 07:59:46,905 : DEBUG : __init__ : Settings loaded
-2021-04-26 07:59:47,367 : DEBUG : __init__ : Icons loaded
-2021-04-26 07:59:47,367 : DEBUG : __init__ : Theme loaded
-2021-04-26 07:59:47,379 : DEBUG : __initialize_custom_style : Initialized custom style.
-2021-04-26 07:59:47,477 : DEBUG : __init__ : Menu created
-2021-04-26 07:59:47,491 : DEBUG : __init__ : Right-click menu created
-2021-04-26 07:59:47,491 : DEBUG : __init__ : Bindings created
-2021-04-26 07:59:47,491 : DEBUG : update_title : update_title: No file open
-2021-04-26 07:59:47,491 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-04-26 07:59:47,515 : DEBUG : create_text_widget : Textbox created
-2021-04-26 07:59:47,777 : DEBUG : update_statusbar : update_statusbar: OK
-2021-04-26 07:59:47,777 : DEBUG : update_title : update_title: OK
-2021-04-26 07:59:47,777 : DEBUG : key : update_title: OK
-2021-04-26 07:59:47,780 : INFO : open_file : File opened
-2021-04-26 07:59:47,783 : DEBUG : start_screen : Start screen created
-2021-04-26 07:59:48,855 : DEBUG : update_statusbar : update_statusbar: OK
-2021-04-26 07:59:48,855 : DEBUG : update_title : update_title: OK
-2021-04-26 07:59:48,855 : DEBUG : mouse : update_title: OK
-2021-04-26 07:59:50,821 : DEBUG : update_statusbar : update_statusbar: OK
-2021-04-26 07:59:50,821 : DEBUG : update_title : update_title: OK
-2021-04-26 07:59:50,822 : DEBUG : mouse : update_title: OK
-2021-04-26 07:59:50,977 : DEBUG : update_statusbar : update_statusbar: OK
-2021-04-26 07:59:50,978 : DEBUG : update_title : update_title: OK
-2021-04-26 07:59:50,978 : DEBUG : mouse : update_title: OK
-2021-04-26 08:00:07,909 : DEBUG : update_statusbar : update_statusbar: OK
-2021-04-26 08:00:07,910 : DEBUG : update_title : update_title: OK
-2021-04-26 08:00:07,910 : DEBUG : mouse : update_title: OK
+2021-04-26 08:34:24,632 : INFO : <module> : Tkinter version: 8.6
+2021-04-26 08:34:24,633 : DEBUG : <module> : All modules imported
+2021-04-26 08:34:24,868 : DEBUG : __init__ : Settings loaded
+2021-04-26 08:34:25,442 : DEBUG : __init__ : Icons loaded
+2021-04-26 08:34:25,444 : DEBUG : __init__ : Theme loaded
+2021-04-26 08:34:25,459 : DEBUG : __initialize_custom_style : Initialized custom style.
+2021-04-26 08:34:25,555 : DEBUG : __init__ : Menu created
+2021-04-26 08:34:25,563 : DEBUG : __init__ : Right-click menu created
+2021-04-26 08:34:25,563 : DEBUG : __init__ : Bindings created
+2021-04-26 08:34:25,563 : DEBUG : update_title : update_title: No file open
+2021-04-26 08:34:25,563 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-26 08:34:25,573 : DEBUG : start_screen : Start screen created
+2021-04-26 08:34:31,527 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-26 08:34:31,527 : DEBUG : update_title : update_title: No file open
+2021-04-26 08:34:31,527 : DEBUG : mouse : update_title: OK
+2021-04-26 08:34:34,294 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-26 08:34:34,294 : DEBUG : update_title : update_title: No file open
+2021-04-26 08:34:34,294 : DEBUG : mouse : update_title: OK
+2021-04-26 08:34:36,521 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-26 08:34:36,524 : DEBUG : update_title : update_title: No file open
+2021-04-26 08:34:36,524 : DEBUG : mouse : update_title: OK
+2021-04-26 08:34:36,674 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-26 08:34:36,674 : DEBUG : update_title : update_title: No file open
+2021-04-26 08:34:36,674 : DEBUG : mouse : update_title: OK
+2021-04-26 08:34:38,148 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-26 08:34:38,148 : DEBUG : update_title : update_title: No file open
+2021-04-26 08:34:38,148 : DEBUG : mouse : update_title: OK
+2021-04-26 08:34:38,324 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-26 08:34:38,325 : DEBUG : update_title : update_title: No file open
+2021-04-26 08:34:38,325 : DEBUG : mouse : update_title: OK
+2021-04-26 08:34:40,069 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-26 08:34:40,069 : DEBUG : update_title : update_title: No file open
+2021-04-26 08:34:40,070 : DEBUG : mouse : update_title: OK
+2021-04-26 08:34:50,428 : INFO : apply : apply
+2021-04-26 08:34:54,836 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-04-26 08:34:54,837 : DEBUG : update_title : update_title: No file open
+2021-04-26 08:34:54,837 : DEBUG : mouse : update_title: OK

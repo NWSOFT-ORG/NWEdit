@@ -18,8 +18,8 @@ class ClosableNotebook(ttk.Notebook):
 
     def __init__(self, master, cmd):
         self.style = ttkthemes.ThemedStyle()
-        settings = Settings()
-        self.style.set_theme(settings.get_settings("theme"))
+        self.settings = Settings()
+        self.style.set_theme(self.settings.get_settings("theme"))
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
         if is_dark_color(self.bg):

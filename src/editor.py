@@ -27,7 +27,7 @@ from src.constants import (
     logger,
 )
 from src.customenotebook import ClosableNotebook
-from src.dialogs import ErrorInfoDialog, InputStringDialog, YesNoDialog
+from src.dialogs import ErrorInfoDialog, InputStringDialog, YesNoDialog, ViewDialog
 from src.filedialog import FileOpenDialog, FileSaveAsDialog
 from src.functions import (
     download_file,
@@ -375,6 +375,10 @@ class Editor:
             self.codemenu.add_command(
                 label="Unit tests",
                 command=self.test,
+            )
+            self.codemenu.add_command(
+                label="Classes and functions",
+                command=self.view,
             )
 
             self.navmenu = MenuItem()
@@ -845,6 +849,11 @@ class Editor:
         main_window.pack(fill="both", expand=1)
         shell_frame.mainloop()
 
+    def view(self):
+        file_dir = self.tabs[self.get_tab()].file_dir
+        text = self.tabs[self.get_tab()].textbox
+        ViewDialog(self.master, f"Classes and functions for {file_dir}", text, file_dir)
+
     def backspace(self, _=None) -> None:
         if not self.tabs:
             return
@@ -1033,7 +1042,7 @@ class Editor:
         self.__init__(newtk)
         newtk.mainloop()
 
-    def get_tab(self) -> tk.Misc:
+    def get_tab(self) -> Document:
         return self.nb.nametowidget(self.nb.select())
 
     def move_tab(self, event: tk.EventType) -> None:

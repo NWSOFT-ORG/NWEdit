@@ -20,9 +20,8 @@ class CommitView:
         self.files_listbox.tag_configure("added", foreground="green")
         self.files_listbox.tag_configure("modified", foreground="brown")
         self.files_listbox.tag_configure("deleted", foreground="red")
-        self.files_listbox.event_add('<<Click>>', '<1>')
-        self.files_listbox.bind("<<Click>>", self.click_files)
-        self.files_listbox.bind("<Double-1>", self.diff)
+        self.files_listbox.bind("<<DoubleClick>>", self.diff)
+        self.files_listbox.event_add('<<DoubleClick>>', "<Double-1>")
         diff_frame.pack(fill="both")
 
         commit_frame = ttk.Frame(self.window)
@@ -106,10 +105,6 @@ class CommitView:
         )
         self.window.mainloop()
 
-    def click_files(self, _=None):
-        item = self.files_listbox.focus()
-        self.selected = self.files_listbox.item(item, "text")[2:]
-
     def commit(self, _=None):
         if commit_msg := self.committext.get("1.0", "end"):
             subprocess.Popen(
@@ -119,18 +114,18 @@ class CommitView:
             )
             self.window.destroy()
 
-    def diff(self, _=None):
+    def diff(self, event=None):
         try:
+            item = self.files_listbox.identify("item", event.x, event.y)
+            selected = self.files_listbox.item(item, "text")[2:]
             diffwindow = tk.Toplevel(self.window)
             diffwindow.resizable(0, 0)
             textframe = EnhancedTextFrame(diffwindow)
             difftext = textframe.text
             difftext.lexer = lexers.get_lexer_by_name("diff")
-            create_tags(difftext)
-            recolorize(difftext)
             difftext.update()
-            subprocess.Popen(
-                f'git diff --staged {self.selected} > \
+            subprocess.run(
+                f'git diff --staged {selected} > \
                             {os.path.join(APPDIR, "out.txt")}',
                 shell=True,
                 cwd=self.dir,
@@ -139,6 +134,8 @@ class CommitView:
                 message = f.read()
             os.remove("out.txt")
             difftext.insert("end", message)
+            create_tags(difftext)
+            recolorize(difftext)
             difftext.config(state="disabled", wrap="none")
             textframe.pack(fill="both")
             diffwindow.mainloop()

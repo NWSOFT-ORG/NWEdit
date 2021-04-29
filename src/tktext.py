@@ -2,6 +2,7 @@
 
 from src.modules import font, get_style_by_name, tk, ttk
 from src.settings import Settings
+from src.functions import darken_color, is_dark_color, lighten_color
 
 
 class TextLineNumbers(tk.Canvas):
@@ -129,13 +130,19 @@ class EnhancedTextFrame(ttk.Frame):
         style = get_style_by_name(settings_class.get_settings("pygments"))
         bgcolor = style.background_color
         fgcolor = style.highlight_color
+        if is_dark_color(bgcolor):
+            bg = lighten_color(bgcolor, 30, 30, 30)
+            fg = lighten_color(fgcolor, 40, 40, 40)
+        else:
+            bg = darken_color(bgcolor, 30, 30, 30)
+            fg = darken_color(fgcolor, 40, 40, 40)
         self.text = EnhancedText(
             self,
             bg=bgcolor,
             fg=fgcolor,
-            selectforeground=bgcolor,
+            selectforeground=bg,
             selectbackground=fgcolor,
-            insertbackground=fgcolor,
+            insertbackground=fg,
             highlightthickness=0,
             font=self.font,
             wrap="none",

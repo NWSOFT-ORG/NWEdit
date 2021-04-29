@@ -1,6 +1,7 @@
 ﻿from src.modules import font, get_style_by_name, tk
 from src.settings import Settings
 
+
 def create_tags(textbox: tk.Text) -> None:
     """
     The method creates the tags associated with each distinct style element of the
@@ -30,8 +31,7 @@ def create_tags(textbox: tk.Text) -> None:
         else:
             foreground = None
 
-        currtext.tag_configure(
-            str(ttype), foreground=foreground, font=tag_font)
+        currtext.tag_configure(str(ttype), foreground=foreground, font=tag_font)
 
 
 def recolorize(textbox: tk.Text) -> None:
@@ -53,15 +53,14 @@ def recolorize(textbox: tk.Text) -> None:
             else:
                 end_index += len(value)
 
-            if value not in (" ", "\n"):
-                index1 = f"{start_line}.{start_index}"
-                index2 = f"{end_line}.{end_index}"
+            index1 = f"{start_line}.{start_index}"
+            index2 = f"{end_line}.{end_index}"
 
-                for tagname in currtext.tag_names(index1):
-                    if tagname not in ["sel", "found"]:
-                        currtext.tag_remove(tagname, index1, index2)
+            for tagname in currtext.tag_names(index1):
+                if tagname not in ["sel", "found"]:
+                    currtext.tag_remove(tagname, index1, index2)
 
-                currtext.tag_add(str(ttype), index1, index2)
+            currtext.tag_add(str(ttype), index1, index2)
 
             start_line = end_line
             start_index = end_index

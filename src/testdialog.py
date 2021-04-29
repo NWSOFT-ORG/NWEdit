@@ -1,6 +1,6 @@
-from src.modules import tk, ttk, os
-from src.tktext import EnhancedTextFrame
 from src.dialogs import InputStringDialog
+from src.modules import os, tk, ttk
+from src.tktext import EnhancedTextFrame
 
 
 class TestDialog(tk.Toplevel):
@@ -8,9 +8,9 @@ class TestDialog(tk.Toplevel):
         if parent:
             super().__init__(parent)
             self.transient(parent)
-        if not os.path.exists(os.path.join(path, 'test.py')):
-            with open(os.path.join(path, 'test.py'), 'w') as f:
-                f.write('')
+        if not os.path.exists(os.path.join(path, "test.py")):
+            with open(os.path.join(path, "test.py"), "w") as f:
+                f.write("")
         self.title("Unit Tests")
         self.resizable(0, 0)
         self.tests_listbox = ttk.Treeview(self, show="tree")
@@ -29,15 +29,15 @@ class TestDialog(tk.Toplevel):
             return
         name = "test_" + name
         codewin = tk.Toplevel(self)
-        codewin.geometry('500x300')
+        codewin.geometry("500x300")
         codewin.resizable(0, 0)
         codewin.transient(self)
         textframe = EnhancedTextFrame(codewin)
         textframe.pack(fill="both")
         button_frame = ttk.Frame(codewin)
-        okbtn = ttk.Button(button_frame, text='OK')
+        okbtn = ttk.Button(button_frame, text="OK")
         okbtn.pack()
-        cancelbtn = ttk.Button(button_frame, text='Cancel')
+        cancelbtn = ttk.Button(button_frame, text="Cancel")
         cancelbtn.pack()
         button_frame.pack()
         codewin.mainloop()

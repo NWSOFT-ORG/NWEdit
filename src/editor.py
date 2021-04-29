@@ -15,61 +15,32 @@
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 Also, it's cross-compatible!
 """
-from src.console import Console
-from src.constants import (
-    APPDIR,
-    LINT_BATCH,
-    MAIN_KEY,
-    OSX,
-    RUN_BATCH,
-    VERSION,
-    WINDOWS,
-    logger,
-)
-from src.customenotebook import ClosableNotebook
-from src.dialogs import ErrorInfoDialog, InputStringDialog, YesNoDialog, ViewDialog
-from src.filedialog import FileOpenDialog, FileSaveAsDialog
-from src.functions import (
-    download_file,
-    is_binary_string,
-    open_system_shell,
-    run_in_terminal,
-    is_dark_color,
-)
+from multiprocessing import Process
 
+from src.console import Console
+from src.constants import (APPDIR, LINT_BATCH, MAIN_KEY, OSX, RUN_BATCH,
+                           VERSION, WINDOWS, logger)
+from src.customenotebook import ClosableNotebook
+from src.dialogs import (ErrorInfoDialog, InputStringDialog, ViewDialog,
+                         YesNoDialog)
+from src.filedialog import FileOpenDialog, FileSaveAsDialog
+from src.functions import (download_file, is_binary_string, is_dark_color,
+                           open_system_shell, run_in_terminal)
 # These modules are from the base directory
 from src.Git.commitview import CommitView
 from src.goto import Navigate
 from src.hexview import HexView
-from src.menubar import MenuItem, Menubar
-from src.modules import (
-    EditorErr,
-    Path,
-    json,
-    lexers,
-    logging,
-    os,
-    subprocess,
-    sys,
-    tk,
-    ttk,
-    ttkthemes,
-    webbrowser,
-)
+from src.highlighter import create_tags, recolorize
+from src.menubar import Menubar, MenuItem
+from src.modules import (EditorErr, Path, json, lexers, logging, os,
+                         subprocess, sys, tk, ttk, ttkthemes, webbrowser)
 from src.search import Search
-from src.settings import (
-    CommentMarker,
-    FormatCommand,
-    Lexer,
-    Linter,
-    RunCommand,
-    Settings,
-)
+from src.settings import (CommentMarker, FormatCommand, Lexer, Linter,
+                          RunCommand, Settings)
 from src.statusbar import Statusbar
 from src.testdialog import TestDialog
 from src.tktext import EnhancedTextFrame
 from src.treeview import FileTree
-from src.highlighter import recolorize, create_tags
 
 if OSX:
     from src.modules import PyTouchBar
@@ -115,15 +86,22 @@ class Editor:
                 self.close_icon = tk.PhotoImage(file="Images/close.gif")
                 self.copy_icon = tk.PhotoImage(file="Images/copy-light.gif")
                 self.lint_icon = tk.PhotoImage(file="Images/lint-light.gif")
-                self.delete_icon = tk.PhotoImage(file="Images/delete-light.gif")
-                self.indent_icon = tk.PhotoImage(file="Images/indent-light.gif")
+                self.delete_icon = tk.PhotoImage(
+                    file="Images/delete-light.gif")
+                self.indent_icon = tk.PhotoImage(
+                    file="Images/indent-light.gif")
                 self.paste_icon = tk.PhotoImage(file="Images/paste-light.gif")
-                self.unindent_icon = tk.PhotoImage(file="Images/unindent-light.gif")
-                self.search_icon = tk.PhotoImage(file="Images/search-light.gif")
-                self.pyterm_icon = tk.PhotoImage(file="Images/py-term-light.gif")
+                self.unindent_icon = tk.PhotoImage(
+                    file="Images/unindent-light.gif")
+                self.search_icon = tk.PhotoImage(
+                    file="Images/search-light.gif")
+                self.pyterm_icon = tk.PhotoImage(
+                    file="Images/py-term-light.gif")
                 self.term_icon = tk.PhotoImage(file="Images/term-light.gif")
-                self.format_icon = tk.PhotoImage(file="Images/format-light.gif")
-                self.sel_all_icon = tk.PhotoImage(file="Images/sel-all-light.gif")
+                self.format_icon = tk.PhotoImage(
+                    file="Images/format-light.gif")
+                self.sel_all_icon = tk.PhotoImage(
+                    file="Images/sel-all-light.gif")
             else:
                 self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
                 self.lint_icon = tk.PhotoImage(file="Images/lint.gif")
@@ -188,230 +166,18 @@ class Editor:
             self.pandedwin.add(self.nb)
             self.nb.enable_traversal()
             self.statusbar = Statusbar()
-            # Name can be apple only, don't really know why!
-            self.appmenu = MenuItem()
 
-            self.appmenu.add_command(label="About PyPlus", command=self._version)
-            self.appmenu.add_command(
-                label="General Settings",
-                command=lambda: self.open_file(
-                    APPDIR + "/Settings/general-settings" ".json"
-                ),
-            )
-            self.appmenu.add_command(
-                label="Format Command Settings",
-                command=lambda: self.open_file(
-                    APPDIR + "/Settings/format-settings" ".json"
-                ),
-            )
-            self.appmenu.add_command(
-                label="Lexer Settings",
-                command=lambda: self.open_file(
-                    APPDIR + "/Settings/lexer-settings" ".json"
-                ),
-            )
-            self.appmenu.add_command(
-                label="Linter Settings",
-                command=lambda: self.open_file(
-                    APPDIR + "/Settings/linter-settings" ".json"
-                ),
-            )
-            self.appmenu.add_command(
-                label="Run Command Settings",
-                command=lambda: self.open_file(
-                    APPDIR + "/Settings/cmd-settings" ".json"
-                ),
-            )
-            self.appmenu.add_command(
-                label="Backup Settings to...", command=self.settings_class.zipsettings
-            )
-            self.appmenu.add_command(
-                label="Load Settings from...", command=self.settings_class.unzipsettings
-            )
-            self.appmenu.add_command(label="Exit Editor", command=self.exit)
-            self.appmenu.add_command(label="Restart app", command=self.restart)
-            self.appmenu.add_command(
-                label="Check for updates", command=self.check_updates
-            )
+            self.create_menu()
 
-            self.filemenu = MenuItem()
-            self.filemenu.add_command(
-                label="New...",
-                command=self.filetree.new_file,
-                image=self.new_icon,
-            )
-            self.filemenu.add_command(
-                label="Open File",
-                command=self._open,
-                image=self.open_icon,
-            )
-            self.filemenu.add_command(
-                label="Open File in Hex",
-                command=self.openhex,
-                image=self.open_icon,
-            )
-            self.filemenu.add_command(
-                label="Save Copy to...",
-                command=self._saveas,
-                image=self.save_as_icon,
-            )
-            self.filemenu.add_command(
-                label="Close Tab",
-                command=self.close_tab,
-                image=self.close_icon,
-            )
-            self.filemenu.add_command(
-                label="Reload all files from disk",
-                command=self.reload,
-                image=self.reload_icon,
-            )
-
-            self.editmenu = MenuItem()
-            self.editmenu.add_command(
-                label="Undo",
-                command=self.undo,
-                image=self.undo_icon,
-            )
-            self.editmenu.add_command(
-                label="Redo",
-                command=self.redo,
-                image=self.redo_icon,
-            )
-            self.editmenu.add_command(
-                label="Cut",
-                command=self.cut,
-                image=self.cut_icon,
-            )
-            self.editmenu.add_command(
-                label="Copy",
-                command=self.copy,
-                image=self.copy_icon,
-            )
-            self.editmenu.add_command(
-                label="Paste",
-                command=self.paste,
-                image=self.paste_icon,
-            )
-            self.editmenu.add_command(
-                label="Delete Selected",
-                image=self.delete_icon,
-                command=self.delete,
-            )
-            self.editmenu.add_command(
-                label="Duplicate Line or Selected", command=self.duplicate_line
-            )
-            self.editmenu.add_command(label="Join lines", command=self.join_lines)
-            self.editmenu.add_command(label="Swap case", command=self.swap_case)
-            self.editmenu.add_command(label="Upper case", command=self.upper_case)
-            self.editmenu.add_command(label="Lower case", command=self.lower_case)
-            self.editmenu.add_command(
-                label="Select All",
-                command=self.select_all,
-                image=self.sel_all_icon,
-            )
-            self.editmenu.add_command(label="Select Line", command=self.sel_line)
-            self.editmenu.add_command(label="Select Word", command=self.sel_word)
-            self.editmenu.add_command(
-                label="Select Prev Word", command=self.sel_word_left
-            )
-            self.editmenu.add_command(
-                label="Select Next Word", command=self.sel_word_right
-            )
-            self.editmenu.add_command(label="Delete Word", command=self.del_word)
-            self.editmenu.add_command(
-                label="Delete Prev Word", command=self.del_word_left
-            )
-            self.editmenu.add_command(
-                label="Delete Next Word", command=self.del_word_right
-            )
-            self.editmenu.add_command(label="Move line up", command=self.mv_line_up)
-            self.editmenu.add_command(label="Move line down", command=self.mv_line_dn)
-
-            self.codemenu = MenuItem()
-            self.codemenu.add_command(
-                label="Indent",
-                command=lambda: self.indent("indent"),
-                image=self.indent_icon,
-            )
-            self.codemenu.add_command(
-                label="Unident",
-                command=lambda: self.indent("unindent"),
-                image=self.unindent_icon,
-            )
-            self.codemenu.add_command(
-                label="Comment/Uncomment Line or Selected", command=self.comment_lines
-            )
-            self.codemenu.add_command(
-                label="Run",
-                command=self.run,
-                image=self.run_icon,
-            )
-            self.codemenu.add_command(
-                label="Lint",
-                command=self.lint_source,
-                image=self.lint_icon,
-            )
-            self.codemenu.add_command(
-                label="Auto-format",
-                command=self.autopep,
-                image=self.format_icon,
-            )
-            self.codemenu.add_command(
-                label="Find and replace",
-                command=self.search,
-                image=self.search_icon,
-            )
-            self.codemenu.add_command(label="Bigger view", command=self.biggerview)
-            self.codemenu.add_command(
-                label="Open Python Shell",
-                command=self.python_shell,
-                image=self.pyterm_icon,
-            )
-            self.codemenu.add_command(
-                label="Open System Shell",
-                command=self.system_shell,
-                image=self.term_icon,
-            )
-            self.codemenu.add_command(
-                label="Unit tests",
-                command=self.test,
-            )
-            self.codemenu.add_command(
-                label="Classes and functions",
-                command=self.view,
-            )
-
-            self.navmenu = MenuItem()
-            self.navmenu.add_command(label="Go to ...", command=self.goto)
-            self.navmenu.add_command(label="-1 char", command=self.nav_1cb)
-            self.navmenu.add_command(label="+1 char", command=self.nav_1cf)
-            self.navmenu.add_command(label="Word end", command=self.nav_wordend)
-            self.navmenu.add_command(label="Word start", command=self.nav_wordstart)
-
-            self.gitmenu = MenuItem()
-            self.gitmenu.add_command(
-                label="Initialize", command=lambda: self.git("init")
-            )
-            self.gitmenu.add_command(label="Commit", command=lambda: self.git("commit"))
-            self.gitmenu.add_command(label="Clone", command=lambda: self.git("clone"))
-
-            self.menubar.add_cascade(label="PyPlus", menu=self.appmenu)  # App menu
-            self.menubar.add_cascade(label="File", menu=self.filemenu)
-            self.menubar.add_cascade(label="Edit", menu=self.editmenu)
-            self.menubar.add_cascade(label="Code", menu=self.codemenu)
-            self.menubar.add_cascade(label="Navigate", menu=self.navmenu)
-            self.menubar.add_cascade(label="Git", menu=self.gitmenu)
-            if OSX:
-                menu = tk.Menu(self.master)
-                self.master.config(menu=menu)
-            logger.debug("Menu created")
             self.right_click_menu = tk.Menu()
             self.right_click_menu.add_command(label="Undo", command=self.undo)
             self.right_click_menu.add_command(label="Redo", command=self.redo)
             self.right_click_menu.add_command(label="Cut", command=self.cut)
             self.right_click_menu.add_command(label="Copy", command=self.copy)
-            self.right_click_menu.add_command(label="Paste", command=self.paste)
-            self.right_click_menu.add_command(label="Delete", command=self.delete)
+            self.right_click_menu.add_command(
+                label="Paste", command=self.paste)
+            self.right_click_menu.add_command(
+                label="Delete", command=self.delete)
             self.right_click_menu.add_command(
                 label="Select All", command=self.select_all
             )
@@ -440,8 +206,232 @@ class Editor:
             logger.exception("Error when initializing:")
             self.restart()
 
+    def create_menu(self) -> None:
+        self.appmenu = MenuItem()
+
+        self.appmenu.add_command(label="About PyPlus", command=self._version)
+        self.appmenu.add_command(
+            label="General Settings",
+            command=lambda: self.open_file(
+                APPDIR + "/Settings/general-settings" ".json"
+            ),
+        )
+        self.appmenu.add_command(
+            label="Format Command Settings",
+            command=lambda: self.open_file(
+                APPDIR + "/Settings/format-settings" ".json"
+            ),
+        )
+        self.appmenu.add_command(
+            label="Lexer Settings",
+            command=lambda: self.open_file(
+                APPDIR + "/Settings/lexer-settings" ".json"
+            ),
+        )
+        self.appmenu.add_command(
+            label="Linter Settings",
+            command=lambda: self.open_file(
+                APPDIR + "/Settings/linter-settings" ".json"
+            ),
+        )
+        self.appmenu.add_command(
+            label="Run Command Settings",
+            command=lambda: self.open_file(
+                APPDIR + "/Settings/cmd-settings" ".json"
+            ),
+        )
+        self.appmenu.add_command(
+            label="Backup Settings to...", command=self.settings_class.zipsettings
+        )
+        self.appmenu.add_command(
+            label="Load Settings from...", command=self.settings_class.unzipsettings
+        )
+        self.appmenu.add_command(label="Exit Editor", command=self.exit)
+        self.appmenu.add_command(label="Restart app", command=self.restart)
+        self.appmenu.add_command(
+            label="Check for updates", command=self.check_updates
+        )
+
+        self.filemenu = MenuItem()
+        self.filemenu.add_command(
+            label="New...",
+            command=self.filetree.new_file,
+            image=self.new_icon,
+        )
+        self.filemenu.add_command(
+            label="Open File",
+            command=self._open,
+            image=self.open_icon,
+        )
+        self.filemenu.add_command(
+            label="Open File in Hex",
+            command=self.openhex,
+            image=self.open_icon,
+        )
+        self.filemenu.add_command(
+            label="Save Copy to...",
+            command=self._saveas,
+            image=self.save_as_icon,
+        )
+        self.filemenu.add_command(
+            label="Close Tab",
+            command=self.close_tab,
+            image=self.close_icon,
+        )
+        self.filemenu.add_command(
+            label="Reload all files from disk",
+            command=self.reload,
+            image=self.reload_icon,
+        )
+
+        self.editmenu = MenuItem()
+        self.editmenu.add_command(
+            label="Undo",
+            command=self.undo,
+            image=self.undo_icon,
+        )
+        self.editmenu.add_command(
+            label="Redo",
+            command=self.redo,
+            image=self.redo_icon,
+        )
+        self.editmenu.add_command(
+            label="Cut",
+            command=self.cut,
+            image=self.cut_icon,
+        )
+        self.editmenu.add_command(
+            label="Copy",
+            command=self.copy,
+            image=self.copy_icon,
+        )
+        self.editmenu.add_command(
+            label="Paste",
+            command=self.paste,
+            image=self.paste_icon,
+        )
+        self.editmenu.add_command(
+            label="Delete Selected",
+            image=self.delete_icon,
+            command=self.delete,
+        )
+        self.editmenu.add_command(
+            label="Duplicate Line or Selected", command=self.duplicate_line
+        )
+        self.editmenu.add_command(label="Join lines", command=self.join_lines)
+        self.editmenu.add_command(label="Swap case", command=self.swap_case)
+        self.editmenu.add_command(label="Upper case", command=self.upper_case)
+        self.editmenu.add_command(label="Lower case", command=self.lower_case)
+        self.editmenu.add_command(
+            label="Select All",
+            command=self.select_all,
+            image=self.sel_all_icon,
+        )
+        self.editmenu.add_command(label="Select Line", command=self.sel_line)
+        self.editmenu.add_command(label="Select Word", command=self.sel_word)
+        self.editmenu.add_command(
+            label="Select Prev Word", command=self.sel_word_left
+        )
+        self.editmenu.add_command(
+            label="Select Next Word", command=self.sel_word_right
+        )
+        self.editmenu.add_command(label="Delete Word", command=self.del_word)
+        self.editmenu.add_command(
+            label="Delete Prev Word", command=self.del_word_left
+        )
+        self.editmenu.add_command(
+            label="Delete Next Word", command=self.del_word_right
+        )
+        self.editmenu.add_command(
+            label="Move line up", command=self.mv_line_up)
+        self.editmenu.add_command(
+            label="Move line down", command=self.mv_line_dn)
+
+        self.codemenu = MenuItem()
+        self.codemenu.add_command(
+            label="Indent",
+            command=lambda: self.indent("indent"),
+            image=self.indent_icon,
+        )
+        self.codemenu.add_command(
+            label="Unident",
+            command=lambda: self.indent("unindent"),
+            image=self.unindent_icon,
+        )
+        self.codemenu.add_command(
+            label="Comment/Uncomment Line or Selected", command=self.comment_lines
+        )
+        self.codemenu.add_command(
+            label="Run",
+            command=self.run,
+            image=self.run_icon,
+        )
+        self.codemenu.add_command(
+            label="Lint",
+            command=self.lint_source,
+            image=self.lint_icon,
+        )
+        self.codemenu.add_command(
+            label="Auto-format",
+            command=self.autopep,
+            image=self.format_icon,
+        )
+        self.codemenu.add_command(
+            label="Find and replace",
+            command=self.search,
+            image=self.search_icon,
+        )
+        self.codemenu.add_command(label="Bigger view", command=self.biggerview)
+        self.codemenu.add_command(
+            label="Open Python Shell",
+            command=self.python_shell,
+            image=self.pyterm_icon,
+        )
+        self.codemenu.add_command(
+            label="Open System Shell",
+            command=self.system_shell,
+            image=self.term_icon,
+        )
+        self.codemenu.add_command(
+            label="Unit tests",
+            command=self.test,
+        )
+        self.codemenu.add_command(
+            label="Classes and functions",
+            command=self.view,
+        )
+
+        self.navmenu = MenuItem()
+        self.navmenu.add_command(label="Go to ...", command=self.goto)
+        self.navmenu.add_command(label="-1 char", command=self.nav_1cb)
+        self.navmenu.add_command(label="+1 char", command=self.nav_1cf)
+        self.navmenu.add_command(label="Word end", command=self.nav_wordend)
+        self.navmenu.add_command(
+            label="Word start", command=self.nav_wordstart)
+
+        self.gitmenu = MenuItem()
+        self.gitmenu.add_command(
+            label="Initialize", command=lambda: self.git("init")
+        )
+        self.gitmenu.add_command(
+            label="Commit", command=lambda: self.git("commit"))
+        self.gitmenu.add_command(
+            label="Clone", command=lambda: self.git("clone"))
+
+        self.menubar.add_cascade(label="PyPlus", menu=self.appmenu)  # App menu
+        self.menubar.add_cascade(label="File", menu=self.filemenu)
+        self.menubar.add_cascade(label="Edit", menu=self.editmenu)
+        self.menubar.add_cascade(label="Code", menu=self.codemenu)
+        self.menubar.add_cascade(label="Navigate", menu=self.navmenu)
+        self.menubar.add_cascade(label="Git", menu=self.gitmenu)
+        if OSX:
+            menu = tk.Menu(self.master)
+            self.master.config(menu=menu)
+        logger.debug("Menu created")
+
     def start_screen(self) -> None:
-        first_tab = tk.Canvas(self.nb, background=self.bg, highlightthickness=0)
+        first_tab = tk.Canvas(self.nb, background=self.bg,
+                              highlightthickness=0)
         first_tab.create_image(20, 20, anchor="nw", image=self.icon)
         fg = "#8dd9f7" if is_dark_color(self.bg) else "blue"
         first_tab.create_text(
@@ -502,11 +492,9 @@ class Editor:
         """Creates a text widget in a frame."""
 
         def tab(event=None):
-            event.widget.edit_separator()
             # Convert tabs to spaces
             event.widget.insert("insert", " " * self.tabwidth)
             self.key()
-            event.widget.edit_separator()
             # Quit quickly, before a char is being inserted.
             return "break"
 
@@ -553,7 +541,8 @@ class Editor:
                 self.master.title("PyPlus -- No file open")
                 logger.debug("update_title: No file open")
                 return "break"
-            self.master.title(f"PyPlus -- {self.tabs[self.get_tab()].file_dir}")
+            self.master.title(
+                f"PyPlus -- {self.tabs[self.get_tab()].file_dir}")
             logger.debug("update_title: OK")
             return "break"
         except Exception:
@@ -571,7 +560,8 @@ class Editor:
             index = currtext.index("insert")
             ln = index.split(".")[0]
             col = index.split(".")[1]
-            self.statusbar.label2.config(text=f"{self.tabs[self.get_tab()].file_dir} |")
+            self.statusbar.label2.config(
+                text=f"{self.tabs[self.get_tab()].file_dir} |")
             self.statusbar.label3.config(text=f"Line {ln} Col {col}")
             logger.debug("update_statusbar: OK")
             return "break"
@@ -645,7 +635,8 @@ class Editor:
                         return
                 if is_binary_string(open(file_dir, "rb").read()):
                     if askhex:
-                        dialog = YesNoDialog(self.master, "Error", "View in Hex?")
+                        dialog = YesNoDialog(
+                            self.master, "Error", "View in Hex?")
                         if dialog.result:
                             self.open_hex(file_dir)
                         logging.info("User pressed No.")
@@ -664,11 +655,14 @@ class Editor:
 
                 # Puts the contents of the file into the text widget.
                 currtext = self.tabs[new_tab].textbox
-                currtext.insert("end", file.read().replace("\t", " " * self.tabwidth))
+                currtext.insert("end", file.read().replace(
+                    "\t", " " * self.tabwidth))
                 # Inserts file content, replacing tabs with four spaces
                 currtext.focus_set()
-                currtext.set_lexer(self.file_settings_class.get_settings(extens))
-                currtext.lint_cmd = self.linter_settings_class.get_settings(extens)
+                currtext.set_lexer(
+                    self.file_settings_class.get_settings(extens))
+                currtext.lint_cmd = self.linter_settings_class.get_settings(
+                    extens)
                 currtext.cmd = self.cmd_settings_class.get_settings(extens)
                 currtext.format_command = self.format_settings_class.get_settings(
                     extens
@@ -726,7 +720,8 @@ class Editor:
                 return
             if os.access(self.tabs[curr_tab].file_dir, os.W_OK):
                 with open(self.tabs[curr_tab].file_dir, "w") as file:
-                    file.write(self.tabs[curr_tab].textbox.get(1.0, "end").strip())
+                    file.write(self.tabs[curr_tab].textbox.get(
+                        1.0, "end").strip())
             else:
                 ErrorInfoDialog(self.master, "File read only")
         except Exception:
@@ -734,7 +729,8 @@ class Editor:
 
     def copy(self) -> None:
         try:
-            sel = self.tabs[self.get_tab()].textbox.get(tk.SEL_FIRST, tk.SEL_LAST)
+            sel = self.tabs[self.get_tab()].textbox.get(
+                tk.SEL_FIRST, tk.SEL_LAST)
             self.tabs[self.get_tab()].textbox.clipboard_clear()
             self.tabs[self.get_tab()].textbox.clipboard_append(sel)
         except Exception:
@@ -747,12 +743,10 @@ class Editor:
     def cut(self) -> None:
         try:
             currtext = self.tabs[self.get_tab()].textbox
-            currtext.edit_separator()
             sel = currtext.get(tk.SEL_FIRST, tk.SEL_LAST)
             currtext.clipboard_clear()
             currtext.clipboard_append(sel)
             currtext.delete(tk.SEL_FIRST, tk.SEL_LAST)
-            currtext.edit_separator()
             self.key()
         except tk.TclError:
             pass
@@ -760,13 +754,11 @@ class Editor:
     def paste(self) -> None:
         try:
             clipboard = self.tabs[self.get_tab()].textbox.clipboard_get()
-            self.tabs[self.get_tab()].textbox.edit_separator()
             if clipboard:
                 self.tabs[self.get_tab()].textbox.insert(
                     "insert", clipboard.replace("\t", " " * self.tabwidth)
                 )
             self.key()
-            self.tabs[self.get_tab()].textbox.edit_separator()
         except Exception:
             pass
 
@@ -783,7 +775,6 @@ class Editor:
         if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
-        currtext.edit_separator()
         sel = currtext.get("sel.first", "sel.last")
         if currtext.tag_ranges("sel"):
             currtext.tag_remove("sel", "1.0", "end")
@@ -791,7 +782,6 @@ class Editor:
         else:
             text = currtext.get("insert linestart", "insert lineend")
             currtext.insert("insert", "\n" + text)
-        currtext.edit_separator()
         self.key()
 
     def run(self, _=None) -> None:
@@ -827,7 +817,8 @@ class Editor:
                             )
                         )
                     )
-                run_in_terminal("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
+                run_in_terminal(
+                    "chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
         except Exception:
             ErrorInfoDialog(self.master, "This language is not supported.")
 
@@ -852,13 +843,13 @@ class Editor:
     def view(self):
         file_dir = self.tabs[self.get_tab()].file_dir
         text = self.tabs[self.get_tab()].textbox
-        ViewDialog(self.master, f"Classes and functions for {file_dir}", text, file_dir)
+        ViewDialog(
+            self.master, f"Classes and functions for {file_dir}", text, file_dir)
 
     def backspace(self, _=None) -> None:
         if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
-        currtext.edit_separator()
         # Backchar
         if currtext.get("insert -1c", "insert +1c") in ["''", '""', "[]", "{}", "()"]:
             currtext.delete("insert", "insert +1c")
@@ -866,84 +857,84 @@ class Editor:
         if currtext.get(f"insert -{self.tabwidth}c", "insert") == " " * self.tabwidth:
             currtext.delete(f"insert -{self.tabwidth - 1}c", "insert")
         self.key()
-        currtext.edit_separator()
 
-    def close_brackets(self, _=None) -> None:
+    def close_brackets(self, event: tk.EventType = None) -> str:
         if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
-        if currtext.get("insert", "insert +1c") in [")", "]", "}", "'", '"']:
+        if event.char in [")", "]", "}", "'", '"']:
             currtext.mark_set("insert", "insert +1c")
             self.key()
-            return
-        currtext.edit_separator()
+            return "break"
+        currtext.insert('insert', event.char)
         self.key()
 
-    def autoinsert(self, event=None) -> None:
+    def autoinsert(self, event=None) -> str:
         """Auto-inserts a symbol
         * ' -> ''
         * " -> ""
         * ( -> ()
         * [ -> []
         * { -> {}"""
-        if not self.tabs:
-            return
         currtext = self.tabs[self.get_tab()].textbox
-        currtext.edit_separator()
         char = event.char
         if currtext.tag_ranges("sel"):
             selected = currtext.get("sel.first", "sel.last")
             if char == "'":
                 currtext.delete("sel.first", "sel.last")
                 currtext.insert("insert", f"'{selected}'")
-                return
+                return 'break'
             if char == '"':
                 currtext.delete("sel.first", "sel.last")
                 currtext.insert("insert", f'"{selected}"')
-                return
+                return 'break'
             if char == "(":
                 currtext.delete("sel.first", "sel.last")
                 currtext.insert("insert", f"({selected})")
-                return
+                return 'break'
             if char == "[":
                 currtext.delete("sel.first", "sel.last")
                 currtext.insert("insert", f"[{selected}]")
-                return
+                return 'break'
             if char == "{":
                 currtext.delete("sel.first", "sel.last")
                 currtext.insert(
                     "insert", "{" + selected + "}"
                 )  # Can't use f-string for this!
-                return
+                return 'break'
 
         if char == "'":
             if currtext.get("insert", "insert +1c") == "'":
                 currtext.mark_set("insert", "insert +1c")
-                return
+                return 'break'
             currtext.insert("insert", "''")
             currtext.mark_set("insert", "insert -1c")
-            return
+            return 'break'
         if char == '"':
             if currtext.get("insert", "insert +1c") == '"':
                 currtext.mark_set("insert", "insert +1c")
-                return
+                return 'break'
             currtext.insert("insert", '""')
             currtext.mark_set("insert", "insert -1c")
-            return
+            return 'break'
         if char == "(":
-            currtext.insert("insert", ")")
+            currtext.insert("insert", "()")
+            currtext.mark_set('insert', 'insert -1c')
+            return 'break'
         if char == "[":
-            currtext.insert("insert", "]")
+            currtext.insert("insert", "[]")
+            currtext.mark_set('insert', 'insert -1c')
+            return 'break'
         if char == "{":
-            currtext.insert("insert", "}")
+            currtext.insert("insert", r"{}")
+            currtext.mark_set('insert', 'insert -1c')
+            return 'break'
         currtext.mark_set("insert", "insert -1c")
-        currtext.edit_separator()
         self.key()
 
     def autoindent(self, _=None) -> str:
         """Auto-indents the next line"""
         currtext = self.tabs[self.get_tab()].textbox
-        currtext.edit_separator()
         indentation = ""
         lineindex = currtext.index("insert").split(".")[0]
         linetext = currtext.get(lineindex + ".0", lineindex + ".end")
@@ -963,7 +954,6 @@ class Editor:
             indentation += " " * self.tabwidth
 
         currtext.insert(currtext.index("insert"), "\n" + indentation)
-        currtext.edit_separator()
         self.key()
         return "break"
 
@@ -995,8 +985,10 @@ class Editor:
                 # Otherwise close the tab based on coordinates of center-click.
                 else:
                     try:
-                        index = event.widget.index("@%d,%d" % (event.x, event.y))
-                        selected_tab = self.nb.nametowidget(self.nb.tabs()[index])
+                        index = event.widget.index(
+                            "@%d,%d" % (event.x, event.y))
+                        selected_tab = self.nb.nametowidget(
+                            self.nb.tabs()[index])
                     except tk.TclError:
                         return
 
@@ -1051,7 +1043,8 @@ class Editor:
 
             try:
                 self.nb.insert(
-                    event.widget.index("@%d,%d" % (event.x, y)), self.nb.select()
+                    event.widget.index("@%d,%d" %
+                                       (event.x, y)), self.nb.select()
                 )
             except tk.TclError:
                 return
@@ -1072,7 +1065,8 @@ class Editor:
             update.pack(fill="both")
             update.bind(
                 "<Button-1>",
-                lambda e: webbrowser.open_new_tab(self.check_updates(popup=False)[1]),
+                lambda e: webbrowser.open_new_tab(
+                    self.check_updates(popup=False)[1]),
             )
         else:
             ttk.Label(ver, text="No updates available").pack(fill="both")
@@ -1114,7 +1108,6 @@ class Editor:
         """Auto Pretty-Format the document"""
         try:
             currtext = self.tabs[self.get_tab()].textbox
-            currtext.edit_separator()
             currdir = self.tabs[self.get_tab()].file_dir
             if currtext.format_command:
                 subprocess.Popen(
@@ -1124,7 +1117,6 @@ class Editor:
                 ErrorInfoDialog(self.master, "Language not supported.")
                 return
             self.reload()
-            currtext.edit_separator()
         except Exception:
             logger.exception("Error when formatting:")
 
@@ -1279,7 +1271,8 @@ class Editor:
         currtext = self.tabs[self.get_tab()].textbox
         if not currtext.tag_ranges("sel"):
             return
-        selected_text = currtext.get("sel.first -1c linestart", "sel.last lineend")
+        selected_text = currtext.get(
+            "sel.first -1c linestart", "sel.last lineend")
         win = tk.Toplevel(self.master)
         win.resizable(0, 0)
         win.transient(self.master)
@@ -1342,10 +1335,12 @@ class Editor:
             url = dialog.result
             if not url:
                 return
-            subprocess.Popen(f"git clone {url} > {os.devnull}", shell=True, cwd=currdir)
+            subprocess.Popen(
+                f"git clone {url} > {os.devnull}", shell=True, cwd=currdir)
             return
         if not os.path.exists(path := os.path.join(currdir, ".git")):
-            ErrorInfoDialog(self.master, f"Not a git repository: {Path(path).parent}")
+            ErrorInfoDialog(
+                self.master, f"Not a git repository: {Path(path).parent}")
             return
         if action == "init":
             subprocess.Popen(
@@ -1361,7 +1356,6 @@ class Editor:
         if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
-        currtext.edit_separator()
         if currtext.tag_ranges("sel"):
             sel_start = currtext.index("sel.first linestart")
             sel_end = currtext.index("sel.last lineend")
@@ -1393,7 +1387,6 @@ class Editor:
             self.key()
         else:
             raise EditorErr("Action undefined.")
-        currtext.edit_separator()
 
     def comment_lines(self, _=None):
         """Comments the selection or line"""
@@ -1416,11 +1409,12 @@ class Editor:
                 if block:
                     if text.startswith(comment_start):
                         currtext.insert(
-                            "insert", text[len(comment_start) : -len(comment_end)]
+                            "insert", text[len(comment_start)                                           : -len(comment_end)]
                         )
                         self.key()
                         return
-                    currtext.insert("insert", f"{comment_start} {text} {comment_end}")
+                    currtext.insert(
+                        "insert", f"{comment_start} {text} {comment_end}")
                     self.key()
                     return
                 for line in currtext.get(start_index, end_index).splitlines():
@@ -1442,7 +1436,8 @@ class Editor:
                         "insert", f"{line[len(comment_start):len(comment_end)]}\n"
                     )
                 else:
-                    currtext.insert("insert", f"{comment_start}{line}{comment_end}\n")
+                    currtext.insert(
+                        "insert", f"{comment_start}{line}{comment_end}\n")
             self.key()
         except (KeyError, AttributeError):
             return

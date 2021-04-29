@@ -1,6 +1,6 @@
 from src.dialogs import get_theme
-from src.modules import tk, ttk, ttkthemes
 from src.functions import darken_color
+from src.modules import tk, ttk, ttkthemes
 
 
 class Search:

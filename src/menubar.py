@@ -1,4 +1,4 @@
-from src.modules import ttk, tk, ScrolledFrame
+from src.modules import ScrolledFrame, tk, ttk
 
 
 class MenuItem:

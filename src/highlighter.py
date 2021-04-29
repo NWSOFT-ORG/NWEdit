@@ -1,6 +1,5 @@
-from src.modules import font, get_style_by_name, tk
+﻿from src.modules import font, get_style_by_name, tk
 from src.settings import Settings
-
 
 def create_tags(textbox: tk.Text) -> None:
     """
@@ -31,10 +30,11 @@ def create_tags(textbox: tk.Text) -> None:
         else:
             foreground = None
 
-        currtext.tag_configure(str(ttype), foreground=foreground, font=tag_font)
+        currtext.tag_configure(
+            str(ttype), foreground=foreground, font=tag_font)
 
 
-def recolorize(textbox):
+def recolorize(textbox: tk.Text) -> None:
     """
     This method colors and styles the prepared tags"""
     try:
@@ -54,8 +54,8 @@ def recolorize(textbox):
                 end_index += len(value)
 
             if value not in (" ", "\n"):
-                index1 = str(start_line) + "." + str(start_index)
-                index2 = str(end_line) + "." + str(end_index)
+                index1 = f"{start_line}.{start_index}"
+                index2 = f"{end_line}.{end_index}"
 
                 for tagname in currtext.tag_names(index1):
                     if tagname not in ["sel", "found"]:

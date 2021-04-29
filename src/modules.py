@@ -1,4 +1,7 @@
 """All the nessasary modules"""
+# pylint: disable-all
+# flake8: noqa
+
 import code
 import codecs
 import hashlib
@@ -28,6 +31,8 @@ from pygments import lexers
 from pygments.styles import get_style_by_name
 from pygson.json_lexer import JSONLexer
 from ttkthemes import ThemedStyle
+import inspect
+import imp
 
 if sys.platform == "darwin":
     import PyTouchBar
@@ -55,11 +60,11 @@ class ScrolledFrame(ttk.Frame):
 
         # create a frame inside the canvas which will be scrolled with it
         self.interior = interior = ttk.Frame(canvas)
-        interior_id = canvas.create_window(
+        canvas.create_window(
             0, 0, window=interior, anchor="nw", height=50
         )
 
-        def _configure_interior(event):
+        def _configure_interior(_):
             # update the scrollbars to match the size of the inner fram
             size = (interior.winfo_reqwidth(), interior.winfo_reqheight())
             canvas.config(scrollregion="0 0 %s %s" % size)

@@ -687,7 +687,7 @@ class Editor:
         self.open_file()
 
     def search(self, _=None) -> None:
-        Search(self.master, self.nb, self.tabs)
+        Search(self.master, self.tabs[self.get_tab()].textbox)
 
     def save_as(self, file: str = None) -> None:
         """Save the document as a different name."""
@@ -1034,7 +1034,7 @@ class Editor:
         self.__init__(newtk)
         newtk.mainloop()
 
-    def get_tab(self) -> Document:
+    def get_tab(self):
         return self.nb.nametowidget(self.nb.select())
 
     def move_tab(self, event: tk.EventType) -> None:
@@ -1123,7 +1123,7 @@ class Editor:
     def goto(self, _=None) -> None:
         if not self.tabs:
             return
-        Navigate(self.nb, self.tabs)
+        Navigate(self.tabs[self.get_tab()].textbox)
 
     def nav_1cf(self) -> None:
         if not self.tabs:

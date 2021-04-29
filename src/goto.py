@@ -4,8 +4,8 @@ from src.modules import tk, ttk, ttkthemes
 
 
 class Navigate:
-    def __init__(self, tabwidget: ttk.Notebook, tablist: dict):
-        self.text: tk.Text = tablist[tabwidget.nametowidget(tabwidget.select())].textbox
+    def __init__(self, text: tk.Text):
+        self.text: tk.Text = text
         if self.text.navigate or self.text.searchable:
             return
         self.text.navigate = True
@@ -15,7 +15,8 @@ class Navigate:
         bg = self._style.lookup("TLabel", "background")
         fg = self._style.lookup("TLabel", "foreground")
         self.goto_frame.pack(anchor="nw")
-        ttk.Label(self.goto_frame, text="Go to place: [Ln].[Col] ").pack(side="left")
+        ttk.Label(self.goto_frame, text="Go to place: [Ln].[Col] ").pack(
+            side="left")
         self.place = tk.Entry(
             self.goto_frame,
             background=darken_color(bg, 30, 30, 30),
@@ -38,7 +39,8 @@ class Navigate:
         index = self.place.get().split(".")
         lines = int(float(self.text.index("end")))
         if (not len(index) == 2) or index[0] > lines:
-            self.statuslabel.config(text=f'Error: invalid index: {".".join(index)}')
+            self.statuslabel.config(
+                text=f'Error: invalid index: {".".join(index)}')
             return False
         return True
 

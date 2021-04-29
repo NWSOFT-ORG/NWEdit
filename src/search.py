@@ -5,14 +5,14 @@ from src.modules import tk, ttk, ttkthemes
 
 class Search:
     def __init__(
-        self, master: tk.Misc, tabwidget: ttk.Notebook, tablist: dict
+        self, master: tk.Misc, text: tk.Text
     ):  # TODO: reduce args
         self.master = master
         self.case = tk.BooleanVar()
         self.regexp = tk.BooleanVar()
         self.start = "sel.first"
         self.end = "sel.last"
-        self.text = tablist[tabwidget.nametowidget(tabwidget.select())].textbox
+        self.text = text
         self.result = None
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
@@ -78,9 +78,8 @@ class Search:
         self.forward.config(command=self.nav_forward)
         self.backward.config(command=self.nav_backward)
         self.content.bind("<KeyRelease>", self.find)
-        closeicon = tk.PhotoImage(file="Images/close.gif")
         ttk.Button(
-            self.search_frame, image=closeicon, command=self._exit, width=1
+            self.search_frame, text='x', command=self._exit
         ).pack(side="right")
         self.text.searchable = True
 

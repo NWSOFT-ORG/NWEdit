@@ -19,6 +19,24 @@ class FileTree(ttk.Frame):
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
         self.bg = self._style.lookup("TLabel", "background")
+        style.layout(
+            "Treeview.Item",
+            [
+                (
+                    "Treeitem.padding",
+                    {
+                        "sticky": "nswe",
+                        "children": [
+                            ("Treeitem.indicator", {"side": "left", "sticky": ""}),
+                            ("Treeitem.image", {"side": "left", "sticky": ""}),
+                            # ('Treeitem.focus', {'side': 'left', 'sticky': '', 'children': [
+                            ("Treeitem.text", {"side": "left", "sticky": ""}),
+                            # ]})
+                        ],
+                    },
+                )
+            ],
+        )
         super().__init__(master)
         style.configure("style.Treeview", font=("Arial", 8))
         style.configure("style.Treeview.Heading", font=("Arial", 13, "bold"))
@@ -32,7 +50,7 @@ class FileTree(ttk.Frame):
         self.tree["yscrollcommand"] = yscroll.set
         self.tree["xscrollcommand"] = xscroll.set
         self.master = master
-        self.path = str(path)
+        self.path = path if path != "" else os.path.expanduser("~")
         self.opencommand = opencommand
         if showbuttonframe:
             topframe = ttk.Frame(self)
@@ -182,8 +200,9 @@ class FileTree(ttk.Frame):
         self.init_ui()
 
     def init_ui(self):
-        path = os.path.expanduser("~")
-
+        path = self.path
+        if not path:
+            path = os.path.expanduser("~")
         self.tree.delete(*self.tree.get_children())
         self.tree.bind("<Double-1>", self.on_double_click_treeview)
         self.tree.update()

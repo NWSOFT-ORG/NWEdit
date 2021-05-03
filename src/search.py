@@ -4,9 +4,7 @@ from src.modules import tk, ttk, ttkthemes
 
 
 class Search:
-    def __init__(
-        self, master: tk.Misc, text: tk.Text
-    ):  # TODO: reduce args
+    def __init__(self, master: tk.Misc, text: tk.Text):  # TODO: reduce args
         self.master = master
         self.case = tk.BooleanVar()
         self.regexp = tk.BooleanVar()
@@ -78,9 +76,7 @@ class Search:
         self.forward.config(command=self.nav_forward)
         self.backward.config(command=self.nav_backward)
         self.content.bind("<KeyRelease>", self.find)
-        ttk.Button(
-            self.search_frame, text='x', command=self._exit
-        ).pack(side="right")
+        ttk.Button(self.search_frame, text="x", command=self._exit).pack(side="right")
         self.text.searchable = True
 
     def find(self, _=None):

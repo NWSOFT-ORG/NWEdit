@@ -60,9 +60,7 @@ class ScrolledFrame(ttk.Frame):
 
         # create a frame inside the canvas which will be scrolled with it
         self.interior = interior = ttk.Frame(canvas)
-        canvas.create_window(
-            0, 0, window=interior, anchor="nw", height=50
-        )
+        canvas.create_window(0, 0, window=interior, anchor="nw", height=50)
 
         def _configure_interior(_):
             # update the scrollbars to match the size of the inner fram

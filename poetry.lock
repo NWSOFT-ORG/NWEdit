@@ -20,7 +20,7 @@ description = "ASCII Art Library For Python"
 name = "art"
 optional = false
 python-versions = ">=2.7"
-version = "5.1"
+version = "5.2"
 
 [package.extras]
 dev = ["coverage (>=4.1)", "codecov (>=2.0.15)", "vulture (>=1.0)", "bandit (>=1.5.1)", "pydocstyle (>=3.0.0)"]
@@ -43,7 +43,7 @@ description = "A tool that automatically formats Python code to conform to the P
 name = "autopep8"
 optional = false
 python-versions = "*"
-version = "1.5.6"
+version = "1.5.7"
 
 [package.dependencies]
 pycodestyle = ">=2.7.0"
@@ -287,7 +287,7 @@ description = "Pygments is a syntax highlighting package written in Python."
 name = "pygments"
 optional = false
 python-versions = ">=3.5"
-version = "2.8.1"
+version = "2.9.0"
 
 [[package]]
 category = "main"
@@ -299,17 +299,6 @@ version = "1.0"
 
 [package.dependencies]
 pygments = "*"
-
-[[package]]
-category = "main"
-description = "Pygments JSON formatter"
-name = "pygments-json"
-optional = false
-python-versions = "*"
-version = "0.1"
-
-[package.dependencies]
-Pygments = "*"
 
 [[package]]
 category = "dev"
@@ -415,7 +404,7 @@ description = "Backported and Experimental Type Hints for Python 3.5+"
 name = "typing-extensions"
 optional = false
 python-versions = "*"
-version = "3.7.4.3"
+version = "3.10.0.0"
 
 [[package]]
 category = "main"
@@ -439,7 +428,7 @@ python-versions = "*"
 version = "1.12.1"
 
 [metadata]
-content-hash = "183676ff2f2e42a320a104367ab7d1fe2aacb6dbdf1c8aea964e038b06df2fd4"
+content-hash = "541d547f054c0436b4580c8887098b625717477b58b5fc7e7fcd25ac18be75bd"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -452,16 +441,16 @@ appdirs = [
     {file = "appdirs-1.4.4.tar.gz", hash = "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41"},
 ]
 art = [
-    {file = "art-5.1-py2.py3-none-any.whl", hash = "sha256:94b2f457dd10c20efe426eb79f752d03845cee80f262e00cbb4fa77dff768385"},
-    {file = "art-5.1.tar.gz", hash = "sha256:380cb9a3bf97c6a3e6a90a7ab7d20b74aec0a1a4294f921ec3a8eb1057f37180"},
+    {file = "art-5.2-py2.py3-none-any.whl", hash = "sha256:0d289b585a1d36720318383643bde71dc4e10416759486ec800a472091bef1a7"},
+    {file = "art-5.2.tar.gz", hash = "sha256:c069b08cd11dec860dab1ce2cc2550ffcf1b76968ff322b4303241e030696ba7"},
 ]
 astroid = [
     {file = "astroid-2.5.6-py3-none-any.whl", hash = "sha256:4db03ab5fc3340cf619dbc25e42c2cc3755154ce6009469766d7143d1fc2ee4e"},
     {file = "astroid-2.5.6.tar.gz", hash = "sha256:8a398dfce302c13f14bab13e2b14fe385d32b73f4e4853b9bdfb64598baa1975"},
 ]
 autopep8 = [
-    {file = "autopep8-1.5.6-py2.py3-none-any.whl", hash = "sha256:f01b06a6808bc31698db907761e5890eb2295e287af53f6693b39ce55454034a"},
-    {file = "autopep8-1.5.6.tar.gz", hash = "sha256:5454e6e9a3d02aae38f866eec0d9a7de4ab9f93c10a273fb0340f3d6d09f7514"},
+    {file = "autopep8-1.5.7-py2.py3-none-any.whl", hash = "sha256:aa213493c30dcdac99537249ee65b24af0b2c29f2e83cd8b3f68760441ed0db9"},
+    {file = "autopep8-1.5.7.tar.gz", hash = "sha256:276ced7e9e3cb22e5d7c14748384a5cf5d9002257c0ed50c0e075b68011bb6d0"},
 ]
 black = [
     {file = "black-20.8b1.tar.gz", hash = "sha256:1c02557aa099101b9d21496f8a914e9ed2222ef70336404eeeac8edba836fbea"},
@@ -604,14 +593,11 @@ pyflakes = [
     {file = "pyflakes-2.3.1.tar.gz", hash = "sha256:f5bc8ecabc05bb9d291eb5203d6810b49040f6ff446a756326104746cc00c1db"},
 ]
 pygments = [
-    {file = "Pygments-2.8.1-py3-none-any.whl", hash = "sha256:534ef71d539ae97d4c3a4cf7d6f110f214b0e687e92f9cb9d2a3b0d3101289c8"},
-    {file = "Pygments-2.8.1.tar.gz", hash = "sha256:2656e1a6edcdabf4275f9a3640db59fd5de107d88e8663c5d4e9a0fa62f77f94"},
+    {file = "Pygments-2.9.0-py3-none-any.whl", hash = "sha256:d66e804411278594d764fc69ec36ec13d9ae9147193a1740cd34d272ca383b8e"},
+    {file = "Pygments-2.9.0.tar.gz", hash = "sha256:a18f47b506a429f6f4b9df81bb02beab9ca21d0a5fee38ed15aef65f0545519f"},
 ]
 pygments-agentspeak = [
     {file = "pygments-agentspeak-1.0.tar.gz", hash = "sha256:84dcd6b398ff2ab9c2247d184332dbe5d7e5d1125cb81ba6f6adbf7e4c65d77a"},
-]
-pygments-json = [
-    {file = "pygments-json-0.1.tar.gz", hash = "sha256:a70ce5b3c5a50e7b2a3a873cec7211c33ba2f9736a7553d389098d73f7ce1208"},
 ]
 pylint = [
     {file = "pylint-2.8.2-py3-none-any.whl", hash = "sha256:f7e2072654a6b6afdf5e2fb38147d3e2d2d43c89f648637baab63e026481279b"},
@@ -714,9 +700,9 @@ typed-ast = [
     {file = "typed_ast-1.4.3.tar.gz", hash = "sha256:fb1bbeac803adea29cedd70781399c99138358c26d05fcbd23c13016b7f5ec65"},
 ]
 typing-extensions = [
-    {file = "typing_extensions-3.7.4.3-py2-none-any.whl", hash = "sha256:dafc7639cde7f1b6e1acc0f457842a83e722ccca8eef5270af2d74792619a89f"},
-    {file = "typing_extensions-3.7.4.3-py3-none-any.whl", hash = "sha256:7cb407020f00f7bfc3cb3e7881628838e69d8f3fcab2f64742a5e76b2f841918"},
-    {file = "typing_extensions-3.7.4.3.tar.gz", hash = "sha256:99d4073b617d30288f569d3f13d2bd7548c3a7e4c8de87db09a9d29bb3a4a60c"},
+    {file = "typing_extensions-3.10.0.0-py2-none-any.whl", hash = "sha256:0ac0f89795dd19de6b97debb0c6af1c70987fd80a2d62d1958f7e56fcc31b497"},
+    {file = "typing_extensions-3.10.0.0-py3-none-any.whl", hash = "sha256:779383f6086d90c99ae41cf0ff39aac8a7937a9283ce0a414e5dd782f4c94a84"},
+    {file = "typing_extensions-3.10.0.0.tar.gz", hash = "sha256:50b6f157849174217d0656f99dc82fe932884fb250826c18350e159ec6cdf342"},
 ]
 urllib3 = [
     {file = "urllib3-1.26.4-py2.py3-none-any.whl", hash = "sha256:2f4da4594db7e1e110a944bb1b551fdf4e6c136ad42e4234131391e21eb5b0df"},

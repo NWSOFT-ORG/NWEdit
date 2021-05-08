@@ -1,7 +1,10 @@
 from src.dialogs import InputStringDialog, YesNoDialog
-from src.modules import os, tk, ttk, json, lexers
+from src.modules import os, tk, ttk, json, lexers, ScrolledFrame
 from src.tktext import EnhancedTextFrame
 from src.highlighter import create_tags, recolorize
+
+TESTS_FILE = '.PyPlus/Tests/tests.json'
+SETTINGS_FILE = '.PyPlus/Tests/settings.json'
 
 
 class TestDialog(tk.Toplevel):
@@ -18,14 +21,20 @@ class TestDialog(tk.Toplevel):
         yscroll.pack(side="right", fill="y")
         self.tests_listbox.config(yscrollcommand=yscroll.set)
         self.refresh_tests()
+        self.settings_list = self.read_settings()
         self.tests_listbox.pack(fill="both")
         self.button_frame = ttk.Frame(self)
-        ttk.Button(self.button_frame, text="New", command=self.new).pack(side="left")
-        ttk.Button(self.button_frame, text="Delete", command=self.delete).pack(
-            side="left"
-        )
-        ttk.Button(self.button_frame, text="Edit", command=self.edit).pack(side="left")
-        ttk.Button(self.button_frame, text="Run All Tests", command=self.run_test).pack(side="left")
+        ttk.Button(self.button_frame, text="New",
+                   command=self.new).pack(side="left")
+        ttk.Button(self.button_frame, text="Delete",
+                   command=self.delete).pack(side="left")
+        ttk.Button(self.button_frame, text="Edit",
+                   command=self.edit).pack(side="left")
+        ttk.Button(self.button_frame,
+                   text="Run All Tests",
+                   command=self.run_test).pack(side="left")
+        ttk.Button(self.button_frame, text="...",
+                   command=self.settings).pack(side="left")
         self.button_frame.pack(side="bottom")
         self.mainloop()
 
@@ -37,18 +46,42 @@ class TestDialog(tk.Toplevel):
             self.tests_listbox.insert("", "end", text=test)
 
     def write_test(self):
-        if not os.path.isfile((os.path.join(self.path, ".PyPlus/tests.json"))):
-            os.mkdir((os.path.join(self.path, ".PyPlus")))
+        if not os.path.isdir(os.path.join(self.path, '.PyPlus')):
+            os.mkdir(os.path.join(self.path, ".PyPlus"))
+        if not os.path.isdir(os.path.join(self.path, '.PyPlus', 'Tests')):
+            os.mkdir(os.path.join(self.path, ".PyPlus", 'Tests'))
         try:
-            with open(os.path.join(self.path, ".PyPlus/tests.json"), "w") as f:
+            with open(os.path.join(self.path, TESTS_FILE), "w") as f:
                 json.dump(self.method_list, f)
         except AttributeError:
-            with open(os.path.join(self.path, ".PyPlus/tests.json"), "w") as f:
+            with open(os.path.join(self.path, TESTS_FILE), "w") as f:
                 json.dump({}, f)
 
     def read_test(self) -> dict:
         try:
-            with open(os.path.join(self.path, ".PyPlus/tests.json")) as f:
+            with open(os.path.join(self.path, TESTS_FILE)) as f:
+                return json.load(f)
+        except (ValueError, FileNotFoundError):
+            return {}
+
+    def refresh_tests(self):
+        self.tests_listbox.delete(*self.tests_listbox.get_children())
+        self.method_list = self.read_test()
+        self.write_test()
+        for test in self.method_list.keys():
+            self.tests_listbox.insert("", "end", text=test)
+
+    def write_settings(self):
+        try:
+            with open(os.path.join(self.path, SETTINGS_FILE), "w") as f:
+                json.dump(self.settings_list, f)
+        except AttributeError:
+            with open(os.path.join(self.path, SETTINGS_FILE), "w") as f:
+                json.dump({}, f)
+
+    def read_settings(self) -> dict:
+        try:
+            with open(os.path.join(self.path, SETTINGS_FILE)) as f:
                 return json.load(f)
         except (ValueError, FileNotFoundError):
             return {}
@@ -57,8 +90,38 @@ class TestDialog(tk.Toplevel):
         self.method_list[name] = code
         self.write_test()
 
+    def modify_settings(self, setting_name, setting):
+        self.settings_list[setting_name] = setting
+        self.write_settings()
+
+    def settings(self):
+        settingswin = tk.Toplevel(self)
+        imports = EnhancedTextFrame(settingswin)
+        setup = EnhancedTextFrame(settingswin)
+        teardown = EnhancedTextFrame(settingswin)
+        imports.text['height'] = 3
+        setup.text['height'] = 3
+        teardown.text['height'] = 3
+        ttk.Label(settingswin, text='Imports').pack(fill='both', expand=1)
+        imports.pack(fill='both', expand=1)
+        ttk.Label(settingswin, text='SetUp').pack(fill='both', expand=1)
+        setup.pack(fill='both', expand=1)
+        ttk.Label(settingswin, text='TearDown').pack(fill='both', expand=1)
+        teardown.pack(fill='both', expand=1)
+
+        def save_and_close():
+            self.modify_settings('imports', imports.text.get('1.0', 'end'))
+            self.modify_settings('setup', setup.text.get('1.0', 'end'))
+            self.modify_settings('teardown', teardown.text.get('1.0', 'end'))
+            self.write_settings()
+            settingswin.destroy()
+
+        ttk.Button(settingswin, text='OK',
+                   command=save_and_close).pack(fill='both')
+        settingswin.mainloop()
+
     def new(self):
-        dialog = InputStringDialog(self.master, "New", "Name")
+        dialog = InputStringDialog(self, "New", "Name")
         name = dialog.result
         if not name:
             return
@@ -82,7 +145,9 @@ class TestDialog(tk.Toplevel):
 
         okbtn = ttk.Button(button_frame, text="OK", command=save_and_close)
         okbtn.pack(side="left")
-        cancelbtn = ttk.Button(button_frame, text="Cancel", command=codewin.destroy)
+        cancelbtn = ttk.Button(button_frame,
+                               text="Cancel",
+                               command=codewin.destroy)
         cancelbtn.pack(side="left")
         button_frame.pack(fill="x")
         codewin.mainloop()
@@ -119,23 +184,34 @@ class TestDialog(tk.Toplevel):
 
         okbtn = ttk.Button(button_frame, text="OK", command=save_and_close)
         okbtn.pack(side="left")
-        cancelbtn = ttk.Button(button_frame, text="Cancel", command=codewin.destroy)
+        cancelbtn = ttk.Button(button_frame,
+                               text="Cancel",
+                               command=codewin.destroy)
         cancelbtn.pack(side="left")
         button_frame.pack(fill="x")
         codewin.mainloop()
         self.refresh_tests()
 
     def run_test(self):
-        res = '''import unittest
+        modules = self.settings_list['imports']
+        teardown = self.settings_list['teardown']
+        setup = self.settings_list['setup']
+        method_list = self.method_list
+        method_list['setUp'] = setup
+        method_list['tearDown'] = teardown
+        res = f'''import unittest
+{modules}
 
-class TestMain(unittest.TestCase):'''
-        for key, value in self.method_list.items():
+class TestMain(unittest.TestCase):
+'''
+        for key, value in method_list.items():
             values = ''
             for line in value.splitlines():
-                values += '        ' + line + '\n'
+                values += ' ' * 8 + line + '\n'
             res += f'''
     def {key}():
 {values}
 '''
         with open(os.path.join(self.path, 'test.py'), 'w') as f:
             f.write(res)
+

@@ -31,61 +31,58 @@ class CommitView:
         self.files_listbox.delete(*self.files_listbox.get_children())
         modified_files = [
             "M " + x
-            for x in subprocess.Popen(
+            for x in subprocess.run(
                 "git diff --staged --name-only --diff-filter=M",
-                stdout=subprocess.PIPE,
                 shell=True,
                 cwd=self.dir,
-            )
-            .communicate()[0]
-            .decode("utf-8")
-            .splitlines()
+                capture_output=True
+            ).stdout.decode('utf-8').splitlines()
         ]
         renamed_files = [
             "R " + x
-            for x in subprocess.Popen(
+            for x in subprocess.run(
                 "git diff --staged --name-only --diff-filter=R",
-                stdout=subprocess.PIPE,
+                capture_output=True,
                 shell=True,
                 cwd=self.dir,
             )
-            .communicate()[0]
+            .stdout
             .decode("utf-8")
             .splitlines()
         ]
         added_files = [
             "A " + x
-            for x in subprocess.Popen(
+            for x in subprocess.run(
                 "git diff --staged --name-only --diff-filter=A",
-                stdout=subprocess.PIPE,
+                capture_output=True,
                 shell=True,
                 cwd=self.dir,
             )
-            .communicate()[0]
+            .stdout
             .decode("utf-8")
             .splitlines()
         ]
         deleted_files = [
             "D " + x
-            for x in subprocess.Popen(
+            for x in subprocess.run(
                 "git diff --staged --name-only --diff-filter=D",
-                stdout=subprocess.PIPE,
+                capture_output=True,
                 shell=True,
                 cwd=self.dir,
             )
-            .communicate()[0]
+            .stdout
             .decode("utf-8")
             .splitlines()
         ]
         copied_files = [
             "C " + x
-            for x in subprocess.Popen(
+            for x in subprocess.run(
                 "git diff --staged --name-only --diff-filter=C",
-                stdout=subprocess.PIPE,
+                capture_output=True,
                 shell=True,
                 cwd=self.dir,
             )
-            .communicate()[0]
+            .stdout
             .decode("utf-8")
             .splitlines()
         ]
@@ -115,29 +112,27 @@ class CommitView:
             self.window.destroy()
 
     def diff(self, event=None):
-        try:
-            item = self.files_listbox.identify("item", event.x, event.y)
-            selected = self.files_listbox.item(item, "text")[2:]
-            diffwindow = tk.Toplevel(self.window)
-            diffwindow.resizable(0, 0)
-            textframe = EnhancedTextFrame(diffwindow)
-            difftext = textframe.text
-            difftext.lexer = lexers.get_lexer_by_name("diff")
-            difftext.update()
-            subprocess.run(
-                f'git diff --staged {selected} > \
-                            {os.path.join(APPDIR, "out.txt")}',
-                shell=True,
-                cwd=self.dir,
-            )
-            with open(os.path.join(APPDIR, "out.txt")) as f:
-                message = f.read()
-            os.remove("out.txt")
-            difftext.insert("end", message)
-            create_tags(difftext)
-            recolorize(difftext)
-            difftext.config(state="disabled", wrap="none")
-            textframe.pack(fill="both")
-            diffwindow.mainloop()
-        except Exception as e:
-            print(e, flush=True)
+        item = self.files_listbox.identify("item", event.x, event.y)
+        selected = self.files_listbox.item(item, "text")[2:]
+        diffwindow = tk.Toplevel(self.window)
+        diffwindow.resizable(0, 0)
+        diffwindow.title(f'Diff of {selected}')
+        textframe = EnhancedTextFrame(diffwindow)
+        difftext = textframe.text
+        difftext.lexer = lexers.get_lexer_by_name("diff")
+        difftext.update()
+        subprocess.run(
+            f'git diff --staged {selected} > \
+                        {os.path.join(APPDIR, "out.txt")}',
+            shell=True,
+            cwd=self.dir,
+        )
+        with open(os.path.join(APPDIR, "out.txt")) as f:
+            message = f.read()
+        os.remove("out.txt")
+        difftext.insert("end", message)
+        create_tags(difftext)
+        recolorize(difftext)
+        difftext.config(state="disabled", wrap="none")
+        textframe.pack(fill="both")
+        diffwindow.mainloop()

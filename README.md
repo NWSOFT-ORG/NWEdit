@@ -16,7 +16,7 @@ Some code is from pyro written by James Stalings, licensed after the GPL v3.0 Li
 simple elegant text editor built on Python/Tkinter
     by James Stallings, June 2015
     Adapted from:
-    
+
       Pygments Tkinter example
       copyleft 2014 by Jens Diemer
       licensed under GNU GPL v3

@@ -17,7 +17,6 @@ import sys
 import threading
 import time
 import tkinter as tk
-import tkinter.filedialog
 import tkinter.font as font
 import tkinter.ttk as ttk
 import webbrowser
@@ -28,11 +27,7 @@ import json5 as json
 import requests
 import ttkthemes
 from pygments import lexers
-from pygments.styles import get_style_by_name
-from pygson.json_lexer import JSONLexer
-from ttkthemes import ThemedStyle
-import inspect
-import imp
+from pygments import styles
 
 if sys.platform == "darwin":
     import PyTouchBar

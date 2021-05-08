@@ -1,4 +1,4 @@
-﻿from src.modules import font, get_style_by_name, tk
+from src.modules import font, styles, tk
 from src.settings import Settings
 
 
@@ -14,7 +14,7 @@ def create_tags(textbox: tk.Text) -> None:
     bold_italic_font = font.Font(currtext, currtext.cget("font"))
     bold_italic_font.configure(weight=font.BOLD, slant=font.ITALIC)
     settings = Settings()
-    style = get_style_by_name(settings.get_settings("pygments"))
+    style = styles.get_style_by_name(settings.get_settings("pygments"))
 
     for ttype, ndef in style:
         tag_font = None

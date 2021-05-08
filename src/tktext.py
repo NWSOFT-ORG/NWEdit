@@ -1,6 +1,6 @@
 """A modded version of tkinter.Text"""
 
-from src.modules import font, get_style_by_name, tk, ttk
+from src.modules import font, styles, tk, ttk
 from src.settings import Settings
 from src.functions import darken_color, is_dark_color, lighten_color
 
@@ -127,7 +127,7 @@ class EnhancedTextFrame(ttk.Frame):
         settings_class = Settings()
         self.font = settings_class.get_settings("font")
         self.first_line = 1
-        style = get_style_by_name(settings_class.get_settings("pygments"))
+        style = styles.get_style_by_name(settings_class.get_settings("pygments"))
         bgcolor = style.background_color
         fgcolor = style.highlight_color
         if is_dark_color(bgcolor):

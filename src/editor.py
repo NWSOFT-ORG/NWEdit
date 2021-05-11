@@ -177,23 +177,37 @@ class Editor:
             )  # When the window is closed, or quit from Mac, do exit action
             self.master.createcommand("::tk::mac::Quit", self.exit)
 
-            def maximise(_=None):
-                w, h = self.master.winfo_screenwidth(), self.master.winfo_screenheight()
-                self.master.geometry("%dx%d+0+0" % (w, h))
-
-            self.menubar = Menubar(self.master, closeaction=lambda _=None: self.exit(force=True),
-                                   maximiseaction=maximise,
-                                   minimiseaction=lambda _=None: self.master.iconify())
+            self.menubar = Menubar(self.master)
             self.pandedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.pandedwin.pack(fill="both", expand=1)
-            self.nb = ClosableNotebook(self.master, self.close_tab)
+            frame = ttk.Frame(self.master)
+            frame.pack(fill='both', expand=1)
+            self.nb = ClosableNotebook(frame, self.close_tab)
             self.nb.bind("<B1-Motion>", self.move_tab)
             self.nb.pack(expand=1, fill="both")
             self.filetree = FileTree(self.master, self.open_file)
             self.pandedwin.add(self.filetree)
-            self.pandedwin.add(self.nb)
+            self.pandedwin.add(frame)
             self.nb.enable_traversal()
             self.statusbar = Statusbar()
+
+
+            slideFrame = ttk.Frame(self.nb)
+            slideFrame.place(relx=1.0, x=0, y=1, anchor='ne')
+
+
+            def _bottomMenu(event):
+                tabListMenu = tk.Menu(event.widget, tearoff = 0)
+                for tab in self.nb.tabs():
+                    tabListMenu.add_command(label=self.nb.tab(tab, option="text"),command= lambda temp=tab: self.nb.select(temp))
+                try:
+                    tabListMenu.tk_popup(event.x_root, event.y_root)
+                finally:
+                    tabListMenu.grab_release()
+
+            leftArrow = ttk.Label(slideFrame, text="All items")
+            leftArrow.bind("<1>", _bottomMenu)
+            leftArrow.pack(side='left')
 
             self.create_menu()
 

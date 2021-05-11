@@ -211,7 +211,8 @@ class FileTree(ttk.Frame):
         self.refresh_tree()
 
     def process_directory(self, path: str, showdironly: bool = False):
-        ls = os.listdir(path)
+        self.path = path.strip()
+        ls = os.listdir(self.path)
         dirs = []
         files = []
         for file in ls:

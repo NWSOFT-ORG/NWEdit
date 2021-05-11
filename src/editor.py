@@ -569,7 +569,7 @@ class Editor:
     def update_statusbar(self, _=None) -> str:
         try:
             if not self.tabs:
-                self.statusbar.label2.config(text="No file open |")
+                self.statusbar.label2.config(text="No file open")
                 self.statusbar.label3.config(text="")
                 logger.debug("update_statusbar: No file open")
                 return "break"
@@ -577,7 +577,7 @@ class Editor:
             index = currtext.index("insert")
             ln = index.split(".")[0]
             col = index.split(".")[1]
-            self.statusbar.label2.config(text=f"{self.tabs[self.get_tab()].file_dir} |")
+            self.statusbar.label2.config(text=f"{self.tabs[self.get_tab()].file_dir}")
             self.statusbar.label3.config(text=f"Line {ln} Col {col}")
             logger.debug("update_statusbar: OK")
             return "break"

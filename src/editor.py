@@ -176,8 +176,14 @@ class Editor:
                 "WM_DELETE_WINDOW", lambda: self.exit(force=False)
             )  # When the window is closed, or quit from Mac, do exit action
             self.master.createcommand("::tk::mac::Quit", self.exit)
-            self.menubar = Menubar(self.master)
-            self.menubar.pack(fill="x", side="top")
+
+            def maximise(_=None):
+                w, h = self.master.winfo_screenwidth(), self.master.winfo_screenheight()
+                self.master.geometry("%dx%d+0+0" % (w, h))
+
+            self.menubar = Menubar(self.master, closeaction=lambda _=None: self.exit(force=True),
+                                   maximiseaction=maximise,
+                                   minimiseaction=lambda _=None: self.master.iconify())
             self.pandedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.pandedwin.pack(fill="both", expand=1)
             self.nb = ClosableNotebook(self.master, self.close_tab)

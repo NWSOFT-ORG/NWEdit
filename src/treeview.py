@@ -29,9 +29,7 @@ class FileTree(ttk.Frame):
                         "children": [
                             ("Treeitem.indicator", {"side": "left", "sticky": ""}),
                             ("Treeitem.image", {"side": "left", "sticky": ""}),
-                            # ('Treeitem.focus', {'side': 'left', 'sticky': '', 'children': [
                             ("Treeitem.text", {"side": "left", "sticky": ""}),
-                            # ]})
                         ],
                     },
                 )

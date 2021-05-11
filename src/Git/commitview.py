@@ -35,8 +35,10 @@ class CommitView:
                 "git diff --staged --name-only --diff-filter=M",
                 shell=True,
                 cwd=self.dir,
-                capture_output=True
-            ).stdout.decode('utf-8').splitlines()
+                capture_output=True,
+            )
+            .stdout.decode("utf-8")
+            .splitlines()
         ]
         renamed_files = [
             "R " + x
@@ -46,8 +48,7 @@ class CommitView:
                 shell=True,
                 cwd=self.dir,
             )
-            .stdout
-            .decode("utf-8")
+            .stdout.decode("utf-8")
             .splitlines()
         ]
         added_files = [
@@ -58,8 +59,7 @@ class CommitView:
                 shell=True,
                 cwd=self.dir,
             )
-            .stdout
-            .decode("utf-8")
+            .stdout.decode("utf-8")
             .splitlines()
         ]
         deleted_files = [
@@ -70,8 +70,7 @@ class CommitView:
                 shell=True,
                 cwd=self.dir,
             )
-            .stdout
-            .decode("utf-8")
+            .stdout.decode("utf-8")
             .splitlines()
         ]
         copied_files = [
@@ -82,8 +81,7 @@ class CommitView:
                 shell=True,
                 cwd=self.dir,
             )
-            .stdout
-            .decode("utf-8")
+            .stdout.decode("utf-8")
             .splitlines()
         ]
         for x in added_files:
@@ -116,7 +114,7 @@ class CommitView:
         selected = self.files_listbox.item(item, "text")[2:]
         diffwindow = tk.Toplevel(self.window)
         diffwindow.resizable(0, 0)
-        diffwindow.title(f'Diff of {selected}')
+        diffwindow.title(f"Diff of {selected}")
         textframe = EnhancedTextFrame(diffwindow)
         difftext = textframe.text
         difftext.lexer = lexers.get_lexer_by_name("diff")

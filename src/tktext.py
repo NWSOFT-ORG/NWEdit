@@ -1,8 +1,10 @@
 """A modded version of tkinter.Text"""
 
-from src.modules import font, styles, tk, ttk
+from src.modules import font, styles, tk, ttk, EditorErr
 from src.settings import Settings
 from src.functions import darken_color, is_dark_color, lighten_color
+from src.highlighter import recolorize
+from src.constants import MAIN_KEY, logger
 
 
 class TextLineNumbers(tk.Canvas):
@@ -178,3 +180,185 @@ class EnhancedTextFrame(ttk.Frame):
 
     def set_first_line(self, line: int) -> None:
         self.first_line = line
+
+
+class TextOpts:
+    def __init__(self, textwidget: tk.Text, bindkey: bool = False, keyaction: callable = None):
+        if bindkey and keyaction:
+            raise EditorErr('`bindkey` and `keyaction` cannot be specified at the same time.')
+        self.keyaction = keyaction
+        self.bindkey = bindkey
+        self.text = textwidget
+        self.settings_class = Settings()
+        self.tabwidth = self.settings_class.get_settings("tab")
+        if bindkey:
+            self.text.bind("<<Key>>", self.key)
+            self.text.event_add("<<Key>>", "<KeyRelease>")
+        for char in ['"', "'", "(", "[", "{"]:
+            self.text.bind(char, self.autoinsert)
+        for char in [")", "]", "}"]:
+            self.text.bind(char, self.close_brackets)
+
+        def tab(event=None):
+            # Convert tabs to spaces
+            event.widget.insert("insert", " " * self.tabwidth)
+            self.key()
+            # Quit quickly, before a char is being inserted.
+            return "break"
+        self.text.bind("<BackSpace>", self.backspace)
+        self.text.bind("<Return>", self.autoindent)
+        self.text.bind("<Tab>", tab)
+        self.text.bind(f"<{MAIN_KEY}-i>", lambda _=None: self.indent("indent"))
+        self.text.bind(f"<{MAIN_KEY}-u>", lambda _=None: self.indent("unindent"))
+        self.text.bind(f"<{MAIN_KEY}-Z>", self.redo)
+        self.text.bind(f"<{MAIN_KEY}-z>", self.undo)
+        self.text.bind(f"{MAIN_KEY}-d", self.duplicate_line)
+
+    def key(self, _=None) -> None:
+        """Event when a key is pressed."""
+        if not self.bindkey:
+            currtext = self.text
+            recolorize(currtext)
+            currtext.edit_separator()
+            currtext.see("insert")
+            logger.exception("Error when handling keyboard event:")
+        else:
+            self.keyaction()
+    
+    def duplicate_line(self) -> None:
+        if not self.tabs:
+            return
+        currtext = self.text
+        sel = currtext.get("sel.first", "sel.last")
+        if currtext.tag_ranges("sel"):
+            currtext.tag_remove("sel", "1.0", "end")
+            currtext.insert("insert", sel)
+        else:
+            text = currtext.get("insert linestart", "insert lineend")
+            currtext.insert("insert", "\n" + text)
+        self.key()
+    
+    def backspace(self, _=None) -> None:
+        if not self.tabs:
+            return
+        currtext = self.text
+        # Backchar
+        if currtext.get("insert -1c", "insert +1c") in ["''", '""', "[]", "{}", "()"]:
+            currtext.delete("insert", "insert +1c")
+        # Backtab
+        if currtext.get(f"insert -{self.tabwidth}c", "insert") == " " * self.tabwidth:
+            currtext.delete(f"insert -{self.tabwidth - 1}c", "insert")
+        self.key()
+
+    def close_brackets(self, event: tk.EventType = None) -> str:
+        if not self.tabs:
+            return
+        currtext = self.text
+        if event.char in [")", "]", "}", "'", '"']:
+            currtext.mark_set("insert", "insert +1c")
+            self.key()
+            return "break"
+        currtext.insert("insert", event.char)
+        self.key()
+
+    def autoinsert(self, event=None) -> str:
+        """Auto-inserts a symbol
+        * ' -> ''
+        * " -> ""
+        * ( -> ()
+        * [ -> []
+        * { -> {}"""
+        currtext = self.text
+        char = event.char
+        if currtext.tag_ranges("sel"):
+            selected = currtext.get("sel.first", "sel.last")
+            if char == "'":
+                currtext.delete("sel.first", "sel.last")
+                currtext.insert("insert", f"'{selected}'")
+                return "break"
+            if char == '"':
+                currtext.delete("sel.first", "sel.last")
+                currtext.insert("insert", f'"{selected}"')
+                return "break"
+            if char == "(":
+                currtext.delete("sel.first", "sel.last")
+                currtext.insert("insert", f"({selected})")
+                return "break"
+            if char == "[":
+                currtext.delete("sel.first", "sel.last")
+                currtext.insert("insert", f"[{selected}]")
+                return "break"
+            if char == "{":
+                currtext.delete("sel.first", "sel.last")
+                currtext.insert(
+                    "insert", "{" + selected + "}"
+                )  # Can't use f-string for this!
+                return "break"
+
+        if char == "'":
+            if currtext.get("insert", "insert +1c") == "'":
+                currtext.mark_set("insert", "insert +1c")
+                return "break"
+            currtext.insert("insert", "''")
+            currtext.mark_set("insert", "insert -1c")
+            return "break"
+        if char == '"':
+            if currtext.get("insert", "insert +1c") == '"':
+                currtext.mark_set("insert", "insert +1c")
+                return "break"
+            currtext.insert("insert", '""')
+            currtext.mark_set("insert", "insert -1c")
+            return "break"
+        if char == "(":
+            currtext.insert("insert", "()")
+            currtext.mark_set("insert", "insert -1c")
+            return "break"
+        if char == "[":
+            currtext.insert("insert", "[]")
+            currtext.mark_set("insert", "insert -1c")
+            return "break"
+        if char == "{":
+            currtext.insert("insert", r"{}")
+            currtext.mark_set("insert", "insert -1c")
+            return "break"
+        currtext.mark_set("insert", "insert -1c")
+        self.key()
+
+    def autoindent(self, _=None) -> str:
+        """Auto-indents the next line"""
+        currtext = self.text
+        indentation = ""
+        lineindex = currtext.index("insert").split(".")[0]
+        linetext = currtext.get(lineindex + ".0", lineindex + ".end")
+        for character in linetext:
+            if character in [" ", "\t"]:
+                indentation += character
+            else:
+                break
+
+        if linetext.endswith(":"):
+            indentation += " " * self.tabwidth
+        if linetext.endswith("\\"):
+            indentation += " " * self.tabwidth
+        if "return" in linetext or "break" in linetext:
+            indentation = indentation[4:]
+        if linetext.endswith("(") or linetext.endswith(", ") or linetext.endswith(","):
+            indentation += " " * self.tabwidth
+
+        currtext.insert(currtext.index("insert"), "\n" + indentation)
+        self.key()
+        return "break"
+
+    def undo(self, _=None) -> None:
+        try:
+            self.text.edit_undo()
+            self.key()
+        except Exception:
+            return
+
+    def redo(self, _=None) -> None:
+        try:
+            self.text.edit_redo()
+            self.key()
+        except Exception:
+            return

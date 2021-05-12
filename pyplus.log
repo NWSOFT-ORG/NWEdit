@@ -1,18 +1,46 @@
-2021-05-11 17:05:00,311 : INFO : <module> : Tkinter version: 8.6
-2021-05-11 17:05:00,311 : DEBUG : <module> : All modules imported
-2021-05-11 17:05:01,085 : DEBUG : __init__ : Settings loaded
-2021-05-11 17:05:01,221 : DEBUG : __init__ : Icons loaded
-2021-05-11 17:05:01,226 : DEBUG : __init__ : Theme loaded
-2021-05-11 17:05:01,252 : DEBUG : __initialize_custom_style : Initialized custom style.
-2021-05-11 17:05:01,510 : DEBUG : create_menu : Menu created
-2021-05-11 17:05:01,510 : DEBUG : __init__ : Right-click menu created
-2021-05-11 17:05:01,511 : DEBUG : __init__ : Bindings created
-2021-05-11 17:05:01,512 : DEBUG : update_title : update_title: No file open
-2021-05-11 17:05:01,513 : DEBUG : update_statusbar : update_statusbar: No file open
-2021-05-11 17:05:01,569 : DEBUG : create_text_widget : Textbox created
-2021-05-11 17:05:02,121 : DEBUG : update_statusbar : update_statusbar: OK
-2021-05-11 17:05:02,122 : DEBUG : update_title : update_title: OK
-2021-05-11 17:05:02,122 : DEBUG : key : update_title: OK
-2021-05-11 17:05:02,125 : INFO : open_file : File opened
-2021-05-11 17:05:02,127 : DEBUG : start_screen : Start screen created
-2021-05-11 17:05:07,940 : INFO : exit : Window is destroyed
+2021-05-12 07:38:35,213 : INFO : <module> : Tkinter version: 8.6
+2021-05-12 07:38:35,214 : DEBUG : <module> : All modules imported
+2021-05-12 07:38:36,680 : DEBUG : __init__ : Settings loaded
+2021-05-12 07:38:37,953 : DEBUG : __init__ : Icons loaded
+2021-05-12 07:38:37,954 : DEBUG : __init__ : Theme loaded
+2021-05-12 07:38:37,976 : DEBUG : __initialize_custom_style : Initialized custom style.
+2021-05-12 07:38:38,530 : DEBUG : create_menu : Menu created
+2021-05-12 07:38:38,559 : DEBUG : __init__ : Right-click menu created
+2021-05-12 07:38:38,566 : DEBUG : __init__ : Bindings created
+2021-05-12 07:38:38,568 : DEBUG : update_title : update_title: No file open
+2021-05-12 07:38:38,568 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-05-12 07:38:38,569 : ERROR : open_file : Error when opening file:
+Traceback (most recent call last):
+  File "/home/runner/PyPlus/src/editor.py", line 652, in open_file
+    if is_binary_string(open(file_dir, "rb").read()):
+IsADirectoryError: [Errno 21] Is a directory: '/'
+2021-05-12 07:38:38,577 : DEBUG : start_screen : Start screen created
+2021-05-12 07:38:40,816 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-05-12 07:38:40,816 : DEBUG : update_title : update_title: No file open
+2021-05-12 07:38:40,817 : DEBUG : mouse : update_title: OK
+2021-05-12 07:38:41,999 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-05-12 07:38:41,999 : DEBUG : update_title : update_title: No file open
+2021-05-12 07:38:41,999 : DEBUG : mouse : update_title: OK
+2021-05-12 07:38:42,258 : DEBUG : create_text_widget : Textbox created
+2021-05-12 07:38:42,633 : INFO : open_file : File opened
+2021-05-12 07:38:42,640 : DEBUG : update_statusbar : update_statusbar: OK
+2021-05-12 07:38:42,641 : DEBUG : update_title : update_title: OK
+2021-05-12 07:38:42,641 : DEBUG : mouse : update_title: OK
+2021-05-12 07:38:43,659 : DEBUG : update_statusbar : update_statusbar: OK
+2021-05-12 07:38:43,684 : DEBUG : update_title : update_title: OK
+2021-05-12 07:38:43,685 : DEBUG : mouse : update_title: OK
+2021-05-12 07:38:45,539 : DEBUG : update_statusbar : update_statusbar: OK
+2021-05-12 07:38:45,539 : DEBUG : update_title : update_title: OK
+2021-05-12 07:38:45,540 : DEBUG : mouse : update_title: OK
+2021-05-12 07:38:45,865 : DEBUG : update_statusbar : update_statusbar: OK
+2021-05-12 07:38:45,865 : DEBUG : update_title : update_title: OK
+2021-05-12 07:38:45,865 : DEBUG : mouse : update_title: OK
+2021-05-12 07:38:54,022 : DEBUG : on_close_press : Close tab start
+2021-05-12 07:38:54,158 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-05-12 07:38:54,159 : DEBUG : update_title : update_title: No file open
+2021-05-12 07:38:54,159 : DEBUG : mouse : update_title: OK
+2021-05-12 07:38:54,159 : DEBUG : on_close_release : Close tab end
+2021-05-12 07:38:54,160 : DEBUG : update_statusbar : update_statusbar: No file open
+2021-05-12 07:38:54,160 : DEBUG : update_title : update_title: No file open
+2021-05-12 07:38:54,160 : DEBUG : mouse : update_title: OK
+2021-05-12 07:38:58,500 : INFO : exit : Window is destroyed

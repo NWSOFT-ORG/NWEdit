@@ -68,7 +68,7 @@ from src.settings import (
 )
 from src.statusbar import Statusbar
 from src.testdialog import TestDialog
-from src.tktext import EnhancedTextFrame
+from src.tktext import EnhancedTextFrame, TextOpts
 from src.treeview import FileTree
 
 if OSX:
@@ -243,6 +243,10 @@ class Editor:
                 self.filetree.path = f.read()
                 self.filetree.init_ui()
         except FileNotFoundError:
+            with open("Backups/recent_files.txt", "w") as f:
+                f.write('/')
+            with open("Backups/recent_dir.txt", "w") as f:
+                f.write('')
             logger.exception("Error when initializing:")
             self.restart()
 
@@ -509,13 +513,6 @@ class Editor:
     def create_text_widget(self, frame: ttk.Frame) -> EnhancedTextFrame:
         """Creates a text widget in a frame."""
 
-        def tab(event=None):
-            # Convert tabs to spaces
-            event.widget.insert("insert", " " * self.tabwidth)
-            self.key()
-            # Quit quickly, before a char is being inserted.
-            return "break"
-
         panedwin = ttk.Panedwindow(frame)
         panedwin.pack(fill="both", expand=1)
 
@@ -527,31 +524,34 @@ class Editor:
         textframe.set_first_line(1)
 
         textbox = textframe.text  # text widget
+        TextOpts(textbox, bindkey=False, keyaction=self.key)
         textbox.frame = frame  # The text will be packed into the frame.
         textbox.bind(("<Button-2>" if OSX else "<Button-3>"), self.right_click)
-        textbox.bind("<BackSpace>", self.backspace)
-        textbox.bind("<Return>", self.autoindent)
-        textbox.bind("<Tab>", tab)
         textbox.bind(f"<{MAIN_KEY}-b>", self.run)
         textbox.bind(f"<{MAIN_KEY}-f>", self.search)
-        textbox.bind(f"<{MAIN_KEY}-i>", lambda _=None: self.indent("indent"))
         textbox.bind(f"<{MAIN_KEY}-n>", self.filetree.new_file)
         textbox.bind(f"<{MAIN_KEY}-N>", self.goto)
         textbox.bind(f"<{MAIN_KEY}-r>", self.reload)
         textbox.bind(f"<{MAIN_KEY}-S>", self._saveas)
-        textbox.bind(f"<{MAIN_KEY}-u>", lambda _=None: self.indent("unindent"))
-        textbox.bind(f"<{MAIN_KEY}-Z>", self.redo)
-        textbox.bind(f"<{MAIN_KEY}-z>", self.undo)
-        textbox.bind("<<Key>>", self.key)
-        textbox.event_add("<<Key>>", "<KeyRelease>")
-        for char in ['"', "'", "(", "[", "{"]:
-            textbox.bind(char, self.autoinsert)
-        for char in [")", "]", "}"]:
-            textbox.bind(char, self.close_brackets)
         textbox.focus_set()
         create_tags(textbox)
         logger.debug("Textbox created")
         return textbox
+    
+    def undo(self):
+        if not self.tabs:
+            return
+        self.tabs[self.get_tab()].textbox.ops.undo()
+
+    def redo(self):
+        if not self.tabs:
+            return
+        self.tabs[self.get_tab()].textbox.ops.redo()
+
+    def duplicate_line(self):
+        if not self.tabs:
+            return
+        self.tabs[self.get_tab()].textbox.ops.duplicate()
 
     def update_title(self, _=None) -> str:
         try:
@@ -781,19 +781,6 @@ class Editor:
         except Exception:
             pass
 
-    def duplicate_line(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        sel = currtext.get("sel.first", "sel.last")
-        if currtext.tag_ranges("sel"):
-            currtext.tag_remove("sel", "1.0", "end")
-            currtext.insert("insert", sel)
-        else:
-            text = currtext.get("insert linestart", "insert lineend")
-            currtext.insert("insert", "\n" + text)
-        self.key()
-
     def run(self, _=None) -> None:
         """Runs the file
         Steps:
@@ -853,131 +840,6 @@ class Editor:
         file_dir = self.tabs[self.get_tab()].file_dir
         text = self.tabs[self.get_tab()].textbox
         ViewDialog(self.master, f"Classes and functions for {file_dir}", text, file_dir)
-
-    def backspace(self, _=None) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        # Backchar
-        if currtext.get("insert -1c", "insert +1c") in ["''", '""', "[]", "{}", "()"]:
-            currtext.delete("insert", "insert +1c")
-        # Backtab
-        if currtext.get(f"insert -{self.tabwidth}c", "insert") == " " * self.tabwidth:
-            currtext.delete(f"insert -{self.tabwidth - 1}c", "insert")
-        self.key()
-
-    def close_brackets(self, event: tk.EventType = None) -> str:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        if event.char in [")", "]", "}", "'", '"']:
-            currtext.mark_set("insert", "insert +1c")
-            self.key()
-            return "break"
-        currtext.insert("insert", event.char)
-        self.key()
-
-    def autoinsert(self, event=None) -> str:
-        """Auto-inserts a symbol
-        * ' -> ''
-        * " -> ""
-        * ( -> ()
-        * [ -> []
-        * { -> {}"""
-        currtext = self.tabs[self.get_tab()].textbox
-        char = event.char
-        if currtext.tag_ranges("sel"):
-            selected = currtext.get("sel.first", "sel.last")
-            if char == "'":
-                currtext.delete("sel.first", "sel.last")
-                currtext.insert("insert", f"'{selected}'")
-                return "break"
-            if char == '"':
-                currtext.delete("sel.first", "sel.last")
-                currtext.insert("insert", f'"{selected}"')
-                return "break"
-            if char == "(":
-                currtext.delete("sel.first", "sel.last")
-                currtext.insert("insert", f"({selected})")
-                return "break"
-            if char == "[":
-                currtext.delete("sel.first", "sel.last")
-                currtext.insert("insert", f"[{selected}]")
-                return "break"
-            if char == "{":
-                currtext.delete("sel.first", "sel.last")
-                currtext.insert(
-                    "insert", "{" + selected + "}"
-                )  # Can't use f-string for this!
-                return "break"
-
-        if char == "'":
-            if currtext.get("insert", "insert +1c") == "'":
-                currtext.mark_set("insert", "insert +1c")
-                return "break"
-            currtext.insert("insert", "''")
-            currtext.mark_set("insert", "insert -1c")
-            return "break"
-        if char == '"':
-            if currtext.get("insert", "insert +1c") == '"':
-                currtext.mark_set("insert", "insert +1c")
-                return "break"
-            currtext.insert("insert", '""')
-            currtext.mark_set("insert", "insert -1c")
-            return "break"
-        if char == "(":
-            currtext.insert("insert", "()")
-            currtext.mark_set("insert", "insert -1c")
-            return "break"
-        if char == "[":
-            currtext.insert("insert", "[]")
-            currtext.mark_set("insert", "insert -1c")
-            return "break"
-        if char == "{":
-            currtext.insert("insert", r"{}")
-            currtext.mark_set("insert", "insert -1c")
-            return "break"
-        currtext.mark_set("insert", "insert -1c")
-        self.key()
-
-    def autoindent(self, _=None) -> str:
-        """Auto-indents the next line"""
-        currtext = self.tabs[self.get_tab()].textbox
-        indentation = ""
-        lineindex = currtext.index("insert").split(".")[0]
-        linetext = currtext.get(lineindex + ".0", lineindex + ".end")
-        for character in linetext:
-            if character in [" ", "\t"]:
-                indentation += character
-            else:
-                break
-
-        if linetext.endswith(":"):
-            indentation += " " * self.tabwidth
-        if linetext.endswith("\\"):
-            indentation += " " * self.tabwidth
-        if "return" in linetext or "break" in linetext:
-            indentation = indentation[4:]
-        if linetext.endswith("(") or linetext.endswith(", ") or linetext.endswith(","):
-            indentation += " " * self.tabwidth
-
-        currtext.insert(currtext.index("insert"), "\n" + indentation)
-        self.key()
-        return "break"
-
-    def undo(self, _=None) -> None:
-        try:
-            self.tabs[self.get_tab()].textbox.edit_undo()
-            self.key()
-        except Exception:
-            return
-
-    def redo(self, _=None) -> None:
-        try:
-            self.tabs[self.get_tab()].textbox.edit_redo()
-            self.key()
-        except Exception:
-            return
 
     def right_click(self, event: tk.EventType) -> None:
         self.right_click_menu.tk_popup(event.x_root, event.y_root)

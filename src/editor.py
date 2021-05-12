@@ -537,21 +537,21 @@ class Editor:
         create_tags(textbox)
         logger.debug("Textbox created")
         return textbox
-    
+
     def undo(self):
         if not self.tabs:
             return
-        self.tabs[self.get_tab()].textbox.ops.undo()
+        self.tabs[self.get_tab()].textbox.opts.undo()
 
     def redo(self):
         if not self.tabs:
             return
-        self.tabs[self.get_tab()].textbox.ops.redo()
+        self.tabs[self.get_tab()].textbox.opts.redo()
 
     def duplicate_line(self):
         if not self.tabs:
             return
-        self.tabs[self.get_tab()].textbox.ops.duplicate()
+        self.tabs[self.get_tab()].textbox.opts.duplicate()
 
     def update_title(self, _=None) -> str:
         try:
@@ -682,10 +682,11 @@ class Editor:
                 currtext.comment_marker = self.commet_settings_class.get_settings(
                     extens
                 )
+
                 currtext.see("insert")
                 currtext.event_generate("<<Key>>")
                 currtext.focus_set()
-                currtext.master.on_change()
+                recolorize(currtext)
                 logging.info("File opened")
                 return
             except Exception as e:
@@ -1161,7 +1162,7 @@ class Editor:
                 "Updates aren't supported by develop builds,\n\
             since you're always on the latest version!",
             )  # If you're on the developer build, you don't need updates!
-            return []
+            return [True, 'about://blank']
         download_file(
             url="https://raw.githubusercontent.com/ZCG-coder/NWSOFT/master/PyPlusWeb/ver.json"
         )

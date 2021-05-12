@@ -26,6 +26,7 @@ from pathlib import Path
 import json5 as json
 import requests
 import ttkthemes
+import pygments
 from pygments import lexers
 from pygments import styles
 

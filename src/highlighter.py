@@ -1,4 +1,4 @@
-from src.modules import font, styles, tk
+from src.modules import font, styles, tk, pygments
 from src.settings import Settings
 
 
@@ -37,34 +37,30 @@ def create_tags(textbox: tk.Text) -> None:
 def recolorize(textbox: tk.Text) -> None:
     """
     This method colors and styles the prepared tags"""
-    try:
-        currtext = textbox
-        _code = currtext.get("1.0", "end-1c")
-        tokensource = currtext.lexer.get_tokens(_code)
-        start_line = 1
-        start_index = 0
-        end_line = 1
-        end_index = 0
+    currtext = textbox
+    start_index = currtext.index('1.0')
+    end_index = currtext.index('end')
 
-        for ttype, value in tokensource:
-            if "\n" in value:
-                end_line += value.count("\n")
-                end_index = len(value.rsplit("\n", 1)[1])
-            else:
-                end_index += len(value)
+    for tag in currtext.tag_names():
+        if tag in ['sel', 'found']:
+            continue
+        currtext.tag_remove(
+            tag, start_index, end_index)
 
-            index1 = f"{start_line}.{start_index}"
-            index2 = f"{end_line}.{end_index}"
+    _code = currtext.get(start_index, end_index)
 
-            for tagname in currtext.tag_names(index1):
-                if tagname not in ["sel", "found"]:
-                    currtext.tag_remove(tagname, index1, index2)
+    for index, line in enumerate(_code):
+        if index == 0 and line != '\n':
+            break
+        elif line == '\n':
+            start_index = currtext.index(f'{start_index}+1line')
+        else:
+            break
 
-            currtext.tag_add(str(ttype), index1, index2)
-
-            start_line = end_line
-            start_index = end_index
-
-        currtext.update()  # Have to update
-    except Exception:
-        pass
+    currtext.mark_set('range_start', start_index)
+    for token, content in pygments.lex(_code, currtext.lexer):
+        currtext.mark_set('range_end', f'range_start + {len(content)}c')
+        currtext.tag_add(
+            str(token), 'range_start', 'range_end')
+        currtext.mark_set(
+            'range_start', 'range_end')

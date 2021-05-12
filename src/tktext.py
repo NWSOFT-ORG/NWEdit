@@ -191,9 +191,8 @@ class TextOpts:
         self.text = textwidget
         self.settings_class = Settings()
         self.tabwidth = self.settings_class.get_settings("tab")
-        if bindkey:
-            self.text.bind("<<Key>>", self.key)
-            self.text.event_add("<<Key>>", "<KeyRelease>")
+        self.text.bind("<<Key>>", self.key)
+        self.text.event_add("<<Key>>", "<KeyRelease>")
         for char in ['"', "'", "(", "[", "{"]:
             self.text.bind(char, self.autoinsert)
         for char in [")", "]", "}"]:
@@ -216,18 +215,15 @@ class TextOpts:
 
     def key(self, _=None) -> None:
         """Event when a key is pressed."""
-        if not self.bindkey:
+        if self.bindkey:
             currtext = self.text
-            recolorize(currtext)
             currtext.edit_separator()
             currtext.see("insert")
             logger.exception("Error when handling keyboard event:")
         else:
             self.keyaction()
-    
+
     def duplicate_line(self) -> None:
-        if not self.tabs:
-            return
         currtext = self.text
         sel = currtext.get("sel.first", "sel.last")
         if currtext.tag_ranges("sel"):
@@ -237,10 +233,8 @@ class TextOpts:
             text = currtext.get("insert linestart", "insert lineend")
             currtext.insert("insert", "\n" + text)
         self.key()
-    
+
     def backspace(self, _=None) -> None:
-        if not self.tabs:
-            return
         currtext = self.text
         # Backchar
         if currtext.get("insert -1c", "insert +1c") in ["''", '""', "[]", "{}", "()"]:
@@ -251,14 +245,13 @@ class TextOpts:
         self.key()
 
     def close_brackets(self, event: tk.EventType = None) -> str:
-        if not self.tabs:
-            return
         currtext = self.text
-        if event.char in [")", "]", "}", "'", '"']:
+        if (event.char in [")", "]", "}", "'", '"'] and
+                currtext.get('insert -1c', 'insert') in [")", "]", "}", "'", '"']):
             currtext.mark_set("insert", "insert +1c")
             self.key()
             return "break"
-        currtext.insert("insert", event.char)
+        currtext.delete("insert", 'insert +1c')
         self.key()
 
     def autoinsert(self, event=None) -> str:

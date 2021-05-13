@@ -3,7 +3,6 @@
 from src.modules import font, styles, tk, ttk, EditorErr
 from src.settings import Settings
 from src.functions import darken_color, is_dark_color, lighten_color
-from src.highlighter import recolorize
 from src.constants import MAIN_KEY, logger
 
 

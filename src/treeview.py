@@ -39,14 +39,15 @@ class FileTree(ttk.Frame):
         style.configure("style.Treeview", font=("Arial", 8))
         style.configure("style.Treeview.Heading", font=("Arial", 13, "bold"))
         self.tree = ttk.Treeview(self, style="style.Treeview")
-        yscroll, xscroll = ttk.Scrollbar(self, command=self.tree.yview), ttk.Scrollbar(
+        self.yscroll = ttk.Scrollbar(self, command=self.tree.yview)
+        self.xscroll = ttk.Scrollbar(
             self, command=self.tree.xview, orient="horizontal"
         )
         style.configure("style.Treeview", rowheight=25, background=self.bg)
-        yscroll.pack(side="right", fill="y")
-        xscroll.pack(side="bottom", fill="x")
-        self.tree["yscrollcommand"] = yscroll.set
-        self.tree["xscrollcommand"] = xscroll.set
+        self.yscroll.pack(side="right", fill="y")
+        self.xscroll.pack(side="bottom", fill="x")
+        self.tree["yscrollcommand"] = self.yscroll.set
+        self.tree["xscrollcommand"] = self.xscroll.set
         self.master = master
         self.path = path if path != "" else os.path.expanduser("~")
         self.opencommand = opencommand
@@ -59,8 +60,8 @@ class FileTree(ttk.Frame):
                 values=["Rename...", "New...", "Refresh", "Remove...", "Get info..."],
             )
             self.actioncombobox.set("New...")
-            self.actioncombobox.pack(anchor="nw", side="left")
-            ttk.Button(topframe, text=">>", command=self.do_action).pack(
+            self.actioncombobox.pack(anchor="nw", side="left", fill='both')
+            ttk.Button(topframe, text=">>", command=self.do_action, width=3).pack(
                 side="left", anchor="nw"
             )
 
@@ -77,7 +78,7 @@ class FileTree(ttk.Frame):
         elif action == "Rename...":
             self.rename()
         elif action == "Refresh":
-            self.init_ui()
+            self.refresh_tree()
         elif action == "Remove...":
             self.remove()
         elif action == "Get info...":
@@ -92,7 +93,7 @@ class FileTree(ttk.Frame):
                 shutil.rmtree(path)
             else:
                 os.remove(path)
-            self.init_ui()
+            self.refresh_tree()
 
     def rename(self):
         try:
@@ -100,7 +101,7 @@ class FileTree(ttk.Frame):
             dialog = InputStringDialog(self.master, "Rename", "New name:")
             newdir = os.path.join(self.path, dialog.result)
             os.rename(path, newdir)
-            self.init_ui()
+            self.refresh_tree()
         except (IsADirectoryError, FileExistsError):
             pass
 
@@ -195,20 +196,16 @@ class FileTree(ttk.Frame):
         cancelbtn = ttk.Button(win, text="Cancel", command=lambda _=None: win.destroy())
         cancelbtn.pack(side="left", anchor="w", fill="x")
         win.mainloop()
-        self.init_ui()
+        self.refresh_tree()
 
     def init_ui(self):
         path = self.path
         if not path:
             path = os.path.expanduser("~")
-        self.tree.delete(*self.tree.get_children())
-        self.tree.bind("<Double-1>", self.on_double_click_treeview)
-        self.tree.update()
-
-        abspath = os.path.abspath(path)
-        self.process_directory(abspath)
 
         self.refresh_tree()
+        self.tree.bind("<Double-1>", self.on_double_click_treeview)
+        self.tree.update()
 
     def process_directory(self, path: str, showdironly: bool = False):
         self.path = path.strip()
@@ -239,7 +236,6 @@ class FileTree(ttk.Frame):
                 _dir = os.path.join(root, sub)
                 self.path = os.path.abspath(_dir)
                 self.refresh_tree()
-                self.tree.update()
 
             else:
                 file = self.tree.item(item, "text")
@@ -252,18 +248,14 @@ class FileTree(ttk.Frame):
                 except Exception:
                     pass
 
-                # workaround
-                # step 2
-                self.refresh_tree()
-                self.tree.update()
-
-            self.refresh_tree()
         except Exception:
             pass
 
     def refresh_tree(self):
         self.tree.delete(*self.tree.get_children())
+        ypos = self.yscroll.get()
         self.tree.heading("#0", text=self.path)
         path = self.path
         abspath = os.path.abspath(path)
         self.process_directory(abspath)
+        self.yscroll.set(*ypos)

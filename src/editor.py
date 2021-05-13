@@ -192,22 +192,22 @@ class Editor:
             self.statusbar = Statusbar()
 
 
-            slideFrame = ttk.Frame(self.nb)
-            slideFrame.place(relx=1.0, x=0, y=1, anchor='ne')
+            tab_frame = ttk.Frame(self.nb)
+            tab_frame.place(relx=1.0, x=0, y=1, anchor='ne')
 
 
-            def _bottomMenu(event):
-                tabListMenu = tk.Menu(event.widget, tearoff = 0)
+            def show_tab_menu(event):
+                tab_menu = tk.Menu(event.widget, tearoff=0)
                 for tab in self.nb.tabs():
-                    tabListMenu.add_command(label=self.nb.tab(tab, option="text"),command= lambda temp=tab: self.nb.select(temp))
+                    tab_menu.add_command(label=self.nb.tab(tab, option="text"),command= lambda temp=tab: self.nb.select(temp))
                 try:
-                    tabListMenu.tk_popup(event.x_root, event.y_root)
+                    tab_menu.tk_popup(event.x_root, event.y_root)
                 finally:
-                    tabListMenu.grab_release()
+                    tab_menu.grab_release()
 
-            leftArrow = ttk.Label(slideFrame, text="All items")
-            leftArrow.bind("<1>", _bottomMenu)
-            leftArrow.pack(side='left')
+            allitems_label = ttk.Label(tab_frame, text="All items")
+            allitems_label.bind("<1>", show_tab_menu)
+            allitems_label.pack(side='left')
 
             self.create_menu()
 
@@ -243,10 +243,6 @@ class Editor:
                 self.filetree.path = f.read()
                 self.filetree.init_ui()
         except FileNotFoundError:
-            with open("Backups/recent_files.txt", "w") as f:
-                f.write('/')
-            with open("Backups/recent_dir.txt", "w") as f:
-                f.write('')
             logger.exception("Error when initializing:")
             self.restart()
 

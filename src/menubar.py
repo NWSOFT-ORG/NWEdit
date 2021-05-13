@@ -60,5 +60,5 @@ class Menubar(ttk.Frame):
             btn = ttk.Button(
                 frame.interior, text=item, image=image, command=command, compound="top"
             )
-            btn.pack(side="left", anchor="nw")
+            btn.pack(side="left", anchor="nw", fill='both')
         self.notebook.add(frame, text=label, sticky="nsew")

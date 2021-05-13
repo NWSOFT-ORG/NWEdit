@@ -273,55 +273,35 @@ class ViewDialog(tk.Toplevel):
                             break
                         elif "def" in second_line:
                             l = second_line.lstrip()
-                            if l.startswith("def"):
-                                if l.startswith("#"):
-                                    continue
-                                else:
-                                    if whitespaces < whitespaces_second:
-                                        self.treeview.insert(
-                                            node,
-                                            "end",
-                                            text=second_line,
-                                            tags="function",
-                                        )
-                                        key += second_line
-                                        self.find_line[key] = x + y
-                                        key = "_class_" + line
-                                    else:
-                                        break
+                            if l.startswith("def") and whitespaces < whitespaces_second:
+                                    self.treeview.insert(
+                                        node,
+                                        "end",
+                                        text=second_line,
+                                        tags="function",
+                                    )
+                                    key += second_line
+                                    self.find_line[key] = x + y
+                                    key = "_class_" + line
+                            else:
+                                break
             elif "def" in line:
                 whitespaces = len(line) - len(line.lstrip())
                 if whitespaces == 0:
                     l = line.lstrip()
                     if l.startswith("def"):
-                        if l.startswith("#"):
-                            continue
-                        else:
-                            node = self.treeview.insert(
-                                "", "end", text=line, tags="function"
-                            )
-                            key = "_root_" + line
-                            self.find_line[key] = x
+                        node = self.treeview.insert(
+                            "", "end", text=line, tags="function"
+                        )
+                        key = "_root_" + line
+                        self.find_line[key] = x
 
                     else:
                         continue
 
-            elif "if __name__ ==" in line:
-                l = line.lstrip()
-                if l.startswith("if __name__"):
-                    node = self.treeview.insert("", "end", line)
-                    key = "_root_" + line
-                    self.find_line[key] = x
-
     def double_click(self, event):
         item = self.treeview.identify("item", event.x, event.y)
         label = self.treeview.item(item, "text")
-
-        if label == "":
-            self.text.mark_set("insert", "1.0")
-            self.text.see("insert")
-            self.text.focus_force()
-            return
 
         key = ""
         search_key = ""
@@ -383,3 +363,7 @@ class ViewDialog(tk.Toplevel):
             self.text.mark_set("insert", "%d.0" % (z))
             self.text.see("insert")
             self.text.focus_force()
+
+
+class ErrorReportDialog(Dialog):
+    pass

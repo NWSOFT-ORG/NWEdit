@@ -51,7 +51,7 @@ class ScrolledFrame(ttk.Frame):
         canvas = tk.Canvas(
             self, bd=0, highlightthickness=0, xscrollcommand=scrollbar.set, height=50
         )
-        canvas.pack()
+        canvas.pack(fill='both', expand=1)
         scrollbar.config(command=canvas.xview)
 
         # create a frame inside the canvas which will be scrolled with it

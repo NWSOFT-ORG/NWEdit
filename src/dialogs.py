@@ -227,14 +227,16 @@ class ViewDialog(tk.Toplevel):
         return box
     
     def show_info(self, parent, obj):
-        self.tree.insert(parent, obj.lineno, "end", text=obj.name)
+        self.tree.insert(parent, "end", text=f"{obj.name} [{obj.lineno}]")
     
     def double_click(self, event=None):
         try:
             item = self.tree.identify("item", event.x, event.y)
-            name = self.tree.item(item, "name")
+            text = self.tree.item(item, 'text')
+            line = text.split(' ')[-1][1:-1]
             try:
-                self.text.mark_set('insert', name)
+                self.text.mark_set('insert', f"{line}.0")
+                self.text.focus_set()
                 self.destroy()
             except Exception:
                 pass

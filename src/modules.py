@@ -22,6 +22,7 @@ import tkinter.ttk as ttk
 import webbrowser
 import zipfile
 from pathlib import Path
+import imp
 
 import json5 as json
 import requests

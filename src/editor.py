@@ -982,7 +982,7 @@ class Editor:
                                 cmd=self.tabs[self.get_tab()].textbox.lint_cmd
                             )
                         )
-                    subprocess.Popen(f'lint.bat "{currdir}"', shell=True)
+                    subprocess.call(f'lint.bat "{currdir}"', shell=True)
                     os.remove("lint.bat")
                 else:
                     with open("lint.sh", "w") as f:
@@ -991,7 +991,7 @@ class Editor:
                                 cmd=self.tabs[self.get_tab()].textbox.lint_cmd
                             )
                         )
-                    subprocess.Popen(
+                    subprocess.call(
                         f'chmod 700 lint.sh && ./lint.sh "{currdir}"', shell=True
                     )
                     os.remove("lint.sh")

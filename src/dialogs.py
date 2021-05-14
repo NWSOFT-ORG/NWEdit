@@ -1,5 +1,6 @@
 from src.constants import APPDIR, logger
-from src.modules import json, tk, ttk, ttkthemes
+from src.modules import json, tk, ttk, ttkthemes, imp
+import ast
 
 
 def get_theme():
@@ -43,14 +44,16 @@ class Dialog(tk.Toplevel):
         self.wait_window(self)
 
     def body(self, master: tk.Misc):
-        # create dialog body.  return widget that should have
-        # initial focus.  this method should be overridden
+        """create dialog body.  return widget that should have
+        initial focus.  this method should be overridden
+        """
 
         return master
 
     def buttonbox(self):
-        # add standard button box. override if you don't want the
-        # standard buttons
+        """add standard button box. override if you don't want the
+        standard buttons
+        """
 
         box = ttk.Frame(self)
 
@@ -105,6 +108,7 @@ class YesNoDialog(Dialog):
         b2.pack(side="left", padx=5, pady=5)
 
         box.pack(fill="x")
+        return box
 
     def apply(self, _=None):
         self.result = 1
@@ -112,7 +116,7 @@ class YesNoDialog(Dialog):
         logger.info("apply")
 
     def cancel(self, _=None):
-        # put focus back to the parent window
+        """put focus back to the parent window"""
         self.result = 0
         self.destroy()
         logger.info("cancel")
@@ -140,6 +144,7 @@ class InputStringDialog(Dialog):
         b2.pack(side="left", padx=5, pady=5)
 
         box.pack(fill="x")
+        return box
 
     def apply(self, _=None):
         self.result = self.entry.get()
@@ -147,7 +152,7 @@ class InputStringDialog(Dialog):
         logger.info("apply")
 
     def cancel(self, _=None):
-        # put focus back to the parent window
+        """put focus back to the parent window"""
         self.result = 0
         self.destroy()
         logger.info("cancel")
@@ -173,196 +178,69 @@ class ErrorInfoDialog(Dialog):
         logger.info("apply")
 
     @staticmethod
-    def cancel(_=None, **kwargs):
+    def cancel(_=None):
         pass
 
 
 class ViewDialog(tk.Toplevel):
     def __init__(self, parent=None, title=None, text=None, file=None):
-        if parent:
-            super().__init__(parent)
-            self.transient(parent)
-            self.parent = parent
-        else:
-            super().__init__()
-            self.transient(".")
-            self.parent = None
-
-        self.text = text
+        super().__init__(parent)
+        self.title(title)
         self.file = file
-
-        if title:
-            self.title(title)
-
-        self.result = None
-
-        body = ttk.Frame(self)
-        self.initial_focus = self.body(body)
-        body.pack(fill="both", expand=1)
-
+        self.text = text
+        self.body(self)
         self.buttonbox()
+        self.show_items()
+    
+    def show_items(self):
+        filename = self.file
+        with open(filename) as f:
+            node = ast.parse(f.read())
 
-        self.grab_set()
+        functions = [n for n in node.body if isinstance(n, ast.FunctionDef)]
+        classes = [n for n in node.body if isinstance(n, ast.ClassDef)]
 
-        if not self.initial_focus:
-            self.initial_focus = self
+        for function in functions:
+            self.show_info("", function)
 
-        self.protocol("WM_DELETE_WINDOW", self.cancel)
-
-        self.work()
-
-        self.initial_focus.focus_set()
-        self.wait_window(self)
-
-    def body(self, master):
-        self.treeview = ttk.Treeview(self)
-        self.treeview.pack(fill="both", expand=1)
-        self.treeview.bind("<Double-1>", self.double_click)
-
-        self.treeview.tag_configure("class", foreground="yellow")
-        self.treeview.tag_configure("function", foreground="#448dc4")
+        for class_ in classes:
+            parent = self.tree.insert("", "end", text=class_.name)
+            methods = [n for n in class_.body if isinstance(n, ast.FunctionDef)]
+            for method in methods:
+                self.show_info(parent, method)
+    
+    def body(self, master: tk.Misc):
+        box = ttk.Frame(master)
+        self.tree = ttk.Treeview(box)
+        self.tree.bind('<Double-1>', self.double_click)
+        self.tree.pack(fill='both', expand=1)
+        box.pack(fill='both', expand=1)
+        return self.tree
 
     def buttonbox(self):
         box = ttk.Frame(self)
 
-        w = ttk.Button(box, text="OK", width=10, command=self.cancel)
-        w.pack(side="left")
-        box.pack(fill="both", expand=1)
+        b1 = ttk.Button(box, text="Ok", command=self.destroy)
+        b1.pack(side="left")
 
-    def cancel(self, event=None):
-        # put focus back to the parent window
-        if self.parent:
-            self.parent.focus_set()
-        self.destroy()
+        box.pack(fill="x")
+        return box
+    
+    def show_info(self, parent, obj):
+        self.tree.insert(parent, obj.lineno, "end", text=obj.name)
+    
+    def double_click(self, event=None):
+        try:
+            item = self.tree.identify("item", event.x, event.y)
+            name = self.tree.item(item, "name")
+            try:
+                self.text.mark_set('insert', name)
+                self.destroy()
+            except Exception:
+                pass
 
-    def work(self):
-        filename = self.file
-
-        self.treeview.heading("#0", text=filename)
-        self.treeview.column("#0", stretch="yes", minwidth=350, width=350)
-        self.i = 0
-
-        text_lines = self.text.get("1.0", "end-1c")
-        lines = text_lines.split("\n")
-
-        self.add_nodes(lines)
-
-    def add_nodes(self, text):
-        self.find_line = {}
-        x = 0
-        for line in text:
-            x += 1
-            y = 0
-            whitespaces = len(line) - len(line.lstrip())
-            if line.lstrip().startswith("class"):
-                node = self.treeview.insert("", "end", text=line, tags="class")
-                key = "_class_" + line
-                self.find_line[key] = x
-
-                for second_line in text[x:]:
-                    whitespaces_second = len(second_line) - len(second_line.lstrip())
-                    y += 1
-                    new_class = False
-                    if not new_class:
-                        if "class" in second_line:
-                            l = second_line.lstrip()
-                            if l.startswith("#"):
-                                continue
-                            new_class = True
-                            key = ""
-                            break
-                        elif "def" in second_line:
-                            l = second_line.lstrip()
-                            if l.startswith("def") and whitespaces < whitespaces_second:
-                                    self.treeview.insert(
-                                        node,
-                                        "end",
-                                        text=second_line,
-                                        tags="function",
-                                    )
-                                    key += second_line
-                                    self.find_line[key] = x + y
-                                    key = "_class_" + line
-                            else:
-                                break
-            elif "def" in line:
-                whitespaces = len(line) - len(line.lstrip())
-                if whitespaces == 0:
-                    l = line.lstrip()
-                    if l.startswith("def"):
-                        node = self.treeview.insert(
-                            "", "end", text=line, tags="function"
-                        )
-                        key = "_root_" + line
-                        self.find_line[key] = x
-
-                    else:
-                        continue
-
-    def double_click(self, event):
-        item = self.treeview.identify("item", event.x, event.y)
-        label = self.treeview.item(item, "text")
-
-        key = ""
-        search_key = ""
-
-        if "class" in label and "def" not in label:
-            key = "_class_" + label
-            z = self.find_line[key]
-            self.text.mark_set("insert", "%d.0" % (z))
-            self.text.see("insert")
-            self.text.focus_force()
-
-        elif "def" in label:
-            child_label = label
-
-            info = self.treeview.get_children()
-            self.nodeList = []
-            for i in info:
-                if i.startswith("I"):
-                    self.nodeList.append(i)
-            parent_label = None
-            for i in self.nodeList:
-                if i < item:
-                    parent_label = self.treeview.item(i, "text")
-
-            if parent_label == None:
-                search_key = "_root_" + child_label
-                z = self.find_line[search_key]
-                self.text.mark_set("insert", "%d.0" % (z))
-                self.text.see("insert")
-                self.text.focus_force()
-
-            elif parent_label:
-                if "class" in parent_label:
-                    try:
-                        search_key = "_class_" + parent_label
-                        search_key += child_label
-                        z = self.find_line[search_key]
-                        self.text.mark_set("insert", "%d.0" % (z))
-                        self.text.see("insert")
-                        self.text.focus_force()
-                    except:
-                        # exception class ends -> change to def in _root_
-                        search_key = "_root_" + child_label
-                        z = self.find_line[search_key]
-                        self.text.mark_set("insert", "%d.0" % (z))
-                        self.text.see("insert")
-                        self.text.focus_force()
-
-                else:
-                    search_key = "_root_" + child_label
-                    z = self.find_line[search_key]
-                    self.text.mark_set("insert", "%d.0" % (z))
-                    self.text.see("insert")
-                    self.text.focus_force()
-
-        elif "if __name__" in label:
-            key = "_root_" + label
-            z = self.find_line[key]
-            self.text.mark_set("insert", "%d.0" % (z))
-            self.text.see("insert")
-            self.text.focus_force()
+        except Exception:
+            pass
 
 
 class ErrorReportDialog(Dialog):

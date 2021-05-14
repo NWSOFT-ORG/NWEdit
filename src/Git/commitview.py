@@ -31,7 +31,7 @@ class CommitView:
         self.files_listbox.delete(*self.files_listbox.get_children())
         modified_files = [
             "M " + x
-            for x in subprocess.run(
+            for x in subprocess.call(
                 "git diff --staged --name-only --diff-filter=M",
                 shell=True,
                 cwd=self.dir,
@@ -42,7 +42,7 @@ class CommitView:
         ]
         renamed_files = [
             "R " + x
-            for x in subprocess.run(
+            for x in subprocess.call(
                 "git diff --staged --name-only --diff-filter=R",
                 capture_output=True,
                 shell=True,
@@ -53,7 +53,7 @@ class CommitView:
         ]
         added_files = [
             "A " + x
-            for x in subprocess.run(
+            for x in subprocess.call(
                 "git diff --staged --name-only --diff-filter=A",
                 capture_output=True,
                 shell=True,
@@ -64,7 +64,7 @@ class CommitView:
         ]
         deleted_files = [
             "D " + x
-            for x in subprocess.run(
+            for x in subprocess.call(
                 "git diff --staged --name-only --diff-filter=D",
                 capture_output=True,
                 shell=True,
@@ -75,7 +75,7 @@ class CommitView:
         ]
         copied_files = [
             "C " + x
-            for x in subprocess.run(
+            for x in subprocess.call(
                 "git diff --staged --name-only --diff-filter=C",
                 capture_output=True,
                 shell=True,
@@ -119,7 +119,7 @@ class CommitView:
         difftext = textframe.text
         difftext.lexer = lexers.get_lexer_by_name("diff")
         difftext.update()
-        subprocess.run(
+        subprocess.call(
             f'git diff --staged {selected} > \
                         {os.path.join(APPDIR, "out.txt")}',
             shell=True,

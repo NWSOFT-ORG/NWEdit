@@ -92,10 +92,6 @@ class Lexer(ExtensionSettings):
 
     def get_settings(self, extension: str):
         try:
-            if lexers.get_lexer_by_name(
-                self.items[self.extens.index(extension)]
-            ) == lexers.get_lexer_by_name("JSON"):
-                return JSONLexer
             return lexers.get_lexer_by_name(self.items[self.extens.index(extension)])
         except ValueError:
             return lexers.get_lexer_by_name("Text")

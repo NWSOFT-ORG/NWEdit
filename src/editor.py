@@ -402,10 +402,6 @@ class Editor:
             label="Unit tests",
             command=self.test,
         )
-        self.codemenu.add_command(
-            label="Classes and functions",
-            command=self.view,
-        )
 
         self.navmenu = MenuItem()
         self.navmenu.add_command(label="Go to ...", command=self.goto)
@@ -413,6 +409,10 @@ class Editor:
         self.navmenu.add_command(label="+1 char", command=self.nav_1cf)
         self.navmenu.add_command(label="Word end", command=self.nav_wordend)
         self.navmenu.add_command(label="Word start", command=self.nav_wordstart)
+        self.navmenu.add_command(
+            label="Classes and functions",
+            command=self.view,
+        )
 
         self.gitmenu = MenuItem()
         self.gitmenu.add_command(label="Initialize", command=lambda: self.git("init"))

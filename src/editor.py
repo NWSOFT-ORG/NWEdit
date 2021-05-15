@@ -124,9 +124,6 @@ class Editor:
                 self.term_icon = tk.PhotoImage(file="Images/term-light.gif")
                 self.format_icon = tk.PhotoImage(file="Images/format-light.gif")
                 self.sel_all_icon = tk.PhotoImage(file="Images/sel-all-light.gif")
-                self.alltabs_icon = tk.PhotoImage(file="Images/all-tabs-light.gif")
-                self.nexttab_icon = tk.PhotoImage(file="Images/next-tab-light.gif")
-                self.prevtab_icon = tk.PhotoImage(file="Images/prev-tab-light.gif")
             else:
                 self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
                 self.lint_icon = tk.PhotoImage(file="Images/lint.gif")
@@ -140,9 +137,6 @@ class Editor:
                 self.term_icon = tk.PhotoImage(file="Images/term.gif")
                 self.format_icon = tk.PhotoImage(file="Images/format.gif")
                 self.sel_all_icon = tk.PhotoImage(file="Images/sel-all.gif")
-                self.alltabs_icon = tk.PhotoImage(file="Images/all-tabs.gif")
-                self.nexttab_icon = tk.PhotoImage(file="Images/next-tab.gif")
-                self.prevtab_icon = tk.PhotoImage(file="Images/prev-tab.gif")
 
             self.cut_icon = tk.PhotoImage(file="Images/cut.gif")
             self.new_icon = tk.PhotoImage(file="Images/new.gif")
@@ -196,52 +190,6 @@ class Editor:
             self.pandedwin.add(frame)
             self.nb.enable_traversal()
             self.statusbar = Statusbar()
-
-
-            tab_frame = ttk.Frame(self.nb)
-            tab_frame.place(relx=1.0, x=0, y=1, anchor='ne')
-
-
-            def show_tab_menu(event):
-                tab_menu = tk.Menu(event.widget, tearoff=0)
-                for tab in self.nb.tabs():
-                    tab_menu.add_command(label=self.nb.tab(tab, option="text"),command= lambda temp=tab: self.nb.select(temp))
-                try:
-                    tab_menu.tk_popup(event.x_root, event.y_root)
-                finally:
-                    tab_menu.grab_release()
-            
-            def prevtab(_=None):
-                try:
-                    self.nb.select(self.nb.index('current') - 1)
-                except tk.TclError:
-                    pass
-            
-            def nexttab(_=None):
-                try:
-                    self.nb.select(self.nb.index('current') + 1)
-                except tk.TclError:
-                    pass
-
-            ttk.Separator(tab_frame, orient='vertical').pack(
-                side='left', fill='y')
-
-            prev_tab_label = ttk.Label(tab_frame, image=self.prevtab_icon)
-            prev_tab_label.image = self.prevtab_icon
-            prev_tab_label.bind("<1>", prevtab)
-            prev_tab_label.pack(side='left')
-
-            next_tab_label = ttk.Label(tab_frame, image=self.nexttab_icon)
-            next_tab_label.image = self.nexttab_icon
-            next_tab_label.bind("<1>", nexttab)
-            next_tab_label.pack(side='left')
-
-            ttk.Separator(tab_frame, orient='vertical').pack(side='left', fill='y')
-
-            allitems_label = ttk.Label(tab_frame, image=self.alltabs_icon)
-            allitems_label.image = self.alltabs_icon
-            allitems_label.bind("<1>", show_tab_menu)
-            allitems_label.pack(side='left')
 
             self.create_menu()
 

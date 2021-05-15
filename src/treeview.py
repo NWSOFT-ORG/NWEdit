@@ -199,16 +199,17 @@ class FileTree(ttk.Frame):
         self.refresh_tree()
 
     def init_ui(self):
-        path = self.path
-        if not path:
-            path = os.path.expanduser("~")
-
         self.refresh_tree()
         self.tree.bind("<Double-1>", self.on_double_click_treeview)
         self.tree.update()
 
     def process_directory(self, path: str, showdironly: bool = False):
-        self.path = path.strip()
+        if os.path.isdir(path.strip()):
+            self.path = path.strip()
+        else:
+            self.path = os.path.expanduser('~')
+            self.refresh_tree()
+            return
         ls = os.listdir(self.path)
         dirs = []
         files = []

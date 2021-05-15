@@ -65,7 +65,7 @@ class Menubar(ttk.Frame):
     def _search_command(self, event):
         text = self.search_entry.get()
         menu = tk.Menu(event.widget, tearoff=0)
-        for item in self.commands.keys():
+        for item in sorted(self.commands.keys()):
             if text in item:
                 menu.add_command(label=item,
                                  command=self.commands[item]

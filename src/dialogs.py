@@ -197,14 +197,14 @@ class ViewDialog(tk.Toplevel):
         with open(filename) as f:
             node = ast.parse(f.read())
 
-        functions = [n for n in node.body if isinstance(n, ast.FunctionDef)]
-        classes = [n for n in node.body if isinstance(n, ast.ClassDef)]
+        functions = [_obj for _obj in node.body if isinstance(n, ast.FunctionDef)]
+        classes = [_obj for _obj in node.body if isinstance(n, ast.ClassDef)]
 
         for function in functions:
             self.show_info("", function)
 
         for class_ in classes:
-            parent = self.tree.insert("", "end", text=class_.name)
+            parent = self.show_info("", class_)
             methods = [n for n in class_.body if isinstance(n, ast.FunctionDef)]
             for method in methods:
                 self.show_info(parent, method)
@@ -227,22 +227,16 @@ class ViewDialog(tk.Toplevel):
         return box
     
     def show_info(self, parent, obj):
-        self.tree.insert(parent, "end", text=f"{obj.name} [{obj.lineno}]")
+        return self.tree.insert(parent, "end", text=f"{obj.name} [{obj.lineno}]")
     
     def double_click(self, event=None):
-        try:
-            item = self.tree.identify("item", event.x, event.y)
-            text = self.tree.item(item, 'text')
-            line = text.split(' ')[-1][1:-1]
-            try:
-                self.text.mark_set('insert', f"{line}.0")
-                self.text.focus_set()
-                self.destroy()
-            except Exception:
-                pass
-
-        except Exception:
-            pass
+        item = self.tree.focus()
+        text = self.tree.item(item, 'text')
+        line = text.split(' ')[-1][1:-1]
+        self.text.mark_set('insert', f"{line}.0")
+        self.text.see('insert')
+        self.text.focus_set()
+        self.destroy()
 
 
 class ErrorReportDialog(Dialog):

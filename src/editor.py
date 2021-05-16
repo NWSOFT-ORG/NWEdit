@@ -42,7 +42,7 @@ from src.Git.commitview import CommitView
 from src.goto import Navigate
 from src.hexview import HexView
 from src.highlighter import create_tags, recolorize
-from src.menubar import Menubar, MenuItem
+from src.menubar import Menubar, MenuItem, Menu
 from src.modules import (
     EditorErr,
     Path,
@@ -193,7 +193,7 @@ class Editor:
 
             self.create_menu()
 
-            self.right_click_menu = tk.Menu()
+            self.right_click_menu = Menu(self.master)
             self.right_click_menu.add_command(label="Undo", command=self.undo)
             self.right_click_menu.add_command(label="Redo", command=self.redo)
             self.right_click_menu.add_command(label="Cut", command=self.cut)

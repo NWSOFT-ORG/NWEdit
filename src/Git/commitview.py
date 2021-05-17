@@ -1,6 +1,6 @@
 from src.constants import APPDIR
 from src.modules import lexers, os, subprocess, tk, ttk
-from src.tktext import EnhancedTextFrame
+from src.tktext import EnhancedTextFrame, TextOpts
 from src.highlighter import create_tags, recolorize
 
 

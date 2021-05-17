@@ -1,6 +1,6 @@
 from src.dialogs import InputStringDialog, YesNoDialog
 from src.modules import os, tk, ttk, json, lexers
-from src.tktext import EnhancedTextFrame
+from src.tktext import EnhancedTextFrame, TextOpts
 from src.highlighter import create_tags, recolorize
 
 TESTS_FILE = ".PyPlus/Tests/tests.json"
@@ -101,6 +101,9 @@ class TestDialog(tk.Toplevel):
         imports = EnhancedTextFrame(settingswin)
         setup = EnhancedTextFrame(settingswin)
         teardown = EnhancedTextFrame(settingswin)
+        TextOpts(textwidget=imports.text, bindkey=True)
+        TextOpts(textwidget=setup.text, bindkey=True)
+        TextOpts(textwidget=teardown.text, bindkey=True)
         imports.text["height"] = 3
         setup.text["height"] = 3
         teardown.text["height"] = 3
@@ -136,9 +139,7 @@ class TestDialog(tk.Toplevel):
         textframe = EnhancedTextFrame(codewin)
         text = textframe.text
         text.lexer = lexers.get_lexer_by_name("Python")
-        create_tags(text)
-        recolorize(text)
-        text.bind("<KeyRelease>", lambda _=None: recolorize(text))
+        TextOpts(textwidget=text, bindkey=True)
         textframe.pack(fill="both", expand=1)
         button_frame = ttk.Frame(codewin)
 
@@ -174,9 +175,7 @@ class TestDialog(tk.Toplevel):
         text: tk.Text = textframe.text
         text.lexer = lexers.get_lexer_by_name("Python")
         text.insert("end", self.method_list[name])
-        create_tags(text)
-        recolorize(text)
-        text.bind("<KeyRelease>", lambda _=None: recolorize(text))
+        TextOpts(text, bindkey=True)
         textframe.pack(fill="both", expand=1)
         button_frame = ttk.Frame(codewin)
 

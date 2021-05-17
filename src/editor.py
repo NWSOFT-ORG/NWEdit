@@ -502,7 +502,6 @@ class Editor:
         textframe.set_first_line(1)
 
         textbox = textframe.text  # text widget
-        TextOpts(textbox, bindkey=False, keyaction=self.key)
         textbox.frame = frame  # The text will be packed into the frame.
         textbox.bind(("<Button-2>" if OSX else "<Button-3>"), self.right_click)
         textbox.bind(f"<{MAIN_KEY}-b>", self.run)
@@ -664,7 +663,7 @@ class Editor:
                 currtext.see("insert")
                 currtext.event_generate("<<Key>>")
                 currtext.focus_set()
-                recolorize(currtext)
+                TextOpts(currtext, bindkey=False, keyaction=self.key)
                 logging.info("File opened")
                 return
             except Exception as e:

@@ -4,6 +4,7 @@ from src.modules import font, styles, tk, ttk, EditorErr
 from src.settings import Settings
 from src.functions import darken_color, is_dark_color, lighten_color
 from src.constants import MAIN_KEY, logger
+from src.highlighter import create_tags, recolorize
 
 
 class TextLineNumbers(tk.Canvas):
@@ -211,11 +212,14 @@ class TextOpts:
         self.text.bind(f"<{MAIN_KEY}-Z>", self.redo)
         self.text.bind(f"<{MAIN_KEY}-z>", self.undo)
         self.text.bind(f"{MAIN_KEY}-d", self.duplicate_line)
+        create_tags(self.text)
+        recolorize(self.text)
 
     def key(self, _=None) -> None:
         """Event when a key is pressed."""
         if self.bindkey:
             currtext = self.text
+            recolorize(currtext)
             currtext.edit_separator()
             currtext.see("insert")
             logger.exception("Error when handling keyboard event:")

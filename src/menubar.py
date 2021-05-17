@@ -17,7 +17,7 @@ class MenuItem:
 
 class Menu(ttk.Frame):
     def __init__(self, tkwin: tk.Tk):
-        super().__init__(relief='groove')
+        super().__init__(tkwin, relief='groove')
         self.win = tkwin
     
     def add_command(self, label, command, image=None):
@@ -41,12 +41,13 @@ class Menu(ttk.Frame):
         command_label.pack(side='top', anchor='nw')
     
     def tk_popup(self, x, y):
-        self.place_forget()
-        self.place_configure(x=x, y=y)
         self.place(x=x, y=y)
-    
+
+        def close_menu(_=None):
+            self.place_forget()
+            self.win.event_delete('<<CloseMenu>>')
         self.win.event_add('<<CloseMenu>>', '<1>')
-        self.win.bind('<<CloseMenu>>', lambda _=None: self.place_forget())
+        self.win.bind('<<CloseMenu>>', close_menu)
 
 
 class Menubar(ttk.Frame):
@@ -86,11 +87,11 @@ class Menubar(ttk.Frame):
         label_widget = ttk.Label(
             self,
             text=label,
-            padding=[1, 3, 6, 2],
-            font="TkDefaultFont",
+            padding=[1, 3, 6, 1],
+            font="Arial 14",
         )
 
-        label_widget.pack(side='left')
+        label_widget.pack(side='left', fill='both', anchor='nw')
 
         def enter(_):
             label_widget.state(("active",))
@@ -100,8 +101,8 @@ class Menubar(ttk.Frame):
 
         def click(_):
             dropdown.tk_popup(
-                label_widget.winfo_rootx(),
-                label_widget.winfo_rooty(),
+                label_widget.winfo_x(),
+                label_widget.winfo_y() + label_widget.winfo_height(),
             )
 
         label_widget.bind("<Enter>", enter, True)

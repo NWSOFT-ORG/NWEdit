@@ -1,5 +1,4 @@
 from src.modules import tk, ttk
-from src.scrollableframe import ScrolledFrame
 
 
 class MenuItem:
@@ -42,7 +41,10 @@ class Menu(ttk.Frame):
         command_label.pack(side='top', anchor='nw')
     
     def tk_popup(self, x, y):
+        self.place_forget()
+        self.place_configure(x=x, y=y)
         self.place(x=x, y=y)
+    
         self.win.event_add('<<CloseMenu>>', '<1>')
         self.win.bind('<<CloseMenu>>', lambda _=None: self.place_forget())
 
@@ -84,7 +86,7 @@ class Menubar(ttk.Frame):
         label_widget = ttk.Label(
             self,
             text=label,
-            padding=[6, 3, 6, 2],
+            padding=[1, 3, 6, 2],
             font="TkDefaultFont",
         )
 

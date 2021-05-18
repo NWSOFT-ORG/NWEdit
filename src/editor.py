@@ -39,6 +39,7 @@ from src.functions import (
 
 # These modules are from the base directory
 from src.Git.commitview import CommitView
+from src.Git.remoteview import RemoteView
 from src.goto import Navigate
 from src.hexview import HexView
 from src.highlighter import create_tags, recolorize
@@ -417,6 +418,7 @@ class Editor:
         self.gitmenu = MenuItem()
         self.gitmenu.add_command(label="Initialize", command=lambda: self.git("init"))
         self.gitmenu.add_command(label="Commit", command=lambda: self.git("commit"))
+        self.gitmenu.add_command(label="Remote", command=lambda: self.git("remote"))
         self.gitmenu.add_command(label="Clone", command=lambda: self.git("clone"))
 
         self.menubar.add_cascade(label="PyPlus", menu=self.appmenu)  # App menu
@@ -815,6 +817,8 @@ class Editor:
         shell_frame.mainloop()
 
     def view(self):
+        if not self.tabs:
+            return
         file_dir = self.tabs[self.get_tab()].file_dir
         text = self.tabs[self.get_tab()].textbox
         ViewDialog(self.master, f"Classes and functions for {file_dir}", text, file_dir)
@@ -1191,6 +1195,8 @@ class Editor:
             )
         elif action == "commit":
             CommitView(self.master, currdir)
+        elif action == "remote":
+            RemoteView(self.master, currdir)
 
     def indent(self, action="indent") -> None:
         """Indent/unindent feature."""

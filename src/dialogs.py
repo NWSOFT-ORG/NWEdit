@@ -1,5 +1,5 @@
 from src.constants import APPDIR, logger
-from src.modules import json, tk, ttk, ttkthemes, imp
+from src.modules import json, tk, ttk, ttkthemes
 import ast
 
 
@@ -188,17 +188,20 @@ class ViewDialog(tk.Toplevel):
         self.title(title)
         self.file = file
         self.text = text
-        self.body(self)
-        self.buttonbox()
+        self.tree = ttk.Treeview(self)
+        self.tree.bind('<Double-1>', self.double_click)
+        self.tree.pack(fill='both', expand=1)
+        ttk.Button(self, text="Ok", command=self.destroy).pack(side="left")
         self.show_items()
+        self.mainloop()
     
     def show_items(self):
         filename = self.file
         with open(filename) as f:
             node = ast.parse(f.read())
 
-        functions = [_obj for _obj in node.body if isinstance(n, ast.FunctionDef)]
-        classes = [_obj for _obj in node.body if isinstance(n, ast.ClassDef)]
+        functions = [_obj for _obj in node.body if isinstance(_obj, ast.FunctionDef)]
+        classes = [_obj for _obj in node.body if isinstance(_obj, ast.ClassDef)]
 
         for function in functions:
             self.show_info("", function)
@@ -209,35 +212,31 @@ class ViewDialog(tk.Toplevel):
             for method in methods:
                 self.show_info(parent, method)
     
-    def body(self, master: tk.Misc):
-        box = ttk.Frame(master)
-        self.tree = ttk.Treeview(box)
-        self.tree.bind('<Double-1>', self.double_click)
-        self.tree.pack(fill='both', expand=1)
-        box.pack(fill='both', expand=1)
-        return self.tree
-
-    def buttonbox(self):
-        box = ttk.Frame(self)
-
-        b1 = ttk.Button(box, text="Ok", command=self.destroy)
-        b1.pack(side="left")
-
-        box.pack(fill="x")
-        return box
+    def show_info(self, parent, _obj):
+        return self.tree.insert(parent, "end", text=f"{_obj.name} [{_obj.lineno}:{_obj.col_offset}]")
     
-    def show_info(self, parent, obj):
-        return self.tree.insert(parent, "end", text=f"{obj.name} [{obj.lineno}]")
-    
-    def double_click(self, event=None):
+    def double_click(self, _=None):
         item = self.tree.focus()
         text = self.tree.item(item, 'text')
-        line = text.split(' ')[-1][1:-1]
-        self.text.mark_set('insert', f"{line}.0")
+        index = text.split(' ')[-1][1:-1]
+        line = index.split(':')[0]
+        col = index.split(':')[1]
+        self.text.mark_set('insert', f"{line}.{col}")
         self.text.see('insert')
         self.text.focus_set()
         self.destroy()
 
+class ErrorReportDialog(tk.Toplevel):
+    def __init__(self, error_name, error_message):
+        super().__init__()
+        self.title(error_name)
+        self.master.withdraw()
+        ttk.Label(self, text='Please consider reporting a bug on github.').pack(anchor='nw', fill='x')
+        text = tk.Text(self)
+        text.insert('end', error_message)
+        text.config(state='disabled')
+        text.pack(fill='both')
+        self.mainloop()
 
-class ErrorReportDialog(Dialog):
+class LogViewDialog():
     pass

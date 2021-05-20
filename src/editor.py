@@ -27,7 +27,7 @@ from src.constants import (
     logger,
 )
 from src.customenotebook import ClosableNotebook
-from src.dialogs import ErrorInfoDialog, InputStringDialog, ViewDialog, YesNoDialog
+from src.dialogs import ErrorInfoDialog, InputStringDialog, ViewDialog, YesNoDialog, ErrorReportDialog
 from src.filedialog import FileOpenDialog, FileSaveAsDialog
 from src.functions import (
     download_file,
@@ -222,11 +222,14 @@ class Editor:
                         self.open_file(line, askhex=False)
                 if not f.read():
                     self.start_screen()
+            1/0
             with open("Backups/recent_dir.txt") as f:
                 self.filetree.path = f.read()
                 self.filetree.init_ui()
-        except FileNotFoundError:
-            logger.exception("Error when initializing:")
+        except Exception:
+            x = logger.exception("Error when initializing:")
+            print(x, flush=True)
+            ErrorReportDialog('Error when starting.', 'None')
             self.restart()
 
     def create_menu(self) -> None:
@@ -865,14 +868,14 @@ class Editor:
         self.nb.select(curr)
 
     def exit(self, force=False) -> None:
+        with open("Backups/recent_dir.txt", "w") as f:
+            f.write(self.filetree.path)
+        with open("Backups/recent_files.txt", "w") as f:
+            file_list = ""
+            for tab in self.tabs.values():
+                file_list += tab.file_dir + "\n"
+            f.write(file_list)
         if not force:
-            with open("Backups/recent_dir.txt", "w") as f:
-                f.write(self.filetree.path)
-            with open("Backups/recent_files.txt", "w") as f:
-                file_list = ""
-                for tab in self.tabs.values():
-                    file_list += tab.file_dir + "\n"
-                f.write(file_list)
             self.master.destroy()
             logger.info("Window is destroyed")
         else:
@@ -1286,3 +1289,10 @@ class Editor:
             self.key()
         except (KeyError, AttributeError):
             return
+
+
+
+
+
+
+

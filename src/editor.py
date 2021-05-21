@@ -15,6 +15,7 @@
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 Also, it's cross-compatible!
 """
+import traceback
 from src.console import Console
 from src.constants import (
     APPDIR,
@@ -222,14 +223,12 @@ class Editor:
                         self.open_file(line, askhex=False)
                 if not f.read():
                     self.start_screen()
-            1/0
             with open("Backups/recent_dir.txt") as f:
                 self.filetree.path = f.read()
                 self.filetree.init_ui()
         except Exception:
-            x = logger.exception("Error when initializing:")
-            print(x, flush=True)
-            ErrorReportDialog('Error when starting.', 'None')
+            logger.exception("Error when initializing:")
+            ErrorReportDialog('Error when starting.', traceback.format_exc())
             self.restart()
 
     def create_menu(self) -> None:

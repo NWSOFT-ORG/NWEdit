@@ -1,12 +1,18 @@
 from src.constants import APPDIR, logger
-from src.modules import json, tk, ttk, ttkthemes
+from src.modules import json, tk, ttk, ttkthemes, styles, lexers
 import ast
 
 
+# Need these because importing settings is a circular import
 def get_theme():
     with open(APPDIR + "/Settings/general-settings.json") as f:
         settings = json.load(f)
     return settings["theme"]
+
+def get_font():
+    with open(APPDIR + "/Settings/general-settings.json") as f:
+        settings = json.load(f)
+    return settings["font"]
 
 
 class Dialog(tk.Toplevel):
@@ -225,18 +231,3 @@ class ViewDialog(tk.Toplevel):
         self.text.see('insert')
         self.text.focus_set()
         self.destroy()
-
-class ErrorReportDialog(tk.Toplevel):
-    def __init__(self, error_name, error_message):
-        super().__init__()
-        self.title(error_name)
-        self.master.withdraw()
-        ttk.Label(self, text='Please consider reporting a bug on github.').pack(anchor='nw', fill='x')
-        text = tk.Text(self)
-        text.insert('end', error_message)
-        text.config(state='disabled')
-        text.pack(fill='both')
-        self.mainloop()
-
-class LogViewDialog():
-    pass

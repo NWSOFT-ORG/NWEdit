@@ -7,13 +7,13 @@ def create_tags(textbox: tk.Text) -> None:
     The method creates the tags associated with each distinct style element of the
     source code 'dressing'"""
     currtext = textbox
-    bold_font = font.Font(currtext, currtext.cget("font"))
-    bold_font.configure(weight=font.BOLD)
-    italic_font = font.Font(currtext, currtext.cget("font"))
-    italic_font.configure(slant=font.ITALIC)
-    bold_italic_font = font.Font(currtext, currtext.cget("font"))
-    bold_italic_font.configure(weight=font.BOLD, slant=font.ITALIC)
     settings = Settings()
+    bold_font = font.Font(currtext, settings.get_settings("font"))
+    bold_font.configure(weight=font.BOLD)
+    italic_font = font.Font(currtext, settings.get_settings("font"))
+    italic_font.configure(slant=font.ITALIC)
+    bold_italic_font = font.Font(currtext, settings.get_settings("font"))
+    bold_italic_font.configure(weight=font.BOLD, slant=font.ITALIC)
     style = styles.get_style_by_name(settings.get_settings("pygments"))
 
     for ttype, ndef in style:

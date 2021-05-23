@@ -28,7 +28,9 @@ from src.constants import (
     logger,
 )
 from src.customenotebook import ClosableNotebook
-from src.dialogs import ErrorInfoDialog, InputStringDialog, ViewDialog, YesNoDialog, ErrorReportDialog
+from src.dialogs import (ErrorInfoDialog, InputStringDialog, ViewDialog,
+                         YesNoDialog)
+from src.debugdialog import (ErrorReportDialog, LogViewDialog)
 from src.filedialog import FileOpenDialog, FileSaveAsDialog
 from src.functions import (
     download_file,
@@ -270,6 +272,7 @@ class Editor:
         self.appmenu.add_command(label="Exit Editor", command=self.exit)
         self.appmenu.add_command(label="Restart app", command=self.restart)
         self.appmenu.add_command(label="Check for updates", command=self.check_updates)
+        self.appmenu.add_command(label='View log', command=self.view_log)
 
         self.filemenu = MenuItem()
         self.filemenu.add_command(
@@ -515,7 +518,6 @@ class Editor:
         textbox.bind(f"<{MAIN_KEY}-r>", self.reload)
         textbox.bind(f"<{MAIN_KEY}-S>", self._saveas)
         textbox.focus_set()
-        create_tags(textbox)
         logger.debug("Textbox created")
         return textbox
 
@@ -667,7 +669,8 @@ class Editor:
                 currtext.see("insert")
                 currtext.event_generate("<<Key>>")
                 currtext.focus_set()
-                TextOpts(currtext, bindkey=False, keyaction=self.key)
+                currtext.opts = TextOpts(currtext, bindkey=False, keyaction=self.key)
+                currtext.edit_reset()
                 logging.info("File opened")
                 return
             except Exception as e:
@@ -824,6 +827,9 @@ class Editor:
         file_dir = self.tabs[self.get_tab()].file_dir
         text = self.tabs[self.get_tab()].textbox
         ViewDialog(self.master, f"Classes and functions for {file_dir}", text, file_dir)
+    
+    def view_log(self):
+        LogViewDialog()
 
     def right_click(self, event: tk.EventType) -> None:
         self.right_click_menu.tk_popup(event.x_root, event.y_root)

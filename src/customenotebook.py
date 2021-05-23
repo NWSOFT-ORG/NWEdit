@@ -4,6 +4,7 @@ from src.functions import is_dark_color, lighten_color
 from src.modules import tk, ttk, ttkthemes
 from src.settings import Settings
 from src.menubar import Menu
+from src.statusbar import bind_events
 
 
 class ClosableNotebook(ttk.Notebook):
@@ -85,6 +86,10 @@ class ClosableNotebook(ttk.Notebook):
         allitems_label.image = self.alltabs_icon
         allitems_label.bind("<1>", show_tab_menu)
         allitems_label.pack(side='left')
+        
+        bind_events(prev_tab_label)
+        bind_events(next_tab_label)
+        bind_events(allitems_label)
 
 
     def on_close_press(self, event):

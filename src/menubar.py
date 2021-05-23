@@ -1,4 +1,5 @@
 from src.modules import tk, ttk
+from src.statusbar import bind_events
 
 
 class MenuItem:
@@ -30,18 +31,14 @@ class Menu(ttk.Frame):
             self.place_forget()
             command()
 
-        def enter(_):
-            command_label.state(("active",))
-
-        def leave(_):
-            command_label.state(("!active",))
         command_label.bind('<1>', exec_command)
-        command_label.bind("<Enter>", enter, True)
-        command_label.bind("<Leave>", leave, True)
+        bind_events(command_label)
         command_label.pack(side='top', anchor='nw')
     
     def tk_popup(self, x, y):
         self.place(x=x, y=y)
+        if (x + self.winfo_width()) > self.win.winfo_width():
+            self.place_configure(x=x, y=y, anchor='ne')
 
         def close_menu(_=None):
             self.place_forget()
@@ -93,18 +90,11 @@ class Menubar(ttk.Frame):
 
         label_widget.pack(side='left', fill='both', anchor='nw')
 
-        def enter(_):
-            label_widget.state(("active",))
-
-        def leave(_):
-            label_widget.state(("!active",))
-
         def click(_):
             dropdown.tk_popup(
                 label_widget.winfo_x(),
                 label_widget.winfo_y() + label_widget.winfo_height(),
             )
 
-        label_widget.bind("<Enter>", enter, True)
-        label_widget.bind("<Leave>", leave, True)
+        bind_events(label_widget)
         label_widget.bind("<1>", click, True)

@@ -216,7 +216,7 @@ class Editor:
 
             self.master.bind("<<MouseEvent>>", self.mouse)
             self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
-            self.master.focus_force()
+            self.master.focus_set()
             self.update_title()
             self.update_statusbar()
             with open("Backups/recent_files.txt") as f:
@@ -742,10 +742,9 @@ class Editor:
     def cut(self) -> None:
         try:
             currtext = self.tabs[self.get_tab()].textbox
-            sel = currtext.get(tk.SEL_FIRST, tk.SEL_LAST)
-            currtext.clipboard_clear()
-            currtext.clipboard_append(sel)
-            currtext.delete(tk.SEL_FIRST, tk.SEL_LAST)
+            sel = currtext.get("sel.first", "sel.last")
+            self.copy()
+            currtext.delete("sel.first", "sel.last")
             self.key()
         except tk.TclError:
             pass

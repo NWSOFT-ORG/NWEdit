@@ -197,16 +197,9 @@ class TextOpts:
             self.text.bind(char, self.autoinsert)
         for char in [")", "]", "}"]:
             self.text.bind(char, self.close_brackets)
-
-        def tab(event=None):
-            # Convert tabs to spaces
-            event.widget.insert("insert", " " * self.tabwidth)
-            self.key()
-            # Quit quickly, before a char is being inserted.
-            return "break"
         self.text.bind("<BackSpace>", self.backspace)
         self.text.bind("<Return>", self.autoindent)
-        self.text.bind("<Tab>", tab)
+        self.text.bind("<Tab>", self.tab)
         self.text.bind(f"<{MAIN_KEY}-i>", lambda _=None: self.indent("indent"))
         self.text.bind(f"<{MAIN_KEY}-u>", lambda _=None: self.indent("unindent"))
         self.text.bind(f"<{MAIN_KEY}-Z>", self.redo)
@@ -214,6 +207,13 @@ class TextOpts:
         self.text.bind(f"{MAIN_KEY}-d", self.duplicate_line)
         create_tags(self.text)
         recolorize(self.text)
+
+    def tab(self, event=None):
+        # Convert tabs to spaces
+        event.widget.insert("insert", " " * self.tabwidth)
+        self.key()
+        # Quit quickly, before a char is being inserted.
+        return "break"
 
     def key(self, _=None) -> None:
         """Event when a key is pressed."""

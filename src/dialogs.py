@@ -188,10 +188,9 @@ class ErrorInfoDialog(Dialog):
         pass
 
 
-class ViewDialog(tk.Toplevel):
-    def __init__(self, parent=None, title=None, text=None, file=None):
+class ViewDialog(ttk.Frame):
+    def __init__(self, parent=None, text=None, file=None):
         super().__init__(parent)
-        self.title(title)
         self.file = file
         self.text = text
         self.tree = ttk.Treeview(self)
@@ -199,7 +198,9 @@ class ViewDialog(tk.Toplevel):
         self.tree.pack(fill='both', expand=1)
         ttk.Button(self, text="Ok", command=self.destroy).pack(side="left")
         self.show_items()
-        self.mainloop()
+        self.pack(fill='both', expand=1)
+        parent.forget(parent.panes()[0])
+        parent.insert('0', self)
     
     def show_items(self):
         filename = self.file

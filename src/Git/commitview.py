@@ -4,15 +4,12 @@ from src.tktext import EnhancedTextFrame
 from src.highlighter import create_tags, recolorize
 
 
-class CommitView(tk.Toplevel):
-    def __init__(self, master, path):
-        super().__init__(master)
+class CommitView(ttk.Frame):
+    def __init__(self, parent, path):
+        super().__init__(parent)
         self.dir = path
-        self.master = master
-        subprocess.Popen("git add .", shell=True, cwd=self.dir)
-        self.title("Commit")
-        self.resizable(0, 0)
-        self.transient(master)
+        self.master = parent
+        subprocess.run("git add .", shell=True, cwd=self.dir)
 
         diff_frame = ttk.Frame(self)
         self.files_listbox = ttk.Treeview(diff_frame, show="tree")
@@ -99,7 +96,9 @@ class CommitView(tk.Toplevel):
         ttk.Button(commit_frame, text="Commit >>", command=self.commit).pack(
             side="bottom", fill="x"
         )
-        self.mainloop()
+        parent.forget(parent.panes()[0])
+        parent.insert('0', self)
+        self.pack(fill='both', expand=1)
 
     def commit(self, _=None):
         if commit_msg := self.committext.get("1.0", "end"):

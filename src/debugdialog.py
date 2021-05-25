@@ -2,6 +2,7 @@ from src.constants import APPDIR, logger
 from src.modules import json, tk, ttk, styles
 from src.highlighter import create_tags, recolorize
 
+# Need these to prevent circular imports
 def get_pygments():
     with open(APPDIR + "/Settings/general-settings.json") as f:
         settings = json.load(f)
@@ -11,6 +12,7 @@ def get_font():
     with open(APPDIR + "/Settings/general-settings.json") as f:
         settings = json.load(f)
     return settings["font"]
+
 
 class ReadonlyText(tk.Text):
     def __init__(self, master):
@@ -41,6 +43,7 @@ class ErrorReportDialog(tk.Toplevel):
         text.insert('end', error_message)
         text.pack(fill='both')
         self.mainloop()
+
 
 class LogViewDialog(tk.Toplevel):
     def __init__(self):

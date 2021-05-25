@@ -34,7 +34,6 @@ class TestDialog(ttk.Frame):
             side="left"
         )
         self.button_frame.pack(side="bottom")
-        self.mainloop()
 
     def refresh_tests(self):
         self.tests_listbox.delete(*self.tests_listbox.get_children())

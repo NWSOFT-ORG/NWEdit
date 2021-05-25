@@ -182,16 +182,16 @@ class Editor:
             self.master.createcommand("::tk::mac::Quit", self.exit)
 
             self.menubar = Menubar(self.master)
-            self.pandedwin = ttk.Panedwindow(self.master, orient="horizontal")
-            self.pandedwin.pack(fill="both", expand=1)
-            frame = ttk.Frame(self.master)
-            frame.pack(fill='both', expand=1)
-            self.nb = ClosableNotebook(frame, self.close_tab)
+            self.panedwin = ttk.Panedwindow(self.master, orient="horizontal")
+            self.panedwin.pack(fill="both", expand=1)
+            mainframe = ttk.Frame(self.master)
+            mainframe.pack(fill='both', expand=1)
+            self.nb = ClosableNotebook(mainframe, self.close_tab)
             self.nb.bind("<B1-Motion>", self.move_tab)
             self.nb.pack(expand=1, fill="both")
             self.filetree = FileTree(self.master, self.open_file)
-            self.pandedwin.add(self.filetree)
-            self.pandedwin.add(frame)
+            self.panedwin.add(self.filetree)
+            self.panedwin.add(mainframe)
             self.nb.enable_traversal()
             self.statusbar = Statusbar()
 
@@ -388,25 +388,27 @@ class Editor:
             command=self.autopep,
             image=self.format_icon,
         )
-        self.codemenu.add_command(
-            label="Find and replace",
-            command=self.search,
-            image=self.search_icon,
-        )
         self.codemenu.add_command(label="Bigger view", command=self.biggerview)
-        self.codemenu.add_command(
-            label="Open Python Shell",
-            command=self.python_shell,
-            image=self.pyterm_icon,
-        )
         self.codemenu.add_command(
             label="Open System Shell",
             command=self.system_shell,
             image=self.term_icon,
         )
-        self.codemenu.add_command(
+
+        self.viewmenu = MenuItem()
+        self.viewmenu.add_command(
+            label="System Shell",
+            command=self.python_shell,
+            image=self.pyterm_icon,
+        )
+        self.viewmenu.add_command(
             label="Unit tests",
             command=self.test,
+        )
+        self.viewmenu.add_command(
+            label="Find and replace",
+            command=self.search,
+            image=self.search_icon,
         )
 
         self.navmenu = MenuItem()
@@ -430,6 +432,7 @@ class Editor:
         self.menubar.add_cascade(label="File", menu=self.filemenu)
         self.menubar.add_cascade(label="Edit", menu=self.editmenu)
         self.menubar.add_cascade(label="Code", menu=self.codemenu)
+        self.menubar.add_cascade(label="View", menu=self.viewmenu)
         self.menubar.add_cascade(label="Navigate", menu=self.navmenu)
         self.menubar.add_cascade(label="Git", menu=self.gitmenu)
         if OSX:
@@ -829,7 +832,7 @@ class Editor:
             return
         file_dir = self.tabs[self.get_tab()].file_dir
         text = self.tabs[self.get_tab()].textbox
-        ViewDialog(self.master, f"Classes and functions for {file_dir}", text, file_dir)
+        ViewDialog(self.panedwin, text, file_dir)
     
     def view_log(self):
         LogViewDialog()
@@ -1145,7 +1148,7 @@ class Editor:
         win.mainloop()
 
     def test(self):
-        TestDialog(self.pandedwin, self.filetree.path)
+        TestDialog(self.panedwin, self.filetree.path)
 
     def check_updates(self, popup=True) -> list:
         if "DEV" in VERSION:
@@ -1193,7 +1196,7 @@ class Editor:
             url = dialog.result
             if not url:
                 return
-            subprocess.Popen(f"git clone {url} > {os.devnull}", shell=True, cwd=currdir)
+            subprocess.Popen(f"git clone {url}", shell=True, cwd=currdir)
             return
         if not os.path.exists(path := os.path.join(currdir, ".git")):
             ErrorInfoDialog(self.master, f"Not a git repository: {Path(path).parent}")
@@ -1205,9 +1208,9 @@ class Editor:
                 cwd=currdir,
             )
         elif action == "commit":
-            CommitView(self.master, currdir)
+            CommitView(self.panedwin, currdir)
         elif action == "remote":
-            RemoteView(self.master, currdir)
+            RemoteView(self.panedwin, currdir)
 
     def indent(self, action="indent") -> None:
         """Indent/unindent feature."""

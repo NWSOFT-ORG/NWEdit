@@ -1,5 +1,5 @@
 """Constants for the editor."""
-from src.modules import Path, logging, sys, tk
+from src.modules import Path, logging, sys, tk, os
 
 WINDOWS = bool(sys.platform.startswith("win"))
 OSX = bool(sys.platform.startswith("darwin"))
@@ -151,12 +151,13 @@ ENCODINGS = (
     "utf_8_sig",
 )
 textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7F})
+os.chdir(APPDIR)
 logger = logging.getLogger("PyPlus")
 logging.basicConfig(
     filename="pyplus.log",
     filemode="w",
     level=logging.DEBUG,
-    format="%(asctime)s : %(levelname)s : %(funcName)s : %(message)s",
+    format="%(asctime)s %(levelname)s %(funcName)s %(message)s",
 )
 
 logger.info(f"Tkinter version: {tk.TkVersion}")

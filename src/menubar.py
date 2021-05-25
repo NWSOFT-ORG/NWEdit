@@ -33,7 +33,7 @@ class Menu(ttk.Frame):
 
         command_label.bind('<1>', exec_command)
         bind_events(command_label)
-        command_label.pack(side='top', anchor='nw')
+        command_label.pack(side='top', anchor='nw', fill='x')
     
     def tk_popup(self, x, y):
         self.place(x=x, y=y)

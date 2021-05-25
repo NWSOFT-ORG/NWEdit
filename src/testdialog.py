@@ -7,22 +7,20 @@ TESTS_FILE = ".PyPlus/Tests/tests.json"
 SETTINGS_FILE = ".PyPlus/Tests/settings.json"
 
 
-class TestDialog(tk.Toplevel):
+class TestDialog(ttk.Frame):
     def __init__(self, parent, path):
-        if parent:
-            super().__init__(parent)
-            self.transient(parent)
+        super().__init__(parent)
+        parent.forget(parent.panes()[0])
+        self.pack(fill='both', expand=1)
+        parent.insert('0', self)
         self.path = path = path
-
-        self.title("Unit Tests")
-        self.resizable(0, 0)
         self.tests_listbox = ttk.Treeview(self, show="tree")
         yscroll = ttk.Scrollbar(self, command=self.tests_listbox.yview)
         yscroll.pack(side="right", fill="y")
         self.tests_listbox.config(yscrollcommand=yscroll.set)
         self.refresh_tests()
         self.settings_list = self.read_settings()
-        self.tests_listbox.pack(fill="both")
+        self.tests_listbox.pack(fill="both", expand=1)
         self.button_frame = ttk.Frame(self)
         ttk.Button(self.button_frame, text="New", command=self.new).pack(side="left")
         ttk.Button(self.button_frame, text="Delete", command=self.delete).pack(
@@ -46,16 +44,22 @@ class TestDialog(tk.Toplevel):
             self.tests_listbox.insert("", "end", text=test)
 
     def write_test(self):
-        if not os.path.isdir(os.path.join(self.path, ".PyPlus")):
-            os.mkdir(os.path.join(self.path, ".PyPlus"))
-        if not os.path.isdir(os.path.join(self.path, ".PyPlus", "Tests")):
-            os.mkdir(os.path.join(self.path, ".PyPlus", "Tests"))
+        try:
+            if not os.path.isdir(os.path.join(self.path, ".PyPlus")):
+                os.mkdir(os.path.join(self.path, ".PyPlus"))
+            if not os.path.isdir(os.path.join(self.path, ".PyPlus", "Tests")):
+                os.mkdir(os.path.join(self.path, ".PyPlus", "Tests"))
+        except OSError:
+            pass
         try:
             with open(os.path.join(self.path, TESTS_FILE), "w") as f:
                 json.dump(self.method_list, f)
-        except AttributeError:
-            with open(os.path.join(self.path, TESTS_FILE), "w") as f:
-                json.dump({}, f)
+        except (AttributeError, FileNotFoundError):
+            try:
+                with open(os.path.join(self.path, TESTS_FILE), "w") as f:
+                    json.dump({}, f)
+            except FileNotFoundError:
+                pass
 
     def read_test(self) -> dict:
         try:

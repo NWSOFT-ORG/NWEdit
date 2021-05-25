@@ -1145,7 +1145,7 @@ class Editor:
         win.mainloop()
 
     def test(self):
-        TestDialog(self.master, self.filetree.path)
+        TestDialog(self.pandedwin, self.filetree.path)
 
     def check_updates(self, popup=True) -> list:
         if "DEV" in VERSION:

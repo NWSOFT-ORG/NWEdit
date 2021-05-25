@@ -509,6 +509,7 @@ class Editor:
         textframe.set_first_line(1)
 
         textbox = textframe.text  # text widget
+        textbox.panedwin = panedwin
         textbox.frame = frame  # The text will be packed into the frame.
         textbox.bind(("<Button-2>" if OSX else "<Button-3>"), self.right_click)
         textbox.bind(f"<{MAIN_KEY}-b>", self.run)
@@ -808,7 +809,8 @@ class Editor:
         open_system_shell()
 
     def python_shell(self) -> None:
-        shell_frame = tk.Toplevel(self.master)
+        curr_tab = self.tabs[self.get_tab()].textbox.panedwin
+        shell_frame = ttk.Frame(curr_tab)
         ttkthemes.ThemedStyle(shell_frame).set_theme(self.theme)
         main_window = Console(shell_frame, None, shell_frame.destroy)
         main_window.text.lexer = lexers.get_lexer_by_name("pycon")
@@ -819,7 +821,8 @@ class Editor:
             "<KeyRelease>", lambda _=None: recolorize(main_window.text)
         )
         main_window.pack(fill="both", expand=1)
-        shell_frame.mainloop()
+        shell_frame.pack(fill='both', expand=1)
+        curr_tab.add(shell_frame)
 
     def view(self):
         if not self.tabs:
@@ -1142,7 +1145,7 @@ class Editor:
         win.mainloop()
 
     def test(self):
-        TestDialog(self.master, self.filetree.path)
+        TestDialog(self.pandedwin, self.filetree.path)
 
     def check_updates(self, popup=True) -> list:
         if "DEV" in VERSION:

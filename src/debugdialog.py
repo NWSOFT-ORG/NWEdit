@@ -52,9 +52,8 @@ class LogViewDialog(tk.Toplevel):
         ttk.Button(frame, text='Copy', command=self.copy_log).pack(side='right')
         self.log_text = ReadonlyText(self)
         self.log_text.pack(fill='both', expand=1)
-        while True:
-            self.log_text.after(10, self.update_log)
-            self.mainloop()
+        self.log_text.after(10, self.update_log)
+        self.mainloop()
     
     def update_log(self):
         with open('../pyplus.log') as f:

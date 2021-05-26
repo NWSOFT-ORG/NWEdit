@@ -1,6 +1,7 @@
 from src.constants import APPDIR, logger
 from src.modules import json, tk, ttk, ttkthemes, styles, lexers
 import ast
+import traceback
 
 
 # Need these because importing settings is a circular import
@@ -188,11 +189,14 @@ class ErrorInfoDialog(Dialog):
         pass
 
 
-class ViewDialog(ttk.Frame):
+class CodeListDialog(ttk.Frame):
     def __init__(self, parent=None, text=None, file=None):
         super().__init__(parent)
         self.file = file
         self.text = text
+
+        self.state_label = ttk.Label(self, text='')
+        self.state_label.pack(anchor='nw', fill='x')
         self.tree = ttk.Treeview(self)
         self.tree.bind('<Double-1>', self.double_click)
         self.tree.pack(fill='both', expand=1)
@@ -205,7 +209,11 @@ class ViewDialog(ttk.Frame):
     def show_items(self):
         filename = self.file
         with open(filename) as f:
-            node = ast.parse(f.read())
+            try:
+                node = ast.parse(f.read())
+            except SyntaxError:
+                self.state_label.configure(text=f'Error: Cannot parse docoment.\n {traceback.format_exc()}')
+                return
 
         functions = [_obj for _obj in node.body if isinstance(_obj, ast.FunctionDef)]
         classes = [_obj for _obj in node.body if isinstance(_obj, ast.ClassDef)]

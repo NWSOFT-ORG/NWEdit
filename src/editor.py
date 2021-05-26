@@ -28,7 +28,7 @@ from src.constants import (
     logger,
 )
 from src.customenotebook import ClosableNotebook
-from src.dialogs import (ErrorInfoDialog, InputStringDialog, ViewDialog,
+from src.dialogs import (ErrorInfoDialog, InputStringDialog, CodeListDialog,
                          YesNoDialog)
 from src.debugdialog import (ErrorReportDialog, LogViewDialog)
 from src.filedialog import FileOpenDialog, FileSaveAsDialog
@@ -41,8 +41,6 @@ from src.functions import (
 )
 
 # These modules are from the base directory
-from src.Git.commitview import CommitView
-from src.Git.remoteview import RemoteView
 from src.goto import Navigate
 from src.hexview import HexView
 from src.highlighter import create_tags, recolorize
@@ -396,8 +394,9 @@ class Editor:
         )
 
         self.viewmenu = MenuItem()
+        self.viewmenu.add_command(label="Show File Tree", command=self.show_filelist)
         self.viewmenu.add_command(
-            label="System Shell",
+            label="Python Shell",
             command=self.python_shell,
             image=self.pyterm_icon,
         )
@@ -410,6 +409,11 @@ class Editor:
             command=self.search,
             image=self.search_icon,
         )
+        self.viewmenu.add_command(label="Git: Commit and Push...", command=lambda: self.git("commit"))
+        self.viewmenu.add_command(
+            label="Classes and functions",
+            command=self.codelist,
+        )
 
         self.navmenu = MenuItem()
         self.navmenu.add_command(label="Go to ...", command=self.goto)
@@ -417,16 +421,10 @@ class Editor:
         self.navmenu.add_command(label="+1 char", command=self.nav_1cf)
         self.navmenu.add_command(label="Word end", command=self.nav_wordend)
         self.navmenu.add_command(label="Word start", command=self.nav_wordstart)
-        self.navmenu.add_command(
-            label="Classes and functions",
-            command=self.view,
-        )
 
         self.gitmenu = MenuItem()
         self.gitmenu.add_command(label="Initialize", command=lambda: self.git("init"))
-        self.gitmenu.add_command(label="Commit", command=lambda: self.git("commit"))
-        self.gitmenu.add_command(label="Remote", command=lambda: self.git("remote"))
-        self.gitmenu.add_command(label="Clone", command=lambda: self.git("clone"))
+        self.gitmenu.add_command(label="Clone...", command=lambda: self.git("clone"))
 
         self.menubar.add_cascade(label="PyPlus", menu=self.appmenu)  # App menu
         self.menubar.add_cascade(label="File", menu=self.filemenu)
@@ -732,7 +730,7 @@ class Editor:
             sel = self.tabs[self.get_tab()].textbox.get(tk.SEL_FIRST, tk.SEL_LAST)
             self.tabs[self.get_tab()].textbox.clipboard_clear()
             self.tabs[self.get_tab()].textbox.clipboard_append(sel)
-        except Exception:
+        except tk.TclError:
             pass
 
     def delete(self) -> None:
@@ -763,10 +761,10 @@ class Editor:
     def select_all(self) -> None:
         try:
             curr_tab = self.get_tab()
-            self.tabs[curr_tab].textbox.tag_add(tk.SEL, "1.0", tk.END)
+            self.tabs[curr_tab].textbox.tag_add('sel', "1.0", 'end')
             self.tabs[curr_tab].textbox.mark_set("insert", "end")
             self.tabs[curr_tab].textbox.see("insert")
-        except Exception:
+        except tk.TclError:
             pass
 
     def run(self, _=None) -> None:
@@ -826,12 +824,16 @@ class Editor:
         shell_frame.pack(fill='both', expand=1)
         curr_tab.add(shell_frame)
 
-    def view(self):
+    def codelist(self):
         if not self.tabs:
             return
         file_dir = self.tabs[self.get_tab()].file_dir
         text = self.tabs[self.get_tab()].textbox
-        ViewDialog(self.panedwin, text, file_dir)
+        CodeListDialog(self.panedwin, text, file_dir)
+        
+    def show_filelist(self):
+        self.panedwin.forget(self.panedwin.panes()[0])
+        self.panedwin.insert('0', self.filetree)
     
     def view_log(self):
         LogViewDialog()
@@ -1207,8 +1209,6 @@ class Editor:
                 cwd=currdir,
             )
         elif action == "commit":
-            CommitView(self.panedwin, currdir)
-        elif action == "remote":
             RemoteView(self.panedwin, currdir)
 
     def indent(self, action="indent") -> None:
@@ -1299,10 +1299,3 @@ class Editor:
             self.key()
         except (KeyError, AttributeError):
             return
-
-
-
-
-
-
-

@@ -28,10 +28,10 @@ from src.constants import (
     logger,
 )
 from src.customenotebook import ClosableNotebook
-from src.dialogs import (ErrorInfoDialog, InputStringDialog, CodeListDialog,
+from src.Dialog.commondialog import (ErrorInfoDialog, InputStringDialog, CodeListDialog,
                          YesNoDialog)
-from src.debugdialog import (ErrorReportDialog, LogViewDialog)
-from src.filedialog import FileOpenDialog, FileSaveAsDialog
+from src.Dialog.debugdialog import (ErrorReportDialog, LogViewDialog)
+from src.Dialog.filedialog import FileOpenDialog, FileSaveAsDialog
 from src.functions import (
     download_file,
     is_binary_string,
@@ -69,9 +69,10 @@ from src.settings import (
     Settings,
 )
 from src.statusbar import Statusbar
-from src.testdialog import TestDialog
+from src.Dialog.testdialog import TestDialog
 from src.tktext import EnhancedTextFrame, TextOpts
 from src.treeview import FileTree
+from src.Git.commitview import CommitView
 
 if OSX:
     from src.modules import PyTouchBar
@@ -1209,7 +1210,7 @@ class Editor:
                 cwd=currdir,
             )
         elif action == "commit":
-            RemoteView(self.panedwin, currdir)
+            CommitView(self.panedwin, currdir)
 
     def indent(self, action="indent") -> None:
         """Indent/unindent feature."""

@@ -197,10 +197,10 @@ class CodeListDialog(ttk.Frame):
 
         self.state_label = ttk.Label(self, text='')
         self.state_label.pack(anchor='nw', fill='x')
-        self.tree = ttk.Treeview(self)
+        self.tree = ttk.Treeview(self, show='tree')
         self.tree.bind('<Double-1>', self.double_click)
         self.tree.pack(fill='both', expand=1)
-        ttk.Button(self, text="Ok", command=self.destroy).pack(side="left")
+
         self.show_items()
         self.pack(fill='both', expand=1)
         parent.forget(parent.panes()[0])
@@ -211,32 +211,38 @@ class CodeListDialog(ttk.Frame):
         with open(filename) as f:
             try:
                 node = ast.parse(f.read())
-            except SyntaxError:
-                self.state_label.configure(text=f'Error: Cannot parse docoment.\n {traceback.format_exc()}')
+            except Exception:
+                self.state_label.configure(text=f'Error: Cannot parse docoment.\n {traceback.format_exc()}',
+                                           foreground='red')
                 return
 
         functions = [_obj for _obj in node.body if isinstance(_obj, ast.FunctionDef)]
         classes = [_obj for _obj in node.body if isinstance(_obj, ast.ClassDef)]
 
+
         for function in functions:
-            self.show_info("", function)
+            self.show_info("", function, 'func')
 
         for class_ in classes:
-            parent = self.show_info("", class_)
-            methods = [n for n in class_.body if isinstance(n, ast.FunctionDef)]
+            parent = self.show_info("", class_, 'class')
+            methods = [_obj for _obj in class_.body if isinstance(_obj, ast.FunctionDef)]
             for method in methods:
-                self.show_info(parent, method)
+                self.show_info(parent, method, 'func')
     
-    def show_info(self, parent, _obj):
-        return self.tree.insert(parent, "end", text=f"{_obj.name} [{_obj.lineno}:{_obj.col_offset}]")
+    def show_info(self, parent, _obj, _type):
+        return self.tree.insert(parent,
+                                "end", text=f"{_obj.name} [{_obj.lineno}:{_obj.col_offset}]",
+                                tags=[_type])
     
     def double_click(self, _=None):
-        item = self.tree.focus()
-        text = self.tree.item(item, 'text')
-        index = text.split(' ')[-1][1:-1]
-        line = index.split(':')[0]
-        col = index.split(':')[1]
-        self.text.mark_set('insert', f"{line}.{col}")
-        self.text.see('insert')
-        self.text.focus_set()
-        self.destroy()
+        try:
+            item = self.tree.focus()
+            text = self.tree.item(item, 'text')
+            index = text.split(' ')[-1][1:-1]
+            line = index.split(':')[0]
+            col = index.split(':')[1]
+            self.text.mark_set('insert', f"{line}.{col}")
+            self.text.see('insert')
+            self.text.focus_set()
+        except IndexError:  # Click on empty places
+            pass

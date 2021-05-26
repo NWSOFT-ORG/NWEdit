@@ -1,4 +1,4 @@
-from src.dialogs import get_theme
+from src.Dialog.commondialog import get_theme
 from src.functions import darken_color
 from src.modules import tk, ttk, ttkthemes
 

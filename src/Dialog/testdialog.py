@@ -1,4 +1,4 @@
-from src.dialogs import InputStringDialog, YesNoDialog
+from src.Dialog.commondialog import InputStringDialog, YesNoDialog
 from src.modules import os, tk, ttk, json, lexers
 from src.tktext import EnhancedTextFrame, TextOpts
 from src.highlighter import create_tags, recolorize

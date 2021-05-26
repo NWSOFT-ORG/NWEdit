@@ -1,7 +1,7 @@
 """A Hex Viewer to view non-text documents."""
 
 from src.constants import BLOCK_HEIGHT, BLOCK_WIDTH, ENCODINGS
-from src.dialogs import get_theme
+from src.Dialog.commondialog import get_theme
 from src.modules import codecs, os, tk, ttk, ttkthemes
 
 

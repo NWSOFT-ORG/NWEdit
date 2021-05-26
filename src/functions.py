@@ -3,7 +3,7 @@
 import shlex
 
 from src.constants import OSX, WINDOWS, textchars
-from src.dialogs import ErrorInfoDialog
+from src.Dialog.commondialog import ErrorInfoDialog
 from src.modules import os, platform, requests, shutil, subprocess, sys
 
 DARK_COLOR = 128

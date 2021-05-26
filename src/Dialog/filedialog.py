@@ -1,4 +1,4 @@
-from src.dialogs import get_theme
+from src.Dialog.commondialog import get_theme
 from src.modules import os, tk, ttk, ttkthemes
 from src.treeview import FileTree
 

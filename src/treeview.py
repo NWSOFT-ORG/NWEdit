@@ -1,5 +1,5 @@
 from src.constants import OSX, WINDOWS
-from src.dialogs import InputStringDialog, YesNoDialog, get_theme
+from src.Dialog.commondialog import InputStringDialog, YesNoDialog, get_theme
 from src.modules import os, shutil, time, tk, ttk, ttkthemes
 
 

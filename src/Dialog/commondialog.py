@@ -218,6 +218,7 @@ class CodeListDialog(ttk.Frame):
 
         functions = [_obj for _obj in node.body if isinstance(_obj, ast.FunctionDef)]
         classes = [_obj for _obj in node.body if isinstance(_obj, ast.ClassDef)]
+        defined_vars = [_obj for _obj in node.body if isinstance(_obj, ast.Assign)]
 
 
         for function in functions:
@@ -226,13 +227,25 @@ class CodeListDialog(ttk.Frame):
         for class_ in classes:
             parent = self.show_info("", class_, 'class')
             methods = [_obj for _obj in class_.body if isinstance(_obj, ast.FunctionDef)]
+            defined_vars = [_obj.targets for _obj in class_.body if isinstance(_obj, ast.Assign)]
             for method in methods:
                 self.show_info(parent, method, 'func')
+            
+            for var in defined_vars:
+                self.show_var(parent, var)
+        
+        for var in defined_vars:
+            self.show_var("", var)
     
-    def show_info(self, parent, _obj, _type):
+    def show_info(self, parent, _obj, _type=''):
         return self.tree.insert(parent,
                                 "end", text=f"{_obj.name} [{_obj.lineno}:{_obj.col_offset}]",
                                 tags=[_type])
+    
+    def show_var(self, parent,  _obj):
+        for item in _obj.targets:
+            self.tree.insert(parent, 'end',
+                             text=f'{item.id} [{item.lineno}:{item.col_offset}]')
     
     def double_click(self, _=None):
         try:

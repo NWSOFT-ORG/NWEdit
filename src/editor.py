@@ -44,7 +44,7 @@ from src.functions import (
 from src.goto import Navigate
 from src.hexview import HexView
 from src.highlighter import create_tags, recolorize
-from src.menubar import Menubar, MenuItem, Menu
+from src.Menu.menubar import Menubar, MenuItem, Menu
 from src.modules import (
     EditorErr,
     Path,

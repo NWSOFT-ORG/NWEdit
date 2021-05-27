@@ -1,6 +1,7 @@
 from src.constants import APPDIR, logger
 from src.modules import json, tk, ttk, styles
-from src.highlighter import create_tags, recolorize
+
+from src.tktext import EnhancedTextFrame
 
 # Need these to prevent circular imports
 def get_pygments():
@@ -14,23 +15,25 @@ def get_font():
     return settings["font"]
 
 
-class ReadonlyText(tk.Text):
+class ReadonlyText(EnhancedTextFrame):
     def __init__(self, master):
+        super().__init__(master)
         style = styles.get_style_by_name(get_pygments())
         bgcolor = style.background_color
         fgcolor = style.highlight_color
-        super().__init__(master, fg=fgcolor, bg=bgcolor, font=get_font())
-        self.configure(state='disabled')
-        
+        self.text.configure(state='disabled',
+                       fg=fgcolor, bg=bgcolor,
+                       font=get_font())
+
     def insert(self, pos, text):
-        self.configure(state='normal')
-        super().insert(pos, text)
-        self.configure(state='disabled')
+        self.text.configure(state='normal')
+        self.text.insert(pos, text)
+        self.text.configure(state='disabled')
     
     def delete(self, pos1, pos2):
-        self.configure(state='normal')
-        super().delete(pos1, pos2)
-        self.configure(state='disabled')
+        self.text.configure(state='normal')
+        self.text.delete(pos1, pos2)
+        self.text.configure(state='disabled')
 
 
 class ErrorReportDialog(tk.Toplevel):
@@ -59,11 +62,11 @@ class LogViewDialog(tk.Toplevel):
         self.mainloop()
     
     def update_log(self):
-        with open('../pyplus.log') as f:
+        with open('pyplus.log') as f:
             log = f.read()
         self.log_text.delete('1.0', 'end')
         self.log_text.insert('end', log)
-        self.log_text.see('end')
+        self.log_text.text.see('end')
         self.log_text.after(10, self.update_log)
     
     def copy_log(self):

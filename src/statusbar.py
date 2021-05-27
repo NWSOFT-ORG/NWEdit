@@ -1,7 +1,5 @@
 from src.modules import ttk
 
-
-    
 def bind_events(label):
     label.bind('<Leave>', lambda _=None: label.state(('!active',)))
     label.bind('<Enter>', lambda _=None: label.state(('active',)))

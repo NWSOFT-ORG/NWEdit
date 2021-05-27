@@ -3,7 +3,7 @@ from src.constants import logger
 from src.functions import is_dark_color, lighten_color
 from src.modules import tk, ttk, ttkthemes
 from src.settings import Settings
-from src.menubar import Menu
+from src.Menu.menubar import Menu
 from src.statusbar import bind_events
 
 

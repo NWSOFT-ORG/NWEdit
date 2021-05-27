@@ -2,7 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\src",
+    "\\src\\Backups",
     "\\src\\Git"
   ],
-  "PreviewInSolutionExplorer": false
+  "PreviewInSolutionExplorer": true
 }

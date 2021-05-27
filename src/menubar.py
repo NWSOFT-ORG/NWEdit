@@ -20,6 +20,7 @@ class Menu(ttk.Frame):
     def __init__(self, tkwin: tk.Tk):
         super().__init__(tkwin, relief='groove')
         self.win = tkwin
+        self.opened = False
     
     def add_command(self, label, command, image=None):
         if image:
@@ -38,13 +39,18 @@ class Menu(ttk.Frame):
     def tk_popup(self, x, y):
         self.place(x=x, y=y)
         if (x + self.winfo_width()) > self.win.winfo_width():
-            self.place_configure(x=x, y=y, anchor='ne')
+            self.place_configure(x=(x - self.winfo_width()), y=y, anchor='ne')
+        self.opened = True
 
         def close_menu(_=None):
             self.place_forget()
             self.win.event_delete('<<CloseMenu>>')
+            self.opened = False
         self.win.event_add('<<CloseMenu>>', '<1>')
         self.win.bind('<<CloseMenu>>', close_menu)
+
+    def unpost(self):
+        self.place_forget()
 
 
 class Menubar(ttk.Frame):
@@ -58,13 +64,13 @@ class Menubar(ttk.Frame):
         tab_frame.place(relx=1.0, x=0, y=1, anchor='ne')
         self.search_entry = ttk.Entry(tab_frame, width=15)
         self.search_entry.pack(side='left', fill='both')
-        search_button = ttk.Button(tab_frame, text='>>', width=2)
-        search_button.bind('<1>', self._search_command)
-        # Needs to use bind, so I can pass in x and y
-        search_button.pack(side='left')
+        self.search_button = ttk.Button(tab_frame, text='>>', width=3, command=self._search_command)
+        self.search_button.pack(side='left')
         self.commands = {}
+        self.menus = []
+        self.menu_opened = None
     
-    def _search_command(self, event):
+    def _search_command(self):
         text = self.search_entry.get()
         menu = Menu(self.master)
         for item in sorted(self.commands.keys()):
@@ -72,7 +78,9 @@ class Menubar(ttk.Frame):
                 menu.add_command(label=item,
                                  command=self.commands[item]
                                 )
-        menu.tk_popup(event.x_root, event.y_root)
+        menu.tk_popup(self.winfo_x() + self.winfo_width() + self.search_button.winfo_x() + self.search_button.winfo_width(),
+                      self.search_button.winfo_y() + self.search_button.winfo_height()
+                      )
 
     def add_cascade(self, label: str, menu: MenuItem) -> None:
         dropdown = Menu(self.master)
@@ -85,16 +93,28 @@ class Menubar(ttk.Frame):
             self,
             text=label,
             padding=[1, 3, 6, 1],
-            font="Arial 14",
+            font="Arial 12",
         )
 
         label_widget.pack(side='left', fill='both', anchor='nw')
 
         def click(_):
+            self.menu_opened = dropdown
             dropdown.tk_popup(
                 label_widget.winfo_x(),
                 label_widget.winfo_y() + label_widget.winfo_height(),
             )
 
-        bind_events(label_widget)
+        def enter(event):
+            if self.menu_opened:
+                if self.menu_opened.opened:
+                    self.menu_opened.unpost()
+                    click(event)
+            label_widget.state(('active',))
+
+        def leave(_):
+            label_widget.state(('!active',))
+
+        label_widget.bind('<Leave>', leave)
+        label_widget.bind('<Enter>', enter)
         label_widget.bind("<1>", click, True)

@@ -95,8 +95,7 @@ class ClosableNotebook(ttk.Notebook):
     def on_close_press(self, event):
         """Called when the button is pressed over the close button"""
 
-        element = self.identify(event.x, event.y)
-
+        element = self.identify(event.x, event.y) 
         if "close" in element:
             index = self.index("@%d,%d" % (event.x, event.y))
             self.state(["pressed"])

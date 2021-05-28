@@ -2,6 +2,7 @@ from src.Dialog.commondialog import InputStringDialog, YesNoDialog
 from src.modules import os, tk, ttk, json, lexers
 from src.tktext import EnhancedTextFrame, TextOpts
 from src.highlighter import create_tags, recolorize
+from src.functions import is_valid_name
 
 TESTS_FILE = ".PyPlus/Tests/tests.json"
 SETTINGS_FILE = ".PyPlus/Tests/settings.json"
@@ -136,6 +137,8 @@ class TestDialog(ttk.Frame):
         if not name:
             return
         name = "test_" + name
+        if not is_valid_name(name):
+            return
         codewin = tk.Toplevel(self)
         codewin.title(name)
         codewin.transient(self)
@@ -213,6 +216,9 @@ class TestMain(unittest.TestCase):
             res += f"""
     def {key}():
 {values}
+
+if __name__ == '__main__':
+    unittest.main()
 """
         with open(os.path.join(self.path, "test.py"), "w") as f:
             f.write(res)

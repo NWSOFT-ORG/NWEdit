@@ -22,7 +22,6 @@ import tkinter.ttk as ttk
 import webbrowser
 import zipfile
 from pathlib import Path
-import imp
 
 import json5 as json
 import requests
@@ -30,6 +29,7 @@ import ttkthemes
 import pygments
 from pygments import lexers
 from pygments import styles
+from keyword import iskeyword
 
 if sys.platform == "darwin":
     import PyTouchBar

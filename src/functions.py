@@ -4,7 +4,8 @@ import shlex
 
 from src.constants import OSX, WINDOWS, textchars
 from src.Dialog.commondialog import ErrorInfoDialog
-from src.modules import os, platform, requests, shutil, subprocess, sys
+from src.modules import (os, platform, requests, shutil,
+                         subprocess, sys, iskeyword)
 
 DARK_COLOR = 128
 
@@ -63,6 +64,10 @@ def lighten_color(hex_code, red, green, blue) -> bool:
     for x in rgb:
         value += dec2hex(x)[2:]
     return value
+
+
+def is_valid_name(name):
+    return name.isidentifier() and not iskeyword(name)
 
 
 def download_file(url, localfile=None) -> str:

@@ -28,8 +28,9 @@ from src.constants import (
     logger,
 )
 from src.customenotebook import ClosableNotebook
-from src.Dialog.commondialog import (ErrorInfoDialog, InputStringDialog, CodeListDialog,
+from src.Dialog.commondialog import (ErrorInfoDialog, InputStringDialog,
                          YesNoDialog)
+from src.Dialog.codelistdialog import CodeListDialog
 from src.Dialog.debugdialog import (ErrorReportDialog, LogViewDialog)
 from src.Dialog.filedialog import FileOpenDialog, FileSaveAsDialog
 from src.functions import (

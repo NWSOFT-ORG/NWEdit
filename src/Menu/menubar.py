@@ -30,6 +30,7 @@ class Menu(ttk.Frame):
         
         def exec_command(_=None):
             self.place_forget()
+            self.opened = False
             command()
 
         command_label.bind('<1>', exec_command)
@@ -50,6 +51,7 @@ class Menu(ttk.Frame):
         self.win.bind('<<CloseMenu>>', close_menu)
 
     def unpost(self):
+        self.opened = False
         self.place_forget()
 
 

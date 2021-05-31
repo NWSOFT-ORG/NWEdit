@@ -2,6 +2,18 @@ from src.Dialog.commondialog import get_theme
 from src.functions import darken_color
 from src.modules import tk, ttk, ttkthemes
 import re
+import string
+
+def find_all(sub, text, case):
+    if case:
+        text = text.casefold()
+        sub = sub.casefold()
+    start = 0
+    while True:
+        start = text.find(sub, start)
+        if start == -1: return
+        yield (start, start + len(sub))
+        start += len(sub)
 
 
 class Search:
@@ -82,9 +94,13 @@ class Search:
 
     def re_search(self, pat, text, nocase, exact_match):
         if nocase:
-            res = re.search(pat, text, re.IGNORECASE)
+            res = find_all(pat, text, case=False)
+        if nocase and exact_match:
+            res = list(re.finditer(r"\b" + re.escape(string1) + r"\b", string2, re.IGNORECASE))
         if exact_match:
-            res = re.search(f"${pat}^", text)
+            res = list(re.finditer(r"\b" + re.escape(string1) + r"\b", string2))
+        if regexp:
+            res = list(re.finditer(pat, text))
         return res
 
     def find(self, _=None):

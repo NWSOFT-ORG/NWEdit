@@ -1,10 +1,11 @@
 from src.Dialog.commondialog import get_theme
 from src.functions import darken_color
 from src.modules import tk, ttk, ttkthemes
+import re
 
 
 class Search:
-    def __init__(self, master: tk.Misc, text: tk.Text):  # TODO: reduce args
+    def __init__(self, master: tk.Misc, text: tk.Text):
         self.master = master
         self.case = tk.BooleanVar()
         self.regexp = tk.BooleanVar()
@@ -78,6 +79,13 @@ class Search:
         self.content.bind("<KeyRelease>", self.find)
         ttk.Button(self.search_frame, text="x", command=self._exit).pack(side="right")
         self.text.searchable = True
+
+    def re_search(self, pat, text, nocase, exact_match):
+        if nocase:
+            res = re.search(pat, text, re.IGNORECASE)
+        if exact_match:
+            res = re.search(f"${pat}^", text)
+        return res
 
     def find(self, _=None):
         found = tk.IntVar()

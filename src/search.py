@@ -2,27 +2,38 @@ from src.Dialog.commondialog import get_theme
 from src.functions import darken_color
 from src.modules import tk, ttk, ttkthemes
 import re
-import string
 
-def find_all(sub, text, case):
-    if case:
-        text = text.casefold()
-        sub = sub.casefold()
-    start = 0
-    while True:
-        start = text.find(sub, start)
-        if start == -1: return
-        yield (start, start + len(sub))
-        start += len(sub)
+def finditer_withlineno(pattern, string, flags=0):
+    """
+    A version of 're.finditer' that returns '(match, line_number)' pairs.
+    """
+
+    matches = list(re.finditer(pattern, string, flags))
+    if not matches:
+        return []
+
+    end = matches[-1].start()
+    # -1 so a failed 'rfind' maps to the first line.
+    newline_table = {-1: 0}
+    for i, m in enumerate(re.finditer(r'\n', string), 1):
+        # don't find newlines past our last match
+        offset = m.start()
+        if offset > end:
+            break
+        newline_table[offset] = i
+
+    # Failing to find the newline is OK, -1 maps to 0.
+    for m in matches:
+        newline_offset = string.rfind('\n', 0, m.start())
+        print(newline_table, newline_offset)
+        line_number = newline_table[newline_offset]
+        yield (line_number, newline_offset)
 
 
 class Search:
     def __init__(self, master: tk.Misc, text: tk.Text):
         self.master = master
         self.case = tk.BooleanVar()
-        self.regexp = tk.BooleanVar()
-        self.start = "sel.first"
-        self.end = "sel.last"
         self.text = text
         self.result = None
         self._style = ttkthemes.ThemedStyle()
@@ -79,11 +90,6 @@ class Search:
         )
         self.case_yn.pack(side="left")
 
-        self.reg_button = ttk.Checkbutton(
-            self.search_frame, text="Regexp", variable=self.regexp
-        )
-        self.reg_button.pack(side="left")
-
         self.clear_button.config(command=self.clear)
         self.repl_button.config(command=self.replace)
         self.forward.config(command=self.nav_forward)
@@ -92,41 +98,29 @@ class Search:
         ttk.Button(self.search_frame, text="x", command=self._exit).pack(side="right")
         self.text.searchable = True
 
-    def re_search(self, pat, text, nocase, exact_match):
-        if nocase:
-            res = find_all(pat, text, case=False)
-        if nocase and exact_match:
-            res = list(re.finditer(r"\b" + re.escape(string1) + r"\b", string2, re.IGNORECASE))
-        if exact_match:
-            res = list(re.finditer(r"\b" + re.escape(string1) + r"\b", string2))
-        if regexp:
-            res = list(re.finditer(pat, text))
+    def re_search(self, pat, text, nocase=False, full_word=False):
+        if nocase and full_word:
+            res = [(x[0], x[1]) for x in finditer_withlineno(r"\b" + re.escape(string1) + r"\b", string2, (re.IGNORECASE, re.MULTILINE))]
+        if full_word:
+            res = [(x[0], x[1]) for x in finditer_withlineno(r"\b" + re.escape(string1) + r"\b", string2, re.MULTILINE)]
+        else:
+            res = [(x[0], x[1]) for x in finditer_withlineno(pat, text, re.MULTILINE)]
+        print(res)
         return res
 
     def find(self, _=None):
-        found = tk.IntVar()
         text = self.text
         text.tag_remove("found", "1.0", "end")
         s = self.content.get()
         self.starts.clear()
         if s:
-            idx = "1.0"
-            while 1:
-                idx = text.search(
-                    s,
-                    idx,
-                    nocase=not (self.case.get()),
-                    stopindex="end",
-                    regexp=self.regexp.get(),
-                    count=found,
-                )
-                if not idx:
-                    break
-                lastidx = "%s+%dc" % (idx, len(s))
-                text.tag_add("found", idx, lastidx)
-                self.starts.append(idx)
-                text.mark_set("insert", idx)
-                idx = lastidx
+            matches = self.re_search(
+                s,
+                text.get('1.0', 'end'),
+                nocase=not (self.case.get())
+            )
+            for x in matches:
+                text.tag_add("found", str(x[0]), str(x[1]))
             text.tag_config("found", foreground="red", background="yellow")
 
     def replace(self):

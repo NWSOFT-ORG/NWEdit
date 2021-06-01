@@ -25,9 +25,9 @@ def finditer_withlineno(pattern, string, flags=0):
     # Failing to find the newline is OK, -1 maps to 0.
     for m in matches:
         newline_offset = string.rfind('\n', 0, m.start())
-        print(newline_table, newline_offset)
         line_number = newline_table[newline_offset]
-        yield (line_number, newline_offset)
+        yield ((line_number + 1, m.start() - newline_offset - 1),
+               (line_number + 1, m.end() - newline_offset - 1))
 
 
 class Search:
@@ -105,7 +105,6 @@ class Search:
             res = [(x[0], x[1]) for x in finditer_withlineno(r"\b" + re.escape(string1) + r"\b", string2, re.MULTILINE)]
         else:
             res = [(x[0], x[1]) for x in finditer_withlineno(pat, text, re.MULTILINE)]
-        print(res)
         return res
 
     def find(self, _=None):
@@ -120,7 +119,10 @@ class Search:
                 nocase=not (self.case.get())
             )
             for x in matches:
-                text.tag_add("found", str(x[0]), str(x[1]))
+                start = f'{x[0][0]}.{x[0][1]}'
+                end = f'{x[1][0]}.{x[1][1]}'
+                self.starts.append(start)
+                text.tag_add("found", start, end)
             text.tag_config("found", foreground="red", background="yellow")
 
     def replace(self):
@@ -128,22 +130,17 @@ class Search:
         text.tag_remove("found", "1.0", "end")
         s = self.content.get()
         r = self.repl.get()
-        if s != "\\" and s:
-            idx = "1.0"
-            while 1:
-                idx = text.search(
-                    s,
-                    idx,
-                    nocase=not (self.case.get()),
-                    stopindex="end",
-                    regexp=self.regexp.get(),
-                )
-                if not idx:
-                    break
-                lastidx = "%s+%dc" % (idx, len(s))
-                text.delete(idx, lastidx)
-                text.insert(idx, r)
-                idx = lastidx
+        if s:
+            matches = self.re_search(
+                s,
+                text.get('1.0', 'end'),
+                nocase=not (self.case.get())
+            )
+            for x in matches:
+                start = f'{x[0][0]}.{x[0][1]}'
+                end = f'{x[1][0]}.{x[1][1]}'
+                text.delete(start, end)
+                text.insert(start, r)
 
     def clear(self):
         text = self.text

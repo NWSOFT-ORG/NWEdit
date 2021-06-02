@@ -42,7 +42,7 @@ from src.functions import (
 )
 
 # These modules are from the base directory
-from src.goto import Navigate
+from src.Dialog.goto import Navigate
 from src.hexview import HexView
 from src.highlighter import create_tags, recolorize
 from src.Menu.menubar import Menubar, MenuItem, Menu
@@ -60,7 +60,7 @@ from src.modules import (
     ttkthemes,
     webbrowser,
 )
-from src.search import Search
+from src.Dialog.search import Search
 from src.settings import (
     CommentMarker,
     FormatCommand,

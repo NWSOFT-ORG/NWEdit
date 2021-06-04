@@ -1,13 +1,25 @@
 from src.Dialog.commondialog import get_theme
 from src.functions import darken_color
-from src.modules import tk, ttk, ttkthemes
+from src.modules import tk, ttk, ttkthemes, os
 from src.Dialog.search import finditer_withlineno, find_all
 import re
 
+def list_all(directory):
+    itemslist = os.listdir(directory)
+    files = []
+    for file in itemslist:
+        path = os.path.abspath(os.path.join(directory, file))
+        if os.path.isdir(path):
+            files += list_all(path)
+        else:
+            files.append(path)
+
+    return files
+
 
 class Search:
-	def __init__(self, master: tk.Misc, path: str):
-		self.master = master
+	def __init__(self, parent: ttk.Panedwindow, path: str):
+		self.parent = parent
 		self.path = path
 		self.result = None
 		self._style = ttkthemes.ThemedStyle()
@@ -80,17 +92,17 @@ class Search:
 	def re_search(self, pat, text, nocase=False, full_word=False, regex=False):
 		if nocase and full_word:
 			res = [(x[0], x[1]) for x in finditer_withlineno(
-				r"\b" + re.escape(string1) +
-				r"\b", string2, (re.IGNORECASE, re.MULTILINE))]
+				r"\b" + re.escape(pat) +
+				r"\b", text, (re.IGNORECASE, re.MULTILINE))]
 		elif full_word:
 			res = [(x[0], x[1]) for x in finditer_withlineno(
-				r"\b" + re.escape(string1) + r"\b", string2, re.MULTILINE)]
+				r"\b" + re.escape(pat) + r"\b", text, re.MULTILINE)]
 		elif nocase and regex:
 			res = [(x[0], x[1]) for x in finditer_withlineno(
-				string1, string2, (re.IGNORECASE, re.MULTILINE))]
+				pat, text, (re.IGNORECASE, re.MULTILINE))]
 		elif regex:
 			res = [(x[0], x[1]) for x in finditer_withlineno(
-				string1, string2, re.MULTILINE)]
+				pat, text, re.MULTILINE)]
 		if nocase:
 		    res = [(x[0], x[1]) for x in find_all(pat, text, case=False)]
 		else:
@@ -99,7 +111,11 @@ class Search:
 
 	def find(self, *_):
 		path = self.path
-		# FIXME: add something
+		files = list_all(path)
+
+        for file in files:
+            with open(file) as f:
+                self.re_search(f.read())
 
 	def replace(self):
 		pass

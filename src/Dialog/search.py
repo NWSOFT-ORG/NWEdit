@@ -143,17 +143,17 @@ class Search:
 	def re_search(self, pat, text, nocase=False, full_word=False, regex=False):
 		if nocase and full_word:
 			res = [(x[0], x[1]) for x in finditer_withlineno(
-				r"\b" + re.escape(string1) +
-				r"\b", string2, (re.IGNORECASE, re.MULTILINE))]
+				r"\b" + re.escape(pat) +
+				r"\b", text, (re.IGNORECASE, re.MULTILINE))]
 		elif full_word:
 			res = [(x[0], x[1]) for x in finditer_withlineno(
-				r"\b" + re.escape(string1) + r"\b", string2, re.MULTILINE)]
+				r"\b" + re.escape(pat) + r"\b", text, re.MULTILINE)]
 		elif nocase and regex:
 			res = [(x[0], x[1]) for x in finditer_withlineno(
-				string1, string2, (re.IGNORECASE, re.MULTILINE))]
+				pat, text, (re.IGNORECASE, re.MULTILINE))]
 		elif regex:
 			res = [(x[0], x[1]) for x in finditer_withlineno(
-				string1, string2, re.MULTILINE)]
+				pat, text, re.MULTILINE)]
 		if nocase:
 		    res = [(x[0], x[1]) for x in find_all(pat, text, case=False)]
 		else:

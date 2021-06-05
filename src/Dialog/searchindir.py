@@ -49,6 +49,8 @@ class SearchInDir(ttk.Frame):
             highlightthickness=0,
         )
         self.content.pack(side="top", fill="both")
+        ttk.Button(self, text='Search',
+                   command=self.find).pack(side='top', fill='x')
 
         # Checkboxes
         checkbox_frame = ttk.Frame(self)
@@ -81,7 +83,6 @@ class SearchInDir(ttk.Frame):
         
         for x in (self.case, self.regex, self.fullword):
             x.trace_add('write', self.find)
-        self.content.bind("<KeyRelease>", self.find)
         
         self.content.insert('end', 'e')
         self.find()
@@ -115,20 +116,18 @@ class SearchInDir(ttk.Frame):
         if s:
             for file in files:
                 try:
-                    with open(file) as f:
+                    with open(file, 'rb') as f:
                         matches = self.re_search(s,
-                                                f.read(),
+                                                f.read().decode('utf-8'),
                                                 nocase=not (self.case.get()),
                                                 regex=self.regex.get())
                 except UnicodeDecodeError:
-                    continue  # Binary files aren't searched.
+                    continue
                 if not matches:
                     continue
-                self.found[file] = []
-                for x in matches:
-                    start = f'{x[0][0]}.{x[0][1]}'
-                    end = f'{x[1][0]}.{x[1][1]}'
-                    self.found[file].append((start, end))
+                self.found[file] = [((f'{x[0][0]}.{x[0][1]}',
+                                      f'{x[1][0]}.{x[1][1]}'
+                                    )) for x in matches]
             self.update_treeview()
     
     def update_treeview(self):
@@ -154,5 +153,7 @@ class SearchInDir(ttk.Frame):
                 end = ls[-1]
                 textbox.tag_remove('sel', '1.0', 'end')
                 textbox.tag_add('sel', start, end)
+                textbox.mark_set('insert', start)
+                textbox.see('insert')
         except Exception:
             pass

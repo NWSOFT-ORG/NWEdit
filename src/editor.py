@@ -71,6 +71,7 @@ from src.settings import (
 )
 from src.statusbar import Statusbar
 from src.Dialog.testdialog import TestDialog
+from src.Dialog.searchindir import SearchInDir
 from src.tktext import EnhancedTextFrame, TextOpts
 from src.treeview import FileTree
 from src.Git.commitview import CommitView
@@ -416,6 +417,10 @@ class Editor:
             label="Classes and functions",
             command=self.codelist,
         )
+        self.viewmenu.add_command(
+            label="Search In directory",
+            command=self.searchindir,
+        )
 
         self.navmenu = MenuItem()
         self.navmenu.add_command(label="Go to ...", command=self.goto)
@@ -616,9 +621,10 @@ class Editor:
             self.nb.select(viewer)
             self.update_title()
             self.update_statusbar()
+            return window.textbox
 
     def openhex(self):
-        self.open_hex()
+        return self.open_hex()
 
     def open_file(self, file: str = "", askhex: bool = True) -> None:
         """Opens a file
@@ -635,16 +641,16 @@ class Editor:
                 for tab in self.tabs.items():
                     if file_dir == tab[1].file_dir:
                         self.nb.select(tab[1].frame)
-                        return
+                        return tab[1].textbox
                 if is_binary_string(open(file_dir, "rb").read()):
                     if askhex:
                         dialog = YesNoDialog(self.master, "Error", "View in Hex?")
                         if dialog.result:
                             self.open_hex(file_dir)
                         logging.info("User pressed No.")
-                        return
+                        return self.tabs[self.get_tab()].textbox
                     self.open_hex(file_dir)
-                    return
+                    return self.tabs[self.get_tab()].textbox
 
                 file = open(file_dir)
                 extens = file_dir.split(".")[-1]
@@ -676,7 +682,7 @@ class Editor:
                 currtext.opts = TextOpts(currtext, bindkey=False, keyaction=self.key)
                 currtext.edit_reset()
                 logging.info("File opened")
-                return
+                return currtext
             except Exception as e:
                 if type(e).__name__ != "ValueError":
                     logger.exception("Error when opening file:")
@@ -685,7 +691,7 @@ class Editor:
 
     def _open(self, _=None) -> None:
         """Prompt the user to open a file when C-O is pressed"""
-        self.open_file()
+        return self.open_file()
 
     def search(self, _=None) -> None:
         Search(self.master, self.tabs[self.get_tab()].textbox)
@@ -836,6 +842,9 @@ class Editor:
     def show_filelist(self):
         self.panedwin.forget(self.panedwin.panes()[0])
         self.panedwin.insert('0', self.filetree)
+    
+    def searchindir(self):
+        SearchInDir(self.panedwin, self.filetree.path, self.open_file)
     
     def view_log(self):
         LogViewDialog()

@@ -17,7 +17,7 @@ def list_all(directory):
     return files
 
 
-class Search(ttk.Frame):
+class SearchInDir(ttk.Frame):
     def __init__(self, parent: ttk.Panedwindow, path: str, opencommand: callable):
         super().__init__(parent)
         parent.forget(parent.panes()[0])
@@ -37,8 +37,8 @@ class Search(ttk.Frame):
         self.regex = tk.BooleanVar()
         self.fullword = tk.BooleanVar()
 
-        self.found = []
-        ttk.Label(self, text="Search: ").pack(side="left",
+        self.found = {}
+        ttk.Label(self, text="Search: ").pack(side="top",
                                                            anchor="nw",
                                                            fill="y")
         self.content = tk.Entry(
@@ -48,23 +48,36 @@ class Search(ttk.Frame):
             insertbackground=fg,
             highlightthickness=0,
         )
-        self.content.pack(side="left", fill="both")
+        self.content.pack(side="top", fill="both")
 
         # Checkboxes
-        self.case_yn = ttk.Checkbutton(self,
+        checkbox_frame = ttk.Frame(self)
+        self.case_yn = ttk.Checkbutton(checkbox_frame,
                                        text="Case Sensitive",
                                        variable=self.case)
         self.case_yn.pack(side="left")
 
-        self.reg_yn = ttk.Checkbutton(self,
+        self.reg_yn = ttk.Checkbutton(checkbox_frame,
                                        text="RegExp",
                                        variable=self.regex)
         self.reg_yn.pack(side="left")
 
-        self.fullw_yn = ttk.Checkbutton(self,
+        self.fullw_yn = ttk.Checkbutton(checkbox_frame,
                                        text="Full Word",
                                        variable=self.fullword)
         self.fullw_yn.pack(side="left")
+        
+        checkbox_frame.pack(side='top', fill='both')
+        
+        treeframe = ttk.Frame(self)
+        self.tree = ttk.Treeview(treeframe, show='tree')
+        self.tree.pack(side='left', fill='both', expand=1)
+        
+        yscroll = ttk.Scrollbar(treeframe, command=self.tree.yview)
+        yscroll.pack(side="right", fill="y")
+        self.tree.config(yscrollcommand=yscroll.set)
+        self.tree.bind('<Double-1>', self.on_double_click)
+        treeframe.pack(fill='both', expand=1)
         
         for x in (self.case, self.regex, self.fullword):
             x.trace_add('write', self.find)
@@ -101,14 +114,45 @@ class Search(ttk.Frame):
         
         if s:
             for file in files:
-                with open(file) as f:
-                    matchs = self.re_search(s,
-                                            f.read(),
-                                            nocase=not (self.case.get()),
-                                            regex=self.regex.get())
-                    if not matchs:
-                        continue
-                    for x in matches:
-                        start = f'{x[0][0]}.{x[0][1]}'
-                        end = f'{x[1][0]}.{x[1][1]}'
-                        self.found.append([filename, start, end])
+                try:
+                    with open(file) as f:
+                        matches = self.re_search(s,
+                                                f.read(),
+                                                nocase=not (self.case.get()),
+                                                regex=self.regex.get())
+                except UnicodeDecodeError:
+                    continue  # Binary files aren't searched.
+                if not matches:
+                    continue
+                self.found[file] = []
+                for x in matches:
+                    start = f'{x[0][0]}.{x[0][1]}'
+                    end = f'{x[1][0]}.{x[1][1]}'
+                    self.found[file].append((start, end))
+            self.update_treeview()
+    
+    def update_treeview(self):
+        self.tree.delete(*self.tree.get_children())
+        for k in self.found.keys():
+            parent = self.tree.insert('', 'end', text=k)
+            for pos in self.found[k]:
+                self.tree.insert(parent, 'end', text=' - '.join(pos))
+    
+    def on_double_click(self, _=None):
+        try:
+            item = self.tree.focus()
+            text = self.tree.item(item, 'text')
+            
+            if os.path.isfile(text):
+                self.opencommand(text)
+            else:
+                parent = self.tree.parent(item)
+                parenttext = self.tree.item(parent, 'text')
+                textbox = self.opencommand(parenttext)
+                ls = text.split()
+                start = ls[0]
+                end = ls[-1]
+                textbox.tag_remove('sel', '1.0', 'end')
+                textbox.tag_add('sel', start, end)
+        except Exception:
+            pass

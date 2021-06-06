@@ -1,6 +1,6 @@
 from src.Dialog.commondialog import get_theme
 from src.functions import darken_color
-from src.modules import tk, ttk, ttkthemes, os
+from src.modules import tk, ttk, ttkthemes, os, threading
 from src.Dialog.search import finditer_withlineno, find_all
 import re
 
@@ -50,7 +50,7 @@ class SearchInDir(ttk.Frame):
         )
         self.content.pack(side="top", fill="both")
         ttk.Button(self, text='Search',
-                   command=self.find).pack(side='top', fill='x')
+                   command=lambda: threading.Thread(target=self.find).start()).pack(side='top', fill='x')
 
         # Checkboxes
         checkbox_frame = ttk.Frame(self)
@@ -85,7 +85,6 @@ class SearchInDir(ttk.Frame):
             x.trace_add('write', self.find)
         
         self.content.insert('end', 'e')
-        self.find()
 
     def re_search(self, pat, text, nocase=False, full_word=False, regex=False):
         if nocase and full_word:

@@ -19,7 +19,7 @@ class YesNoDialog(tk.Toplevel):
         self.text = text
         super().__init__(parent)
         self.title(title)
-        label1 = ttk.Label(text=self.text)
+        label1 = ttk.Label(self, text=self.text)
         label1.pack(fill="both")
 
         box = ttk.Frame(self)
@@ -96,4 +96,3 @@ class ErrorInfoDialog(tk.Toplevel):
     @staticmethod
     def cancel(_=None):
         pass
-

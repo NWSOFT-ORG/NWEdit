@@ -13,7 +13,7 @@ def list_all(directory):
             files += list_all(path)
         else:
             files.append(path)
-
+    files.sort()
     return files
 
 
@@ -52,11 +52,14 @@ class SearchInDir(ttk.Frame):
         ttk.Button(self, text='Search',
                    command=lambda: threading.Thread(target=self.find).start()).pack(side='top', fill='x')
 
+        progressbar_frame = ttk.Frame(self)
+        self.search_stat = ttk.Label(progressbar_frame, text="Press 'Search' to start searching.")
+        self.search_stat.pack(fill='x')
+        self.progressbar = ttk.Progressbar(progressbar_frame)
+        self.progressbar.pack(side='top', fill='x')
+        progressbar_frame.pack(side='top', fill='both')
         # Checkboxes
         checkbox_frame = ttk.Frame(self)
-        
-        self.progressbar = ttk.Progressbar(checkbox_frame)
-        self.progressbar.pack(side='top', fill='x')
         self.case_yn = ttk.Checkbutton(checkbox_frame,
                                        text="Case Sensitive",
                                        variable=self.case)
@@ -114,14 +117,15 @@ class SearchInDir(ttk.Frame):
         files = list_all(path)
         self.found.clear()
         s = self.content.get()
-        self.tree.delete(*self.tree.get_children())
         
         self.progressbar['value'] = 0
         self.progressbar['maximum'] = len(files)
         
         if s:
             for file in files:
-                self.progressbar['value'] += 1
+                new_status = self.progressbar['value'] + 1
+                self.progressbar['value'] = new_status
+                self.search_stat.config(text=f'Searching in file {new_status}/{len(files)}')
                 try:
                     with open(file, 'rb') as f:
                         matches = self.re_search(s,
@@ -135,14 +139,18 @@ class SearchInDir(ttk.Frame):
                 self.found[file] = [((f'{x[0][0]}.{x[0][1]}',
                                       f'{x[1][0]}.{x[1][1]}'
                                     )) for x in matches]
-                self.update_treeview()
+            self.search_stat.config(text='Search Completed!')
+            self.update_treeview()
     
     def update_treeview(self):
+        self.search_stat.config(text='Updating results...')
+        self.tree.delete(*self.tree.get_children())
         found_list = self.found.keys()
         for k in found_list:
             parent = self.tree.insert('', 'end', text=k)
             for pos in self.found[k]:
                 self.tree.insert(parent, 'end', text=' - '.join(pos))
+        self.search_stat.config(text='Finished! Press Search to search again.')
     
     def on_double_click(self, _=None):
         try:

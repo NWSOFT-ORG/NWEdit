@@ -1,4 +1,7 @@
-from src.modules import tk, ttk, subprocess
+from src.modules import tk, ttk, subprocess, lexers, os
+from src.tktext import EnhancedTextFrame
+from src.constants import APPDIR
+from src.highlighter import create_tags, recolorize
 
 
 class CommitView(ttk.Frame):
@@ -165,7 +168,7 @@ class CommitView(ttk.Frame):
             f'git diff --staged {selected} > \
                         {os.path.join(APPDIR, "out.txt")}',
             shell=True,
-            cwd=self.dir,
+            cwd=self.path,
         )
         with open(os.path.join(APPDIR, "out.txt")) as f:
             message = f.read()

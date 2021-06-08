@@ -54,6 +54,9 @@ class SearchInDir(ttk.Frame):
 
         # Checkboxes
         checkbox_frame = ttk.Frame(self)
+        
+        self.progressbar = ttk.Progressbar(checkbox_frame)
+        self.progressbar.pack(side='top', fill='x')
         self.case_yn = ttk.Checkbutton(checkbox_frame,
                                        text="Case Sensitive",
                                        variable=self.case)
@@ -111,27 +114,32 @@ class SearchInDir(ttk.Frame):
         files = list_all(path)
         self.found.clear()
         s = self.content.get()
+        self.tree.delete(*self.tree.get_children())
+        
+        self.progressbar['value'] = 0
+        self.progressbar['maximum'] = len(files)
         
         if s:
             for file in files:
+                self.progressbar['value'] += 1
                 try:
                     with open(file, 'rb') as f:
                         matches = self.re_search(s,
                                                 f.read().decode('utf-8'),
                                                 nocase=not (self.case.get()),
                                                 regex=self.regex.get())
-                except UnicodeDecodeError:
+                except (UnicodeDecodeError, PermissionError):
                     continue
                 if not matches:
                     continue
                 self.found[file] = [((f'{x[0][0]}.{x[0][1]}',
                                       f'{x[1][0]}.{x[1][1]}'
                                     )) for x in matches]
-            self.update_treeview()
+                self.update_treeview()
     
     def update_treeview(self):
-        self.tree.delete(*self.tree.get_children())
-        for k in self.found.keys():
+        found_list = self.found.keys()
+        for k in found_list:
             parent = self.tree.insert('', 'end', text=k)
             for pos in self.found[k]:
                 self.tree.insert(parent, 'end', text=' - '.join(pos))

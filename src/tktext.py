@@ -183,6 +183,7 @@ class EnhancedTextFrame(ttk.Frame):
 
 
 class TextOpts:
+
     def __init__(self, textwidget: tk.Text, bindkey: bool = False, keyaction: callable = None):
         if bindkey and keyaction:
             raise EditorErr('`bindkey` and `keyaction` cannot be specified at the same time.')
@@ -191,26 +192,29 @@ class TextOpts:
         self.text = textwidget
         self.settings_class = Settings()
         self.tabwidth = self.settings_class.get_settings("tab")
-        self.text.bind("<<Key>>", self.key)
-        self.text.event_add("<<Key>>", "<KeyRelease>")
-        for char in ['"', "'", "(", "[", "{"]:
-            self.text.bind(char, self.autoinsert)
-        for char in [")", "]", "}"]:
-            self.text.bind(char, self.close_brackets)
-        self.text.bind("<BackSpace>", self.backspace)
-        self.text.bind("<Return>", self.autoindent)
-        self.text.bind("<Tab>", self.tab)
-        self.text.bind(f"<{MAIN_KEY}-i>", lambda _=None: self.indent("indent"))
-        self.text.bind(f"<{MAIN_KEY}-u>", lambda _=None: self.indent("unindent"))
-        self.text.bind(f"<{MAIN_KEY}-Z>", self.redo)
-        self.text.bind(f"<{MAIN_KEY}-z>", self.undo)
-        self.text.bind(f"{MAIN_KEY}-d", self.duplicate_line)
-        create_tags(self.text)
-        recolorize(self.text)
+        self.bind_events()
 
-    def tab(self, event=None):
+    def bind_events(self):
+        text = self.text
+        text.bind("<KeyRelease>", self.key)
+        for char in ['"', "'", "(", "[", "{"]:
+            text.bind(char, self.autoinsert)
+        for char in [")", "]", "}"]:
+            text.bind(char, self.close_brackets)
+        text.bind("<BackSpace>", self.backspace)
+        text.bind("<Return>", self.autoindent)
+        text.bind("<Tab>", self.tab)
+        text.bind(f"<{MAIN_KEY}-i>", lambda _=None: self.indent("indent"))
+        text.bind(f"<{MAIN_KEY}-u>", lambda _=None: self.indent("unindent"))
+        text.bind(f"<{MAIN_KEY}-Z>", self.redo)
+        text.bind(f"<{MAIN_KEY}-z>", self.undo)
+        text.bind(f"{MAIN_KEY}-d", self.duplicate_line)
+        create_tags(text)
+        recolorize(text)
+
+    def tab(self, _=None):
         # Convert tabs to spaces
-        event.widget.insert("insert", " " * self.tabwidth)
+        self.text.insert("insert", " " * self.tabwidth)
         self.key()
         # Quit quickly, before a char is being inserted.
         return "break"

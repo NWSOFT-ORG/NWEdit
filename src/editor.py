@@ -41,7 +41,7 @@ from src.functions import (
     run_in_terminal,
 )
 
-# These modules are from the base directory
+from src.Dialog.autocomplete import CompleteDialog
 from src.Dialog.goto import Navigate
 from src.hexview import HexView
 from src.highlighter import create_tags, recolorize
@@ -518,6 +518,7 @@ class Editor:
 
         textbox = textframe.text  # text widget
         textbox.panedwin = panedwin
+        textbox.complete = CompleteDialog(textframe, textbox)
         textbox.frame = frame  # The text will be packed into the frame.
         textbox.bind(("<Button-2>" if OSX else "<Button-3>"), self.right_click)
         textbox.bind(f"<{MAIN_KEY}-b>", self.run)
@@ -583,6 +584,7 @@ class Editor:
             recolorize(currtext)
             currtext.edit_separator()
             currtext.see("insert")
+            currtext.complete.complete()
             # Auto-save
             self.save_file()
             self.update_statusbar()

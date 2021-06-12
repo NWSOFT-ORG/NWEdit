@@ -1,15 +1,16 @@
 import string
 from src.modules import ttk
 
+punc = [x for x in string.punctuation.replace('_', '')]
+whites = [x for x in string.whitespace]
+
 def sep_words(str_to_sep: str) -> list:
     result = str_to_sep
-    punc = [x for x in string.punctuation]
-    whites = [x for x in string.whitespace]
     for char in (*punc, *whites):
         result = result.replace(char, ' ')
 
     result = list(filter(None, result.split()))
-    result = dict.fromkeys(result)
+    result = list(dict.fromkeys(result))
     return result
     
 
@@ -29,15 +30,27 @@ class CompleteDialog(ttk.Frame):
         item = self.completions.focus()
         text = self.text
         completion = self.completions.item(item, 'text')
+        text.delete('insert -1c wordstart', 'insert wordend')
         text.insert('insert', completion)
 
-    def complete(self, _=None):
+    def complete(self):
         text = self.text
         dline = text.dlineinfo('insert')
         self.place_configure(x=dline[0] + dline[2], y=dline[1] + dline[3])
-        content = text.get('1.0', 'insert')
+        content = text.get('1.0', 'end')
         all_matches = sep_words(content)
 
+        curr_word = self.get_word()
+        print(repr(curr_word), all_matches, flush=True)
         self.completions.delete(*self.completions.get_children())
         for match in all_matches:
-            self.completions.insert('', 'end', text=match)
+            if curr_word in match:
+                self.completions.insert('', 'end', text=match)
+    
+    def get_word(self):
+        text = self.text
+        word = text.get("insert wordstart", "insert wordend")
+        if "\n" in word or ' ' in word:
+            lines = word.count('\n')
+            return text.get(f"insert -1c wordstart +{line}c", "insert")
+        return word

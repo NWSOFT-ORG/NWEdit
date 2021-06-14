@@ -26,11 +26,11 @@ class CompleteDialog(ttk.Frame):
         self.completions['yscrollcommand'] = yscroll.set
         self.text = text
 
-    def click_treeview(self, _=None):
-        item = self.completions.focus()
+    def click_treeview(self, event=None):
+        item = self.completions.identify("item", event.x, event.y)
         text = self.text
         completion = self.completions.item(item, 'text')
-        text.delete('insert -1c wordstart', 'insert wordend')
+        text.delete(*self.index_word())
         text.insert('insert', completion)
 
     def complete(self):
@@ -41,7 +41,6 @@ class CompleteDialog(ttk.Frame):
         all_matches = sep_words(content)
 
         curr_word = self.get_word()
-        print(repr(curr_word), all_matches, flush=True)
         self.completions.delete(*self.completions.get_children())
         for match in all_matches:
             if curr_word in match:
@@ -49,8 +48,15 @@ class CompleteDialog(ttk.Frame):
     
     def get_word(self):
         text = self.text
-        word = text.get("insert wordstart", "insert wordend")
-        if "\n" in word or ' ' in word:
-            lines = word.count('\n')
-            return text.get(f"insert -1c wordstart +{line}c", "insert")
+        all_words = sep_words(text.get("1.0", "insert"))
+        word = all_words[-1]
         return word
+    
+    def index_word(self):
+        text = self.text
+        content = text.get("1.0", "insert")
+        words = sep_words(content)
+        line = content.count('\n') + 1
+        endcol = len(content.split('\n')[-1])
+        startcol = endcol - len(words[-1])
+        return (f'{line}.{startcol}', f'{line}.{endcol}')

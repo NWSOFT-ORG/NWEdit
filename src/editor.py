@@ -584,7 +584,7 @@ class Editor:
             recolorize(currtext)
             currtext.edit_separator()
             currtext.see("insert")
-            currtext.complete.complete()
+            currtext.complete.insert_completions()
             # Auto-save
             self.save_file()
             self.update_statusbar()

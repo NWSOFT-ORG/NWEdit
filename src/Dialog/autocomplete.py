@@ -19,21 +19,22 @@ class CompleteDialog(ttk.Frame):
         super().__init__(master, relief='groove')
         self.completions = ttk.Treeview(self, show='tree')
         self.completions.pack(side='left',fill='both', expand=1)
-        self.completions.bind('<1>', self.click_treeview)
+        self.completions.bind('<1>', self.complete)
 
         yscroll = ttk.Scrollbar(self, command=self.completions.yview)
         yscroll.pack(side='right', fill='y', expand=1)
         self.completions['yscrollcommand'] = yscroll.set
         self.text = text
 
-    def click_treeview(self, event=None):
+    def complete(self, event=None):
         item = self.completions.identify("item", event.x, event.y)
         text = self.text
         completion = self.completions.item(item, 'text')
         text.delete(*self.index_word())
         text.insert('insert', completion)
+        text.opts.key()
 
-    def complete(self):
+    def insert_completions(self):
         text = self.text
         dline = text.dlineinfo('insert')
         self.place_configure(x=dline[0] + dline[2], y=dline[1] + dline[3])
@@ -48,9 +49,7 @@ class CompleteDialog(ttk.Frame):
     
     def get_word(self):
         text = self.text
-        all_words = sep_words(text.get("1.0", "insert"))
-        word = all_words[-1]
-        return word
+        return text.get(*self.index_word())
     
     def index_word(self):
         text = self.text

@@ -2,7 +2,9 @@ from src.Dialog.commondialog import InputStringDialog, YesNoDialog
 from src.modules import os, tk, ttk, json, lexers
 from src.tktext import EnhancedTextFrame, TextOpts
 from src.highlighter import create_tags, recolorize
-from src.functions import is_valid_name
+from src.functions import is_valid_name, run_in_terminal
+from src.constants import APPDIR
+from src.settings import RunCommand
 
 TESTS_FILE = ".PyPlus/Tests/tests.json"
 SETTINGS_FILE = ".PyPlus/Tests/settings.json"
@@ -35,6 +37,8 @@ class TestDialog(ttk.Frame):
             side="left"
         )
         self.button_frame.pack(side="bottom")
+        
+        self.cmd_settings_class = RunCommand()
 
     def refresh_tests(self):
         self.tests_listbox.delete(*self.tests_listbox.get_children())
@@ -222,3 +226,7 @@ if __name__ == '__main__':
 """
         with open(os.path.join(self.path, "test.py"), "w") as f:
             f.write(res)
+            filename = f.name
+            
+        cmd = self.cmd_settings_class.get_settings('py')
+        run_in_terminal(f"{cmd} {filename} && exit", cwd=APPDIR)

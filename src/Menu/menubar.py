@@ -20,7 +20,12 @@ class MenuItem:
 
 class Menu(ScrollableFrame):
     def __init__(self, tkwin: tk.Tk):
-        super().__init__(tkwin, relief='groove')
+        self.topwin = tk.Toplevel(tkwin)
+        self.topwin.transient(tkwin)
+        self.topwin.overrideredirect(0)
+        self.topwin.overrideredirect(1)
+        self.topwin.withdraw()
+        super().__init__(self.topwin, relief='groove')
         self.win = tkwin
         self.opened = False
 
@@ -42,9 +47,10 @@ class Menu(ScrollableFrame):
         command_label.pack(side='top', anchor='nw', fill='x')
 
     def tk_popup(self, x, y):
-        self.place(x=x, y=y)
-        if (x + self.winfo_width()) > self.win.winfo_width():
-            self.place_configure(x=(x - self.winfo_width()), y=y, anchor='ne')
+        self.pack(fill='both', expand=1)
+        self.update()
+        self.topwin.geometry(f'+{x}+{y}')
+        self.topwin.deiconify()
         self.opened = True
 
         def close_menu(event=None):
@@ -52,7 +58,8 @@ class Menu(ScrollableFrame):
                     self.winfo_x() + self.winfo_width() + 1)
                 and event.y in range(self.winfo_y(),
                                  self.winfo_y() + self.winfo_height() + 1)):
-                self.place_forget()
+                self.pack_forget()
+                self.topwin.withdraw()
                 self.win.event_delete('<<CloseMenu>>')
                 self.opened = False
 
@@ -62,6 +69,7 @@ class Menu(ScrollableFrame):
     def unpost(self):
         self.opened = False
         self.place_forget()
+        self.topwin.withdraw()
 
 
 class Menubar(ttk.Frame):
@@ -89,7 +97,10 @@ class Menubar(ttk.Frame):
         menu = Menu(self.master)
         for item in sorted(self.commands.keys()):
             if text in item:
-                menu.add_command(label=item, command=self.commands[item])
+                p_list = self.commands[item]
+                command = p_list[1]
+                image = p_list[2]
+                menu.add_command(item, command, image)
         menu.tk_popup(
             self.winfo_x() + self.winfo_width() +
             self.search_button.winfo_x() + self.search_button.winfo_width(),
@@ -99,8 +110,9 @@ class Menubar(ttk.Frame):
         dropdown = Menu(self.master)
         for index, item in enumerate(menu.items):
             command = menu.commands[index]
-            dropdown.add_command(item, command, menu.images[index])
-            self.commands[item] = command
+            image = menu.images[index]
+            dropdown.add_command(item, command, image)
+            self.commands[item] = [item, command, image]
 
         label_widget = ttk.Label(
             self,

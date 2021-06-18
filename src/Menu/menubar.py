@@ -1,6 +1,9 @@
-from src.modules import tk, ttk
+from src.modules import tk, ttk, ttkthemes
 from src.statusbar import bind_events
 from src.Menu.yscrolledframe import ScrollableFrame
+from src.constants import OSX
+from src.functions import is_dark_color
+from src.Dialog.commondialog import get_theme
 
 
 class MenuItem:
@@ -40,6 +43,7 @@ class Menu(ScrollableFrame):
 
         def exec_command(_=None):
             self.opened = False
+            self.unpost()
             command()
 
         command_label.bind('<1>', exec_command)
@@ -48,16 +52,17 @@ class Menu(ScrollableFrame):
 
     def tk_popup(self, x, y):
         self.pack(fill='both', expand=1)
+        self.win.update()
         self.update()
-        self.topwin.geometry(f'+{x}+{y}')
+        self.topwin.geometry(f'+{self.win.winfo_x() + x}+{self.win.winfo_y() + y}')
         self.topwin.deiconify()
         self.opened = True
 
         def close_menu(event=None):
-            if not (event.x in range(self.winfo_x(),
-                    self.winfo_x() + self.winfo_width() + 1)
-                and event.y in range(self.winfo_y(),
-                                 self.winfo_y() + self.winfo_height() + 1)):
+            if not (event.x in range(self.topwin.winfo_x(),
+                    self.winfo_x() + self.topwin.winfo_width() + 1)
+                and event.y in range(self.topwin.winfo_y(),
+                                 self.topwin.winfo_y() + self.topwin.winfo_height() + 1)):
                 self.pack_forget()
                 self.topwin.withdraw()
                 self.win.event_delete('<<CloseMenu>>')
@@ -79,11 +84,12 @@ class Menubar(ttk.Frame):
     ) -> None:
         super().__init__(master)
         self.pack(fill="x", side="top")
-        tab_frame = ttk.Frame(self)
-        tab_frame.place(relx=1.0, x=0, y=1, anchor='ne')
-        self.search_entry = ttk.Entry(tab_frame, width=15)
+        self.master = master
+        self.items_frame = ttk.Frame(self)
+        self.items_frame.place(relx=1.0, x=0, y=1, anchor='ne')
+        self.search_entry = ttk.Entry(self.items_frame, width=15)
         self.search_entry.pack(side='left', fill='both')
-        self.search_button = ttk.Button(tab_frame,
+        self.search_button = ttk.Button(self.items_frame,
                                         text='>>',
                                         width=3,
                                         command=self._search_command)
@@ -91,6 +97,79 @@ class Menubar(ttk.Frame):
         self.commands = {}
         self.menus = []
         self.menu_opened = None
+        if not OSX:
+            self.style = ttkthemes.ThemedStyle(self.master)
+            self.style.set_theme(get_theme())
+            self.bg = self.style.lookup("TLabel", "background")
+            if is_dark_color(self.bg):
+                self.close_icon = tk.PhotoImage(file="Images/close.gif")
+                self.maximise_icon = tk.PhotoImage(file="Images/maximise-light.gif")
+                self.minimise_icon = tk.PhotoImage(file="Images/minimise-light.gif")
+            else:
+                self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
+                self.maximise_icon = tk.PhotoImage(file="Images/maximise.gif")
+                self.minimise_icon = tk.PhotoImage(file="Images/minimise.gif")
+            self.master.overrideredirect(1)
+            self.init_custom_title()
+
+    def init_custom_title(self):
+        self.top = tk.Toplevel(self.master)
+        self.top.geometry('0x0')
+        self.top.resizable(0, 0)
+        self.top.bind('<FocusIn>', lambda _: self.master.focus_set())
+        self.top.protocol('WM_DELETE_WINDOW', lambda: self.master.destroy())
+
+        self.master.title = self.title
+        self.master.iconphoto = self.icon
+        self.bind('<1>', self.start_move)
+        self.bind('<ButtonRelease-1>', self.stop_move)
+        self.bind('<B1-Motion>', self.moving)
+
+        self.title_label = ttk.Label(self)
+        self.title_label.pack(side='left')
+
+        controls_frame = ttk.Frame(self.items_frame)
+        controls_frame.pack(side='right')
+
+        minimise = ttk.Label(controls_frame, image=self.minimise_icon)
+        minimise.pack(side='left')
+        bind_events(minimise)
+        minimise.bind('<1>', lambda _: self.master.iconify())
+
+        maximise = ttk.Label(controls_frame, image=self.maximise_icon)
+        maximise.pack(side='left')
+        bind_events(maximise)
+        maximise.bind('<1>', self.maximise)
+
+        close = ttk.Label(controls_frame, image=self.close_icon)
+        close.pack(side='left')
+        bind_events(close)
+        close.bind('<1>', lambda _: self.master.destroy())
+
+
+    def title(self, title: str = ''):
+        self.top.title(title)
+        self.title_label.config(text=title)
+
+    def icon(self, icon: tk.PhotoImage = None):
+        self.top.iconphoto(icon)
+        self.title_label.config(image=icon)
+
+    def start_move(self, event):
+        self.x_pos = event.x
+        self.y_pos = event.y
+
+    def stop_move(self, _):
+        self.x_pos = None
+        self.y_pos = None
+
+    def moving(self, event):
+        x = (event.x_root - self.x_pos)
+        y = (event.y_root - self.y_pos)
+        self.master.geometry(f"+{x}+{y}")
+
+    def maximise(self, _=None):
+        pass
 
     def _search_command(self):
         text = self.search_entry.get()

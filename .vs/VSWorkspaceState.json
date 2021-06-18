@@ -2,8 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\Dialog"
+    "\\src\\Menu"
   ],
-  "SelectedNode": "\\src\\Dialog\\commondialog.py",
+  "SelectedNode": "\\src\\editor.py",
   "PreviewInSolutionExplorer": true
 }

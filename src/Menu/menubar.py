@@ -1,9 +1,24 @@
 from src.modules import tk, ttk, ttkthemes
 from src.statusbar import bind_events
 from src.Menu.yscrolledframe import ScrollableFrame
-from src.constants import OSX
+from src.constants import WINDOWS
 from src.functions import is_dark_color
 from src.Dialog.commondialog import get_theme
+from ctypes import windll
+
+GWL_EXSTYLE=-20
+WS_EX_APPWINDOW=0x00040000
+WS_EX_TOOLWINDOW=0x00000080
+
+def set_appwindow(root):
+    hwnd = windll.user32.GetParent(root.winfo_id())
+    style = windll.user32.GetWindowLongPtrA(hwnd, GWL_EXSTYLE)
+    style = style & ~WS_EX_TOOLWINDOW
+    style = style | WS_EX_APPWINDOW
+    res = windll.user32.SetWindowLongPtrA(hwnd, GWL_EXSTYLE, style)
+    # re-assert the new window style
+    root.wm_withdraw()
+    root.after(10, lambda: root.wm_deiconify())
 
 
 class MenuItem:
@@ -97,7 +112,7 @@ class Menubar(ttk.Frame):
         self.commands = {}
         self.menus = []
         self.menu_opened = None
-        if not OSX:
+        if WINDOWS:
             self.style = ttkthemes.ThemedStyle(self.master)
             self.style.set_theme(get_theme())
             self.bg = self.style.lookup("TLabel", "background")
@@ -109,24 +124,12 @@ class Menubar(ttk.Frame):
                 self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
                 self.maximise_icon = tk.PhotoImage(file="Images/maximise.gif")
                 self.minimise_icon = tk.PhotoImage(file="Images/minimise.gif")
-            self.master.overrideredirect(1)
             self.init_custom_title()
 
     def init_custom_title(self):
-        self.top = tk.Toplevel(self.master)
-        self.top.geometry('0x0')
-        self.top.resizable(0, 0)
-        self.top.bind('<FocusIn>', lambda _: self.master.focus_set())
-        self.top.protocol('WM_DELETE_WINDOW', lambda: self.master.destroy())
-
-        self.master.title = self.title
-        self.master.iconphoto = self.icon
         self.bind('<1>', self.start_move)
         self.bind('<ButtonRelease-1>', self.stop_move)
         self.bind('<B1-Motion>', self.moving)
-
-        self.title_label = ttk.Label(self)
-        self.title_label.pack(side='left')
 
         controls_frame = ttk.Frame(self.items_frame)
         controls_frame.pack(side='right')
@@ -145,15 +148,10 @@ class Menubar(ttk.Frame):
         close.pack(side='left')
         bind_events(close)
         close.bind('<1>', lambda _: self.master.destroy())
-
-
-    def title(self, title: str = ''):
-        self.top.title(title)
-        self.title_label.config(text=title)
-
-    def icon(self, icon: tk.PhotoImage = None):
-        self.top.iconphoto(icon)
-        self.title_label.config(image=icon)
+        self.master.focus_set()
+        self.master.overrideredirect(1)
+        self.master.after(10, lambda: set_appwindow(self.master))
+        self.master.update_idletasks()
 
     def start_move(self, event):
         self.x_pos = event.x

@@ -4,7 +4,9 @@ from src.Menu.yscrolledframe import ScrollableFrame
 from src.constants import WINDOWS
 from src.functions import is_dark_color
 from src.Dialog.commondialog import get_theme
-from ctypes import windll
+
+if WINDOWS:
+    from ctypes import windll
 
 GWL_EXSTYLE=-20
 WS_EX_APPWINDOW=0x00040000
@@ -69,14 +71,14 @@ class Menu(ScrollableFrame):
         self.pack(fill='both', expand=1)
         self.win.update()
         self.update()
-        self.topwin.geometry(f'+{self.win.winfo_x() + x}+{self.win.winfo_y() + y}')
+        self.topwin.geometry(f'+{x}+{y}')
         self.topwin.deiconify()
         self.opened = True
 
         def close_menu(event=None):
-            if not (event.x in range(self.topwin.winfo_x(),
+            if not (event.x_root in range(self.topwin.winfo_x(),
                     self.winfo_x() + self.topwin.winfo_width() + 1)
-                and event.y in range(self.topwin.winfo_y(),
+                and event.y_root in range(self.topwin.winfo_y(),
                                  self.topwin.winfo_y() + self.topwin.winfo_height() + 1)):
                 self.pack_forget()
                 self.topwin.withdraw()
@@ -178,10 +180,12 @@ class Menubar(ttk.Frame):
                 command = p_list[1]
                 image = p_list[2]
                 menu.add_command(item, command, image)
+        print(
+            self.search_button.winfo_rootx() + self.search_button.winfo_width(),
+            self.search_button.winfo_rooty() + self.search_button.winfo_height())
         menu.tk_popup(
-            self.winfo_x() + self.winfo_width() +
-            self.search_button.winfo_x() + self.search_button.winfo_width(),
-            self.search_button.winfo_y() + self.search_button.winfo_height())
+            self.search_button.winfo_rootx() + self.search_button.winfo_width(),
+            self.search_button.winfo_rooty() + self.search_button.winfo_height())
 
     def add_cascade(self, label: str, menu: MenuItem) -> None:
         dropdown = Menu(self.master)
@@ -203,8 +207,8 @@ class Menubar(ttk.Frame):
         def click(_):
             self.menu_opened = dropdown
             dropdown.tk_popup(
-                label_widget.winfo_x(),
-                label_widget.winfo_y() + label_widget.winfo_height(),
+                label_widget.winfo_rootx(),
+                label_widget.winfo_rooty() + self.winfo_height(),
             )
 
         def enter(event):

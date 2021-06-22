@@ -133,13 +133,15 @@ class Menubar(ttk.Frame):
         self.bind('<ButtonRelease-1>', self.stop_move)
         self.bind('<B1-Motion>', self.moving)
 
+        self.master.bind('<Map>', self.frame_mapped)
+
         controls_frame = ttk.Frame(self.items_frame)
         controls_frame.pack(side='right')
 
         minimise = ttk.Label(controls_frame, image=self.minimise_icon)
         minimise.pack(side='left')
         bind_events(minimise)
-        minimise.bind('<1>', lambda _: self.master.iconify())
+        minimise.bind('<1>', self.minimise)
 
         maximise = ttk.Label(controls_frame, image=self.maximise_icon)
         maximise.pack(side='left')
@@ -150,10 +152,16 @@ class Menubar(ttk.Frame):
         close.pack(side='left')
         bind_events(close)
         close.bind('<1>', lambda _: self.master.destroy())
+        
         self.master.focus_set()
         self.master.overrideredirect(1)
         self.master.after(10, lambda: set_appwindow(self.master))
         self.master.update_idletasks()
+    
+    def frame_mapped(self, _=None):
+        self.master.update_idletasks()
+        self.master.overrideredirect(1)
+        self.master.state('normal')
 
     def start_move(self, event):
         self.x_pos = event.x
@@ -169,7 +177,18 @@ class Menubar(ttk.Frame):
         self.master.geometry(f"+{x}+{y}")
 
     def maximise(self, _=None):
-        pass
+        w, h = self.master.winfo_screenwidth(), self.master.winfo_screenheight()
+        self.master.geometry("%dx%d+0+0" % (w, h))
+
+    def minimise(self, _=None):
+        self.master.withdraw()
+        new = tk.Toplevel(self.master)
+        new.iconify()
+        
+        def focusin(_):
+            new.destroy()
+            self.master.deiconify()
+        new.bind('<FocusIn>', focusin)
 
     def _search_command(self):
         text = self.search_entry.get()

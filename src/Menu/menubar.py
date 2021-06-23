@@ -7,6 +7,8 @@ from src.Dialog.commondialog import get_theme
 
 if WINDOWS:
     from ctypes import windll
+    from win32api import GetMonitorInfo, MonitorFromPoint
+
 
 GWL_EXSTYLE=-20
 WS_EX_APPWINDOW=0x00040000
@@ -115,6 +117,7 @@ class Menubar(ttk.Frame):
         self.menus = []
         self.menu_opened = None
         if WINDOWS:
+            self.maximise_count = 0
             self.style = ttkthemes.ThemedStyle(self.master)
             self.style.set_theme(get_theme())
             self.bg = self.style.lookup("TLabel", "background")
@@ -177,8 +180,16 @@ class Menubar(ttk.Frame):
         self.master.geometry(f"+{x}+{y}")
 
     def maximise(self, _=None):
-        w, h = self.master.winfo_screenwidth(), self.master.winfo_screenheight()
-        self.master.geometry("%dx%d+0+0" % (w, h))
+        self.master.update_idletasks()
+        geometry = self.master.winfo_geometry()
+        if not self.maximise_count % 2:
+            monitor_info = GetMonitorInfo(MonitorFromPoint((0,0)))
+            work_area = monitor_info.get("Work")
+            self.master.geometry(f"{work_area[2]}x{work_area[3]}+0+0")
+        else:
+            self.master.geometry(self.geometry)
+        self.geometry = geometry
+        self.maximise_count += 1
 
     def minimise(self, _=None):
         self.master.withdraw()
@@ -199,9 +210,6 @@ class Menubar(ttk.Frame):
                 command = p_list[1]
                 image = p_list[2]
                 menu.add_command(item, command, image)
-        print(
-            self.search_button.winfo_rootx() + self.search_button.winfo_width(),
-            self.search_button.winfo_rooty() + self.search_button.winfo_height())
         menu.tk_popup(
             self.search_button.winfo_rootx() + self.search_button.winfo_width(),
             self.search_button.winfo_rooty() + self.search_button.winfo_height())

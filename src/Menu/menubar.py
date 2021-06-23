@@ -51,6 +51,10 @@ class Menu(ScrollableFrame):
         self.win = tkwin
         self.opened = False
 
+        self.win.update()
+        self.x = self.win.winfo_rootx()
+        self.y = self.win.winfo_rooty()
+
     def add_command(self, label, command, image=None):
         if image:
             command_label = ttk.Label(self.frame,
@@ -77,23 +81,38 @@ class Menu(ScrollableFrame):
         self.topwin.deiconify()
         self.opened = True
 
-        def close_menu(event=None):
-            if not (event.x_root in range(self.topwin.winfo_x(),
-                    self.winfo_x() + self.topwin.winfo_width() + 1)
-                and event.y_root in range(self.topwin.winfo_y(),
-                                 self.topwin.winfo_y() + self.topwin.winfo_height() + 1)):
-                self.pack_forget()
-                self.topwin.withdraw()
-                self.win.event_delete('<<CloseMenu>>')
-                self.opened = False
-
         self.win.event_add('<<CloseMenu>>', '<1>')
-        self.win.bind('<<CloseMenu>>', close_menu)
+        self.win.event_add('<<Move>>', '<Configure>')
+        self.win.bind('<<CloseMenu>>', self.close_menu)
+        self.win.bind('<<Move>>', self.window_moves)
+
+    def close_menu(self, event=None):
+        if not (event.x_root in range(self.topwin.winfo_x(),
+                self.winfo_x() + self.topwin.winfo_width() + 1)
+            and event.y_root in range(self.topwin.winfo_y(),
+                             self.topwin.winfo_y() + self.topwin.winfo_height() + 1)):
+            self.unpost()
 
     def unpost(self):
         self.opened = False
         self.place_forget()
         self.topwin.withdraw()
+        self.win.event_delete('<<CloseMenu>>')
+        self.win.event_delete('<<Move>>')
+        
+    def window_moves(self, _):
+        self.win.update()
+        self.topwin.update()
+        new_x = self.win.winfo_rootx()
+        new_y = self.win.winfo_rooty()
+        
+        top_x = self.topwin.winfo_rootx()
+        top_y = self.topwin.winfo_rooty()
+        
+        x_change = new_x - self.x
+        y_change = new_y - self.y
+        
+        self.topwin.geometry(f'+{top_x + x_change}+{top_y + y_change}')
 
 
 class Menubar(ttk.Frame):

@@ -24,7 +24,7 @@ requests = "^2.25.1"
 setuptools = "^54.1.2"
 ttkthemes = "^3.2.0"
 fast-autocomplete = "^0.7.1"
-pywin32 = "^301"
+
 [tool.poetry.dev-dependencies]
 flake8 = "^3.9.0"
 pylint = "^2.7.4"

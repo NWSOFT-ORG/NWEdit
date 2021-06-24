@@ -102,10 +102,10 @@ class Menu(ScrollableFrame):
         
     def window_moves(self, _):
         self.win.update()
-        self.topwin.update()
         new_x = self.win.winfo_rootx()
         new_y = self.win.winfo_rooty()
         
+        self.topwin.update()
         top_x = self.topwin.winfo_rootx()
         top_y = self.topwin.winfo_rooty()
         
@@ -113,6 +113,8 @@ class Menu(ScrollableFrame):
         y_change = new_y - self.y
         
         self.topwin.geometry(f'+{top_x + x_change}+{top_y + y_change}')
+        self.x = new_x
+        self.y = new_y
 
 
 class Menubar(ttk.Frame):
@@ -176,13 +178,13 @@ class Menubar(ttk.Frame):
         close.bind('<1>', lambda _: self.master.destroy())
         
         self.master.focus_set()
-        self.master.overrideredirect(1)
+        # self.master.overrideredirect(1)
         self.master.after(10, lambda: set_appwindow(self.master))
         self.master.update_idletasks()
     
     def frame_mapped(self, _=None):
         self.master.update_idletasks()
-        self.master.overrideredirect(1)
+        # self.master.overrideredirect(1)
         self.master.state('normal')
 
     def start_move(self, event):

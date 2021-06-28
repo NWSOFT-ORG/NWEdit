@@ -1,6 +1,9 @@
 .DS_STORE
 src/pyplus.log
-compiled/
-__pycache__/
 *.pyc
 src/node_modules/
+src/Backups
+src/Settings
+.vs
+.vscode
+.PyPlus

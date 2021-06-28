@@ -162,13 +162,12 @@ class Menubar(ttk.Frame):
         close.bind('<1>', lambda _: self.master.destroy())
         
         self.master.focus_set()
-        # self.master.overrideredirect(1)
         self.master.after(10, lambda: set_appwindow(self.master))
         self.master.update_idletasks()
     
     def frame_mapped(self, _=None):
         self.master.update_idletasks()
-        # self.master.overrideredirect(1)
+        self.master.overrideredirect(1)
         self.master.state('normal')
 
     def start_move(self, event):

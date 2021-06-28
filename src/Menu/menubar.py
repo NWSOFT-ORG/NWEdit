@@ -65,7 +65,6 @@ class Menu(ScrollableFrame):
             command_label = ttk.Label(self.frame, text=label)
 
         def exec_command(_=None):
-            self.opened = False
             self.unpost()
             command()
 
@@ -84,37 +83,22 @@ class Menu(ScrollableFrame):
         self.win.event_add('<<CloseMenu>>', '<1>')
         self.win.event_add('<<Move>>', '<Configure>')
         self.win.bind('<<CloseMenu>>', self.close_menu)
-        self.win.bind('<<Move>>', self.window_moves)
+        self.win.bind('<<Move>>', self.unpost)
 
     def close_menu(self, event=None):
+        print(1)
         if not (event.x_root in range(self.topwin.winfo_x(),
                 self.winfo_x() + self.topwin.winfo_width() + 1)
             and event.y_root in range(self.topwin.winfo_y(),
                              self.topwin.winfo_y() + self.topwin.winfo_height() + 1)):
             self.unpost()
 
-    def unpost(self):
+    def unpost(self, _=None):
         self.opened = False
         self.place_forget()
         self.topwin.withdraw()
         self.win.event_delete('<<CloseMenu>>')
         self.win.event_delete('<<Move>>')
-        
-    def window_moves(self, _):
-        self.win.update()
-        new_x = self.win.winfo_rootx()
-        new_y = self.win.winfo_rooty()
-        
-        self.topwin.update()
-        top_x = self.topwin.winfo_rootx()
-        top_y = self.topwin.winfo_rooty()
-        
-        x_change = new_x - self.x
-        y_change = new_y - self.y
-        
-        self.topwin.geometry(f'+{top_x + x_change}+{top_y + y_change}')
-        self.x = new_x
-        self.y = new_y
 
 
 class Menubar(ttk.Frame):

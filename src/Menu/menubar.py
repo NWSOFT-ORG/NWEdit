@@ -95,7 +95,7 @@ class Menu(ScrollableFrame):
 
     def unpost(self, _=None):
         self.opened = False
-        self.place_forget()
+        self.pack_forget()
         self.topwin.withdraw()
         self.win.event_delete('<<CloseMenu>>')
         self.win.event_delete('<<Move>>')
@@ -123,6 +123,7 @@ class Menubar(ttk.Frame):
         self.menu_opened = None
         if WINDOWS:
             self.maximise_count = 0
+            self.maximised = False
             self.style = ttkthemes.ThemedStyle(self.master)
             self.style.set_theme(get_theme())
             self.bg = self.style.lookup("TLabel", "background")
@@ -179,6 +180,10 @@ class Menubar(ttk.Frame):
         self.y_pos = None
 
     def moving(self, event):
+        if self.maximised:
+            self.master.geometry(self.geometry)
+            self.maximise_count -= 1
+            self.maximised = False
         x = (event.x_root - self.x_pos)
         y = (event.y_root - self.y_pos)
         self.master.geometry(f"+{x}+{y}")
@@ -190,8 +195,10 @@ class Menubar(ttk.Frame):
             monitor_info = GetMonitorInfo(MonitorFromPoint((0,0)))
             work_area = monitor_info.get("Work")
             self.master.geometry(f"{work_area[2]}x{work_area[3]}+0+0")
+            self.maximised = True
         else:
             self.master.geometry(self.geometry)
+            self.maximised = False
         self.geometry = geometry
         self.maximise_count += 1
 

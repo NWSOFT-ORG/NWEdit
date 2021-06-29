@@ -8,25 +8,16 @@ class TestMain(unittest.TestCase):
         self.assertEqual('hi', 'hi')
 
 
-if __name__ == '__main__':
-    unittest.main()
-
     def test_new():
         self.assertEqual('a', 'b')
 
 
-if __name__ == '__main__':
-    unittest.main()
-
     def setUp():
-        
+        pass
 
-
-if __name__ == '__main__':
-    unittest.main()
 
     def tearDown():
-        
+        pass   
 
 
 if __name__ == '__main__':

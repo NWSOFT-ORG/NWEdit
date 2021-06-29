@@ -220,10 +220,10 @@ class TestMain(unittest.TestCase):
             res += f"""
     def {key}():
 {values}
-
-if __name__ == '__main__':
-    unittest.main()
 """
+        res += '''
+if __name__ == '__main__':
+    unittest.main()'''
         with open(os.path.join(self.path, "test.py"), "w") as f:
             f.write(res)
             filename = f.name

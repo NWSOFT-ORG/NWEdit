@@ -1,0 +1,15 @@
+Index: src/Backups/recent_dir.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>C:\\
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Backups/recent_dir.txt b/src/Backups/recent_dir.txt
+--- a/src/Backups/recent_dir.txt	(revision 326b15697740b87380cd188faf6b71dedac8beef)
++++ b/src/Backups/recent_dir.txt	(date 1625214671087)
+@@ -1,1 +1,1 @@
+-C:\
+\ No newline at end of file
++/Users/Andy
+\ No newline at end of file

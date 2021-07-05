@@ -5,6 +5,7 @@ from src.settings import Settings
 from src.functions import darken_color, is_dark_color, lighten_color
 from src.constants import MAIN_KEY, logger
 from src.highlighter import create_tags, recolorize
+import inspect
 
 
 class TextLineNumbers(tk.Canvas):
@@ -183,20 +184,21 @@ class EnhancedTextFrame(ttk.Frame):
 
 
 class TextOpts:
-    def __init__(self, bindkey: bool = False, keyaction: callable = None, master_obj: object = None):
-        if bindkey and keyaction:
-            raise EditorErr('`bindkey` and `keyaction` cannot be specified at the same time.')
-        if master_obj:
-            pass
+    def __init__(self, bindkey: bool = False, keyaction: callable = None):
         self.keyaction = keyaction
         self.bindkey = bindkey
-        self.text = textwidget
         self.settings_class = Settings()
         self.tabwidth = self.settings_class.get_settings("tab")
-        self.bind_events()
     
     def set_text(self, text):
-        self.text = text 
+        self.text = text
+        self.bind_events()
+    
+    def override_master_functions(self, obj: object):
+        members = [x for x in inspect.getmembers(self) if callable(x[1]) and not x[0].startswith('__')]
+        for x in members:
+            if x[0] not in ('bind_events', 'tab', 'key', 'override_master_functions', 'set_text'):
+                exec(f'obj.{x[0]} = x[1]')
 
     def bind_events(self):
         text = self.text
@@ -471,3 +473,109 @@ class TextOpts:
             self.key()
         except Exception:
             return
+    
+    def nav_1cf(self) -> None:
+        currtext = self.text
+        currtext.mark_set("insert", "insert +1c")
+
+    def nav_1cb(self) -> None:
+        currtext = self.text
+        currtext.mark_set("insert", "insert -1c")
+
+    def nav_wordstart(self) -> None:
+        currtext = self.text
+        currtext.mark_set("insert", "insert -1c wordstart")
+
+    def nav_wordend(self) -> None:
+        currtext = self.text
+        currtext.mark_set("insert", "insert wordend")
+
+    def sel_word(self) -> None:
+        currtext = self.text
+        currtext.tag_remove("sel", "1.0", "end")
+        currtext.tag_add("sel", "insert -1c wordstart", "insert wordend")
+
+    def sel_word_left(self) -> None:
+        currtext = self.text
+        currtext.mark_set("insert", "insert wordstart -2c")
+        self.sel_word()
+
+    def sel_word_right(self) -> None:
+        currtext = self.text
+        currtext.mark_set("insert", "insert wordend +2c")
+        self.sel_word()
+
+    def sel_line(self) -> None:
+        currtext = self.text
+        currtext.tag_add("sel", "insert linestart", "insert +1l linestart")
+
+    def del_word(self) -> None:
+        currtext = self.text
+        currtext.delete("insert -1c wordstart", "insert wordend")
+        self.key()
+
+    def del_word_left(self) -> None:
+        currtext = self.text
+        currtext.mark_set("insert", "insert wordstart -2c")
+        self.del_word()
+
+    def del_word_right(self) -> None:
+        currtext = self.text
+        currtext.mark_set("insert", "insert wordend +2c")
+        self.del_word()
+
+    def join_lines(self) -> None:
+        currtext = self.text
+        if not currtext.tag_ranges("sel"):
+            return
+        sel = currtext.get("sel.first", "sel.last").splitlines()
+        if len(sel) < 2:
+            return
+        sel = "".join(sel)
+        currtext.delete("sel.first", "sel.last")
+        currtext.insert("insert", sel)
+        self.key()
+
+    def mv_line_up(self) -> None:
+        currtext = self.text
+        text = currtext.get("insert -1l lineend", "insert lineend")
+        currtext.delete("insert -1l lineend", "insert lineend")
+        currtext.mark_set("insert", "insert -1l")
+        currtext.insert("insert", text)
+
+    def mv_line_dn(self) -> None:
+        currtext = self.text
+        text = currtext.get("insert -1l lineend", "insert lineend")
+        currtext.delete("insert -1l lineend", "insert lineend")
+        currtext.mark_set("insert", "insert +1l")
+        currtext.insert("insert", text)
+
+    def swap_case(self):
+        currtext = self.text
+        if not currtext.tag_ranges("sel"):
+            return
+        text = currtext.get("sel.first", "sel.last")
+        currtext.delete("sel.first", "sel.last")
+        text = text.swapcase()
+        currtext.insert("insert", text)
+        self.key()
+
+    def upper_case(self):
+        currtext = self.text
+        if not currtext.tag_ranges("sel"):
+            return
+        text = currtext.get("sel.first", "sel.last")
+        currtext.delete("sel.first", "sel.last")
+        text = text.upper()
+        currtext.insert("insert", text)
+        self.key()
+
+    def lower_case(self):
+        currtext = self.text
+        if not currtext.tag_ranges("sel"):
+            return
+        text = currtext.get("sel.first", "sel.last")
+        currtext.delete("sel.first", "sel.last")
+        text = text.lower()
+        currtext.insert("insert", text)
+        self.key()

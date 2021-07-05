@@ -47,7 +47,6 @@ from src.hexview import HexView
 from src.highlighter import create_tags, recolorize
 from src.Menu.menubar import Menubar, MenuItem, Menu
 from src.modules import (
-    EditorErr,
     Path,
     json,
     lexers,
@@ -106,6 +105,9 @@ class Editor:
             self.cmd_settings_class = RunCommand()
             self.format_settings_class = FormatCommand()
             self.commet_settings_class = CommentMarker()
+            self.opts = TextOpts(keyaction=self.key)
+            self.opts.override_master_functions(self)
+
             self.theme = self.settings_class.get_settings("theme")
             self.tabwidth = self.settings_class.get_settings("tab")
             logger.debug("Settings loaded")
@@ -189,6 +191,7 @@ class Editor:
             mainframe.pack(fill='both', expand=1)
             self.nb = ClosableNotebook(mainframe, self.close_tab)
             self.nb.bind("<B1-Motion>", self.move_tab)
+            self.nb.bind("<1>", self.click_tab)
             self.nb.pack(expand=1, fill="both")
             self.filetree = FileTree(self.master, self.open_file)
             self.panedwin.add(self.filetree)
@@ -233,6 +236,9 @@ class Editor:
             logger.exception("Error when initializing:")
             ErrorReportDialog('Error when starting.', traceback.format_exc())
             self.restart()
+    
+    def click_tab(self, _=None):
+        self.opts.set_text(self.tabs[self.get_tab()].textbox)
 
     def create_menu(self) -> None:
         self.appmenu = MenuItem()
@@ -531,21 +537,6 @@ class Editor:
         logger.debug("Textbox created")
         return textbox
 
-    def undo(self):
-        if not self.tabs:
-            return
-        self.tabs[self.get_tab()].textbox.opts.undo()
-
-    def redo(self):
-        if not self.tabs:
-            return
-        self.tabs[self.get_tab()].textbox.opts.redo()
-
-    def duplicate_line(self):
-        if not self.tabs:
-            return
-        self.tabs[self.get_tab()].textbox.opts.duplicate()
-
     def update_title(self, _=None) -> str:
         try:
             if not self.tabs:
@@ -681,8 +672,8 @@ class Editor:
                 currtext.see("insert")
                 currtext.event_generate("<<Key>>")
                 currtext.focus_set()
-                currtext.opts = TextOpts(currtext, bindkey=False, keyaction=self.key, master_obj=self)
                 currtext.edit_reset()
+                self.opts.set_text(currtext)
                 logging.info("File opened")
                 return currtext
             except Exception as e:
@@ -749,10 +740,8 @@ class Editor:
 
     def cut(self) -> None:
         try:
-            currtext = self.tabs[self.get_tab()].textbox
-            sel = currtext.get("sel.first", "sel.last")
             self.copy()
-            currtext.delete("sel.first", "sel.last")
+            self.delete()
             self.key()
         except tk.TclError:
             pass
@@ -1001,151 +990,7 @@ class Editor:
             return
         Navigate(self.tabs[self.get_tab()].textbox)
 
-    def nav_1cf(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.mark_set("insert", "insert +1c")
 
-    def nav_1cb(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.mark_set("insert", "insert -1c")
-
-    def nav_wordstart(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.mark_set("insert", "insert -1c wordstart")
-
-    def nav_wordend(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.mark_set("insert", "insert wordend")
-
-    def sel_word(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.tag_remove("sel", "1.0", "end")
-        currtext.tag_add("sel", "insert -1c wordstart", "insert wordend")
-
-    def sel_word_left(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.mark_set("insert", "insert wordstart -2c")
-        self.sel_word()
-
-    def sel_word_right(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.mark_set("insert", "insert wordend +2c")
-        self.sel_word()
-
-    def sel_line(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.tag_add("sel", "insert linestart", "insert +1l linestart")
-
-    def del_word(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.delete("insert -1c wordstart", "insert wordend")
-        self.key()
-
-    def del_word_left(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.mark_set("insert", "insert wordstart -2c")
-        self.del_word()
-
-    def del_word_right(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.mark_set("insert", "insert wordend +2c")
-        self.del_word()
-
-    def join_lines(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        if not currtext.tag_ranges("sel"):
-            return
-        sel = currtext.get("sel.first", "sel.last").splitlines()
-        if len(sel) < 2:
-            return
-        sel = "".join(sel)
-        currtext.delete("sel.first", "sel.last")
-        currtext.insert("insert", sel)
-        self.key()
-
-    def mv_line_up(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        text = currtext.get("insert -1l lineend", "insert lineend")
-        currtext.delete("insert -1l lineend", "insert lineend")
-        currtext.mark_set("insert", "insert -1l")
-        currtext.insert("insert", text)
-
-    def mv_line_dn(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        text = currtext.get("insert -1l lineend", "insert lineend")
-        currtext.delete("insert -1l lineend", "insert lineend")
-        currtext.mark_set("insert", "insert +1l")
-        currtext.insert("insert", text)
-
-    def swap_case(self):
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        if not currtext.tag_ranges("sel"):
-            return
-        text = currtext.get("sel.first", "sel.last")
-        currtext.delete("sel.first", "sel.last")
-        text = text.swapcase()
-        currtext.insert("insert", text)
-        self.key()
-
-    def upper_case(self):
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        if not currtext.tag_ranges("sel"):
-            return
-        text = currtext.get("sel.first", "sel.last")
-        currtext.delete("sel.first", "sel.last")
-        text = text.upper()
-        currtext.insert("insert", text)
-        self.key()
-
-    def lower_case(self):
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        if not currtext.tag_ranges("sel"):
-            return
-        text = currtext.get("sel.first", "sel.last")
-        currtext.delete("sel.first", "sel.last")
-        text = text.lower()
-        currtext.insert("insert", text)
-        self.key()
-
-    def biggerview(self) -> None:
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.opts.biggerview()
 
     def test(self):
         TestDialog(self.panedwin, self.filetree.path)
@@ -1209,16 +1054,3 @@ class Editor:
             )
         elif action == "commit":
             CommitView(self.panedwin, currdir)
-
-    def indent(self, action="indent") -> None:
-        """Indent/unindent feature."""
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.opts.indent(action)
-
-    def comment_lines(self, _=None):
-        if not self.tabs:
-            return
-        currtext = self.tabs[self.get_tab()].textbox
-        currtext.opts.comment_lines()

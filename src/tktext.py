@@ -183,16 +183,20 @@ class EnhancedTextFrame(ttk.Frame):
 
 
 class TextOpts:
-
-    def __init__(self, textwidget: tk.Text, bindkey: bool = False, keyaction: callable = None):
+    def __init__(self, bindkey: bool = False, keyaction: callable = None, master_obj: object = None):
         if bindkey and keyaction:
             raise EditorErr('`bindkey` and `keyaction` cannot be specified at the same time.')
+        if master_obj:
+            pass
         self.keyaction = keyaction
         self.bindkey = bindkey
         self.text = textwidget
         self.settings_class = Settings()
         self.tabwidth = self.settings_class.get_settings("tab")
         self.bind_events()
+    
+    def set_text(self, text):
+        self.text = text 
 
     def bind_events(self):
         text = self.text
@@ -240,6 +244,93 @@ class TextOpts:
             text = currtext.get("insert linestart", "insert lineend")
             currtext.insert("insert", "\n" + text)
         self.key()
+
+    def indent(self, action="indent") -> None:
+        """Indent/unindent feature."""
+        currtext = self.text
+        if currtext.tag_ranges("sel"):
+            sel_start = currtext.index("sel.first linestart")
+            sel_end = currtext.index("sel.last lineend")
+        else:
+            sel_start = currtext.index("insert linestart")
+            sel_end = currtext.index("insert lineend")
+        if action == "indent":
+            selected_text = currtext.get(sel_start, sel_end)
+            indented = []
+            for line in selected_text.splitlines():
+                indented.append(" " * self.tabwidth + line)
+            currtext.delete(sel_start, sel_end)
+            currtext.insert(sel_start, "\n".join(indented))
+            currtext.tag_remove("sel", "1.0", "end")
+            currtext.tag_add("sel", sel_start, f"{sel_end} +4c")
+            self.key()
+        elif action == "unindent":
+            selected_text = currtext.get(sel_start, sel_end)
+            unindented = []
+            for line in selected_text.splitlines():
+                if line.startswith(" " * self.tabwidth):
+                    unindented.append(line[4:])
+                else:
+                    return
+            currtext.delete(sel_start, sel_end)
+            currtext.insert(sel_start, "\n".join(unindented))
+            currtext.tag_remove("sel", "1.0", "end")
+            currtext.tag_add("sel", sel_start, sel_end)
+            self.key()
+        else:
+            raise EditorErr("Action undefined.")
+
+    def comment_lines(self, _=None):
+        """Comments the selection or line"""
+        try:
+            currtext = self.text
+            if not currtext.comment_marker:
+                return
+            comment_markers = currtext.comment_marker.split(" ")
+            block = len(comment_markers) == 2
+            if block and comment_markers[1] != "":
+                comment_start = comment_markers[0]
+                comment_end = comment_markers[1]
+            else:
+                comment_start = currtext.comment_marker
+                comment_end = ""
+            if currtext.tag_ranges("sel"):
+                start_index, end_index = "sel.first linestart", "sel.last lineend"
+                text = currtext.get(start_index, end_index)
+                currtext.delete(start_index, end_index)
+                if block:
+                    if text.startswith(comment_start):
+                        currtext.insert(
+                            "insert", text[len(comment_start) : -len(comment_end)]
+                        )
+                        self.key()
+                        return
+                    currtext.insert("insert", f"{comment_start} {text} {comment_end}")
+                    self.key()
+                    return
+                for line in currtext.get(start_index, end_index).splitlines():
+                    if line.startswith(comment_start) and line.endswith(comment_end):
+                        currtext.insert(
+                            "insert",
+                            f"{line[len(comment_start) + 1:len(comment_end) + 1]}\n",
+                        )
+                    else:
+                        currtext.insert(
+                            "insert", f"{comment_start}{line}{comment_end}\n"
+                        )
+            else:
+                start_index, end_index = "insert linestart", "insert lineend"
+                line = currtext.get(start_index, end_index)
+                currtext.delete(start_index, end_index)
+                if line.startswith(comment_start) and line.endswith(comment_end):
+                    currtext.insert(
+                        "insert", f"{line[len(comment_start):len(comment_end)]}\n"
+                    )
+                else:
+                    currtext.insert("insert", f"{comment_start}{line}{comment_end}\n")
+            self.key()
+        except (KeyError, AttributeError):
+            return
 
     def backspace(self, _=None) -> None:
         currtext = self.text
@@ -323,6 +414,24 @@ class TextOpts:
             return "break"
         currtext.mark_set("insert", "insert -1c")
         self.key()
+    
+    def biggerview(self):
+        currtext = self.text
+        if not currtext.tag_ranges("sel"):
+            return
+        selected_text = currtext.get("sel.first -1c linestart", "sel.last lineend")
+        win = tk.Toplevel()
+        win.resizable(0, 0)
+        win.transient(".")
+        textframe = EnhancedTextFrame(win)
+        textframe.set_first_line(1)
+        textframe.text.insert("insert", selected_text)
+        textframe.text["state"] = "disabled"
+        textframe.text.lexer = currtext.lexer
+        textframe.pack(fill="both", expand=1)
+        create_tags(textframe.text)
+        recolorize(textframe.text)
+        win.mainloop()
 
     def autoindent(self, _=None) -> str:
         """Auto-indents the next line"""
@@ -341,7 +450,7 @@ class TextOpts:
         if linetext.endswith("\\"):
             indentation += " " * self.tabwidth
         if "return" in linetext or "break" in linetext:
-            indentation = indentation[4:]
+            indentation = indentation[self.tabwidth:]
         if linetext.endswith("(") or linetext.endswith(", ") or linetext.endswith(","):
             indentation += " " * self.tabwidth
 

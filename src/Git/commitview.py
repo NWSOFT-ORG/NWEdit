@@ -7,9 +7,8 @@ from src.highlighter import create_tags, recolorize
 class CommitView(ttk.Frame):
     def __init__(self, parent, path: str):
         super().__init__(parent)
-        parent.forget(parent.panes()[0])
-        self.pack(fill='both', expand=1)
-        parent.insert('0', self)
+        self.parent = parent
+        self.init_ui(parent)
 
         self.path = path
         subprocess.run("git add .", shell=True, cwd=self.path)
@@ -30,6 +29,61 @@ class CommitView(ttk.Frame):
         self.committext = tk.Text(commit_frame, font="Arial", height=4)
         self.committext.pack()
         self.files_listbox.delete(*self.files_listbox.get_children())
+        ttk.Button(commit_frame, text="Commit >>", command=self.commit).pack(
+            side="bottom", fill="x"
+        )
+        self.remote_selected = tk.StringVar()
+        self.branch_selected = tk.StringVar()
+        frame = ttk.Frame(self)
+
+        self.remotes_list = ttk.Combobox(frame, textvariable=self.remote_selected)
+        self.branches_list = ttk.Combobox(frame, textvariable=self.branch_selected)
+        self.remotes_list.pack(side='left', anchor="nw")
+        self.branches_list.pack(side='left', anchor="nw")
+        self.remotes_list['state'] = 'readonly'
+        self.branches_list['state'] = 'readonly'
+
+        self.main_frame = ttk.LabelFrame(self, labelwidget=frame)
+        self.main_frame.pack(fill='both', expand=1)
+
+        self.name_label = ttk.Label(self.main_frame, text='')
+        self.name_label.pack(fill='both', anchor='nw')
+
+        self.push_button = ttk.Button(self.main_frame, text='Push', command=self.push)
+        self.push_button.pack(anchor='nw', side='left')
+
+        self.pull_button = ttk.Button(self.main_frame, text='Pull', command=self.pull)
+        self.pull_button.pack(anchor='nw', side='left')
+
+        remotes = [subprocess.run(
+                "git remote",
+                capture_output=True,
+                shell=True,
+                cwd=self.path,
+                ).stdout.decode("utf-8").splitlines()]
+
+        branches = [subprocess.run(
+                "git branch -r --no-color",
+                capture_output=True,
+                shell=True,
+                cwd=self.path,
+                ).stdout.decode("utf-8").splitlines()]
+
+        self.remotes_list["values"] = remotes
+        self.remotes_list.set(remotes[0])
+        self.branches_list["values"] = branches
+        self.branches_list.set(branches[0])
+        self.change_remote()
+        self.update_filelist()
+        self.remote_selected.trace_add('write', self.change_remote)
+    
+    def init_ui(self):
+        parent = self.parent
+        parent.forget(parent.panes()[0])
+        self.pack(fill='both', expand=1)
+        parent.insert('0', self)
+    
+    def update_filelist(self):
         modified_files = [
             "M " + x
             for x in subprocess.run(
@@ -95,53 +149,6 @@ class CommitView(ttk.Frame):
             self.files_listbox.insert("", "end", text=x, tags="deleted")
         for x in modified_files:
             self.files_listbox.insert("", "end", text=x, tags="modified")
-
-        ttk.Button(commit_frame, text="Commit >>", command=self.commit).pack(
-            side="bottom", fill="x"
-        )
-        self.remote_selected = tk.StringVar()
-        self.branch_selected = tk.StringVar()
-        frame = ttk.Frame(self)
-
-        self.remotes_list = ttk.Combobox(frame, textvariable=self.remote_selected)
-        self.branches_list = ttk.Combobox(frame, textvariable=self.branch_selected)
-        self.remotes_list.pack(side='left', anchor="nw")
-        self.branches_list.pack(side='left', anchor="nw")
-        self.remotes_list['state'] = 'readonly'
-        self.branches_list['state'] = 'readonly'
-
-        self.main_frame = ttk.LabelFrame(self, labelwidget=frame)
-        self.main_frame.pack(fill='both', expand=1)
-
-        self.name_label = ttk.Label(self.main_frame, text='')
-        self.name_label.pack(fill='both', anchor='nw')
-
-        self.push_button = ttk.Button(self.main_frame, text='Push', command=self.push)
-        self.push_button.pack(anchor='nw', side='left')
-
-        self.pull_button = ttk.Button(self.main_frame, text='Pull', command=self.pull)
-        self.pull_button.pack(anchor='nw', side='left')
-
-        remotes = [subprocess.run(
-                "git remote",
-                capture_output=True,
-                shell=True,
-                cwd=self.path,
-                ).stdout.decode("utf-8").splitlines()]
-
-        branches = [subprocess.run(
-                "git branch -r --no-color",
-                capture_output=True,
-                shell=True,
-                cwd=self.path,
-                ).stdout.decode("utf-8").splitlines()]
-
-        self.remotes_list["values"] = remotes
-        self.remotes_list.set(remotes[0])
-        self.branches_list["values"] = branches
-        self.branches_list.set(branches[0])
-        self.change_remote()
-        self.remote_selected.trace_add('write', self.change_remote)
 
     def commit(self, _=None):
         if commit_msg := self.committext.get("1.0", "end"):

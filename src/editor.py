@@ -111,7 +111,7 @@ class Editor:
             logger.debug("Settings loaded")
 
             self.master = master
-            self.master.geometry("1200x800")
+            # self.master.geometry("1200x800")
             self.style = ttkthemes.ThemedStyle(self.master)
             self.style.set_theme(self.theme)
             self.bg = self.style.lookup("TLabel", "background")
@@ -681,7 +681,7 @@ class Editor:
                 currtext.see("insert")
                 currtext.event_generate("<<Key>>")
                 currtext.focus_set()
-                currtext.opts = TextOpts(currtext, bindkey=False, keyaction=self.key)
+                currtext.opts = TextOpts(currtext, bindkey=False, keyaction=self.key, master_obj=self)
                 currtext.edit_reset()
                 logging.info("File opened")
                 return currtext
@@ -1145,21 +1145,7 @@ class Editor:
         if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
-        if not currtext.tag_ranges("sel"):
-            return
-        selected_text = currtext.get("sel.first -1c linestart", "sel.last lineend")
-        win = tk.Toplevel(self.master)
-        win.resizable(0, 0)
-        win.transient(self.master)
-        textframe = EnhancedTextFrame(win)
-        textframe.set_first_line(1)
-        textframe.text.insert("insert", selected_text)
-        textframe.text["state"] = "disabled"
-        textframe.text.lexer = currtext.lexer
-        textframe.pack(fill="both", expand=1)
-        create_tags(textframe.text)
-        recolorize(textframe.text)
-        win.mainloop()
+        currtext.opts.biggerview()
 
     def test(self):
         TestDialog(self.panedwin, self.filetree.path)
@@ -1229,86 +1215,10 @@ class Editor:
         if not self.tabs:
             return
         currtext = self.tabs[self.get_tab()].textbox
-        if currtext.tag_ranges("sel"):
-            sel_start = currtext.index("sel.first linestart")
-            sel_end = currtext.index("sel.last lineend")
-        else:
-            sel_start = currtext.index("insert linestart")
-            sel_end = currtext.index("insert lineend")
-        if action == "indent":
-            selected_text = currtext.get(sel_start, sel_end)
-            indented = []
-            for line in selected_text.splitlines():
-                indented.append(" " * self.tabwidth + line)
-            currtext.delete(sel_start, sel_end)
-            currtext.insert(sel_start, "\n".join(indented))
-            currtext.tag_remove("sel", "1.0", "end")
-            currtext.tag_add("sel", sel_start, f"{sel_end} +4c")
-            self.key()
-        elif action == "unindent":
-            selected_text = currtext.get(sel_start, sel_end)
-            unindented = []
-            for line in selected_text.splitlines():
-                if line.startswith(" " * self.tabwidth):
-                    unindented.append(line[4:])
-                else:
-                    return
-            currtext.delete(sel_start, sel_end)
-            currtext.insert(sel_start, "\n".join(unindented))
-            currtext.tag_remove("sel", "1.0", "end")
-            currtext.tag_add("sel", sel_start, sel_end)
-            self.key()
-        else:
-            raise EditorErr("Action undefined.")
+        currtext.opts.indent(action)
 
     def comment_lines(self, _=None):
-        """Comments the selection or line"""
-        try:
-            currtext = self.tabs[self.get_tab()].textbox
-            if not currtext.comment_marker:
-                return
-            comment_markers = currtext.comment_marker.split(" ")
-            block = len(comment_markers) == 2
-            if block and comment_markers[1] != "":
-                comment_start = comment_markers[0]
-                comment_end = comment_markers[1]
-            else:
-                comment_start = currtext.comment_marker
-                comment_end = ""
-            if currtext.tag_ranges("sel"):
-                start_index, end_index = "sel.first linestart", "sel.last lineend"
-                text = currtext.get(start_index, end_index)
-                currtext.delete(start_index, end_index)
-                if block:
-                    if text.startswith(comment_start):
-                        currtext.insert(
-                            "insert", text[len(comment_start) : -len(comment_end)]
-                        )
-                        self.key()
-                        return
-                    currtext.insert("insert", f"{comment_start} {text} {comment_end}")
-                    self.key()
-                    return
-                for line in currtext.get(start_index, end_index).splitlines():
-                    if line.startswith(comment_start) and line.endswith(comment_end):
-                        currtext.insert(
-                            "insert",
-                            f"{line[len(comment_start) + 1:len(comment_end) + 1]}\n",
-                        )
-                    else:
-                        currtext.insert(
-                            "insert", f"{comment_start}{line}{comment_end}\n"
-                        )
-            else:
-                start_index, end_index = "insert linestart", "insert lineend"
-                line = currtext.get(start_index, end_index)
-                currtext.delete(start_index, end_index)
-                if line.startswith(comment_start) and line.endswith(comment_end):
-                    currtext.insert(
-                        "insert", f"{line[len(comment_start):len(comment_end)]}\n"
-                    )
-                else:
-                    currtext.insert("insert", f"{comment_start}{line}{comment_end}\n")
-            self.key()
-        except (KeyError, AttributeError):
+        if not self.tabs:
             return
+        currtext = self.tabs[self.get_tab()].textbox
+        currtext.opts.comment_lines()

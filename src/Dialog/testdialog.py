@@ -109,9 +109,9 @@ class TestDialog(ttk.Frame):
         imports = EnhancedTextFrame(settingswin)
         setup = EnhancedTextFrame(settingswin)
         teardown = EnhancedTextFrame(settingswin)
-        TextOpts(textwidget=imports.text, bindkey=True)
-        TextOpts(textwidget=setup.text, bindkey=True)
-        TextOpts(textwidget=teardown.text, bindkey=True)
+        TextOpts(bindkey=True).set_text(imports.text)
+        TextOpts(bindkey=True).set_text(setup.text)
+        TextOpts(bindkey=True).set_text(teardown.text)
         imports.text["height"] = 3
         setup.text["height"] = 3
         teardown.text["height"] = 3
@@ -149,7 +149,7 @@ class TestDialog(ttk.Frame):
         textframe = EnhancedTextFrame(codewin)
         text = textframe.text
         text.lexer = lexers.get_lexer_by_name("Python")
-        TextOpts(textwidget=text, bindkey=True)
+        TextOpts(bindkey=True).set_text(text)
         textframe.pack(fill="both", expand=1)
         button_frame = ttk.Frame(codewin)
 
@@ -185,7 +185,7 @@ class TestDialog(ttk.Frame):
         text: tk.Text = textframe.text
         text.lexer = lexers.get_lexer_by_name("Python")
         text.insert("end", self.method_list[name])
-        TextOpts(text, bindkey=True)
+        TextOpts(bindkey=True).set_text(text)
         textframe.pack(fill="both", expand=1)
         button_frame = ttk.Frame(codewin)
 

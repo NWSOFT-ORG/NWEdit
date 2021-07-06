@@ -1,4 +1,4 @@
-from src.constants import APPDIR, logger
+from src.constants import APPDIR
 from src.modules import json, tk, ttk, styles
 
 from src.tktext import EnhancedTextFrame

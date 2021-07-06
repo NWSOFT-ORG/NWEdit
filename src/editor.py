@@ -23,18 +23,16 @@ from src.constants import (
     MAIN_KEY,
     OSX,
     RUN_BATCH,
-    VERSION,
     WINDOWS,
     logger,
 )
 from src.customenotebook import ClosableNotebook
 from src.Dialog.commondialog import (ErrorInfoDialog, InputStringDialog,
-                         YesNoDialog)
+                         YesNoDialog, AboutDialog)
 from src.Dialog.codelistdialog import CodeListDialog
 from src.Dialog.debugdialog import (ErrorReportDialog, LogViewDialog)
 from src.Dialog.filedialog import FileOpenDialog, FileSaveAsDialog
 from src.functions import (
-    download_file,
     is_binary_string,
     is_dark_color,
     open_system_shell,
@@ -48,7 +46,6 @@ from src.highlighter import create_tags, recolorize
 from src.Menu.menubar import Menubar, MenuItem, Menu
 from src.modules import (
     Path,
-    json,
     lexers,
     logging,
     os,
@@ -57,7 +54,6 @@ from src.modules import (
     tk,
     ttk,
     ttkthemes,
-    webbrowser,
 )
 from src.Dialog.search import Search
 from src.settings import (
@@ -120,39 +116,24 @@ class Editor:
             self.fg = self.style.lookup("TLabel", "foreground")
             if is_dark_color(self.bg):
                 self.close_icon = tk.PhotoImage(file="Images/close.gif")
-                self.copy_icon = tk.PhotoImage(file="Images/copy-light.gif")
                 self.lint_icon = tk.PhotoImage(file="Images/lint-light.gif")
-                self.delete_icon = tk.PhotoImage(file="Images/delete-light.gif")
-                self.indent_icon = tk.PhotoImage(file="Images/indent-light.gif")
-                self.paste_icon = tk.PhotoImage(file="Images/paste-light.gif")
-                self.unindent_icon = tk.PhotoImage(file="Images/unindent-light.gif")
                 self.search_icon = tk.PhotoImage(file="Images/search-light.gif")
                 self.pyterm_icon = tk.PhotoImage(file="Images/py-term-light.gif")
                 self.term_icon = tk.PhotoImage(file="Images/term-light.gif")
                 self.format_icon = tk.PhotoImage(file="Images/format-light.gif")
-                self.sel_all_icon = tk.PhotoImage(file="Images/sel-all-light.gif")
             else:
                 self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
                 self.lint_icon = tk.PhotoImage(file="Images/lint.gif")
-                self.copy_icon = tk.PhotoImage(file="Images/copy.gif")
-                self.delete_icon = tk.PhotoImage(file="Images/delete.gif")
-                self.indent_icon = tk.PhotoImage(file="Images/indent.gif")
-                self.paste_icon = tk.PhotoImage(file="Images/paste.gif")
-                self.unindent_icon = tk.PhotoImage(file="Images/unindent.gif")
                 self.search_icon = tk.PhotoImage(file="Images/search.gif")
                 self.pyterm_icon = tk.PhotoImage(file="Images/py-term.gif")
                 self.term_icon = tk.PhotoImage(file="Images/term.gif")
                 self.format_icon = tk.PhotoImage(file="Images/format.gif")
-                self.sel_all_icon = tk.PhotoImage(file="Images/sel-all.gif")
 
-            self.cut_icon = tk.PhotoImage(file="Images/cut.gif")
             self.new_icon = tk.PhotoImage(file="Images/new.gif")
             self.open_icon = tk.PhotoImage(file="Images/open-16px.gif")
-            self.redo_icon = tk.PhotoImage(file="Images/redo.gif")
             self.reload_icon = tk.PhotoImage(file="Images/reload.gif")
             self.run_icon = tk.PhotoImage(file="Images/run-16px.gif")
             self.save_as_icon = tk.PhotoImage(file="Images/saveas-16px.gif")
-            self.undo_icon = tk.PhotoImage(file="Images/undo.gif")
             logger.debug("Icons loaded")
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
@@ -278,7 +259,6 @@ class Editor:
         )
         self.appmenu.add_command(label="Exit Editor", command=self.exit)
         self.appmenu.add_command(label="Restart app", command=self.restart)
-        self.appmenu.add_command(label="Check for updates", command=self.check_updates)
         self.appmenu.add_command(label='View log', command=self.view_log)
 
         self.filemenu = MenuItem()
@@ -313,73 +293,7 @@ class Editor:
             image=self.reload_icon,
         )
 
-        self.editmenu = MenuItem()
-        self.editmenu.add_command(
-            label="Undo",
-            command=self.undo,
-            image=self.undo_icon,
-        )
-        self.editmenu.add_command(
-            label="Redo",
-            command=self.redo,
-            image=self.redo_icon,
-        )
-        self.editmenu.add_command(
-            label="Cut",
-            command=self.cut,
-            image=self.cut_icon,
-        )
-        self.editmenu.add_command(
-            label="Copy",
-            command=self.copy,
-            image=self.copy_icon,
-        )
-        self.editmenu.add_command(
-            label="Paste",
-            command=self.paste,
-            image=self.paste_icon,
-        )
-        self.editmenu.add_command(
-            label="Delete Selected",
-            image=self.delete_icon,
-            command=self.delete,
-        )
-        self.editmenu.add_command(
-            label="Duplicate Line or Selected", command=self.duplicate_line
-        )
-        self.editmenu.add_command(label="Join lines", command=self.join_lines)
-        self.editmenu.add_command(label="Swap case", command=self.swap_case)
-        self.editmenu.add_command(label="Upper case", command=self.upper_case)
-        self.editmenu.add_command(label="Lower case", command=self.lower_case)
-        self.editmenu.add_command(
-            label="Select All",
-            command=self.select_all,
-            image=self.sel_all_icon,
-        )
-        self.editmenu.add_command(label="Select Line", command=self.sel_line)
-        self.editmenu.add_command(label="Select Word", command=self.sel_word)
-        self.editmenu.add_command(label="Select Prev Word", command=self.sel_word_left)
-        self.editmenu.add_command(label="Select Next Word", command=self.sel_word_right)
-        self.editmenu.add_command(label="Delete Word", command=self.del_word)
-        self.editmenu.add_command(label="Delete Prev Word", command=self.del_word_left)
-        self.editmenu.add_command(label="Delete Next Word", command=self.del_word_right)
-        self.editmenu.add_command(label="Move line up", command=self.mv_line_up)
-        self.editmenu.add_command(label="Move line down", command=self.mv_line_dn)
-
         self.codemenu = MenuItem()
-        self.codemenu.add_command(
-            label="Indent",
-            command=lambda: self.indent("indent"),
-            image=self.indent_icon,
-        )
-        self.codemenu.add_command(
-            label="Unident",
-            command=lambda: self.indent("unindent"),
-            image=self.unindent_icon,
-        )
-        self.codemenu.add_command(
-            label="Comment/Uncomment Line or Selected", command=self.comment_lines
-        )
         self.codemenu.add_command(
             label="Run",
             command=self.run,
@@ -395,7 +309,6 @@ class Editor:
             command=self.autopep,
             image=self.format_icon,
         )
-        self.codemenu.add_command(label="Bigger view", command=self.biggerview)
         self.codemenu.add_command(
             label="Open System Shell",
             command=self.system_shell,
@@ -441,7 +354,7 @@ class Editor:
 
         self.menubar.add_cascade(label="PyPlus", menu=self.appmenu)  # App menu
         self.menubar.add_cascade(label="File", menu=self.filemenu)
-        self.menubar.add_cascade(label="Edit", menu=self.editmenu)
+        self.menubar.add_cascade(label="Edit", menu=self.opts.menu)
         self.menubar.add_cascade(label="Code", menu=self.codemenu)
         self.menubar.add_cascade(label="View", menu=self.viewmenu)
         self.menubar.add_cascade(label="Navigate", menu=self.navmenu)
@@ -655,27 +568,27 @@ class Editor:
                 self.nb.select(new_tab)
 
                 # Puts the contents of the file into the text widget.
-                currtext = self.tabs[new_tab].textbox
-                currtext.insert("end", file.read().replace("\t", " " * self.tabwidth))
+                textbox.insert("end", file.read().replace("\t", " " * self.tabwidth))
                 # Inserts file content, replacing tabs with four spaces
-                currtext.focus_set()
-                currtext.set_lexer(self.file_settings_class.get_settings(extens))
-                currtext.lint_cmd = self.linter_settings_class.get_settings(extens)
-                currtext.cmd = self.cmd_settings_class.get_settings(extens)
-                currtext.format_command = self.format_settings_class.get_settings(
+                textbox.focus_set()
+                textbox.set_lexer(self.file_settings_class.get_settings(extens))
+                textbox.lint_cmd = self.linter_settings_class.get_settings(extens)
+                textbox.cmd = self.cmd_settings_class.get_settings(extens)
+                textbox.format_command = self.format_settings_class.get_settings(
                     extens
                 )
-                currtext.comment_marker = self.commet_settings_class.get_settings(
+                textbox.comment_marker = self.commet_settings_class.get_settings(
                     extens
                 )
 
-                currtext.see("insert")
-                currtext.event_generate("<<Key>>")
-                currtext.focus_set()
-                currtext.edit_reset()
-                self.opts.set_text(currtext)
+                textbox.see("insert")
+                textbox.event_generate("<<Key>>")
+                textbox.focus_set()
+                textbox.edit_reset()
+                self.opts.set_text(textbox)
+                self.mouse()
                 logging.info("File opened")
-                return currtext
+                return textbox
             except Exception as e:
                 if type(e).__name__ != "ValueError":
                     logger.exception("Error when opening file:")
@@ -724,46 +637,6 @@ class Editor:
             else:
                 ErrorInfoDialog(self.master, "File read only")
         except Exception:
-            pass
-
-    def copy(self) -> None:
-        try:
-            sel = self.tabs[self.get_tab()].textbox.get(tk.SEL_FIRST, tk.SEL_LAST)
-            self.tabs[self.get_tab()].textbox.clipboard_clear()
-            self.tabs[self.get_tab()].textbox.clipboard_append(sel)
-        except tk.TclError:
-            pass
-
-    def delete(self) -> None:
-        self.tabs[self.get_tab()].textbox.delete(tk.SEL_FIRST, tk.SEL_LAST)
-        self.key()
-
-    def cut(self) -> None:
-        try:
-            self.copy()
-            self.delete()
-            self.key()
-        except tk.TclError:
-            pass
-
-    def paste(self) -> None:
-        try:
-            clipboard = self.tabs[self.get_tab()].textbox.clipboard_get()
-            if clipboard:
-                self.tabs[self.get_tab()].textbox.insert(
-                    "insert", clipboard.replace("\t", " " * self.tabwidth)
-                )
-            self.key()
-        except Exception:
-            pass
-
-    def select_all(self) -> None:
-        try:
-            curr_tab = self.get_tab()
-            self.tabs[curr_tab].textbox.tag_add('sel', "1.0", 'end')
-            self.tabs[curr_tab].textbox.mark_set("insert", "end")
-            self.tabs[curr_tab].textbox.see("insert")
-        except tk.TclError:
             pass
 
     def run(self, _=None) -> None:
@@ -917,25 +790,7 @@ class Editor:
 
     def _version(self) -> None:
         """Shows the version and related info of the editor."""
-        ver = tk.Toplevel()
-        ver.resizable(0, 0)
-        ver.title("About PyPlus")
-        ttk.Label(ver, image=self.icon).pack(fill="both")
-        ttk.Label(ver, text=f"Version {VERSION}", font="Arial 30 bold").pack(
-            fill="both"
-        )
-        if self.check_updates(popup=False)[0]:
-            update = ttk.Label(
-                ver, text="Updates available", foreground="blue", cursor="hand2"
-            )
-            update.pack(fill="both")
-            update.bind(
-                "<Button-1>",
-                lambda e: webbrowser.open_new_tab(self.check_updates(popup=False)[1]),
-            )
-        else:
-            ttk.Label(ver, text="No updates available").pack(fill="both")
-        ver.mainloop()
+        AboutDialog(self.master)
 
     def lint_source(self) -> None:
         if not self.tabs:
@@ -990,49 +845,8 @@ class Editor:
             return
         Navigate(self.tabs[self.get_tab()].textbox)
 
-
-
     def test(self):
         TestDialog(self.panedwin, self.filetree.path)
-
-    def check_updates(self, popup=True) -> list:
-        if "DEV" in VERSION:
-            ErrorInfoDialog(
-                self.master,
-                "Updates aren't supported by develop builds,\n\
-            since you're always on the latest version!",
-            )  # If you're on the developer build, you don't need updates!
-            return [True, 'about://blank']
-        download_file(
-            url="https://raw.githubusercontent.com/ZCG-coder/NWSOFT/master/PyPlusWeb/ver.json"
-        )
-        with open("ver.json") as f:
-            newest = json.load(f)
-        version = newest["version"]
-        if not popup:
-            os.remove("ver.json")
-            return [version != VERSION, newest["url"]]
-        updatewin = tk.Toplevel(self.master)
-        updatewin.title("Updates")
-        updatewin.resizable(0, 0)
-        updatewin.transient(self.master)
-        ttkthemes.ThemedStyle(updatewin)
-        if version != VERSION:
-            ttk.Label(updatewin, text="Update available!", font="Arial 30").pack(
-                fill="both"
-            )
-            ttk.Label(updatewin, text=version).pack(fill="both")
-            ttk.Label(updatewin, text=newest["details"]).pack(fill="both")
-            url = newest["url"]
-            ttk.Button(
-                updatewin, text="Get this update", command=lambda: webbrowser.open(url)
-            ).pack()
-        else:
-            ttk.Label(updatewin, text="No updates available", font="Arial 30").pack(
-                fill="both"
-            )
-        os.remove("ver.json")
-        updatewin.mainloop()
 
     def git(self, action=None) -> None:
         currdir = self.filetree.path

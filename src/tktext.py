@@ -1,10 +1,11 @@
 """A modded version of tkinter.Text"""
 
-from src.modules import font, styles, tk, ttk, EditorErr
+from src.modules import font, styles, tk, ttk, ttkthemes, EditorErr
 from src.settings import Settings
 from src.functions import darken_color, is_dark_color, lighten_color
 from src.constants import MAIN_KEY, logger
 from src.highlighter import create_tags, recolorize
+from src.Menu.menubar import MenuItem
 import inspect
 
 
@@ -189,7 +190,29 @@ class TextOpts:
         self.bindkey = bindkey
         self.settings_class = Settings()
         self.tabwidth = self.settings_class.get_settings("tab")
-    
+        self.theme = self.settings_class.get_settings("theme")
+        self.style = ttkthemes.ThemedStyle()
+        self.style.set_theme(self.theme)
+        self.bg = self.style.lookup("TLabel", "background")
+        self.fg = self.style.lookup("TLabel", "foreground")
+        if is_dark_color(self.bg):
+            self.copy_icon = tk.PhotoImage(file="Images/copy-light.gif")
+            self.delete_icon = tk.PhotoImage(file="Images/delete-light.gif")
+            self.indent_icon = tk.PhotoImage(file="Images/indent-light.gif")
+            self.paste_icon = tk.PhotoImage(file="Images/paste-light.gif")
+            self.unindent_icon = tk.PhotoImage(file="Images/unindent-light.gif")
+            self.sel_all_icon = tk.PhotoImage(file="Images/sel-all-light.gif")
+        else:
+            self.copy_icon = tk.PhotoImage(file="Images/copy.gif")
+            self.delete_icon = tk.PhotoImage(file="Images/delete.gif")
+            self.indent_icon = tk.PhotoImage(file="Images/indent.gif")
+            self.paste_icon = tk.PhotoImage(file="Images/paste.gif")
+            self.unindent_icon = tk.PhotoImage(file="Images/unindent.gif")
+            self.sel_all_icon = tk.PhotoImage(file="Images/sel-all.gif")
+        self.cut_icon = tk.PhotoImage(file="Images/cut.gif")
+        self.redo_icon = tk.PhotoImage(file="Images/redo.gif")
+        self.undo_icon = tk.PhotoImage(file="Images/undo.gif")
+
     def set_text(self, text):
         self.text = text
         self.bind_events()
@@ -199,6 +222,71 @@ class TextOpts:
         for x in members:
             if x[0] not in ('bind_events', 'tab', 'key', 'override_master_functions', 'set_text'):
                 exec(f'obj.{x[0]} = x[1]')
+        self.menu = MenuItem()
+        self.menu.add_command(
+            label="Undo",
+            command=self.undo,
+            image=self.undo_icon,
+        )
+        self.menu.add_command(
+            label="Redo",
+            command=self.redo,
+            image=self.redo_icon,
+        )
+        self.menu.add_command(
+            label="Cut",
+            command=self.cut,
+            image=self.cut_icon,
+        )
+        self.menu.add_command(
+            label="Copy",
+            command=self.copy,
+            image=self.copy_icon,
+        )
+        self.menu.add_command(
+            label="Paste",
+            command=self.paste,
+            image=self.paste_icon,
+        )
+        self.menu.add_command(
+            label="Delete Selected",
+            image=self.delete_icon,
+            command=self.delete,
+        )
+        self.menu.add_command(
+            label="Duplicate Line or Selected", command=self.duplicate_line
+        )
+        self.menu.add_command(
+            label="Indent",
+            command=lambda: self.indent("indent"),
+            image=self.indent_icon,
+        )
+        self.menu.add_command(
+            label="Unident",
+            command=lambda: self.indent("unindent"),
+            image=self.unindent_icon,
+        )
+        self.menu.add_command(
+            label="Comment/Uncomment Line or Selected", command=self.comment_lines
+        )
+        self.menu.add_command(label="Join lines", command=self.join_lines)
+        self.menu.add_command(label="Swap case", command=self.swap_case)
+        self.menu.add_command(label="Upper case", command=self.upper_case)
+        self.menu.add_command(label="Lower case", command=self.lower_case)
+        self.menu.add_command(
+            label="Select All",
+            command=self.select_all,
+            image=self.sel_all_icon,
+        )
+        self.menu.add_command(label="Select Line", command=self.sel_line)
+        self.menu.add_command(label="Select Word", command=self.sel_word)
+        self.menu.add_command(label="Select Prev Word", command=self.sel_word_left)
+        self.menu.add_command(label="Select Next Word", command=self.sel_word_right)
+        self.menu.add_command(label="Delete Word", command=self.del_word)
+        self.menu.add_command(label="Delete Prev Word", command=self.del_word_left)
+        self.menu.add_command(label="Delete Next Word", command=self.del_word_right)
+        self.menu.add_command(label="Move line up", command=self.mv_line_up)
+        self.menu.add_command(label="Move line down", command=self.mv_line_dn)
 
     def bind_events(self):
         text = self.text
@@ -416,24 +504,6 @@ class TextOpts:
             return "break"
         currtext.mark_set("insert", "insert -1c")
         self.key()
-    
-    def biggerview(self):
-        currtext = self.text
-        if not currtext.tag_ranges("sel"):
-            return
-        selected_text = currtext.get("sel.first -1c linestart", "sel.last lineend")
-        win = tk.Toplevel()
-        win.resizable(0, 0)
-        win.transient(".")
-        textframe = EnhancedTextFrame(win)
-        textframe.set_first_line(1)
-        textframe.text.insert("insert", selected_text)
-        textframe.text["state"] = "disabled"
-        textframe.text.lexer = currtext.lexer
-        textframe.pack(fill="both", expand=1)
-        create_tags(textframe.text)
-        recolorize(textframe.text)
-        win.mainloop()
 
     def autoindent(self, _=None) -> str:
         """Auto-indents the next line"""
@@ -473,6 +543,47 @@ class TextOpts:
             self.key()
         except Exception:
             return
+    
+    
+    def copy(self) -> None:
+        try:
+            sel = self.tabs[self.get_tab()].textbox.get(tk.SEL_FIRST, tk.SEL_LAST)
+            self.tabs[self.get_tab()].textbox.clipboard_clear()
+            self.tabs[self.get_tab()].textbox.clipboard_append(sel)
+        except tk.TclError:
+            pass
+
+    def delete(self) -> None:
+        self.tabs[self.get_tab()].textbox.delete(tk.SEL_FIRST, tk.SEL_LAST)
+        self.key()
+
+    def cut(self) -> None:
+        try:
+            self.copy()
+            self.delete()
+            self.key()
+        except tk.TclError:
+            pass
+
+    def paste(self) -> None:
+        try:
+            clipboard = self.tabs[self.get_tab()].textbox.clipboard_get()
+            if clipboard:
+                self.tabs[self.get_tab()].textbox.insert(
+                    "insert", clipboard.replace("\t", " " * self.tabwidth)
+                )
+            self.key()
+        except Exception:
+            pass
+
+    def select_all(self) -> None:
+        try:
+            curr_tab = self.get_tab()
+            self.tabs[curr_tab].textbox.tag_add('sel', "1.0", 'end')
+            self.tabs[curr_tab].textbox.mark_set("insert", "end")
+            self.tabs[curr_tab].textbox.see("insert")
+        except tk.TclError:
+            pass
     
     def nav_1cf(self) -> None:
         currtext = self.text

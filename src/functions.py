@@ -70,7 +70,7 @@ def is_valid_name(name):
     return name.isidentifier() and not iskeyword(name)
 
 
-def download_file(url, localfile=None) -> str:
+def download_file(url, localfile='') -> str:
     """Downloads a file from remote path"""
     local_filename = url.split("/")[-1] if not localfile else localfile
     # NOTE the stream=True parameter below
@@ -181,6 +181,8 @@ def _run_in_terminal_in_linux(cmd, cwd, env, keep_open):
         return subprocess.list2cmdline([s])
 
     term_cmd = _get_linux_terminal_command()
+    if not term_cmd:
+        return
 
     if isinstance(cmd, list):
         cmd = " ".join(map(_shellquote, cmd))
@@ -318,6 +320,7 @@ def _get_linux_terminal_command():
         return "xterm"
     else:
         ErrorInfoDialog(text="Terminal emulator cannot be detected.")
+        return
 
 
 def _normalize_path(s):

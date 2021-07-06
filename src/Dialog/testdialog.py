@@ -1,7 +1,6 @@
 from src.Dialog.commondialog import InputStringDialog, YesNoDialog
 from src.modules import os, tk, ttk, json, lexers
 from src.tktext import EnhancedTextFrame, TextOpts
-from src.highlighter import create_tags, recolorize
 from src.functions import is_valid_name, run_in_terminal
 from src.constants import APPDIR
 from src.settings import RunCommand
@@ -71,13 +70,6 @@ class TestDialog(ttk.Frame):
                 return json.load(f)
         except (ValueError, FileNotFoundError):
             return {}
-
-    def refresh_tests(self):
-        self.tests_listbox.delete(*self.tests_listbox.get_children())
-        self.method_list = self.read_test()
-        self.write_test()
-        for test in self.method_list.keys():
-            self.tests_listbox.insert("", "end", text=test)
 
     def write_settings(self):
         try:

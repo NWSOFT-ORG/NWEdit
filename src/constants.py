@@ -4,7 +4,7 @@ from src.modules import Path, logging, sys, tk, os
 WINDOWS = bool(sys.platform.startswith("win"))
 OSX = bool(sys.platform.startswith("darwin"))
 APPDIR = str(Path(__file__).parent)
-VERSION = "6.0-DEV"
+VERSION = "6.0"
 RUN_BATCH = (
     """#!/bin/bash
 set +v

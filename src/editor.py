@@ -28,7 +28,7 @@ from src.constants import (
 )
 from src.customenotebook import ClosableNotebook
 from src.Dialog.commondialog import (ErrorInfoDialog, InputStringDialog,
-                         YesNoDialog, AboutDialog)
+                                     YesNoDialog, AboutDialog)
 from src.Dialog.codelistdialog import CodeListDialog
 from src.Dialog.debugdialog import (ErrorReportDialog, LogViewDialog)
 from src.Dialog.filedialog import FileOpenDialog, FileSaveAsDialog
@@ -43,7 +43,7 @@ from src.Dialog.autocomplete import CompleteDialog
 from src.Dialog.goto import Navigate
 from src.hexview import HexView
 from src.highlighter import create_tags, recolorize
-from src.Menu.menubar import Menubar, MenuItem, Menu
+from src.Menu.menubar import Menubar, MenuItem
 from src.modules import (
     Path,
     lexers,
@@ -101,14 +101,13 @@ class Editor:
             self.cmd_settings_class = RunCommand()
             self.format_settings_class = FormatCommand()
             self.commet_settings_class = CommentMarker()
+            self.master = master
             self.opts = TextOpts(keyaction=self.key)
-            self.opts.override_master_functions(self)
 
             self.theme = self.settings_class.get_settings("theme")
             self.tabwidth = self.settings_class.get_settings("tab")
             logger.debug("Settings loaded")
 
-            self.master = master
             # self.master.geometry("1200x800")
             self.style = ttkthemes.ThemedStyle(self.master)
             self.style.set_theme(self.theme)
@@ -182,18 +181,6 @@ class Editor:
 
             self.create_menu()
 
-            self.right_click_menu = Menu(self.master)
-            self.right_click_menu.add_command(label="Undo", command=self.undo)
-            self.right_click_menu.add_command(label="Redo", command=self.redo)
-            self.right_click_menu.add_command(label="Cut", command=self.cut)
-            self.right_click_menu.add_command(label="Copy", command=self.copy)
-            self.right_click_menu.add_command(label="Paste", command=self.paste)
-            self.right_click_menu.add_command(label="Delete", command=self.delete)
-            self.right_click_menu.add_command(
-                label="Select All", command=self.select_all
-            )
-            logger.debug("Right-click menu created")
-
             # Keyboard bindings
             self.master.bind(f"<{MAIN_KEY}-w>", self.close_tab)
             self.master.bind(f"<{MAIN_KEY}-o>", self._open)
@@ -223,43 +210,11 @@ class Editor:
 
     def create_menu(self) -> None:
         self.appmenu = MenuItem()
-
         self.appmenu.add_command(label="About PyPlus", command=self._version)
-        self.appmenu.add_command(
-            label="General Settings",
-            command=lambda: self.open_file(
-                APPDIR + "/Settings/general-settings" ".json"
-            ),
-        )
-        self.appmenu.add_command(
-            label="Format Command Settings",
-            command=lambda: self.open_file(
-                APPDIR + "/Settings/format-settings" ".json"
-            ),
-        )
-        self.appmenu.add_command(
-            label="Lexer Settings",
-            command=lambda: self.open_file(APPDIR + "/Settings/lexer-settings" ".json"),
-        )
-        self.appmenu.add_command(
-            label="Linter Settings",
-            command=lambda: self.open_file(
-                APPDIR + "/Settings/linter-settings" ".json"
-            ),
-        )
-        self.appmenu.add_command(
-            label="Run Command Settings",
-            command=lambda: self.open_file(APPDIR + "/Settings/cmd-settings" ".json"),
-        )
-        self.appmenu.add_command(
-            label="Backup Settings to...", command=self.settings_class.zipsettings
-        )
-        self.appmenu.add_command(
-            label="Load Settings from...", command=self.settings_class.unzipsettings
-        )
+        self.appmenu.merge(self.settings_class.create_menu(self.open_file))
+        self.appmenu.add_command(label='View log', command=self.view_log)
         self.appmenu.add_command(label="Exit Editor", command=self.exit)
         self.appmenu.add_command(label="Restart app", command=self.restart)
-        self.appmenu.add_command(label='View log', command=self.view_log)
 
         self.filemenu = MenuItem()
         self.filemenu.add_command(
@@ -292,6 +247,11 @@ class Editor:
             command=self.reload,
             image=self.reload_icon,
         )
+
+        menu = self.opts.create_menu(self.master)
+        print(menu)
+        self.editmenu = menu[0]
+        self.right_click_menu = menu[1]
 
         self.codemenu = MenuItem()
         self.codemenu.add_command(
@@ -343,10 +303,6 @@ class Editor:
 
         self.navmenu = MenuItem()
         self.navmenu.add_command(label="Go to ...", command=self.goto)
-        self.navmenu.add_command(label="-1 char", command=self.nav_1cb)
-        self.navmenu.add_command(label="+1 char", command=self.nav_1cf)
-        self.navmenu.add_command(label="Word end", command=self.nav_wordend)
-        self.navmenu.add_command(label="Word start", command=self.nav_wordstart)
 
         self.gitmenu = MenuItem()
         self.gitmenu.add_command(label="Initialize", command=lambda: self.git("init"))
@@ -354,15 +310,15 @@ class Editor:
 
         self.menubar.add_cascade(label="PyPlus", menu=self.appmenu)  # App menu
         self.menubar.add_cascade(label="File", menu=self.filemenu)
-        self.menubar.add_cascade(label="Edit", menu=self.opts.menu)
+        self.menubar.add_cascade(label="Edit", menu=self.editmenu)
         self.menubar.add_cascade(label="Code", menu=self.codemenu)
         self.menubar.add_cascade(label="View", menu=self.viewmenu)
         self.menubar.add_cascade(label="Navigate", menu=self.navmenu)
         self.menubar.add_cascade(label="Git", menu=self.gitmenu)
+        logger.debug("Menu created")
         if OSX:
             menu = tk.Menu(self.master)
             self.master.config(menu=menu)
-        logger.debug("Menu created")
 
     def start_screen(self) -> None:
         first_tab = tk.Canvas(self.nb, background=self.bg, highlightthickness=0)
@@ -532,7 +488,7 @@ class Editor:
     def openhex(self):
         return self.open_hex()
 
-    def open_file(self, file: str = "", askhex: bool = True) -> None:
+    def open_file(self, file: str = "", askhex: bool = True):
         """Opens a file
         If a file is not provided, a messagebox'll
         pop up to ask the user to select the path."""
@@ -714,7 +670,8 @@ class Editor:
         LogViewDialog()
 
     def right_click(self, event: tk.EventType) -> None:
-        self.right_click_menu.tk_popup(event.x_root, event.y_root)
+        if self.tabs:
+            self.right_click_menu.tk_popup(event.x_root, event.y_root)
 
     def close_tab(self, event=None) -> None:
         global selected_tab

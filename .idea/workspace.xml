@@ -1,27 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
-  </component>
   <component name="ChangeListManager">
-    <list default="true" id="c8e2b71d-00fa-4e94-82ff-bd292c61c58d" name="Default Changelist" comment="">
+    <list default="true" id="41ceca10-1b99-4687-beaa-18ef931ebff0" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/PyPlus.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/webResources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Default_Changelist]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Default_Changelist_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vs/PyPlus/v16/.suo" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vs/PyPlus/v16/TestStore/0/000.testlog" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vs/PyPlus/v16/TestStore/0/testlog.manifest" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vs/PythonSettings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vs/VSWorkspaceState.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vs/slnx.sqlite" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vs/tasks.vs.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/.ropeproject/config.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/.ropeproject/objectdb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/launch.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Backups/recent_dir.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backups/recent_dir.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backups/recent_files.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backups/recent_files.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Menu/menubar.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Menu/menubar.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/editor.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/editor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tktext.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tktext.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Python Script" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="RESET_MODE" value="SOFT" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -31,29 +44,26 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
-  <component name="ProjectId" id="1ucAfZVdaW97EceBfN0X3pgwk6t" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
-    <ConfirmationsSetting value="2" id="Add" />
-  </component>
+  <component name="ProjectId" id="1ut2kcvpJi7gfD8gxqHHLKoG5bO" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="copyright" />
+    <property name="settings.editor.selected.configurable" value="LogHighlighting" />
   </component>
   <component name="RunManager">
     <configuration name="PyPlus" type="PythonConfigurationType" factoryName="Python">
@@ -82,19 +92,15 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="c8e2b71d-00fa-4e94-82ff-bd292c61c58d" name="Default Changelist" comment="" />
-      <created>1624954611518</created>
+      <changelist id="41ceca10-1b99-4687-beaa-18ef931ebff0" name="Default Changelist" comment="" />
+      <created>1625470709147</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1624954611518</updated>
-      <workItem from="1624954616908" duration="266000" />
-      <workItem from="1624954908010" duration="116000" />
-      <workItem from="1625031589819" duration="5402000" />
-      <workItem from="1625211028862" duration="73000" />
-      <workItem from="1625213079123" duration="309000" />
-      <workItem from="1625213435671" duration="98000" />
-      <workItem from="1625213549499" duration="178000" />
-      <workItem from="1625213755533" duration="2838000" />
+      <updated>1625470709147</updated>
+      <workItem from="1625470712157" duration="895000" />
+      <workItem from="1625478820463" duration="97000" />
+      <workItem from="1625555065907" duration="5645000" />
+      <workItem from="1625635687089" duration="5359000" />
     </task>
     <servers />
   </component>
@@ -113,21 +119,33 @@
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
-  <component name="VcsManagerConfiguration">
-    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/editor.py</url>
-          <line>854</line>
-          <option name="timeStamp" value="2" />
+          <line>314</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/editor.py</url>
+          <line>313</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/editor.py</url>
+          <line>316</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/editor.py</url>
+          <line>315</line>
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/PyPlus$PyPlus.coverage" NAME="PyPlus Coverage Results" MODIFIED="1625216008790" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PyPlus$PyPlus.coverage" NAME="PyPlus Coverage Results" MODIFIED="1625641186770" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

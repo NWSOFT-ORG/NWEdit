@@ -1,3 +1,4 @@
+from src.Menu.menubar import MenuItem
 from src.constants import APPDIR
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog
@@ -6,7 +7,6 @@ from src.modules import EditorErr, Path, json, lexers, os, sys, zipfile
 
 class Settings:
     """A class to read data to/from general-settings.json"""
-
     def __init__(self):
         try:
             with open(os.path.join(APPDIR, "Settings/general-settings.json")) as f:
@@ -16,7 +16,6 @@ class Settings:
             self.tabwidth = self.settings["tabwidth"]
             self.font = self.settings["font"].split()[0]
             self.size = self.settings["font"].split()[1]
-            return
         except Exception:
             ErrorInfoDialog(text="Setings are corrupted.")
             sys.exit(1)
@@ -65,6 +64,42 @@ class Settings:
         if setting == "pygments":
             return self.highlight_theme
         raise EditorErr("The setting is not defined")
+
+    def create_menu(self, open_file):
+        menu = MenuItem()
+        menu.add_command(
+            label="General Settings",
+            command=lambda: open_file(
+                APPDIR + "/Settings/general-settings" ".json"
+            ),
+        )
+        menu.add_command(
+            label="Format Command Settings",
+            command=lambda: open_file(
+                APPDIR + "/Settings/format-settings" ".json"
+            ),
+        )
+        menu.add_command(
+            label="Lexer Settings",
+            command=lambda: open_file(APPDIR + "/Settings/lexer-settings" ".json"),
+        )
+        menu.add_command(
+            label="Linter Settings",
+            command=lambda: open_file(
+                APPDIR + "/Settings/linter-settings" ".json"
+            ),
+        )
+        menu.add_command(
+            label="Run Command Settings",
+            command=lambda: open_file(APPDIR + "/Settings/cmd-settings" ".json"),
+        )
+        menu.add_command(
+            label="Backup Settings to...", command=self.zipsettings
+        )
+        menu.add_command(
+            label="Load Settings from...", command=self.unzipsettings
+        )
+        return menu
 
 
 class ExtensionSettings:

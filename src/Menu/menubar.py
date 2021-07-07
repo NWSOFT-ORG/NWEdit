@@ -9,17 +9,17 @@ if WINDOWS:
     from ctypes import windll
     from win32api import GetMonitorInfo, MonitorFromPoint
 
+GWL_EXSTYLE = -20
+WS_EX_APPWINDOW = 0x00040000
+WS_EX_TOOLWINDOW = 0x00000080
 
-GWL_EXSTYLE=-20
-WS_EX_APPWINDOW=0x00040000
-WS_EX_TOOLWINDOW=0x00000080
 
 def set_appwindow(root):
     hwnd = windll.user32.GetParent(root.winfo_id())
     style = windll.user32.GetWindowLongPtrA(hwnd, GWL_EXSTYLE)
     style = style & ~WS_EX_TOOLWINDOW
     style = style | WS_EX_APPWINDOW
-    res = windll.user32.SetWindowLongPtrA(hwnd, GWL_EXSTYLE, style)
+    windll.user32.SetWindowLongPtrA(hwnd, GWL_EXSTYLE, style)
     # re-assert the new window style
     root.wm_withdraw()
     root.after(10, lambda: root.wm_deiconify())
@@ -38,6 +38,12 @@ class MenuItem:
         self.items.append(label)
         self.commands.append(command)
         self.images.append(image)
+
+    def merge(self, menu):
+        for index, item in enumerate(menu.items):
+            self.items.append(item)
+            self.commands.append(menu.commands[index])
+            self.images.append(menu.images[index])
 
 
 class Menu(ScrollableFrame):
@@ -88,9 +94,9 @@ class Menu(ScrollableFrame):
     def close_menu(self, event=None):
         print(1)
         if not (event.x_root in range(self.topwin.winfo_x(),
-                self.winfo_x() + self.topwin.winfo_width() + 1)
-            and event.y_root in range(self.topwin.winfo_y(),
-                             self.topwin.winfo_y() + self.topwin.winfo_height() + 1)):
+                                      self.winfo_x() + self.topwin.winfo_width() + 1)
+                and event.y_root in range(self.topwin.winfo_y(),
+                                          self.topwin.winfo_y() + self.topwin.winfo_height() + 1)):
             self.unpost()
 
     def unpost(self, _=None):
@@ -103,8 +109,8 @@ class Menu(ScrollableFrame):
 
 class Menubar(ttk.Frame):
     def __init__(
-        self,
-        master: tk.Tk,
+            self,
+            master: tk.Tk,
     ) -> None:
         super().__init__(master)
         self.pack(fill="x", side="top")
@@ -122,6 +128,9 @@ class Menubar(ttk.Frame):
         self.menus = []
         self.menu_opened = None
         if WINDOWS:
+            self.x_pos = self.master.winfo_rootx()
+            self.y_pos = self.master.winfo_rooty()
+            self.geometry = self.master.winfo_geometry()
             self.maximise_count = 0
             self.maximised = False
             self.style = ttkthemes.ThemedStyle(self.master)
@@ -161,11 +170,11 @@ class Menubar(ttk.Frame):
         close.pack(side='left')
         bind_events(close)
         close.bind('<1>', lambda _: self.master.destroy())
-        
+
         self.master.focus_set()
         self.master.after(10, lambda: set_appwindow(self.master))
         self.master.update_idletasks()
-    
+
     def frame_mapped(self, _=None):
         self.master.update_idletasks()
         self.master.overrideredirect(1)
@@ -192,7 +201,7 @@ class Menubar(ttk.Frame):
         self.master.update_idletasks()
         geometry = self.master.winfo_geometry()
         if not self.maximise_count % 2:
-            monitor_info = GetMonitorInfo(MonitorFromPoint((0,0)))
+            monitor_info = GetMonitorInfo(MonitorFromPoint((0, 0)))
             work_area = monitor_info.get("Work")
             self.master.geometry(f"{work_area[2]}x{work_area[3]}+0+0")
             self.maximised = True
@@ -206,10 +215,11 @@ class Menubar(ttk.Frame):
         self.master.withdraw()
         new = tk.Toplevel(self.master)
         new.iconify()
-        
+
         def focusin(_):
             new.destroy()
             self.master.deiconify()
+
         new.bind('<FocusIn>', focusin)
 
     def _search_command(self):
@@ -254,10 +264,10 @@ class Menubar(ttk.Frame):
                 if self.menu_opened.opened:
                     self.menu_opened.unpost()
                     click(event)
-            label_widget.state(('active', ))
+            label_widget.state(('active',))
 
         def leave(_):
-            label_widget.state(('!active', ))
+            label_widget.state(('!active',))
 
         label_widget.bind('<Leave>', leave)
         label_widget.bind('<Enter>', enter)

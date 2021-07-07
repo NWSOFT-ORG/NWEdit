@@ -5,8 +5,7 @@ from src.settings import Settings
 from src.functions import darken_color, is_dark_color, lighten_color
 from src.constants import MAIN_KEY, logger
 from src.highlighter import create_tags, recolorize
-from src.Menu.menubar import MenuItem
-import inspect
+from src.Menu.menubar import MenuItem, Menu
 
 
 class TextLineNumbers(tk.Canvas):
@@ -217,76 +216,89 @@ class TextOpts:
         self.text = text
         self.bind_events()
     
-    def override_master_functions(self, obj: object):
-        members = [x for x in inspect.getmembers(self) if callable(x[1]) and not x[0].startswith('__')]
-        for x in members:
-            if x[0] not in ('bind_events', 'tab', 'key', 'override_master_functions', 'set_text'):
-                exec(f'obj.{x[0]} = x[1]')
-        self.menu = MenuItem()
-        self.menu.add_command(
+    def create_menu(self, master):
+        menu = MenuItem()
+        menu.add_command(
             label="Undo",
             command=self.undo,
             image=self.undo_icon,
         )
-        self.menu.add_command(
+        menu.add_command(
             label="Redo",
             command=self.redo,
             image=self.redo_icon,
         )
-        self.menu.add_command(
+        menu.add_command(
             label="Cut",
             command=self.cut,
             image=self.cut_icon,
         )
-        self.menu.add_command(
+        menu.add_command(
             label="Copy",
             command=self.copy,
             image=self.copy_icon,
         )
-        self.menu.add_command(
+        menu.add_command(
             label="Paste",
             command=self.paste,
             image=self.paste_icon,
         )
-        self.menu.add_command(
+        menu.add_command(
             label="Delete Selected",
             image=self.delete_icon,
             command=self.delete,
         )
-        self.menu.add_command(
+        menu.add_command(
             label="Duplicate Line or Selected", command=self.duplicate_line
         )
-        self.menu.add_command(
+        menu.add_command(
             label="Indent",
             command=lambda: self.indent("indent"),
             image=self.indent_icon,
         )
-        self.menu.add_command(
+        menu.add_command(
             label="Unident",
             command=lambda: self.indent("unindent"),
             image=self.unindent_icon,
         )
-        self.menu.add_command(
+        menu.add_command(
             label="Comment/Uncomment Line or Selected", command=self.comment_lines
         )
-        self.menu.add_command(label="Join lines", command=self.join_lines)
-        self.menu.add_command(label="Swap case", command=self.swap_case)
-        self.menu.add_command(label="Upper case", command=self.upper_case)
-        self.menu.add_command(label="Lower case", command=self.lower_case)
-        self.menu.add_command(
+        menu.add_command(label="Join lines", command=self.join_lines)
+        menu.add_command(label="Swap case", command=self.swap_case)
+        menu.add_command(label="Upper case", command=self.upper_case)
+        menu.add_command(label="Lower case", command=self.lower_case)
+        menu.add_command(
             label="Select All",
             command=self.select_all,
             image=self.sel_all_icon,
         )
-        self.menu.add_command(label="Select Line", command=self.sel_line)
-        self.menu.add_command(label="Select Word", command=self.sel_word)
-        self.menu.add_command(label="Select Prev Word", command=self.sel_word_left)
-        self.menu.add_command(label="Select Next Word", command=self.sel_word_right)
-        self.menu.add_command(label="Delete Word", command=self.del_word)
-        self.menu.add_command(label="Delete Prev Word", command=self.del_word_left)
-        self.menu.add_command(label="Delete Next Word", command=self.del_word_right)
-        self.menu.add_command(label="Move line up", command=self.mv_line_up)
-        self.menu.add_command(label="Move line down", command=self.mv_line_dn)
+        menu.add_command(label="Select Line", command=self.sel_line)
+        menu.add_command(label="Select Word", command=self.sel_word)
+        menu.add_command(label="Select Prev Word", command=self.sel_word_left)
+        menu.add_command(label="Select Next Word", command=self.sel_word_right)
+        menu.add_command(label="Delete Word", command=self.del_word)
+        menu.add_command(label="Delete Prev Word", command=self.del_word_left)
+        menu.add_command(label="Delete Next Word", command=self.del_word_right)
+        menu.add_command(label="-1 char", command=self.nav_1cb)
+        menu.add_command(label="+1 char", command=self.nav_1cf)
+        menu.add_command(label="Word end", command=self.nav_wordend)
+        menu.add_command(label="Word start", command=self.nav_wordstart)
+        menu.add_command(label="Move line up", command=self.mv_line_up)
+        menu.add_command(label="Move line down", command=self.mv_line_dn)
+
+        right_click_menu = Menu(master)
+        right_click_menu.add_command(label="Undo", command=self.undo)
+        right_click_menu.add_command(label="Redo", command=self.redo)
+        right_click_menu.add_command(label="Cut", command=self.cut)
+        right_click_menu.add_command(label="Copy", command=self.copy)
+        right_click_menu.add_command(label="Paste", command=self.paste)
+        right_click_menu.add_command(label="Delete", command=self.delete)
+        right_click_menu.add_command(
+            label="Select All", command=self.select_all
+        )
+        logger.debug("Right-click menu created")
+        return [menu, right_click_menu]
 
     def bind_events(self):
         text = self.text
@@ -544,17 +556,16 @@ class TextOpts:
         except Exception:
             return
     
-    
     def copy(self) -> None:
         try:
-            sel = self.tabs[self.get_tab()].textbox.get(tk.SEL_FIRST, tk.SEL_LAST)
-            self.tabs[self.get_tab()].textbox.clipboard_clear()
-            self.tabs[self.get_tab()].textbox.clipboard_append(sel)
+            sel = self.text.get(tk.SEL_FIRST, tk.SEL_LAST)
+            self.text.clipboard_clear()
+            self.text.clipboard_append(sel)
         except tk.TclError:
             pass
 
     def delete(self) -> None:
-        self.tabs[self.get_tab()].textbox.delete(tk.SEL_FIRST, tk.SEL_LAST)
+        self.text.delete(tk.SEL_FIRST, tk.SEL_LAST)
         self.key()
 
     def cut(self) -> None:
@@ -567,9 +578,9 @@ class TextOpts:
 
     def paste(self) -> None:
         try:
-            clipboard = self.tabs[self.get_tab()].textbox.clipboard_get()
+            clipboard = self.text.clipboard_get()
             if clipboard:
-                self.tabs[self.get_tab()].textbox.insert(
+                self.text.insert(
                     "insert", clipboard.replace("\t", " " * self.tabwidth)
                 )
             self.key()
@@ -578,10 +589,9 @@ class TextOpts:
 
     def select_all(self) -> None:
         try:
-            curr_tab = self.get_tab()
-            self.tabs[curr_tab].textbox.tag_add('sel', "1.0", 'end')
-            self.tabs[curr_tab].textbox.mark_set("insert", "end")
-            self.tabs[curr_tab].textbox.see("insert")
+            self.text.tag_add('sel', "1.0", 'end')
+            self.text.mark_set("insert", "end")
+            self.text.see("insert")
         except tk.TclError:
             pass
     

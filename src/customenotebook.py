@@ -44,15 +44,17 @@ class ClosableNotebook(ttk.Notebook):
 
         self.bind("<ButtonPress-1>", self.on_close_press, True)
         self.bind("<ButtonRelease-1>", self.on_close_release)
+        self.bind("<B1-Motion>", self)
 
         tab_frame = ttk.Frame(self)
         tab_frame.place(relx=1.0, x=0, y=1, anchor='ne')
+        self.pack(expand=1, fill="both")
 
         def show_tab_menu(event):
             tab_menu = Menu(self.master)
             for tab in self.tabs():
                 tab_menu.add_command(label=self.tab(tab, option="text"),
-                                     command= lambda temp=tab: self.select(temp))
+                                     command=lambda temp=tab: self.select(temp))
             tab_menu.tk_popup(event.x_root, event.y_root)
         
         def prevtab(_=None):
@@ -90,7 +92,6 @@ class ClosableNotebook(ttk.Notebook):
         bind_events(prev_tab_label)
         bind_events(next_tab_label)
         bind_events(allitems_label)
-
 
     def on_close_press(self, event):
         """Called when the button is pressed over the close button"""
@@ -172,3 +173,17 @@ class ClosableNotebook(ttk.Notebook):
             ],
         )
         logger.debug("Initialized custom style.")
+
+    def move_tab(self, event: tk.EventType) -> None:
+        if self.index("end") > 1:
+            y = self.get_tab().winfo_y() - 5
+
+            try:
+                self.insert(
+                    event.widget.index("@%d,%d" % (event.x, y)), self.select()
+                )
+            except tk.TclError:
+                return
+
+    def get_tab(self):
+        return self.nametowidget(self.select())

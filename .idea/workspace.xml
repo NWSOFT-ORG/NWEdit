@@ -1,32 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="41ceca10-1b99-4687-beaa-18ef931ebff0" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/PyPlus.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/webResources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Default_Changelist]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Default_Changelist_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="41ceca10-1b99-4687-beaa-18ef931ebff0" name="Default Changelist" comment="Fixed the problem that not running on mac now.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/PyPlus/v16/.suo" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/PyPlus/v16/TestStore/0/000.testlog" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/PyPlus/v16/TestStore/0/testlog.manifest" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/PythonSettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/VSWorkspaceState.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/slnx.sqlite" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vs/tasks.vs.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/.ropeproject/config.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/.ropeproject/objectdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/launch.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Backups/recent_dir.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backups/recent_dir.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Backups/recent_files.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backups/recent_files.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Menu/menubar.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Menu/menubar.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/customenotebook.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/customenotebook.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/editor.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/editor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tktext.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tktext.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,12 +22,14 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
+  <component name="ProblemsViewState">
+    <option name="sortByName" value="true" />
+  </component>
   <component name="ProjectId" id="1ut2kcvpJi7gfD8gxqHHLKoG5bO" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
-    <option name="showMembers" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
@@ -63,9 +43,9 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="LogHighlighting" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.PyPlus">
     <configuration name="PyPlus" type="PythonConfigurationType" factoryName="Python">
       <module name="PyPlus" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -88,6 +68,33 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="editor" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="PyPlus" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/editor.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.editor" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -100,8 +107,29 @@
       <workItem from="1625470712157" duration="895000" />
       <workItem from="1625478820463" duration="97000" />
       <workItem from="1625555065907" duration="5645000" />
-      <workItem from="1625635687089" duration="5359000" />
+      <workItem from="1625635687089" duration="5464000" />
+      <workItem from="1625728024444" duration="249000" />
+      <workItem from="1625728292916" duration="19000" />
+      <workItem from="1625728331953" duration="40000" />
+      <workItem from="1625728393195" duration="160000" />
+      <workItem from="1625728585484" duration="1216000" />
+      <workItem from="1625815992995" duration="313000" />
+      <workItem from="1625816327121" duration="166000" />
+      <workItem from="1625816518178" duration="1047000" />
+      <workItem from="1625817586005" duration="112000" />
+      <workItem from="1625818303181" duration="32000" />
+      <workItem from="1625818352580" duration="18000" />
+      <workItem from="1625818389592" duration="605000" />
+      <workItem from="1625820097299" duration="907000" />
     </task>
+    <task id="LOCAL-00001" summary="Fixed the problem that not running on mac now.">
+      <created>1625648185032</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1625648185032</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -119,33 +147,28 @@
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Fixed the problem that not running on mac now." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed the problem that not running on mac now." />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/editor.py</url>
-          <line>314</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/editor.py</url>
-          <line>313</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/editor.py</url>
-          <line>316</line>
+          <line>303</line>
           <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/editor.py</url>
-          <line>315</line>
-          <option name="timeStamp" value="9" />
+          <line>174</line>
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/PyPlus$PyPlus.coverage" NAME="PyPlus Coverage Results" MODIFIED="1625641186770" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PyPlus$PyPlus.coverage" NAME="PyPlus Coverage Results" MODIFIED="1625821466317" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PyPlus$editor.coverage" NAME="editor Coverage Results" MODIFIED="1625821429910" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>

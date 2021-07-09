@@ -159,20 +159,13 @@ class Editor:
 
             self.tabs = {}
 
-            self.master.protocol(
-                "WM_DELETE_WINDOW", lambda: self.exit(force=False)
-            )  # When the window is closed, or quit from Mac, do exit action
-            self.master.createcommand("::tk::mac::Quit", self.exit)
-
             self.menubar = Menubar(self.master)
             self.panedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.panedwin.pack(fill="both", expand=1)
             mainframe = ttk.Frame(self.master)
             mainframe.pack(fill='both', expand=1)
             self.nb = ClosableNotebook(mainframe, self.close_tab)
-            self.nb.bind("<B1-Motion>", self.move_tab)
             self.nb.bind("<1>", self.click_tab)
-            self.nb.pack(expand=1, fill="both")
             self.filetree = FileTree(self.master, self.open_file)
             self.panedwin.add(self.filetree)
             self.panedwin.add(mainframe)
@@ -180,33 +173,29 @@ class Editor:
             self.statusbar = Statusbar()
 
             self.create_menu()
-
-            # Keyboard bindings
-            self.master.bind(f"<{MAIN_KEY}-w>", self.close_tab)
-            self.master.bind(f"<{MAIN_KEY}-o>", self._open)
-            logger.debug("Bindings created")
-
-            self.master.bind("<<MouseEvent>>", self.mouse)
-            self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
-            self.master.focus_set()
-            self.update_title()
-            self.update_statusbar()
-            with open("Backups/recent_files.txt") as f:
-                for line in f.read().split("\n"):
-                    if line:
-                        self.open_file(line, askhex=False)
-                if not f.read():
-                    self.start_screen()
-            with open("Backups/recent_dir.txt") as f:
-                self.filetree.path = f.read()
-                self.filetree.init_ui()
+            self.create_bindings()
+            self.reopen_files()
         except Exception:
             logger.exception("Error when initializing:")
             ErrorReportDialog('Error when starting.', traceback.format_exc())
             self.restart()
     
     def click_tab(self, _=None):
-        self.opts.set_text(self.tabs[self.get_tab()].textbox)
+        self.opts.set_text(self.tabs[self.nb.get_tab()].textbox)
+
+    def create_bindings(self):
+        # Keyboard bindings
+        self.master.bind(f"<{MAIN_KEY}-w>", self.close_tab)
+        self.master.bind(f"<{MAIN_KEY}-o>", self._open)
+        # Mouse bindings
+        self.master.bind("<<MouseEvent>>", self.mouse)
+        self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
+
+        self.master.protocol(
+            "WM_DELETE_WINDOW", lambda: self.exit(force=True)
+        )  # When the window is closed, or quit from Mac, do exit action
+        self.master.createcommand("::tk::mac::Quit", self.exit)
+        logger.debug("Bindings created")
 
     def create_menu(self) -> None:
         self.appmenu = MenuItem()
@@ -412,7 +401,7 @@ class Editor:
                 self.master.title("PyPlus -- No file open")
                 logger.debug("update_title: No file open")
                 return "break"
-            self.master.title(f"PyPlus -- {self.tabs[self.get_tab()].file_dir}")
+            self.master.title(f"PyPlus -- {self.tabs[self.nb.get_tab()].file_dir}")
             logger.debug("update_title: OK")
             return "break"
         except Exception:
@@ -426,11 +415,11 @@ class Editor:
                 self.statusbar.label3.config(text="")
                 logger.debug("update_statusbar: No file open")
                 return "break"
-            currtext = self.tabs[self.get_tab()].textbox
+            currtext = self.tabs[self.nb.get_tab()].textbox
             index = currtext.index("insert")
             ln = index.split(".")[0]
             col = index.split(".")[1]
-            self.statusbar.label2.config(text=f"{self.tabs[self.get_tab()].file_dir}")
+            self.statusbar.label2.config(text=f"{self.tabs[self.nb.get_tab()].file_dir}")
             self.statusbar.label3.config(text=f"Line {ln} Col {col}")
             logger.debug("update_statusbar: OK")
             return "break"
@@ -440,7 +429,7 @@ class Editor:
     def key(self, _=None) -> None:
         """Event when a key is pressed."""
         try:
-            currtext = self.tabs[self.get_tab()].textbox
+            currtext = self.tabs[self.nb.get_tab()].textbox
             recolorize(currtext)
             currtext.edit_separator()
             currtext.see("insert")
@@ -465,6 +454,19 @@ class Editor:
         except KeyError:
             self.master.bell()
             logger.exception("Error when handling mouse event:")
+
+    def reopen_files(self):
+        with open("Backups/recent_files.txt") as f:
+            for line in f.read().split("\n"):
+                if line:
+                    self.open_file(line, askhex=False)
+            if not f.read():
+                self.start_screen()
+        with open("Backups/recent_dir.txt") as f:
+            self.filetree.path = f.read()
+            self.filetree.init_ui()
+        self.update_title()
+        self.update_statusbar()
 
     def open_hex(self, file=""):
         if file:
@@ -510,9 +512,9 @@ class Editor:
                         if dialog.result:
                             self.open_hex(file_dir)
                         logging.info("User pressed No.")
-                        return self.tabs[self.get_tab()].textbox
+                        return self.tabs[self.nb.get_tab()].textbox
                     self.open_hex(file_dir)
-                    return self.tabs[self.get_tab()].textbox
+                    return self.tabs[self.nb.get_tab()].textbox
 
                 file = open(file_dir)
                 extens = file_dir.split(".")[-1]
@@ -556,7 +558,7 @@ class Editor:
         return self.open_file()
 
     def search(self, _=None) -> None:
-        Search(self.master, self.tabs[self.get_tab()].textbox)
+        Search(self.master, self.tabs[self.nb.get_tab()].textbox)
 
     def save_as(self, file: str = None) -> None:
         """Save the document as a different name."""
@@ -566,7 +568,7 @@ class Editor:
             else:
                 FileSaveAsDialog(self.save_as)
                 return
-            curr_tab = self.get_tab()
+            curr_tab = self.nb.get_tab()
             if not file_dir:
                 return
 
@@ -583,7 +585,7 @@ class Editor:
     def save_file(self, _=None) -> None:
         """Save an *existing* file"""
         try:
-            curr_tab = self.get_tab()
+            curr_tab = self.nb.get_tab()
             if not os.path.exists(self.tabs[curr_tab].file_dir):
                 self.save_as()
                 return
@@ -608,8 +610,8 @@ class Editor:
                         (
                             RUN_BATCH.format(
                                 dir=APPDIR,
-                                file=self.tabs[self.get_tab()].file_dir,
-                                cmd=self.tabs[self.get_tab()].textbox.cmd,
+                                file=self.tabs[self.nb.get_tab()].file_dir,
+                                cmd=self.tabs[self.nb.get_tab()].textbox.cmd,
                             )
                         )
                     )
@@ -620,10 +622,10 @@ class Editor:
                         (
                             RUN_BATCH.format(
                                 dir=APPDIR,
-                                file=self.tabs[self.get_tab()].file_dir,
-                                cmd=self.tabs[self.get_tab()].textbox.cmd,
+                                file=self.tabs[self.nb.get_tab()].file_dir,
+                                cmd=self.tabs[self.nb.get_tab()].textbox.cmd,
                                 script_dir=Path(
-                                    self.tabs[self.get_tab()].file_dir
+                                    self.tabs[self.nb.get_tab()].file_dir
                                 ).parent,
                             )
                         )
@@ -637,7 +639,7 @@ class Editor:
         open_system_shell()
 
     def python_shell(self) -> None:
-        curr_tab = self.tabs[self.get_tab()].textbox.panedwin
+        curr_tab = self.tabs[self.nb.get_tab()].textbox.panedwin
         shell_frame = ttk.Frame(curr_tab)
         ttkthemes.ThemedStyle(shell_frame).set_theme(self.theme)
         main_window = Console(shell_frame, None, shell_frame.destroy)
@@ -655,8 +657,8 @@ class Editor:
     def codelist(self):
         if not self.tabs:
             return
-        file_dir = self.tabs[self.get_tab()].file_dir
-        text = self.tabs[self.get_tab()].textbox
+        file_dir = self.tabs[self.nb.get_tab()].file_dir
+        text = self.tabs[self.nb.get_tab()].textbox
         CodeListDialog(self.panedwin, text, file_dir)
         
     def show_filelist(self):
@@ -666,7 +668,8 @@ class Editor:
     def searchindir(self):
         SearchInDir(self.panedwin, self.filetree.path, self.open_file)
     
-    def view_log(self):
+    @staticmethod
+    def view_log():
         LogViewDialog()
 
     def right_click(self, event: tk.EventType) -> None:
@@ -680,7 +683,7 @@ class Editor:
                 # Close the current tab if close is selected from file menu, or
                 # keyboard shortcut.
                 if event is None or event.type == str(2):
-                    selected_tab = self.get_tab()
+                    selected_tab = self.nb.get_tab()
                 # Otherwise close the tab based on coordinates of center-click.
                 else:
                     try:
@@ -731,20 +734,6 @@ class Editor:
         self.__init__(newtk)
         newtk.mainloop()
 
-    def get_tab(self):
-        return self.nb.nametowidget(self.nb.select())
-
-    def move_tab(self, event: tk.EventType) -> None:
-        if self.nb.index("end") > 1:
-            y = self.get_tab().winfo_y() - 5
-
-            try:
-                self.nb.insert(
-                    event.widget.index("@%d,%d" % (event.x, y)), self.nb.select()
-                )
-            except tk.TclError:
-                return
-
     def _version(self) -> None:
         """Shows the version and related info of the editor."""
         AboutDialog(self.master)
@@ -753,13 +742,13 @@ class Editor:
         if not self.tabs:
             return
         try:
-            if self.tabs[self.get_tab()].textbox.lint_cmd:
-                currdir = self.tabs[self.get_tab()].file_dir
+            if self.tabs[self.nb.get_tab()].textbox.lint_cmd:
+                currdir = self.tabs[self.nb.get_tab()].file_dir
                 if WINDOWS:
                     with open("lint.bat", "w") as f:
                         f.write(
                             LINT_BATCH.format(
-                                cmd=self.tabs[self.get_tab()].textbox.lint_cmd
+                                cmd=self.tabs[self.nb.get_tab()].textbox.lint_cmd
                             )
                         )
                     subprocess.call(f'lint.bat "{currdir}"', shell=True)
@@ -768,7 +757,7 @@ class Editor:
                     with open("lint.sh", "w") as f:
                         f.write(
                             LINT_BATCH.format(
-                                cmd=self.tabs[self.get_tab()].textbox.lint_cmd
+                                cmd=self.tabs[self.nb.get_tab()].textbox.lint_cmd
                             )
                         )
                     subprocess.call(
@@ -784,8 +773,8 @@ class Editor:
     def autopep(self) -> None:
         """Auto Pretty-Format the document"""
         try:
-            currtext = self.tabs[self.get_tab()].textbox
-            currdir = self.tabs[self.get_tab()].file_dir
+            currtext = self.tabs[self.nb.get_tab()].textbox
+            currdir = self.tabs[self.nb.get_tab()].file_dir
             if currtext.format_command:
                 subprocess.Popen(
                     f'{currtext.format_command} "{currdir}" > {os.devnull}', shell=True
@@ -800,7 +789,7 @@ class Editor:
     def goto(self, _=None) -> None:
         if not self.tabs:
             return
-        Navigate(self.tabs[self.get_tab()].textbox)
+        Navigate(self.tabs[self.nb.get_tab()].textbox)
 
     def test(self):
         TestDialog(self.panedwin, self.filetree.path)

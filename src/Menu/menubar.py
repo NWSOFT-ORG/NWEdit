@@ -1,6 +1,7 @@
 from src.modules import tk, ttk, ttkthemes
 from src.statusbar import bind_events
 from src.Menu.yscrolledframe import ScrollableFrame
+from src.Menu.menuitem import MenuItem
 from src.constants import WINDOWS
 from src.functions import is_dark_color
 from src.Dialog.commondialog import get_theme
@@ -23,27 +24,6 @@ def set_appwindow(root):
     # re-assert the new window style
     root.wm_withdraw()
     root.after(10, lambda: root.wm_deiconify())
-
-
-class MenuItem:
-    def __init__(self) -> None:
-        self.items = []
-        self.commands = []
-        self.images = []
-
-    def add_command(self,
-                    label: str = None,
-                    command: callable = None,
-                    image: tk.PhotoImage = None) -> None:
-        self.items.append(label)
-        self.commands.append(command)
-        self.images.append(image)
-
-    def merge(self, menu):
-        for index, item in enumerate(menu.items):
-            self.items.append(item)
-            self.commands.append(menu.commands[index])
-            self.images.append(menu.images[index])
 
 
 class Menu(ScrollableFrame):

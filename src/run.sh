@@ -1,10 +1,10 @@
 #!/bin/bash
 set +v
-cd "/home/runner/PyPlus/src"
+cd "/home/runner"
 python3 /home/runner/PyPlus/src/measure.py start
 printf "================================================
 "
-python3 "/home/runner/PyPlus/src/console.py"
+bash "/home/runner/.bashrc"
 printf "================================================
 "
 echo Program Finished With Exit Code $?

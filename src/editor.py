@@ -16,14 +16,10 @@
 Also, it's cross-compatible!
 """
 import traceback
-from src.console import Console
 from src.constants import (
     APPDIR,
-    LINT_BATCH,
     MAIN_KEY,
     OSX,
-    RUN_BATCH,
-    WINDOWS,
     logger,
 )
 from src.customenotebook import ClosableNotebook
@@ -34,19 +30,17 @@ from src.Dialog.debugdialog import (ErrorReportDialog, LogViewDialog)
 from src.Dialog.filedialog import FileOpenDialog, FileSaveAsDialog
 from src.functions import (
     is_binary_string,
-    is_dark_color,
-    open_system_shell,
-    run_in_terminal,
+    is_dark_color
 )
-
+from src.codefunctions import CodeFunctions
 from src.Dialog.autocomplete import CompleteDialog
 from src.Dialog.goto import Navigate
 from src.hexview import HexView
-from src.highlighter import create_tags, recolorize
-from src.Menu.menubar import Menubar, MenuItem
+from src.highlighter import recolorize
+from src.Menu.menubar import Menubar
+from src.Menu.menuitem import MenuItem
 from src.modules import (
     Path,
-    lexers,
     logging,
     os,
     subprocess,
@@ -55,7 +49,6 @@ from src.modules import (
     ttk,
     ttkthemes,
 )
-from src.Dialog.search import Search
 from src.settings import (
     CommentMarker,
     FormatCommand,
@@ -115,43 +108,14 @@ class Editor:
             self.fg = self.style.lookup("TLabel", "foreground")
             if is_dark_color(self.bg):
                 self.close_icon = tk.PhotoImage(file="Images/close.gif")
-                self.lint_icon = tk.PhotoImage(file="Images/lint-light.gif")
-                self.search_icon = tk.PhotoImage(file="Images/search-light.gif")
-                self.pyterm_icon = tk.PhotoImage(file="Images/py-term-light.gif")
-                self.term_icon = tk.PhotoImage(file="Images/term-light.gif")
-                self.format_icon = tk.PhotoImage(file="Images/format-light.gif")
             else:
                 self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
-                self.lint_icon = tk.PhotoImage(file="Images/lint.gif")
-                self.search_icon = tk.PhotoImage(file="Images/search.gif")
-                self.pyterm_icon = tk.PhotoImage(file="Images/py-term.gif")
-                self.term_icon = tk.PhotoImage(file="Images/term.gif")
-                self.format_icon = tk.PhotoImage(file="Images/format.gif")
 
             self.new_icon = tk.PhotoImage(file="Images/new.gif")
             self.open_icon = tk.PhotoImage(file="Images/open-16px.gif")
             self.reload_icon = tk.PhotoImage(file="Images/reload.gif")
-            self.run_icon = tk.PhotoImage(file="Images/run-16px.gif")
             self.save_as_icon = tk.PhotoImage(file="Images/saveas-16px.gif")
             logger.debug("Icons loaded")
-            if OSX:
-                PyTouchBar.prepare_tk_windows(self.master)
-                open_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/open.gif", action=self._open
-                )
-                save_as_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/saveas.gif", action=self.save_as
-                )
-                close_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/close.gif", action=self.close_tab
-                )
-                space = PyTouchBar.TouchBarItems.Space.Flexible()
-                run_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/run.gif", action=self.run
-                )
-                PyTouchBar.set_touchbar(
-                    [open_button, save_as_button, close_button, space, run_button]
-                )
             self.icon = tk.PhotoImage(file="Images/pyplus.gif")
             self.master.iconphoto(True, self.icon)
             # Base64 image, this probably decreases the repo size.
@@ -171,7 +135,27 @@ class Editor:
             self.panedwin.add(mainframe)
             self.nb.enable_traversal()
             self.statusbar = Statusbar()
+            
+            self.codefuncs = CodeFunctions(self.master, self.tabs, self.nb)
 
+            if OSX:
+                PyTouchBar.prepare_tk_windows(self.master)
+                open_button = PyTouchBar.TouchBarItems.Button(
+                    image="Images/open.gif", action=self._open
+                )
+                save_as_button = PyTouchBar.TouchBarItems.Button(
+                    image="Images/saveas.gif", action=self.save_as
+                )
+                close_button = PyTouchBar.TouchBarItems.Button(
+                    image="Images/close.gif", action=self.close_tab
+                )
+                space = PyTouchBar.TouchBarItems.Space.Flexible()
+                run_button = PyTouchBar.TouchBarItems.Button(
+                    image="Images/run.gif", action=self.codefuncs.run
+                )
+                PyTouchBar.set_touchbar(
+                    [open_button, save_as_button, close_button, space, run_button]
+                )
             self.create_menu()
             self.create_bindings()
             self.reopen_files()
@@ -238,47 +222,16 @@ class Editor:
         )
 
         menu = self.opts.create_menu(self.master)
-        print(menu)
         self.editmenu = menu[0]
         self.right_click_menu = menu[1]
 
-        self.codemenu = MenuItem()
-        self.codemenu.add_command(
-            label="Run",
-            command=self.run,
-            image=self.run_icon,
-        )
-        self.codemenu.add_command(
-            label="Lint",
-            command=self.lint_source,
-            image=self.lint_icon,
-        )
-        self.codemenu.add_command(
-            label="Auto-format",
-            command=self.autopep,
-            image=self.format_icon,
-        )
-        self.codemenu.add_command(
-            label="Open System Shell",
-            command=self.system_shell,
-            image=self.term_icon,
-        )
+        self.codemenu = self.codefuncs.create_menu()
 
         self.viewmenu = MenuItem()
         self.viewmenu.add_command(label="Show File Tree", command=self.show_filelist)
         self.viewmenu.add_command(
-            label="Python Shell",
-            command=self.python_shell,
-            image=self.pyterm_icon,
-        )
-        self.viewmenu.add_command(
             label="Unit tests",
             command=self.test,
-        )
-        self.viewmenu.add_command(
-            label="Find and replace",
-            command=self.search,
-            image=self.search_icon,
         )
         self.viewmenu.add_command(label="Git: Commit and Push...", command=lambda: self.git("commit"))
         self.viewmenu.add_command(
@@ -385,8 +338,8 @@ class Editor:
         textbox.complete = CompleteDialog(textframe, textbox)
         textbox.frame = frame  # The text will be packed into the frame.
         textbox.bind(("<Button-2>" if OSX else "<Button-3>"), self.right_click)
-        textbox.bind(f"<{MAIN_KEY}-b>", self.run)
-        textbox.bind(f"<{MAIN_KEY}-f>", self.search)
+        textbox.bind(f"<{MAIN_KEY}-b>", self.codefuncs.run)
+        textbox.bind(f"<{MAIN_KEY}-f>", self.codefuncs.search)
         textbox.bind(f"<{MAIN_KEY}-n>", self.filetree.new_file)
         textbox.bind(f"<{MAIN_KEY}-N>", self.goto)
         textbox.bind(f"<{MAIN_KEY}-r>", self.reload)
@@ -557,9 +510,6 @@ class Editor:
         """Prompt the user to open a file when C-O is pressed"""
         return self.open_file()
 
-    def search(self, _=None) -> None:
-        Search(self.master, self.tabs[self.nb.get_tab()].textbox)
-
     def save_as(self, file: str = None) -> None:
         """Save the document as a different name."""
         if self.tabs:
@@ -596,63 +546,6 @@ class Editor:
                 ErrorInfoDialog(self.master, "File read only")
         except Exception:
             pass
-
-    def run(self, _=None) -> None:
-        """Runs the file
-        Steps:
-        1) Writes run code into the batch file.
-        2) Linux only: uses chmod to make the sh execuable
-        3) Runs the run file"""
-        try:
-            if WINDOWS:  # Windows
-                with open(APPDIR + "/run.bat", "w") as f:
-                    f.write(
-                        (
-                            RUN_BATCH.format(
-                                dir=APPDIR,
-                                file=self.tabs[self.nb.get_tab()].file_dir,
-                                cmd=self.tabs[self.nb.get_tab()].textbox.cmd,
-                            )
-                        )
-                    )
-                run_in_terminal("run.bat && del run.bat && exit", cwd=APPDIR)
-            else:  # Others
-                with open(APPDIR + "/run.sh", "w") as f:
-                    f.write(
-                        (
-                            RUN_BATCH.format(
-                                dir=APPDIR,
-                                file=self.tabs[self.nb.get_tab()].file_dir,
-                                cmd=self.tabs[self.nb.get_tab()].textbox.cmd,
-                                script_dir=Path(
-                                    self.tabs[self.nb.get_tab()].file_dir
-                                ).parent,
-                            )
-                        )
-                    )
-                run_in_terminal("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
-        except Exception:
-            ErrorInfoDialog(self.master, "This language is not supported.")
-
-    @staticmethod
-    def system_shell() -> None:
-        open_system_shell()
-
-    def python_shell(self) -> None:
-        curr_tab = self.tabs[self.nb.get_tab()].textbox.panedwin
-        shell_frame = ttk.Frame(curr_tab)
-        ttkthemes.ThemedStyle(shell_frame).set_theme(self.theme)
-        main_window = Console(shell_frame, None, shell_frame.destroy)
-        main_window.text.lexer = lexers.get_lexer_by_name("pycon")
-        main_window.text.focus_set()
-        create_tags(main_window.text)
-        recolorize(main_window.text)
-        main_window.text.bind(
-            "<KeyRelease>", lambda _=None: recolorize(main_window.text)
-        )
-        main_window.pack(fill="both", expand=1)
-        shell_frame.pack(fill='both', expand=1)
-        curr_tab.add(shell_frame)
 
     def codelist(self):
         if not self.tabs:
@@ -737,54 +630,6 @@ class Editor:
     def _version(self) -> None:
         """Shows the version and related info of the editor."""
         AboutDialog(self.master)
-
-    def lint_source(self) -> None:
-        if not self.tabs:
-            return
-        try:
-            if self.tabs[self.nb.get_tab()].textbox.lint_cmd:
-                currdir = self.tabs[self.nb.get_tab()].file_dir
-                if WINDOWS:
-                    with open("lint.bat", "w") as f:
-                        f.write(
-                            LINT_BATCH.format(
-                                cmd=self.tabs[self.nb.get_tab()].textbox.lint_cmd
-                            )
-                        )
-                    subprocess.call(f'lint.bat "{currdir}"', shell=True)
-                    os.remove("lint.bat")
-                else:
-                    with open("lint.sh", "w") as f:
-                        f.write(
-                            LINT_BATCH.format(
-                                cmd=self.tabs[self.nb.get_tab()].textbox.lint_cmd
-                            )
-                        )
-                    subprocess.call(
-                        f'chmod 700 lint.sh && ./lint.sh "{currdir}"', shell=True
-                    )
-                    os.remove("lint.sh")
-                self.open_file("results.txt")
-                os.remove("results.txt")
-        except Exception:
-            ErrorInfoDialog(self.master, "This language is not supported")
-            return
-
-    def autopep(self) -> None:
-        """Auto Pretty-Format the document"""
-        try:
-            currtext = self.tabs[self.nb.get_tab()].textbox
-            currdir = self.tabs[self.nb.get_tab()].file_dir
-            if currtext.format_command:
-                subprocess.Popen(
-                    f'{currtext.format_command} "{currdir}" > {os.devnull}', shell=True
-                )  # Throw the autopep8 results into the bit bin.(/dev/null)
-            else:
-                ErrorInfoDialog(self.master, "Language not supported.")
-                return
-            self.reload()
-        except Exception:
-            logger.exception("Error when formatting:")
 
     def goto(self, _=None) -> None:
         if not self.tabs:

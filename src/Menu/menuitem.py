@@ -6,6 +6,7 @@ class MenuItem:
         self.items = []
         self.commands = []
         self.images = []
+        self.cascades = []
 
     def add_command(self,
                     label: str = None,
@@ -14,6 +15,11 @@ class MenuItem:
         self.items.append(label)
         self.commands.append(command)
         self.images.append(image)
+        
+    def add_cascade(self, cascade):
+        self.items.append(cascade.items)
+        self.commands.append(cascade.commands)
+        self.images.append(cascade.images)
 
     def merge(self, menu):
         for index, item in enumerate(menu.items):

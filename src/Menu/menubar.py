@@ -41,7 +41,7 @@ class Menu(ScrollableFrame):
         self.x = self.win.winfo_rootx()
         self.y = self.win.winfo_rooty()
 
-    def add_command(self, label, command, image=None):
+    def add_command(self, label, command, image=None, unpost=True):
         if image:
             command_label = ttk.Label(self.frame,
                                       text=label,
@@ -50,9 +50,10 @@ class Menu(ScrollableFrame):
         else:
             command_label = ttk.Label(self.frame, text=label)
 
-        def exec_command(_=None):
-            self.unpost()
-            command()
+        def exec_command(event=None):
+            if unpost:
+                self.unpost()
+            command(event)
 
         command_label.bind('<1>', exec_command)
         bind_events(command_label)
@@ -72,7 +73,6 @@ class Menu(ScrollableFrame):
         self.win.bind('<<Move>>', self.unpost)
 
     def close_menu(self, event=None):
-        print(1)
         if not (event.x_root in range(self.topwin.winfo_x(),
                                       self.winfo_x() + self.topwin.winfo_width() + 1)
                 and event.y_root in range(self.topwin.winfo_y(),
@@ -220,8 +220,28 @@ class Menubar(ttk.Frame):
         for index, item in enumerate(menu.items):
             command = menu.commands[index]
             image = menu.images[index]
-            dropdown.add_command(item, command, image)
-            self.commands[item] = [item, command, image]
+            if not type(item).__name__ == 'list':
+                dropdown.add_command(item, command, image)
+                self.commands[item] = [item, command, image]
+            else:
+                dropdown_image = tk.PhotoImage(file='Images/next-tab.gif')
+                expand = Menu(self.master)
+                
+                def expand_menu(event):
+                    label = event.widget
+                    x = label.winfo_rootx() + label.winfo_width()
+                    y = label.winfo_rooty()
+                    expand.tk_popup(x, y)
+
+                dropdown.add_command(label, command=expand_menu, image=dropdown_image, unpost=False)
+
+                for index, name in enumerate(item):
+                    if type(name).__name__ == 'list':
+                        break
+                    command = menu.commands[index]
+                    image = menu.images[index]
+                    self.commands[name] = [name, command, image]
+                    expand.add_command(name, command=command, image=image)
 
         label_widget = ttk.Label(
             self,

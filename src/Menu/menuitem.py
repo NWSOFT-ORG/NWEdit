@@ -16,8 +16,8 @@ class MenuItem:
         self.commands.append(command)
         self.images.append(image)
         
-    def add_cascade(self, cascade):
-        self.items.append(cascade.items)
+    def add_cascade(self, label, cascade):
+        self.items.append([label, *cascade.items])
         self.commands.append(cascade.commands)
         self.images.append(cascade.images)
 

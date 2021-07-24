@@ -184,7 +184,7 @@ class Editor:
     def create_menu(self) -> None:
         self.appmenu = MenuItem()
         self.appmenu.add_command(label="About PyPlus", command=self._version)
-        self.appmenu.add_cascade(self.settings_class.create_menu(self.open_file))
+        self.appmenu.add_cascade(label='Settings', cascade=self.settings_class.create_menu(self.open_file))
         self.appmenu.add_command(label='View log', command=self.view_log)
         self.appmenu.add_command(label="Exit Editor", command=self.exit)
         self.appmenu.add_command(label="Restart app", command=self.restart)

@@ -31,6 +31,7 @@ class Menu(ScrollableFrame):
         self.topwin = tk.Toplevel(tkwin)
         self.topwin.transient(tkwin)
         self.topwin.overrideredirect(0)
+        
         self.topwin.overrideredirect(1)
         self.topwin.withdraw()
         super().__init__(self.topwin, relief='groove')
@@ -41,7 +42,7 @@ class Menu(ScrollableFrame):
         self.x = self.win.winfo_rootx()
         self.y = self.win.winfo_rooty()
 
-    def add_command(self, label, command, image=None, unpost=True):
+    def add_command(self, label, command, image=None, unpost=True, passeventobj=False):
         if image:
             command_label = ttk.Label(self.frame,
                                       text=label,
@@ -53,7 +54,10 @@ class Menu(ScrollableFrame):
         def exec_command(event=None):
             if unpost:
                 self.unpost()
-            command(event)
+            if passeventobj:
+                command(event)
+            else:
+                command()
 
         command_label.bind('<1>', exec_command)
         bind_events(command_label)
@@ -107,23 +111,25 @@ class Menubar(ttk.Frame):
         self.commands = {}
         self.menus = []
         self.menu_opened = None
+        self.style = ttkthemes.ThemedStyle(self.master)
+        self.style.set_theme(get_theme())
+        self.bg = self.style.lookup("TLabel", "background")
+        if is_dark_color(self.bg):
+            self.close_icon = tk.PhotoImage(file="Images/close.gif")
+            self.maximise_icon = tk.PhotoImage(file="Images/maximise-light.gif")
+            self.minimise_icon = tk.PhotoImage(file="Images/minimise-light.gif")
+            self.dropdown_image = tk.PhotoImage(file='Images/next-tab-light.gif')
+        else:
+            self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
+            self.maximise_icon = tk.PhotoImage(file="Images/maximise.gif")
+            self.minimise_icon = tk.PhotoImage(file="Images/minimise.gif")
+            self.dropdown_image = tk.PhotoImage(file='Images/next-tab.gif')
         if WINDOWS:
             self.x_pos = self.master.winfo_rootx()
             self.y_pos = self.master.winfo_rooty()
             self.geometry = self.master.winfo_geometry()
             self.maximise_count = 0
             self.maximised = False
-            self.style = ttkthemes.ThemedStyle(self.master)
-            self.style.set_theme(get_theme())
-            self.bg = self.style.lookup("TLabel", "background")
-            if is_dark_color(self.bg):
-                self.close_icon = tk.PhotoImage(file="Images/close.gif")
-                self.maximise_icon = tk.PhotoImage(file="Images/maximise-light.gif")
-                self.minimise_icon = tk.PhotoImage(file="Images/minimise-light.gif")
-            else:
-                self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
-                self.maximise_icon = tk.PhotoImage(file="Images/maximise.gif")
-                self.minimise_icon = tk.PhotoImage(file="Images/minimise.gif")
             self.init_custom_title()
 
     def init_custom_title(self):
@@ -224,7 +230,6 @@ class Menubar(ttk.Frame):
                 dropdown.add_command(item, command, image)
                 self.commands[item] = [item, command, image]
             else:
-                dropdown_image = tk.PhotoImage(file='Images/next-tab.gif')
                 expand = Menu(self.master)
                 
                 def expand_menu(event):
@@ -233,15 +238,15 @@ class Menubar(ttk.Frame):
                     y = label.winfo_rooty()
                     expand.tk_popup(x, y)
 
-                dropdown.add_command(label, command=expand_menu, image=dropdown_image, unpost=False)
-
-                for index, name in enumerate(item):
+                for itemindex, name in enumerate(item[1:]):
                     if type(name).__name__ == 'list':
                         break
-                    command = menu.commands[index]
-                    image = menu.images[index]
+                    command = menu.commands[index][itemindex]
+                    image = menu.images[index][itemindex]
                     self.commands[name] = [name, command, image]
                     expand.add_command(name, command=command, image=image)
+                dropdown.add_command(item[0], command=expand_menu, image=self.dropdown_image, unpost=False, passeventobj=True)
+
 
         label_widget = ttk.Label(
             self,

@@ -89,6 +89,10 @@ class Menu(ScrollableFrame):
         self.topwin.withdraw()
         self.win.event_delete('<<CloseMenu>>')
         self.win.event_delete('<<Move>>')
+        self.on_unpost()
+    
+    def on_unpost(self):
+        pass
 
 
 class Menubar(ttk.Frame):
@@ -237,6 +241,8 @@ class Menubar(ttk.Frame):
                     x = label.winfo_rootx() + label.winfo_width()
                     y = label.winfo_rooty()
                     expand.tk_popup(x, y)
+
+                expand.on_unpost = dropdown.unpost
 
                 for itemindex, name in enumerate(item[1:]):
                     if type(name).__name__ == 'list':

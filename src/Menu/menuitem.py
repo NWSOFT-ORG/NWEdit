@@ -6,7 +6,7 @@ class MenuItem:
         self.items = []
         self.commands = []
         self.images = []
-        self.cascades = []
+        self.is_cascade = False
 
     def add_command(self,
                     label: str = None,

@@ -244,42 +244,49 @@ class TextOpts:
             image=self.paste_icon,
         )
         menu.add_command(
-            label="Delete Selected",
-            image=self.delete_icon,
-            command=self.delete,
-        )
-        menu.add_command(
             label="Duplicate Line or Selected", command=self.duplicate_line
         )
-        menu.add_command(
+        indent_cascade = MenuItem()
+        indent_cascade.add_command(
             label="Indent",
             command=lambda: self.indent("indent"),
             image=self.indent_icon,
         )
-        menu.add_command(
+        indent_cascade.add_command(
             label="Unident",
             command=lambda: self.indent("unindent"),
             image=self.unindent_icon,
         )
+        menu.add_cascade('Indent...', indent_cascade)
         menu.add_command(
             label="Comment/Uncomment Line or Selected", command=self.comment_lines
         )
         menu.add_command(label="Join lines", command=self.join_lines)
-        menu.add_command(label="Swap case", command=self.swap_case)
-        menu.add_command(label="Upper case", command=self.upper_case)
-        menu.add_command(label="Lower case", command=self.lower_case)
-        menu.add_command(
+        case_cascade = MenuItem()
+        case_cascade.add_command(label="Swap case", command=self.swap_case)
+        case_cascade.add_command(label="Upper case", command=self.upper_case)
+        case_cascade.add_command(label="Lower case", command=self.lower_case)
+        menu.add_cascade('Case...', case_cascade)
+        select_cascade = MenuItem()
+        select_cascade.add_command(
             label="Select All",
             command=self.select_all,
             image=self.sel_all_icon,
         )
-        menu.add_command(label="Select Line", command=self.sel_line)
-        menu.add_command(label="Select Word", command=self.sel_word)
-        menu.add_command(label="Select Prev Word", command=self.sel_word_left)
-        menu.add_command(label="Select Next Word", command=self.sel_word_right)
-        menu.add_command(label="Delete Word", command=self.del_word)
-        menu.add_command(label="Delete Prev Word", command=self.del_word_left)
-        menu.add_command(label="Delete Next Word", command=self.del_word_right)
+        select_cascade.add_command(label="Select Line", command=self.sel_line)
+        select_cascade.add_command(label="Select Word", command=self.sel_word)
+        select_cascade.add_command(label="Select Prev Word", command=self.sel_word_left)
+        select_cascade.add_command(label="Select Next Word", command=self.sel_word_right)
+        #menu.add_cascade('Select...', select_cascade)
+        delete_cascade = MenuItem()
+        delete_cascade.add_command(
+            label="Delete Selected",
+            image=self.delete_icon,
+            command=self.delete,
+        )
+        delete_cascade.add_command(label="Delete Word", command=self.del_word)
+        delete_cascade.add_command(label="Delete Prev Word", command=self.del_word_left)
+        delete_cascade.add_command(label="Delete Next Word", command=self.del_word_right)
         menu.add_command(label="-1 char", command=self.nav_1cb)
         menu.add_command(label="+1 char", command=self.nav_1cf)
         menu.add_command(label="Word end", command=self.nav_wordend)
@@ -287,7 +294,7 @@ class TextOpts:
         menu.add_command(label="Move line up", command=self.mv_line_up)
         menu.add_command(label="Move line down", command=self.mv_line_dn)
 
-        right_click_menu = Menu(master)
+        right_click_menu = Menu()
         right_click_menu.add_command(label="Undo", command=self.undo)
         right_click_menu.add_command(label="Redo", command=self.redo)
         right_click_menu.add_command(label="Cut", command=self.cut)

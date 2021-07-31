@@ -195,16 +195,18 @@ class Editor:
             command=self.filetree.new_file,
             image=self.new_icon,
         )
-        self.filemenu.add_command(
+        open_cascade = MenuItem()
+        open_cascade.add_command(
             label="Open File",
             command=self._open,
             image=self.open_icon,
         )
-        self.filemenu.add_command(
+        open_cascade.add_command(
             label="Open File in Hex",
             command=self.openhex,
             image=self.open_icon,
         )
+        self.filemenu.add_cascade('Open...', open_cascade)
         self.filemenu.add_command(
             label="Save Copy to...",
             command=self._saveas,

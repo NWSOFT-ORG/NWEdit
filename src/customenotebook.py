@@ -51,7 +51,7 @@ class ClosableNotebook(ttk.Notebook):
         self.pack(expand=1, fill="both")
 
         def show_tab_menu(event):
-            tab_menu = Menu(self.master)
+            tab_menu = Menu()
             for tab in self.tabs():
                 tab_menu.add_command(label=self.tab(tab, option="text"),
                                      command=lambda temp=tab: self.select(temp))

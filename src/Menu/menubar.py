@@ -27,15 +27,15 @@ def set_appwindow(root):
 
 
 class Menu(ScrollableFrame):
-    def __init__(self, tkwin: tk.Tk):
-        self.topwin = tk.Toplevel(tkwin)
-        self.topwin.transient(tkwin)
+    def __init__(self):
+        self.topwin = tk.Toplevel()
+        self.topwin.transient('.')
         self.topwin.overrideredirect(0)
         
         self.topwin.overrideredirect(1)
         self.topwin.withdraw()
         super().__init__(self.topwin, relief='groove')
-        self.win = tkwin
+        self.win = self.topwin.master
         self.opened = False
 
         self.win.update()
@@ -92,7 +92,38 @@ class Menu(ScrollableFrame):
         self.on_unpost()
     
     def on_unpost(self):
+        # Can override
         pass
+
+# This isn't an typo
+def add_cascade(self, master_menu, label, cascade):
+    style = ttkthemes.ThemedStyle()
+    style.set_theme(get_theme())
+    bg = style.lookup("TLabel", "background")
+    if is_dark_color(bg):
+        self.dropdown_image = tk.PhotoImage(file='Images/next-tab-light.gif')
+    else:
+        self.dropdown_image = tk.PhotoImage(file='Images/next-tab.gif')
+
+    expand = Menu()
+
+    def expand_menu(event):
+        label = event.widget
+        x = label.winfo_rootx() + label.winfo_width()
+        y = label.winfo_rooty()
+        expand.tk_popup(x, y)
+
+        expand.on_unpost = master_menu.unpost
+
+        for itemindex, name in enumerate(cascade.items):
+            if type(name).__name__ == 'list':
+                break
+            command = cascade.commands[itemindex]
+            image = cascade.images[itemindex]
+            expand.add_command(name, command=command, image=image)
+    master_menu.add_command(label, command=expand_menu, image=self.dropdown_image, unpost=False, passeventobj=True)
+
+Menu.add_cascade = add_cascade
 
 
 class Menubar(ttk.Frame):
@@ -115,14 +146,13 @@ class Menubar(ttk.Frame):
         self.commands = {}
         self.menus = []
         self.menu_opened = None
-        self.style = ttkthemes.ThemedStyle(self.master)
+        self.style = ttkthemes.ThemedStyle()
         self.style.set_theme(get_theme())
         self.bg = self.style.lookup("TLabel", "background")
         if is_dark_color(self.bg):
             self.close_icon = tk.PhotoImage(file="Images/close.gif")
             self.maximise_icon = tk.PhotoImage(file="Images/maximise-light.gif")
             self.minimise_icon = tk.PhotoImage(file="Images/minimise-light.gif")
-            self.dropdown_image = tk.PhotoImage(file='Images/next-tab-light.gif')
         else:
             self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
             self.maximise_icon = tk.PhotoImage(file="Images/maximise.gif")
@@ -214,7 +244,7 @@ class Menubar(ttk.Frame):
 
     def _search_command(self):
         text = self.search_entry.get()
-        menu = Menu(self.master)
+        menu = Menu()
         for item in sorted(self.commands.keys()):
             if text in item:
                 p_list = self.commands[item]
@@ -226,33 +256,21 @@ class Menubar(ttk.Frame):
             self.search_button.winfo_rooty() + self.search_button.winfo_height())
 
     def add_cascade(self, label: str, menu: MenuItem) -> None:
-        dropdown = Menu(self.master)
+        dropdown = Menu()
         for index, item in enumerate(menu.items):
             command = menu.commands[index]
             image = menu.images[index]
             if not type(item).__name__ == 'list':
                 dropdown.add_command(item, command, image)
                 self.commands[item] = [item, command, image]
+            
             else:
-                expand = Menu(self.master)
-                
-                def expand_menu(event):
-                    label = event.widget
-                    x = label.winfo_rootx() + label.winfo_width()
-                    y = label.winfo_rooty()
-                    expand.tk_popup(x, y)
-
-                expand.on_unpost = dropdown.unpost
-
+                expand = MenuItem()
                 for itemindex, name in enumerate(item[1:]):
-                    if type(name).__name__ == 'list':
-                        break
-                    command = menu.commands[index][itemindex]
-                    image = menu.images[index][itemindex]
-                    self.commands[name] = [name, command, image]
-                    expand.add_command(name, command=command, image=image)
-                dropdown.add_command(item[0], command=expand_menu, image=self.dropdown_image, unpost=False, passeventobj=True)
-
+                    cmd = command[itemindex]
+                    img = image[itemindex]
+                    expand.add_command(name, cmd, img)
+                dropdown.add_cascade(dropdown, item[0], expand)
 
         label_widget = ttk.Label(
             self,

@@ -30,7 +30,6 @@ import pygments
 from pygments import lexers
 from pygments import styles
 from keyword import iskeyword
-import art
 
 if sys.platform == "darwin":
     import PyTouchBar

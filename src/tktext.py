@@ -5,7 +5,6 @@ from src.settings import Settings
 from src.functions import darken_color, is_dark_color, lighten_color
 from src.constants import MAIN_KEY, logger
 from src.highlighter import create_tags, recolorize
-from src.Menu.menubar import MenuItem, Menu
 
 
 class TextLineNumbers(tk.Canvas):
@@ -217,72 +216,81 @@ class TextOpts:
         self.bind_events()
     
     def create_menu(self, master):
-        menu = MenuItem()
+        menu = tk.Menu(master)
         menu.add_command(
             label="Undo",
             command=self.undo,
             image=self.undo_icon,
+            compound='left'
         )
         menu.add_command(
             label="Redo",
             command=self.redo,
             image=self.redo_icon,
+            compound='left'
         )
         menu.add_command(
             label="Cut",
             command=self.cut,
             image=self.cut_icon,
+            compound='left'
         )
         menu.add_command(
             label="Copy",
             command=self.copy,
             image=self.copy_icon,
+            compound='left'
         )
         menu.add_command(
             label="Paste",
             command=self.paste,
             image=self.paste_icon,
+            compound='left'
         )
         menu.add_command(
             label="Duplicate Line or Selected", command=self.duplicate_line
         )
-        indent_cascade = MenuItem()
+        indent_cascade = tk.Menu(menu)
         indent_cascade.add_command(
             label="Indent",
             command=lambda: self.indent("indent"),
             image=self.indent_icon,
+            compound='left'
         )
         indent_cascade.add_command(
             label="Unident",
             command=lambda: self.indent("unindent"),
             image=self.unindent_icon,
+            compound='left'
         )
-        menu.add_cascade('Indent...', indent_cascade)
+        menu.add_cascade(label='Indent...', menu=indent_cascade)
         menu.add_command(
             label="Comment/Uncomment Line or Selected", command=self.comment_lines
         )
         menu.add_command(label="Join lines", command=self.join_lines)
-        case_cascade = MenuItem()
+        case_cascade = tk.Menu(menu)
         case_cascade.add_command(label="Swap case", command=self.swap_case)
         case_cascade.add_command(label="Upper case", command=self.upper_case)
         case_cascade.add_command(label="Lower case", command=self.lower_case)
-        menu.add_cascade('Case...', case_cascade)
-        select_cascade = MenuItem()
+        menu.add_cascade(label='Case...', menu=case_cascade)
+        select_cascade = tk.Menu(menu)
         select_cascade.add_command(
             label="Select All",
             command=self.select_all,
             image=self.sel_all_icon,
+            compound='left'
         )
         select_cascade.add_command(label="Select Line", command=self.sel_line)
         select_cascade.add_command(label="Select Word", command=self.sel_word)
         select_cascade.add_command(label="Select Prev Word", command=self.sel_word_left)
         select_cascade.add_command(label="Select Next Word", command=self.sel_word_right)
-        #menu.add_cascade('Select...', select_cascade)
-        delete_cascade = MenuItem()
+        menu.add_cascade(label='Select...', menu=select_cascade)
+        delete_cascade = tk.Menu(menu)
         delete_cascade.add_command(
             label="Delete Selected",
             image=self.delete_icon,
             command=self.delete,
+            compound='left'
         )
         delete_cascade.add_command(label="Delete Word", command=self.del_word)
         delete_cascade.add_command(label="Delete Prev Word", command=self.del_word_left)
@@ -294,7 +302,7 @@ class TextOpts:
         menu.add_command(label="Move line up", command=self.mv_line_up)
         menu.add_command(label="Move line down", command=self.mv_line_dn)
 
-        right_click_menu = Menu()
+        right_click_menu = tk.Menu(master)
         right_click_menu.add_command(label="Undo", command=self.undo)
         right_click_menu.add_command(label="Redo", command=self.redo)
         right_click_menu.add_command(label="Cut", command=self.cut)

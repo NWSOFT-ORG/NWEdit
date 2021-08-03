@@ -3,7 +3,6 @@ from src.constants import logger
 from src.functions import is_dark_color, lighten_color
 from src.modules import tk, ttk, ttkthemes
 from src.settings import Settings
-from src.Menu.menubar import Menu
 from src.statusbar import bind_events
 
 
@@ -51,7 +50,7 @@ class ClosableNotebook(ttk.Notebook):
         self.pack(expand=1, fill="both")
 
         def show_tab_menu(event):
-            tab_menu = Menu()
+            tab_menu = tk.Menu(master)
             for tab in self.tabs():
                 tab_menu.add_command(label=self.tab(tab, option="text"),
                                      command=lambda temp=tab: self.select(temp))

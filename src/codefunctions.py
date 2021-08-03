@@ -2,7 +2,6 @@ from src.modules import (tk, ttk, ttkthemes, os, subprocess, lexers, Path)
 from src.functions import (is_dark_color, run_in_terminal, open_system_shell)
 from src.Dialog.commondialog import (get_theme, ErrorInfoDialog)
 from src.Dialog.search import Search
-from src.Menu.menuitem import MenuItem
 from src.console import Console
 from src.constants import (WINDOWS, logger, APPDIR, LINT_BATCH, RUN_BATCH)
 from src.highlighter import (recolorize, create_tags)
@@ -18,51 +17,57 @@ class CodeFunctions:
         self.style.set_theme(get_theme())
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
-
-    def create_menu(self):
         if is_dark_color(self.bg):
-            lint_icon = tk.PhotoImage(file="Images/lint-light.gif")
-            search_icon = tk.PhotoImage(file="Images/search-light.gif")
-            pyterm_icon = tk.PhotoImage(file="Images/py-term-light.gif")
-            term_icon = tk.PhotoImage(file="Images/term-light.gif")
-            format_icon = tk.PhotoImage(file="Images/format-light.gif")
+            self.lint_icon = tk.PhotoImage(file="Images/lint-light.gif")
+            self.search_icon = tk.PhotoImage(file="Images/search-light.gif")
+            self.pyterm_icon = tk.PhotoImage(file="Images/py-term-light.gif")
+            self.term_icon = tk.PhotoImage(file="Images/term-light.gif")
+            self.format_icon = tk.PhotoImage(file="Images/format-light.gif")
         else:
-            lint_icon = tk.PhotoImage(file="Images/lint.gif")
-            search_icon = tk.PhotoImage(file="Images/search.gif")
-            pyterm_icon = tk.PhotoImage(file="Images/py-term.gif")
-            term_icon = tk.PhotoImage(file="Images/term.gif")
-            format_icon = tk.PhotoImage(file="Images/format.gif")
-        run_icon = tk.PhotoImage(file="Images/run-16px.gif")
-        codemenu = MenuItem()
+            self.lint_icon = tk.PhotoImage(file="Images/lint.gif")
+            self.search_icon = tk.PhotoImage(file="Images/search.gif")
+            self.pyterm_icon = tk.PhotoImage(file="Images/py-term.gif")
+            self.term_icon = tk.PhotoImage(file="Images/term.gif")
+            self.format_icon = tk.PhotoImage(file="Images/format.gif")
+        self.run_icon = tk.PhotoImage(file="Images/run-16px.gif")
+
+    def create_menu(self, master):
+        codemenu = tk.Menu(master)
         codemenu.add_command(
             label="Run",
             command=self.run,
-            image=run_icon,
+            image=self.run_icon,
+            compound='left'
         )
         codemenu.add_command(
             label="Lint",
             command=self.lint_source,
-            image=lint_icon,
+            image=self.lint_icon,
+            compound='left'
         )
         codemenu.add_command(
             label="Auto-format",
             command=self.autopep,
-            image=format_icon,
+            image=self.format_icon,
+            compound='left'
         )
         codemenu.add_command(
             label="Open System Shell",
             command=self.system_shell,
-            image=term_icon,
+            image=self.term_icon,
+            compound='left'
         )
         codemenu.add_command(
             label="Python Shell",
             command=self.python_shell,
-            image=pyterm_icon,
+            image=self.pyterm_icon,
+            compound='left'
         )
         codemenu.add_command(
             label="Find and replace",
             command=self.search,
-            image=search_icon,
+            image=self.search_icon,
+            compound='left'
         )
         return codemenu
     

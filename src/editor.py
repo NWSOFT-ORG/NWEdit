@@ -58,6 +58,7 @@ from src.settings import (
 from src.statusbar import Statusbar
 from src.Dialog.testdialog import TestDialog
 from src.Dialog.searchindir import SearchInDir
+from src.Dialog.textstyle import StyleWindow
 from src.tktext import EnhancedTextFrame, TextOpts
 from src.treeview import FileTree
 from src.Git.commitview import CommitView
@@ -244,6 +245,10 @@ class Editor:
         self.viewmenu.add_command(
             label="Classes and functions",
             command=self.codelist,
+        )
+        self.viewmenu.add_command(
+            label='Insert Ascii Art',
+            command=lambda: StyleWindow()
         )
         self.viewmenu.add_command(
             label="Search In directory",

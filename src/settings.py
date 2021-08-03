@@ -1,8 +1,7 @@
-from src.Menu.menubar import MenuItem
 from src.constants import APPDIR
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog
-from src.modules import EditorErr, Path, json, lexers, os, sys, zipfile
+from src.modules import EditorErr, Path, json, lexers, os, sys, zipfile, tk
 
 
 class Settings:
@@ -65,8 +64,8 @@ class Settings:
             return self.highlight_theme
         raise EditorErr("The setting is not defined")
 
-    def create_menu(self, open_file):
-        menu = MenuItem()
+    def create_menu(self, open_file, master):
+        menu = tk.Menu(master)
         menu.add_command(
             label="General Settings",
             command=lambda: open_file(

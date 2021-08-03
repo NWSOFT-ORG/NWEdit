@@ -37,8 +37,6 @@ from src.Dialog.autocomplete import CompleteDialog
 from src.Dialog.goto import Navigate
 from src.hexview import HexView
 from src.highlighter import recolorize
-from src.Menu.menubar import Menubar
-from src.Menu.menuitem import MenuItem
 from src.modules import (
     Path,
     logging,
@@ -123,7 +121,7 @@ class Editor:
 
             self.tabs = {}
 
-            self.menubar = Menubar(self.master)
+            self.menubar = tk.Menu(self.master)
             self.panedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.panedwin.pack(fill="both", expand=1)
             mainframe = ttk.Frame(self.master)
@@ -182,54 +180,61 @@ class Editor:
         logger.debug("Bindings created")
 
     def create_menu(self) -> None:
-        self.appmenu = MenuItem()
+        self.appmenu = tk.Menu(self.menubar, name='apple')
         self.appmenu.add_command(label="About PyPlus", command=self._version)
-        self.appmenu.add_cascade(label='Settings', cascade=self.settings_class.create_menu(self.open_file))
+        self.appmenu.add_cascade(label='Settings',
+                                 menu=self.settings_class.create_menu(self.open_file, self.master))
         self.appmenu.add_command(label='View log', command=self.view_log)
         self.appmenu.add_command(label="Exit Editor", command=self.exit)
         self.appmenu.add_command(label="Restart app", command=self.restart)
 
-        self.filemenu = MenuItem()
+        self.filemenu = tk.Menu(self.menubar)
         self.filemenu.add_command(
             label="New...",
             command=self.filetree.new_file,
             image=self.new_icon,
+            compound='left'
         )
-        open_cascade = MenuItem()
+        open_cascade = tk.Menu(self.filemenu)
         open_cascade.add_command(
             label="Open File",
             command=self._open,
             image=self.open_icon,
+            compound='left'
         )
         open_cascade.add_command(
             label="Open File in Hex",
             command=self.openhex,
             image=self.open_icon,
+            compound='left'
         )
-        self.filemenu.add_cascade('Open...', open_cascade)
+        self.filemenu.add_cascade(label='Open...', menu=open_cascade)
         self.filemenu.add_command(
             label="Save Copy to...",
             command=self._saveas,
             image=self.save_as_icon,
+            compound='left'
         )
         self.filemenu.add_command(
             label="Close Tab",
             command=self.close_tab,
             image=self.close_icon,
+            compound='left'
         )
         self.filemenu.add_command(
             label="Reload all files from disk",
             command=self.reload,
             image=self.reload_icon,
+            compound='left'
         )
 
-        menu = self.opts.create_menu(self.master)
-        self.editmenu = menu[0]
-        self.right_click_menu = menu[1]
+        editmenus = self.opts.create_menu(self.master)
+        self.editmenu = editmenus[0]
+        self.right_click_menu = editmenus[1]
 
-        self.codemenu = self.codefuncs.create_menu()
+        self.codemenu = self.codefuncs.create_menu(self.master)
 
-        self.viewmenu = MenuItem()
+        self.viewmenu = tk.Menu(self.menubar)
         self.viewmenu.add_command(label="Show File Tree", command=self.show_filelist)
         self.viewmenu.add_command(
             label="Unit tests",
@@ -245,10 +250,10 @@ class Editor:
             command=self.searchindir,
         )
 
-        self.navmenu = MenuItem()
+        self.navmenu = tk.Menu(self.menubar)
         self.navmenu.add_command(label="Go to ...", command=self.goto)
 
-        self.gitmenu = MenuItem()
+        self.gitmenu = tk.Menu(self.menubar)
         self.gitmenu.add_command(label="Initialize", command=lambda: self.git("init"))
         self.gitmenu.add_command(label="Clone...", command=lambda: self.git("clone"))
 
@@ -259,10 +264,9 @@ class Editor:
         self.menubar.add_cascade(label="View", menu=self.viewmenu)
         self.menubar.add_cascade(label="Navigate", menu=self.navmenu)
         self.menubar.add_cascade(label="Git", menu=self.gitmenu)
+        
+        self.master.config(menu=self.menubar)
         logger.debug("Menu created")
-        if OSX:
-            menu = tk.Menu(self.master)
-            self.master.config(menu=menu)
 
     def start_screen(self) -> None:
         first_tab = tk.Canvas(self.nb, background=self.bg, highlightthickness=0)

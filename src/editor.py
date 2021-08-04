@@ -140,10 +140,10 @@ class Editor:
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
                 open_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/open.gif", action=self._open
+                    image="Images/open.gif", action=lambda: self.open_file()
                 )
                 save_as_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/saveas.gif", action=self.save_as
+                    image="Images/saveas.gif", action=lambda: self.save_as()
                 )
                 close_button = PyTouchBar.TouchBarItems.Button(
                     image="Images/close.gif", action=self.close_tab
@@ -164,12 +164,12 @@ class Editor:
             self.restart()
     
     def click_tab(self, _=None):
-        self.opts.set_text(self.tabs[self.nb.get_tab()].textbox)
+        self.opts.set_text(self.get_text())
 
     def create_bindings(self):
         # Keyboard bindings
         self.master.bind(f"<{MAIN_KEY}-w>", self.close_tab)
-        self.master.bind(f"<{MAIN_KEY}-o>", self._open)
+        self.master.bind(f"<{MAIN_KEY}-o>", lambda: self.open_file())
         # Mouse bindings
         self.master.bind("<<MouseEvent>>", self.mouse)
         self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
@@ -182,10 +182,10 @@ class Editor:
 
     def create_menu(self) -> None:
         self.appmenu = tk.Menu(self.menubar, name='apple')
-        self.appmenu.add_command(label="About PyPlus", command=self._version)
+        self.appmenu.add_command(label="About PyPlus", command=lambda: AboutDialog(self.master))
         self.appmenu.add_cascade(label='Settings',
                                  menu=self.settings_class.create_menu(self.open_file, self.master))
-        self.appmenu.add_command(label='View log', command=self.view_log)
+        self.appmenu.add_command(label='View log', command=lambda: LogViewDialog())
         self.appmenu.add_command(label="Exit Editor", command=self.exit)
         self.appmenu.add_command(label="Restart app", command=self.restart)
 
@@ -199,20 +199,20 @@ class Editor:
         open_cascade = tk.Menu(self.filemenu)
         open_cascade.add_command(
             label="Open File",
-            command=self._open,
+            command=lambda: self.open_file(),
             image=self.open_icon,
             compound='left'
         )
         open_cascade.add_command(
             label="Open File in Hex",
-            command=self.openhex,
+            command=lambda: self.open_hex(),
             image=self.open_icon,
             compound='left'
         )
         self.filemenu.add_cascade(label='Open...', menu=open_cascade)
         self.filemenu.add_command(
             label="Save Copy to...",
-            command=self._saveas,
+            command=lambda: self.save_as(),
             image=self.save_as_icon,
             compound='left'
         )
@@ -239,24 +239,27 @@ class Editor:
         self.viewmenu.add_command(label="Show File Tree", command=self.show_filelist)
         self.viewmenu.add_command(
             label="Unit tests",
-            command=self.test,
+            command=lambda: TestDialog(self.panedwin, self.filetree.path),
         )
         self.viewmenu.add_command(label="Git: Commit and Push...", command=lambda: self.git("commit"))
         self.viewmenu.add_command(
             label="Classes and functions",
-            command=self.codelist,
+            command=lambda: CodeListDialog(self.panedwin,
+                                           self.get_text(),
+                                           self.tabs[self.nb.get_tab()].file_dir) if self.tabs else None
         )
         self.viewmenu.add_command(
             label='Insert Ascii Art',
-            command=lambda: StyleWindow()
+            command=lambda: StyleWindow(self.get_text(), self.key) if self.tabs else None
         )
         self.viewmenu.add_command(
             label="Search In directory",
-            command=self.searchindir,
+            command=lambda: SearchInDir(self.panedwin, self.filetree.path, self.open_file),
         )
 
         self.navmenu = tk.Menu(self.menubar)
-        self.navmenu.add_command(label="Go to ...", command=self.goto)
+        self.navmenu.add_command(label="Go to ...",
+                                 command=lambda: Navigate(self.get_text()) if self.tabs else None)
 
         self.gitmenu = tk.Menu(self.menubar)
         self.gitmenu.add_command(label="Initialize", command=lambda: self.git("init"))
@@ -319,7 +322,7 @@ class Editor:
             compound="left",
             image=self.close_icon,
         )
-        label1.bind("<Button>", self._open)
+        label1.bind("<Button>", lambda _=None: self.open_file())
         label2.bind("<Button>", self.filetree.new_file)
         label4.bind("<Button>", lambda _=None: self.exit(force=True))
         label3.bind("<Button>", lambda _=None: self.git("clone"))
@@ -354,7 +357,7 @@ class Editor:
         textbox.bind(f"<{MAIN_KEY}-n>", self.filetree.new_file)
         textbox.bind(f"<{MAIN_KEY}-N>", self.goto)
         textbox.bind(f"<{MAIN_KEY}-r>", self.reload)
-        textbox.bind(f"<{MAIN_KEY}-S>", self._saveas)
+        textbox.bind(f"<{MAIN_KEY}-S>", lambda _=None: self.save_as())
         textbox.focus_set()
         logger.debug("Textbox created")
         return textbox
@@ -379,7 +382,7 @@ class Editor:
                 self.statusbar.label3.config(text="")
                 logger.debug("update_statusbar: No file open")
                 return "break"
-            currtext = self.tabs[self.nb.get_tab()].textbox
+            currtext = self.get_text()
             index = currtext.index("insert")
             ln = index.split(".")[0]
             col = index.split(".")[1]
@@ -393,7 +396,7 @@ class Editor:
     def key(self, _=None) -> None:
         """Event when a key is pressed."""
         try:
-            currtext = self.tabs[self.nb.get_tab()].textbox
+            currtext = self.get_text()
             recolorize(currtext)
             currtext.edit_separator()
             currtext.see("insert")
@@ -451,9 +454,6 @@ class Editor:
             self.update_statusbar()
             return window.textbox
 
-    def openhex(self):
-        return self.open_hex()
-
     def open_file(self, file: str = "", askhex: bool = True):
         """Opens a file
         If a file is not provided, a messagebox'll
@@ -476,9 +476,9 @@ class Editor:
                         if dialog.result:
                             self.open_hex(file_dir)
                         logging.info("User pressed No.")
-                        return self.tabs[self.nb.get_tab()].textbox
+                        return self.get_text()
                     self.open_hex(file_dir)
-                    return self.tabs[self.nb.get_tab()].textbox
+                    return self.get_text()
 
                 file = open(file_dir)
                 extens = file_dir.split(".")[-1]
@@ -517,10 +517,6 @@ class Editor:
                 else:
                     logger.exception("Warning! Program has ValueError.")
 
-    def _open(self, _=None) -> None:
-        """Prompt the user to open a file when C-O is pressed"""
-        return self.open_file()
-
     def save_as(self, file: str = None) -> None:
         """Save the document as a different name."""
         if self.tabs:
@@ -540,9 +536,6 @@ class Editor:
             self.update_title()
             self.reload()
 
-    def _saveas(self, _=None):
-        self.save_as()
-
     def save_file(self, _=None) -> None:
         """Save an *existing* file"""
         try:
@@ -558,23 +551,9 @@ class Editor:
         except Exception:
             pass
 
-    def codelist(self):
-        if not self.tabs:
-            return
-        file_dir = self.tabs[self.nb.get_tab()].file_dir
-        text = self.tabs[self.nb.get_tab()].textbox
-        CodeListDialog(self.panedwin, text, file_dir)
-        
     def show_filelist(self):
         self.panedwin.forget(self.panedwin.panes()[0])
         self.panedwin.insert('0', self.filetree)
-    
-    def searchindir(self):
-        SearchInDir(self.panedwin, self.filetree.path, self.open_file)
-    
-    @staticmethod
-    def view_log():
-        LogViewDialog()
 
     def right_click(self, event: tk.EventType) -> None:
         if self.tabs:
@@ -638,17 +617,8 @@ class Editor:
         self.__init__(newtk)
         newtk.mainloop()
 
-    def _version(self) -> None:
-        """Shows the version and related info of the editor."""
-        AboutDialog(self.master)
-
-    def goto(self, _=None) -> None:
-        if not self.tabs:
-            return
-        Navigate(self.tabs[self.nb.get_tab()].textbox)
-
-    def test(self):
-        TestDialog(self.panedwin, self.filetree.path)
+    def get_text(self):
+        return self.tabs[self.nb.get_tab()].textbox
 
     def git(self, action=None) -> None:
         currdir = self.filetree.path

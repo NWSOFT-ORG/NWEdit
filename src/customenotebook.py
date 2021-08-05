@@ -125,8 +125,11 @@ class ClosableNotebook(ttk.Notebook):
 
     def __initialize_custom_style(self):
         style = ttk.Style()
-
-        style.element_create("close", "image", "img_close", border=10, sticky="")
+        
+        try:
+            style.element_create("close", "image", "img_close", border=10, sticky="")
+        except tk.TclError:
+            pass
         style.configure(
             "CustomNotebook.Tab", background=lighten_color(self.bg, 20, 20, 20)
         )

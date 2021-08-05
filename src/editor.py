@@ -177,12 +177,14 @@ class Editor:
         self.master.protocol(
             "WM_DELETE_WINDOW", lambda: self.exit(force=True)
         )  # When the window is closed, or quit from Mac, do exit action
-        self.master.createcommand("::tk::mac::Quit", self.exit)
+        if not isinstance(self.master, tk.Toplevel):
+            self.master.createcommand("::tk::mac::Quit", self.exit)
         logger.debug("Bindings created")
 
     def create_menu(self) -> None:
         self.appmenu = tk.Menu(self.menubar, name='apple')
         self.appmenu.add_command(label="About PyPlus", command=lambda: AboutDialog(self.master))
+        self.appmenu.add_command(label='New Window', command=self.new_window)
         self.appmenu.add_cascade(label='Settings',
                                  menu=self.settings_class.create_menu(self.open_file, self.master))
         self.appmenu.add_command(label='View log', command=lambda: LogViewDialog())
@@ -275,7 +277,7 @@ class Editor:
         
         self.master.config(menu=self.menubar)
         logger.debug("Menu created")
-
+    
     def start_screen(self) -> None:
         first_tab = tk.Canvas(self.nb, background=self.bg, highlightthickness=0)
         first_tab.create_image(20, 20, anchor="nw", image=self.icon)
@@ -355,7 +357,7 @@ class Editor:
         textbox.bind(f"<{MAIN_KEY}-b>", self.codefuncs.run)
         textbox.bind(f"<{MAIN_KEY}-f>", self.codefuncs.search)
         textbox.bind(f"<{MAIN_KEY}-n>", self.filetree.new_file)
-        textbox.bind(f"<{MAIN_KEY}-N>", self.goto)
+        textbox.bind(f"<{MAIN_KEY}-N>", lambda _=None: Navigate(self.get_text()))
         textbox.bind(f"<{MAIN_KEY}-r>", self.reload)
         textbox.bind(f"<{MAIN_KEY}-S>", lambda _=None: self.save_as())
         textbox.focus_set()
@@ -640,3 +642,12 @@ class Editor:
             )
         elif action == "commit":
             CommitView(self.panedwin, currdir)
+
+
+def new_window(self):
+    new_window = tk.Toplevel(self.master)
+    Editor(new_window)
+    self.master = new_window
+
+
+Editor.new_window = new_window

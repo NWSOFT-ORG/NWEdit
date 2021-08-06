@@ -1,0 +1,13 @@
+/* General settings
+Improper modifying might cause error
+Please follow the instructions as comments.
+*/
+{
+    // Must be a valid TK font
+    "font": "Consolas 13",
+    // Must be a valid TTK theme
+    "theme": "black",
+    // Must be a valid Pygments theme
+    "pygments": "monokai",
+    "tabwidth": 4
+}

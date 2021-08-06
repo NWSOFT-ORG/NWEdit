@@ -1,0 +1,7 @@
+2021-08-06 09:46:43,637 INFO <module> Tkinter version: 8.6
+2021-08-06 09:46:43,637 DEBUG <module> All modules imported
+2021-08-06 09:46:44,326 DEBUG __init__ Settings loaded
+2021-08-06 09:46:44,330 DEBUG __init__ Icons loaded
+2021-08-06 09:46:44,335 DEBUG __init__ Theme loaded
+2021-08-06 09:46:44,366 DEBUG __initialize_custom_style Initialized custom style.
+2021-08-06 09:46:44,579 DEBUG create_menu Right-click menu created

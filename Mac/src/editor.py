@@ -127,8 +127,10 @@ class Editor:
             self.panedwin.pack(fill="both", expand=1)
             mainframe = ttk.Frame(self.master)
             mainframe.pack(fill='both', expand=1)
+            
             self.nb = ClosableNotebook(mainframe, self.close_tab)
-            self.nb.bind("<1>", self.click_tab)
+            self.nb.event_add('<<Click>>', '<1>')
+            self.nb.bind("<<Click>>", self.click_tab)
             self.filetree = FileTree(self.master, self.open_file)
             self.panedwin.add(self.filetree)
             self.panedwin.add(mainframe)

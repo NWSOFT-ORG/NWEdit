@@ -93,60 +93,15 @@ General Public License for more details.
 
 Thanks to overture for the phplint tool, and thanks to people who wrote greate code on Gist and stack overflow.
 
-# Installing dependencies
-
-This editor needs a **LOT** of dependencies.  
-I have installed a lot.  
-However, to make sure that it works fully, you need to install them  
-Dependencies:
-
-- Python: 3.8 or later
-- npm -> eslint (for JavaScript)
-- autopep8
-- pylint
-- html-linter
-- ttkthemes
-- Pygments You can install them using the following commands:  
-  `poetry install && npm install` (Works on Linux, Mac, and Windows)  
-  To get Poetry, go here: [python-poetry/poetry](https://github.com/python-poetry/poetry#installation)
-
-# How it works
-
-You can find clues about how it works, initializes etc. in the log file.
-
-## How it updates:
-
-This editor uses the magical requests module to get a file from remote.  
-It is at [here](https://zcg-coder.github.io/NWSOFT/PyPlusWeb/ver.json).  
-Then it reads the text, parse it, and determine if there's an update.
-
-## How the syntax highlight works:
-
-This editor uses pygments as its syntax highlighter.  
-When it initilizes, it reads the general-settings.json file at the Settings directory  
-There should be a key, which tells it the syntax highlight theme  
-When a file is opened, it will read another json, called lexer-settings.json.  
-It tells pygments the correct lexer to use.  
-When a key is pressed, it recolorizes the text.  
-It creates the tags, then configure them to make the text's color look different.
-
-## How it handle exeptions
-
-The exceptions will get logged into a file, and I debug it by looking in the log file.  
-I'll try to make the logs contain as much info as I can.  
-If you want to know if the editor works, view the log! If it works, the log should start with:
-
-```
-INFO:pyplus:Tkinter version: 8.6
-DEBUG:pyplus:All modules imported
-DEBUG:pyplus:Settings loaded
-DEBUG:pyplus:Theme loaded
-DEBUG:pyplus:Menu created
-DEBUG:pyplus:Right-click menu created
-DEBUG:pyplus:Tab right-click menu created
-DEBUG:pyplus:Bindings created
-DEBUG:pyplus:Start screen created
-```
-# What I learnt from developing it
-- Some methods look extremely tricky, but they solve the problem!
-- Sometimes it's a good idea to reference other people's code.
+# Directory Structure
+This project is meant to be run prefectly in different OS. Until now, it supports Windows, Mac and Linux.  
+To make it run perfectly in these OS, I have to seperate their files, because the original 'cross-compatable' files are finally to big to run on Mac.  
+Currently, the only major difference between them is the different menus.  
+Windows uses a custom titlebar, so I need to make a custom menubar. But Macs won't run the custom code completely, so I have to use `tk.Menu`.  
+But from now on, the differnce will be bigger.  
+If you are on:
+| OS      | Directory            |
+|---------|----------------------|
+| Windows | Windows              |
+| Mac     | Mac                  |
+| Linux   | Windows (soon won’t) |

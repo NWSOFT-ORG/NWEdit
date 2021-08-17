@@ -4,6 +4,7 @@ from src.modules import ttk
 punc = [x for x in string.punctuation.replace('_', '')]
 whites = [x for x in string.whitespace]
 
+
 def sep_words(str_to_sep: str) -> list:
     result = str_to_sep
     for char in (*punc, *whites):
@@ -18,13 +19,15 @@ class CompleteDialog(ttk.Frame):
     def __init__(self, master, text):
         super().__init__(master, relief='groove')
         self.completions = ttk.Treeview(self, show='tree')
-        self.completions.pack(side='left',fill='both', expand=1)
+        self.completions.pack(side='left', fill='both', expand=1)
         self.completions.bind('<1>', self.complete)
 
         yscroll = ttk.Scrollbar(self, command=self.completions.yview)
         yscroll.pack(side='right', fill='y', expand=1)
         self.completions['yscrollcommand'] = yscroll.set
         self.text = text
+        
+        text.bind('<Button-1>', lambda _: self.place_forget())
 
     def complete(self, event=None):
         item = self.completions.identify("item", event.x, event.y)

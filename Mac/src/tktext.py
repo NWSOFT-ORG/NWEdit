@@ -1,10 +1,10 @@
 """A modded version of tkinter.Text"""
 
-from src.modules import font, styles, tk, ttk, ttkthemes, EditorErr
+from src.modules import font, styles, tk, ttk, ttkthemes, EditorErr, lexers
 from src.settings import Settings
 from src.functions import darken_color, is_dark_color, lighten_color
 from src.constants import MAIN_KEY, logger
-from src.highlighter import create_tags, recolorize
+from src.highlighter import create_tags, recolorize, recolorize_line
 
 
 class TextLineNumbers(tk.Canvas):
@@ -85,6 +85,7 @@ class EnhancedText(tk.Text):
         tk.Text.__init__(self, *args, **kwargs)
         self.searchable = False
         self.navigate = False
+        self.lexer = lexers.get_lexer_by_name('text')
 
         # create a proxy for the underlying widget
         self._orig = self._w + "_orig"
@@ -344,7 +345,7 @@ class TextOpts:
         """Event when a key is pressed."""
         if self.bindkey:
             currtext = self.text
-            recolorize(currtext)
+            recolorize_line(currtext)
             currtext.edit_separator()
             currtext.see("insert")
             logger.exception("Error when handling keyboard event:")

@@ -3,6 +3,7 @@
 from src.constants import BLOCK_HEIGHT, BLOCK_WIDTH, ENCODINGS
 from src.Dialog.commondialog import get_theme
 from src.modules import codecs, os, tk, ttk, ttkthemes
+from src.tktext import EnhancedTextFrame
 
 
 class HexView:
@@ -26,41 +27,28 @@ class HexView:
         self.encoding = tk.StringVar()
         self.encoding.set(ENCODINGS[0])
 
-        self.frame = ttk.Frame(self.parent)
         buttonframe = ttk.Frame(self.parent)
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
-        bg = self._style.lookup("TLabel", "background")
-        fg = self._style.lookup("TLabel", "foreground")
         self.encoding_label = ttk.Label(buttonframe, text="Encoding")
         self.encoding_combobox = ttk.Combobox(
             buttonframe, values=ENCODINGS, textvariable=self.encoding, state="readonly"
         )
-        self.textbox = tk.Text(
-            self.frame,
+        textframe = EnhancedTextFrame(self.parent)
+        self.textbox = textframe.text
+        self.textbox.config(
             height=BLOCK_HEIGHT,
             width=2 + (BLOCK_WIDTH * 4),
             state="disabled",
-            wrap="none",
-            bg=bg,
-            fg=fg,
-            selectbackground=fg,
-            selectforeground=bg,
-            highlightthickness=0,
         )
 
         self.textbox.tag_configure("ascii", foreground="green")
         self.textbox.tag_configure("error", foreground="red")
         self.textbox.tag_configure("hexspace", foreground="navy")
         self.textbox.tag_configure("graybg", background="lightgray")
-        yscroll = ttk.Scrollbar(self.frame, command=self.textbox.yview)
-        self.textbox["yscrollcommand"] = yscroll.set
-        buttonframe.pack(side="top")
-        yscroll.pack(side="right", fill="y")
         self.encoding_label.pack(side="left", anchor="nw")
         self.encoding_combobox.pack(side="left", anchor="nw")
-        self.textbox.pack(fill="both", expand=1)
-        self.frame.pack(fill="both", expand=1)
+        textframe.pack(fill="both", expand=1)
         self.encoding.trace_variable("w", self.show_block)
 
     def show_bytes(self, row):
@@ -105,7 +93,7 @@ class HexView:
             return
         with open(self.filename, "rb") as file:
             block = file.read()
-        rows = [block[i : i + BLOCK_WIDTH] for i in range(0, len(block), BLOCK_WIDTH)]
+        rows = [block[i: i + BLOCK_WIDTH] for i in range(0, len(block), BLOCK_WIDTH)]
         for row in rows:
             self.show_bytes(row)
             self.show_line(row)

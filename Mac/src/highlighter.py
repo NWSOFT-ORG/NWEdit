@@ -64,3 +64,45 @@ def recolorize(textbox: tk.Text) -> None:
             str(token), 'range_start', 'range_end')
         currtext.mark_set(
             'range_start', 'range_end')
+
+
+def recolorize_line(textbox: tk.Text) -> None:
+    """
+    This method colors and styles the prepared tags"""
+    currtext = textbox
+    start_index = currtext.index('insert -1c linestart')
+    end_index = currtext.index('insert lineend')
+    
+    tri_str_start = []
+    tri_str_end = []
+    tri_str = []
+    cursor_pos = float(currtext.index('insert'))
+    for index, linenum in enumerate(currtext.tag_ranges('Token.Literal.String.Doc')):
+        if index % 2 == 1:
+            tri_str_end.append(float(str(linenum)))
+        else:
+            tri_str_start.append(float(str(linenum)))
+
+    for index, value in enumerate(tri_str_start):
+        tri_str.append((value, tri_str_end[index]))
+
+    for x in tri_str:
+        if x[0] <= cursor_pos and x[1] >= cursor_pos:
+            start_index = str(x[0])
+            end_index = str(x[1])
+
+    for tag in currtext.tag_names():
+        if tag in ['sel', 'found']:
+            continue
+        currtext.tag_remove(
+            tag, start_index, end_index)
+
+    _code = currtext.get(start_index, end_index)
+
+    currtext.mark_set('range_start', start_index)
+    for token, content in pygments.lex(_code, currtext.lexer):
+        currtext.mark_set('range_end', f'range_start + {len(content)}c')
+        currtext.tag_add(
+            str(token), 'range_start', 'range_end')
+        currtext.mark_set(
+            'range_start', 'range_end')

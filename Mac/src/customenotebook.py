@@ -41,9 +41,9 @@ class ClosableNotebook(ttk.Notebook):
 
         self._active = None
 
-        self.bind("<ButtonPress-1>", self.on_close_press, True)
+        self.bind("<1>", self.on_close_press, True)
         self.bind("<ButtonRelease-1>", self.on_close_release)
-        self.bind("<B1-Motion>", self)
+        self.bind("<B1-Motion>", self.move_tab)
 
         tab_frame = ttk.Frame(self)
         tab_frame.place(relx=1.0, x=0, y=1, anchor='ne')
@@ -95,7 +95,7 @@ class ClosableNotebook(ttk.Notebook):
     def on_close_press(self, event):
         """Called when the button is pressed over the close button"""
 
-        element = self.identify(event.x, event.y) 
+        element = self.identify(event.x, event.y)
         if "close" in element:
             index = self.index("@%d,%d" % (event.x, event.y))
             self.state(["pressed"])

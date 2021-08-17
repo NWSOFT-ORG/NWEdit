@@ -36,7 +36,7 @@ from src.codefunctions import CodeFunctions
 from src.Dialog.autocomplete import CompleteDialog
 from src.Dialog.goto import Navigate
 from src.hexview import HexView
-from src.highlighter import recolorize
+from src.highlighter import recolorize_line
 from src.modules import (
     Path,
     logging,
@@ -59,7 +59,7 @@ from src.statusbar import Statusbar
 from src.Dialog.testdialog import TestDialog
 from src.Dialog.searchindir import SearchInDir
 from src.Dialog.textstyle import StyleWindow
-from src.tktext import EnhancedTextFrame, TextOpts
+from src.tktext import EnhancedTextFrame, EnhancedText, TextOpts
 from src.treeview import FileTree
 from src.Git.commitview import CommitView
 
@@ -164,7 +164,10 @@ class Editor:
             self.restart()
     
     def click_tab(self, _=None):
-        self.opts.set_text(self.get_text())
+        try:
+            self.opts.set_text(self.get_text())
+        except AttributeError:
+            pass
 
     def create_bindings(self):
         # Keyboard bindings
@@ -184,7 +187,6 @@ class Editor:
     def create_menu(self) -> None:
         self.appmenu = tk.Menu(self.menubar, name='apple')
         self.appmenu.add_command(label="About PyPlus", command=lambda: AboutDialog(self.master))
-        self.appmenu.add_command(label='New Window', command=self.new_window)
         self.appmenu.add_cascade(label='Settings',
                                  menu=self.settings_class.create_menu(self.open_file, self.master))
         self.appmenu.add_command(label='View log', command=lambda: LogViewDialog())
@@ -264,7 +266,12 @@ class Editor:
                                  command=lambda: Navigate(self.get_text()) if self.tabs else None)
 
         self.gitmenu = tk.Menu(self.menubar)
-        self.gitmenu.add_command(label="Initialize", command=lambda: self.git("init"))
+        self.gitmenu.add_command(label="Initialize", command=lambda:
+            subprocess.Popen(
+                'git init && git add . && git commit -am "Added files"',
+                shell=True,
+                cwd=self.filetree.path,
+            ))
         self.gitmenu.add_command(label="Clone...", command=lambda: self.git("clone"))
 
         self.menubar.add_cascade(label="PyPlus", menu=self.appmenu)  # App menu
@@ -399,7 +406,7 @@ class Editor:
         """Event when a key is pressed."""
         try:
             currtext = self.get_text()
-            recolorize(currtext)
+            recolorize_line(currtext)
             currtext.edit_separator()
             currtext.see("insert")
             currtext.complete.insert_completions()
@@ -449,7 +456,7 @@ class Editor:
             viewer.focus_set()
             window = HexView(viewer)
             window.open(file_dir)
-            self.tabs[viewer] = Document(viewer, window.textbox, file_dir)
+            self.tabs[viewer] = Document(viewer, EnhancedText, file_dir)
             self.nb.add(viewer, text=f"Hex -- {os.path.basename(file_dir)}")
             self.nb.select(viewer)
             self.update_title()
@@ -620,7 +627,10 @@ class Editor:
         newtk.mainloop()
 
     def get_text(self):
-        return self.tabs[self.nb.get_tab()].textbox
+        try:
+            return self.tabs[self.nb.get_tab()].textbox
+        except KeyError:
+            pass
 
     def git(self, action=None) -> None:
         currdir = self.filetree.path
@@ -634,20 +644,5 @@ class Editor:
         if not os.path.exists(path := os.path.join(currdir, ".git")):
             ErrorInfoDialog(self.master, f"Not a git repository: {Path(path).parent}")
             return
-        if action == "init":
-            subprocess.Popen(
-                'git init && git add . && git commit -am "Added files"',
-                shell=True,
-                cwd=currdir,
-            )
         elif action == "commit":
             CommitView(self.panedwin, currdir)
-
-
-def new_window(self):
-    new_window = tk.Toplevel(self.master)
-    Editor(new_window)
-    self.master = new_window
-
-
-Editor.new_window = new_window

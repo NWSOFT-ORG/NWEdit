@@ -8,7 +8,7 @@ class CommitView(ttk.Frame):
     def __init__(self, parent, path: str):
         super().__init__(parent)
         self.parent = parent
-        self.init_ui(parent)
+        self.init_ui()
 
         self.path = path
         subprocess.run("git add .", shell=True, cwd=self.path)
@@ -29,9 +29,7 @@ class CommitView(ttk.Frame):
         self.committext = tk.Text(commit_frame, font="Arial", height=4)
         self.committext.pack()
         self.files_listbox.delete(*self.files_listbox.get_children())
-        ttk.Button(commit_frame, text="Commit >>", command=self.commit).pack(
-            side="bottom", fill="x"
-        )
+        ttk.Button(commit_frame, text="Commit >>", command=self.commit).pack(side="bottom")
         self.remote_selected = tk.StringVar()
         self.branch_selected = tk.StringVar()
         frame = ttk.Frame(self)
@@ -55,19 +53,20 @@ class CommitView(ttk.Frame):
         self.pull_button = ttk.Button(self.main_frame, text='Pull', command=self.pull)
         self.pull_button.pack(anchor='nw', side='left')
 
-        remotes = [subprocess.run(
+        remotes = subprocess.run(
                 "git remote",
                 capture_output=True,
                 shell=True,
                 cwd=self.path,
-                ).stdout.decode("utf-8").splitlines()]
+                ).stdout.decode("utf-8").splitlines()
 
-        branches = [subprocess.run(
+        branches = subprocess.run(
                 "git branch -r --no-color",
                 capture_output=True,
                 shell=True,
                 cwd=self.path,
-                ).stdout.decode("utf-8").splitlines()]
+                ).stdout.decode("utf-8").splitlines()
+        del branches[0]
 
         self.remotes_list["values"] = remotes
         self.remotes_list.set(remotes[0])
@@ -157,10 +156,15 @@ class CommitView(ttk.Frame):
                 shell=True,
                 cwd=self.dir,
             )
-            self.destroy()
+            self.files_listbox.delete(*self.files_listbox.get_children())
 
     def diff(self, event=None):
         item = self.files_listbox.identify("item", event.x, event.y)
+        tags = self.files_listbox.item(item, 'tags')
+        
+        if tags[0] != 'modified':
+            return
+
         text = self.files_listbox.item(item, "text")
         prefix = text[0]
         selected = text[2:]

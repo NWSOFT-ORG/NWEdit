@@ -35,7 +35,6 @@ class FileOpenDialog(FileTree):
             master=self.win,
             opencommand=opencommand,
             path=os.path.expanduser("~"),
-            showbuttonframe=False,
         )
 
     def open(self):

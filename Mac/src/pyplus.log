@@ -1,87 +1,161 @@
-2021-09-06 12:49:52,509 INFO <module> Tkinter version: 8.6
-2021-09-06 12:49:52,509 DEBUG <module> All modules imported
-2021-09-06 12:49:53,709 DEBUG __init__ Settings loaded
-2021-09-06 12:49:53,713 DEBUG __init__ Icons loaded
-2021-09-06 12:49:53,718 DEBUG __init__ Theme loaded
-2021-09-06 12:49:53,730 DEBUG __initialize_custom_style Initialized custom style.
-2021-09-06 12:49:53,895 DEBUG create_menu Right-click menu created
-2021-09-06 12:49:53,949 DEBUG create_menu Menu created
-2021-09-06 12:49:53,949 DEBUG create_bindings Bindings created
-2021-09-06 12:49:53,952 DEBUG start_screen Start screen created
-2021-09-06 12:49:54,327 DEBUG update_title update_title: No file open
-2021-09-06 12:49:54,327 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:49:58,151 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:49:58,151 DEBUG update_title update_title: No file open
-2021-09-06 12:49:58,151 DEBUG mouse update_title: OK
-2021-09-06 12:50:02,512 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:02,512 DEBUG update_title update_title: No file open
-2021-09-06 12:50:02,512 DEBUG mouse update_title: OK
-2021-09-06 12:50:03,548 DEBUG on_close_press Close tab start
-2021-09-06 12:50:03,670 DEBUG on_close_release Close tab end
-2021-09-06 12:50:03,671 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:03,671 DEBUG update_title update_title: No file open
-2021-09-06 12:50:03,671 DEBUG mouse update_title: OK
-2021-09-06 12:50:05,286 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:05,286 DEBUG update_title update_title: No file open
-2021-09-06 12:50:05,287 DEBUG mouse update_title: OK
-2021-09-06 12:50:05,439 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:05,439 DEBUG update_title update_title: No file open
-2021-09-06 12:50:05,439 DEBUG mouse update_title: OK
-2021-09-06 12:50:08,014 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:08,014 DEBUG update_title update_title: No file open
-2021-09-06 12:50:08,014 DEBUG mouse update_title: OK
-2021-09-06 12:50:08,227 DEBUG create_text_widget Textbox created
-2021-09-06 12:50:08,297 DEBUG update_statusbar update_statusbar: OK
-2021-09-06 12:50:08,298 DEBUG update_title update_title: OK
-2021-09-06 12:50:08,298 DEBUG mouse update_title: OK
-2021-09-06 12:50:08,299 INFO open_file File opened
-2021-09-06 12:50:08,299 DEBUG update_statusbar update_statusbar: OK
-2021-09-06 12:50:08,299 DEBUG update_title update_title: OK
-2021-09-06 12:50:08,299 DEBUG mouse update_title: OK
-2021-09-06 12:50:09,723 DEBUG on_close_press Close tab start
-2021-09-06 12:50:09,859 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:09,860 DEBUG update_title update_title: No file open
-2021-09-06 12:50:09,860 DEBUG mouse update_title: OK
-2021-09-06 12:50:09,860 DEBUG on_close_release Close tab end
-2021-09-06 12:50:09,860 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:09,860 DEBUG update_title update_title: No file open
-2021-09-06 12:50:09,860 DEBUG mouse update_title: OK
-2021-09-06 12:50:10,976 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:10,977 DEBUG update_title update_title: No file open
-2021-09-06 12:50:10,977 DEBUG mouse update_title: OK
-2021-09-06 12:50:11,153 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:11,153 DEBUG update_title update_title: No file open
-2021-09-06 12:50:11,153 DEBUG mouse update_title: OK
-2021-09-06 12:50:12,944 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:12,944 DEBUG update_title update_title: No file open
-2021-09-06 12:50:12,944 DEBUG mouse update_title: OK
-2021-09-06 12:50:13,027 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:13,028 DEBUG update_title update_title: No file open
-2021-09-06 12:50:13,028 DEBUG mouse update_title: OK
-2021-09-06 12:50:13,131 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:13,131 DEBUG update_title update_title: No file open
-2021-09-06 12:50:13,132 DEBUG mouse update_title: OK
-2021-09-06 12:50:14,793 INFO apply apply
-2021-09-06 12:50:15,925 INFO cancel cancel
-2021-09-06 12:50:15,994 INFO open_file User pressed No.
-2021-09-06 12:50:15,994 INFO open_hex HexView: opened
-2021-09-06 12:50:18,761 INFO cancel cancel
-2021-09-06 12:50:18,778 DEBUG update_title update_title: OK
-2021-09-06 12:50:18,779 INFO open_file User pressed No.
-2021-09-06 12:50:18,779 INFO open_file User pressed No.
-2021-09-06 12:50:41,560 DEBUG update_title update_title: OK
-2021-09-06 12:50:41,562 DEBUG mouse update_title: OK
-2021-09-06 12:50:45,622 DEBUG on_close_press Close tab start
-2021-09-06 12:50:45,731 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:45,732 DEBUG update_title update_title: No file open
-2021-09-06 12:50:45,733 DEBUG mouse update_title: OK
-2021-09-06 12:50:45,733 DEBUG on_close_release Close tab end
-2021-09-06 12:50:45,733 DEBUG update_statusbar update_statusbar: No file open
-2021-09-06 12:50:45,733 DEBUG update_title update_title: No file open
-2021-09-06 12:50:45,733 DEBUG mouse update_title: OK
-2021-09-06 12:50:55,190 INFO exit Window is destroyed
-2021-09-06 12:50:55,190 ERROR open_file Error when opening file:
+2021-09-12 10:06:52,776 INFO <module> Tkinter version: 8.6
+2021-09-12 10:06:52,776 DEBUG <module> All modules imported
+2021-09-12 10:06:53,888 DEBUG __init__ Settings loaded
+2021-09-12 10:06:53,889 DEBUG __init__ Icons loaded
+2021-09-12 10:06:53,890 DEBUG __init__ Theme loaded
+2021-09-12 10:06:53,908 DEBUG __initialize_custom_style Initialized custom style.
+2021-09-12 10:06:57,373 DEBUG create_menu Right-click menu created
+2021-09-12 10:06:57,384 DEBUG create_menu Menu created
+2021-09-12 10:06:57,385 DEBUG create_bindings Bindings created
+2021-09-12 10:06:57,390 DEBUG start_screen Start screen created
+2021-09-12 10:06:57,390 DEBUG update_title update_title: No file open
+2021-09-12 10:06:57,390 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:06:59,052 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:06:59,053 DEBUG update_title update_title: No file open
+2021-09-12 10:06:59,053 DEBUG mouse update_title: OK
+2021-09-12 10:06:59,244 DEBUG create_text_widget Textbox created
+2021-09-12 10:06:59,394 DEBUG update_statusbar update_statusbar: OK
+2021-09-12 10:06:59,394 DEBUG update_title update_title: OK
+2021-09-12 10:06:59,394 DEBUG mouse update_title: OK
+2021-09-12 10:06:59,395 INFO open_file File opened
+2021-09-12 10:06:59,395 DEBUG update_statusbar update_statusbar: OK
+2021-09-12 10:06:59,395 DEBUG update_title update_title: OK
+2021-09-12 10:06:59,395 DEBUG mouse update_title: OK
+2021-09-12 10:07:01,196 DEBUG on_close_press Close tab start
+2021-09-12 10:07:01,197 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:01,197 DEBUG update_title update_title: No file open
+2021-09-12 10:07:01,197 DEBUG mouse update_title: OK
+2021-09-12 10:07:01,197 DEBUG on_close_release Close tab end
+2021-09-12 10:07:01,197 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:01,198 DEBUG update_title update_title: No file open
+2021-09-12 10:07:01,198 DEBUG mouse update_title: OK
+2021-09-12 10:07:02,489 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:02,490 DEBUG update_title update_title: No file open
+2021-09-12 10:07:02,490 DEBUG mouse update_title: OK
+2021-09-12 10:07:03,623 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:03,624 DEBUG update_title update_title: No file open
+2021-09-12 10:07:03,624 DEBUG mouse update_title: OK
+2021-09-12 10:07:03,781 ERROR open_file Error when opening file:
 Traceback (most recent call last):
-  File "/Users/Andy/OneDrive/Documents/PyPlus/Mac/src/editor.py", line 487, in open_file
-    if dialog.result:
-AttributeError: 'YesNoDialog' object has no attribute 'result'
+  File "/home/runner/PyPlus/Mac/src/editor.py", line 483, in open_file
+    if is_binary_string(open(file_dir, "rb").read()):
+IsADirectoryError: [Errno 21] Is a directory: '//home/runner/.m2/repository'
+2021-09-12 10:07:03,782 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:03,782 DEBUG update_title update_title: No file open
+2021-09-12 10:07:03,782 DEBUG mouse update_title: OK
+2021-09-12 10:07:04,705 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:04,705 DEBUG update_title update_title: No file open
+2021-09-12 10:07:04,705 DEBUG mouse update_title: OK
+2021-09-12 10:07:04,899 ERROR open_file Error when opening file:
+Traceback (most recent call last):
+  File "/home/runner/PyPlus/Mac/src/editor.py", line 483, in open_file
+    if is_binary_string(open(file_dir, "rb").read()):
+IsADirectoryError: [Errno 21] Is a directory: '//home/runner/.m2/repository/gsbase'
+2021-09-12 10:07:04,900 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:04,900 DEBUG update_title update_title: No file open
+2021-09-12 10:07:04,900 DEBUG mouse update_title: OK
+2021-09-12 10:07:05,809 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:05,809 DEBUG update_title update_title: No file open
+2021-09-12 10:07:05,810 DEBUG mouse update_title: OK
+2021-09-12 10:07:05,970 ERROR open_file Error when opening file:
+Traceback (most recent call last):
+  File "/home/runner/PyPlus/Mac/src/editor.py", line 483, in open_file
+    if is_binary_string(open(file_dir, "rb").read()):
+IsADirectoryError: [Errno 21] Is a directory: '//home/runner/.m2/repository/gsbase'
+2021-09-12 10:07:05,970 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:05,970 DEBUG update_title update_title: No file open
+2021-09-12 10:07:05,971 DEBUG mouse update_title: OK
+2021-09-12 10:07:06,836 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:06,836 DEBUG update_title update_title: No file open
+2021-09-12 10:07:06,836 DEBUG mouse update_title: OK
+2021-09-12 10:07:06,999 ERROR open_file Error when opening file:
+Traceback (most recent call last):
+  File "/home/runner/PyPlus/Mac/src/editor.py", line 483, in open_file
+    if is_binary_string(open(file_dir, "rb").read()):
+IsADirectoryError: [Errno 21] Is a directory: '//home/runner/.m2/repository/gsbase'
+2021-09-12 10:07:07,000 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:07,000 DEBUG update_title update_title: No file open
+2021-09-12 10:07:07,000 DEBUG mouse update_title: OK
+2021-09-12 10:07:07,906 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:07,906 DEBUG update_title update_title: No file open
+2021-09-12 10:07:07,906 DEBUG mouse update_title: OK
+2021-09-12 10:07:09,081 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:09,082 DEBUG update_title update_title: No file open
+2021-09-12 10:07:09,082 DEBUG mouse update_title: OK
+2021-09-12 10:07:10,297 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:10,297 DEBUG update_title update_title: No file open
+2021-09-12 10:07:10,298 DEBUG mouse update_title: OK
+2021-09-12 10:07:10,524 DEBUG create_text_widget Textbox created
+2021-09-12 10:07:10,533 DEBUG update_statusbar update_statusbar: OK
+2021-09-12 10:07:10,534 DEBUG update_title update_title: OK
+2021-09-12 10:07:10,534 DEBUG mouse update_title: OK
+2021-09-12 10:07:10,534 INFO open_file File opened
+2021-09-12 10:07:10,534 DEBUG update_statusbar update_statusbar: OK
+2021-09-12 10:07:10,534 DEBUG update_title update_title: OK
+2021-09-12 10:07:10,534 DEBUG mouse update_title: OK
+2021-09-12 10:07:13,903 DEBUG on_close_press Close tab start
+2021-09-12 10:07:13,904 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:13,904 DEBUG update_title update_title: No file open
+2021-09-12 10:07:13,904 DEBUG mouse update_title: OK
+2021-09-12 10:07:13,904 DEBUG on_close_release Close tab end
+2021-09-12 10:07:13,905 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:13,905 DEBUG update_title update_title: No file open
+2021-09-12 10:07:13,905 DEBUG mouse update_title: OK
+2021-09-12 10:07:15,427 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:15,428 DEBUG update_title update_title: No file open
+2021-09-12 10:07:15,428 DEBUG mouse update_title: OK
+2021-09-12 10:07:22,822 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:22,822 DEBUG update_title update_title: No file open
+2021-09-12 10:07:22,822 DEBUG mouse update_title: OK
+2021-09-12 10:07:23,834 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:23,834 DEBUG update_title update_title: No file open
+2021-09-12 10:07:23,834 DEBUG mouse update_title: OK
+2021-09-12 10:07:52,638 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:52,638 DEBUG update_title update_title: No file open
+2021-09-12 10:07:52,638 DEBUG mouse update_title: OK
+2021-09-12 10:07:53,884 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:53,885 DEBUG update_title update_title: No file open
+2021-09-12 10:07:53,885 DEBUG mouse update_title: OK
+2021-09-12 10:07:54,111 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:54,111 DEBUG update_title update_title: No file open
+2021-09-12 10:07:54,111 DEBUG mouse update_title: OK
+2021-09-12 10:07:59,155 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:07:59,156 DEBUG update_title update_title: No file open
+2021-09-12 10:07:59,156 DEBUG mouse update_title: OK
+2021-09-12 10:08:03,699 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:08:03,699 DEBUG update_title update_title: No file open
+2021-09-12 10:08:03,700 DEBUG mouse update_title: OK
+2021-09-12 10:08:04,785 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:08:04,786 DEBUG update_title update_title: No file open
+2021-09-12 10:08:04,786 DEBUG mouse update_title: OK
+2021-09-12 10:08:05,840 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:08:05,840 DEBUG update_title update_title: No file open
+2021-09-12 10:08:05,840 DEBUG mouse update_title: OK
+2021-09-12 10:08:06,903 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:08:06,903 DEBUG update_title update_title: No file open
+2021-09-12 10:08:06,903 DEBUG mouse update_title: OK
+2021-09-12 10:08:07,968 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:08:07,969 DEBUG update_title update_title: No file open
+2021-09-12 10:08:07,969 DEBUG mouse update_title: OK
+2021-09-12 10:08:09,108 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:08:09,108 DEBUG update_title update_title: No file open
+2021-09-12 10:08:09,108 DEBUG mouse update_title: OK
+2021-09-12 10:08:09,316 DEBUG create_text_widget Textbox created
+2021-09-12 10:08:09,327 DEBUG update_statusbar update_statusbar: OK
+2021-09-12 10:08:09,327 DEBUG update_title update_title: OK
+2021-09-12 10:08:09,327 DEBUG mouse update_title: OK
+2021-09-12 10:08:09,327 INFO open_file File opened
+2021-09-12 10:08:09,328 DEBUG update_statusbar update_statusbar: OK
+2021-09-12 10:08:09,328 DEBUG update_title update_title: OK
+2021-09-12 10:08:09,328 DEBUG mouse update_title: OK
+2021-09-12 10:08:12,815 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:08:12,815 DEBUG update_title update_title: No file open
+2021-09-12 10:08:12,815 DEBUG mouse update_title: OK
+2021-09-12 10:08:24,700 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:08:24,701 DEBUG update_title update_title: No file open
+2021-09-12 10:08:24,701 DEBUG mouse update_title: OK
+2021-09-12 10:08:24,920 DEBUG update_statusbar update_statusbar: No file open
+2021-09-12 10:08:24,920 DEBUG update_title update_title: No file open
+2021-09-12 10:08:24,920 DEBUG mouse update_title: OK
+2021-09-12 10:08:26,249 INFO apply apply
+2021-09-12 10:08:26,249 INFO open_hex HexView: opened

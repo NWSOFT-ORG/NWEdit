@@ -438,11 +438,10 @@ class Editor:
             for line in f.read().split("\n"):
                 if line:
                     self.open_file(line, askhex=False)
-            if not f.read():
+            if not f.read().strip():
                 self.start_screen()
         with open("Backups/recent_dir.txt") as f:
             self.filetree.path = f.read()
-            self.filetree.init_ui()
         self.update_title()
         self.update_statusbar()
 

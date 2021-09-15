@@ -83,9 +83,7 @@ class Editor:
 
     def __init__(self, master) -> None:
         """The editor object, the entire thing that goes in the
-        window.
-        Lacks these MacOS support:
-        * The file selector does not work."""
+        window."""
         try:
             self.settings_class = Settings()
             self.file_settings_class = Lexer()
@@ -296,7 +294,7 @@ class Editor:
             10,
             anchor="nw",
             text="Welcome to PyPlus!",
-            font="Arial 50",
+            font="Arial 35",
             fill=self.fg,
         )
         label1 = ttk.Label(
@@ -442,90 +440,93 @@ class Editor:
                 self.start_screen()
         with open("Backups/recent_dir.txt") as f:
             self.filetree.path = f.read()
+            self.filetree.refresh_tree()
         self.update_title()
         self.update_statusbar()
 
     def open_hex(self, file=""):
-        if file:
-            file_dir = file
-        else:
-            file_dir = ""
+        if not file:
             FileOpenDialog(self.open_hex)
-        if file_dir:
-            logger.info("HexView: opened")
-            viewer = ttk.Frame(self.master)
-            viewer.focus_set()
-            window = HexView(viewer)
-            window.open(file_dir)
-            self.tabs[viewer] = Document(viewer, EnhancedText, file_dir)
-            self.nb.add(viewer, text=f"Hex -- {os.path.basename(file_dir)}")
-            self.nb.select(viewer)
-            self.update_title()
-            self.update_statusbar()
-            return window.textbox
+        file = os.path.abspath(file)
+        logger.info("HexView: opened")
+        viewer = ttk.Frame(self.master)
+        viewer.focus_set()
+        window = HexView(viewer)
+        window.open(file)
+        self.tabs[viewer] = Document(viewer, EnhancedText, file)
+        self.nb.add(viewer, text=f"Hex -- {os.path.basename(file)}")
+        self.nb.select(viewer)
+        self.update_title()
+        self.update_statusbar()
+        return window.textbox
+    
+    def open_dir(self, directory: str = ""):
+        if not directory:
+            directory = DirectoryOpenDialog(self.open_dir)
+            
+        self.filetree.path = directory
+        self.filetree.refresh_tree()
 
     def open_file(self, file: str = "", askhex: bool = True):
         """Opens a file
         If a file is not provided, a messagebox'll
         pop up to ask the user to select the path."""
-        if file:
-            file_dir = file
-        else:
-            file_dir = ""
+        if not file:
             FileOpenDialog(self.open_file)
 
-        if file_dir:
-            try:  # If the file is in binary, ask the user to open in Hex editor
-                for tab in self.tabs.items():
-                    if file_dir == tab[1].file_dir:
-                        self.nb.select(tab[1].frame)
-                        return tab[1].textbox
-                if is_binary_string(open(file_dir, "rb").read()):
-                    if askhex:
-                        dialog = YesNoDialog(self.master, "Error", "View in Hex?")
-                        if dialog.result:
-                            self.open_hex(file_dir)
-                        logging.info("User pressed No.")
-                        return self.get_text()
-                    self.open_hex(file_dir)
+        file = os.path.abspath(file)
+        try:
+            # If the file is already opened, focus the tab
+            for tab in self.tabs.items():
+                if file == tab[1].file_dir:
+                    self.nb.select(tab[1].frame)
+                    return tab[1].textbox
+            # If the file is in binary, ask the user to open in Hex editor
+            if is_binary_string(open(file, "rb").read()):
+                if askhex:
+                    dialog = YesNoDialog(self.master, "Error", "View in Hex?")
+                    if dialog.result:
+                        self.open_hex(file)
+                    logging.info("User pressed No.")
                     return self.get_text()
+                self.open_hex(file)
+                return self.get_text()
 
-                file = open(file_dir)
-                extens = file_dir.split(".")[-1]
-
-                new_tab = ttk.Frame(self.nb)
-                textbox = self.create_text_widget(new_tab)
-                self.tabs[new_tab] = Document(new_tab, textbox, file_dir)
-                self.nb.add(new_tab, text=os.path.basename(file_dir))
-                self.nb.select(new_tab)
-
+            extens = file.split(".")[-1]
+            new_tab = ttk.Frame(self.nb)
+            textbox = self.create_text_widget(new_tab)
+            with open(file) as f:
                 # Puts the contents of the file into the text widget.
-                textbox.insert("end", file.read().replace("\t", " " * self.tabwidth))
+                textbox.insert("end", f.read().replace("\t", " " * self.tabwidth))
                 # Inserts file content, replacing tabs with four spaces
-                textbox.focus_set()
-                textbox.set_lexer(self.file_settings_class.get_settings(extens))
-                textbox.lint_cmd = self.linter_settings_class.get_settings(extens)
-                textbox.cmd = self.cmd_settings_class.get_settings(extens)
-                textbox.format_command = self.format_settings_class.get_settings(
-                    extens
-                )
-                textbox.comment_marker = self.commet_settings_class.get_settings(
-                    extens
-                )
+            self.tabs[new_tab] = Document(new_tab, textbox, file)
+            self.nb.add(new_tab, text=os.path.basename(file))
+            self.nb.select(new_tab)
 
-                textbox.see("insert")
-                textbox.event_generate("<<Key>>")
-                textbox.focus_set()
-                textbox.edit_reset()
-                self.opts.set_text(textbox)
-                self.mouse()
-                logging.info("File opened")
-                return textbox
-            except Exception as e:
-                if type(e).__name__ != "ValueError":
-                    logger.exception("Error when opening file:")
-                else:
-                    logger.exception("Warning! Program has ValueError.")
+            textbox.focus_set()
+            textbox.set_lexer(self.file_settings_class.get_settings(extens))
+            textbox.lint_cmd = self.linter_settings_class.get_settings(extens)
+            textbox.cmd = self.cmd_settings_class.get_settings(extens)
+            textbox.format_command = self.format_settings_class.get_settings(
+                extens
+            )
+            textbox.comment_marker = self.commet_settings_class.get_settings(
+                extens
+            )
+
+            textbox.see("insert")
+            textbox.event_generate("<<Key>>")
+            textbox.focus_set()
+            textbox.edit_reset()
+            self.opts.set_text(textbox)
+            self.mouse()
+            logging.info("File opened")
+            return textbox
+        except Exception as e:
+            if type(e).__name__ != "ValueError":
+                logger.exception("Error when opening file:")
+            else:
+                logger.exception("Warning! Program has ValueError.")
 
     def save_as(self, file: str = None) -> None:
         """Save the document as a different name."""

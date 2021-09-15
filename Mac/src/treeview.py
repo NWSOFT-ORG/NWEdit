@@ -173,12 +173,15 @@ class FileTree(ttk.Frame):
         self.refresh_tree()
 
     def process_directory(self, parent, path):
-        for p in os.listdir(path):
+        items = next(os.walk(path))[1] + next(os.walk(path))[2]
+        for p in items:
             abspath = os.path.join(path, p)
             isdir = os.path.isdir(abspath)
-            oid = self.tree.insert(parent, 'end', text=p, open=False)
             if isdir:
+                oid = self.tree.insert(parent, 'end', text=p, tags='subfolder', open=False)
                 self.process_directory(oid, abspath)
+            else:
+                oid = self.tree.insert(parent, 'end', text=p, tags='row', open=False)
 
     def on_double_click_treeview(self, _=None, destroy: bool = False):
         global path
@@ -197,6 +200,7 @@ class FileTree(ttk.Frame):
 
         get_parent(item)
         path.reverse()
+        path.remove('')
         path = os.path.abspath('/'.join(path))
         self.opencommand(os.path.join(path, name))
 
@@ -206,6 +210,6 @@ class FileTree(ttk.Frame):
         self.tree.heading("#0", text=self.path)
         path = self.path
         abspath = os.path.abspath(path)
-        root_node = self.tree.insert('', 'end', text=abspath, open=True)
+        root_node = self.tree.insert('', 'end', text=abspath, tags='row', open=True)
         self.process_directory(root_node, abspath)
         self.yscroll.set(*ypos)

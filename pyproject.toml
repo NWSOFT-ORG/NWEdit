@@ -14,13 +14,7 @@ art = "^5.1"
 json5 = "^0.9.5"
 py2app = "^0.23"
 pygments = "^2.8.0"
-pygments-agentspeak = "^1.0"
 python = "^3.8"
 requests = "^2.25.1"
 setuptools = "^54.1.2"
 ttkthemes = "^3.2.0"
-
-[tool.poetry.dev-dependencies]
-flake8 = "^3.9.0"
-pylint = "^2.7.4"
-rope = "^0.18.0"

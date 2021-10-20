@@ -27,7 +27,7 @@ from src.Dialog.commondialog import (ErrorInfoDialog, InputStringDialog,
                                      YesNoDialog, AboutDialog)
 from src.Dialog.codelistdialog import CodeListDialog
 from src.Dialog.debugdialog import (ErrorReportDialog, LogViewDialog)
-from src.Dialog.filedialog import FileOpenDialog, FileSaveAsDialog
+from src.Dialog.filedialog import FileOpenDialog, FileSaveAsDialog, DirectoryOpenDialog
 from src.functions import (
     is_binary_string,
     is_dark_color
@@ -210,6 +210,12 @@ class Editor:
         open_cascade.add_command(
             label="Open File in Hex",
             command=lambda: self.open_hex(),
+            image=self.open_icon,
+            compound='left'
+        )
+        open_cascade.add_command(
+            label="Open Folder/Project",
+            command=lambda: self.open_dir(),
             image=self.open_icon,
             compound='left'
         )
@@ -462,7 +468,8 @@ class Editor:
     
     def open_dir(self, directory: str = ""):
         if not directory:
-            directory = DirectoryOpenDialog(self.open_dir)
+            DirectoryOpenDialog(self.open_dir)
+            return
             
         self.filetree.path = directory
         self.filetree.refresh_tree()
@@ -473,6 +480,7 @@ class Editor:
         pop up to ask the user to select the path."""
         if not file:
             FileOpenDialog(self.open_file)
+            return
 
         file = os.path.abspath(file)
         try:

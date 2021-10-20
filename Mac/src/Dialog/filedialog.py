@@ -70,9 +70,6 @@ class DirectoryOpenDialog(FileOpenDialog):
         self.opencommand = opencommand
         super().__init__(opencommand=opencommand)
 
-    def process_directory(self, path: str):
-        super().process_directory(path, True)
-
     def open(self):
         self.opencommand(
             os.path.join(self.path, self.tree.item(self.tree.focus(), "text"))

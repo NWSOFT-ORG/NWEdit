@@ -59,9 +59,12 @@ class FileTree(ttk.Frame):
         self.tree.tag_configure("row", font="Arial 10")
         self.tree.tag_configure("subfolder", foreground="#448dc4", font="Arial 10")
         self.tree.pack(fill="both", expand=1, anchor="nw")
+    
+    def get_path(self, event):
+        return os.path.join(self.path, self.tree.item(self.tree.identify('item', event.x, event.y), "text"))
 
-    def remove(self):
-        path = os.path.join(self.path, self.tree.item(self.tree.focus())["text"])
+    def remove(self, event):
+        path = self.get_path(event)
         if YesNoDialog(
             title="Warning!", text="This file/directory will be deleted immediately!"
         ):
@@ -71,9 +74,9 @@ class FileTree(ttk.Frame):
                 os.remove(path)
             self.refresh_tree()
 
-    def rename(self):
+    def rename(self, event):
         try:
-            path = os.path.join(self.path, self.tree.item(self.tree.focus())["text"])
+            path = self.get_path(event)
             dialog = InputStringDialog(self.master, "Rename", "New name:")
             newdir = os.path.join(self.path, dialog.result)
             shutil.move(path, newdir)
@@ -81,8 +84,8 @@ class FileTree(ttk.Frame):
         except (IsADirectoryError, FileExistsError):
             pass
 
-    def get_info(self):
-        path = os.path.join(self.path, self.tree.item(self.tree.focus())["text"])
+    def get_info(self, event):
+        path = self.get_path(event)
         basename = os.path.basename(path)
         size = str(os.path.getsize(path))
         # Determine the correct unit
@@ -118,11 +121,11 @@ class FileTree(ttk.Frame):
         if not (WINDOWS or OSX):
             ttk.Label(
                 win,
-                text="Note: the dates would not be the exact date of creation or modification!",
+                text="Note: On Linux, the dates would not be the exact date of creation or modification!",
             ).pack(side="top", anchor="nw", fill="x")
         win.mainloop()
     
-    def new_folder(self, item):
+    def new_folder(self, event):
         win = tk.Toplevel(master=self.master)
         win.title("New Directory")
         win.transient(".")
@@ -131,20 +134,12 @@ class FileTree(ttk.Frame):
         ttk.Label(win, text="Name:").pack(side="top", anchor="nw")
         filename = tk.Entry(win)
         filename.pack(side="top", anchor="nw")
+        item = self.tree.item(self.tree.identify('item', event.x, event.y), 'text')
         def create():
             if not filename.get():
                 return
-            path = []
-            tree = self.tree
-            def get_parent(item):
-                parent_iid = tree.parent(item)
-                parent_text = tree.item(parent_iid, 'text')
-                path.append(parent_text)
-                if parent_text:
-                    get_parent(parent_iid)
-
-            path = '/'.join(path)
             try:
+                path = f'{item}/{filename.get()}'
                 os.mkdir(path)
             except FileExistsError:
                 if YesNoDialog(
@@ -153,10 +148,10 @@ class FileTree(ttk.Frame):
                 ).result:
                     shutil.rmtree(path, ignore_errors=True)
                     os.mkdir(path)
+            self.refresh_tree()
 
-    def new_file(self, item):
-        print(item)
-        win = tk.Toplevel(master=self.master)
+    def new_file(self, event):
+        win = tk.Toplevel(self.master)
         win.title("New File")
         win.transient(".")
         win.resizable(0, 0)
@@ -164,21 +159,12 @@ class FileTree(ttk.Frame):
         ttk.Label(win, text="Name:").pack(side="top", anchor="nw")
         filename = tk.Entry(win)
         filename.pack(side="top", anchor="nw")
+        item = self.tree.identify('item', event.x, event.y)
         def create():
             if not filename.get():
                 return
-            tree = self.tree
-            path = []
-
-            def get_parent(item):
-                parent_iid = tree.parent(item)
-                parent_text = tree.item(parent_iid, 'text')
-                path.append(parent_text)
-                if parent_text:
-                    get_parent(parent_iid)
-
-            path = path[1:]
-            path = '/'.join(path)
+            directory = self.tree.item(self.tree.parent(item), "text")
+            path = f'{directory}/{filename.get()}'
             if os.path.exists(path):
                 YesNoDialog(
                     title="This file already exsists!",
@@ -198,7 +184,7 @@ class FileTree(ttk.Frame):
         self.refresh_tree()
 
     def process_directory(self, parent, showdironly: bool = False, path: str = ''):
-        items = os.listdir(path)
+        items = sorted(os.listdir(path))
         last_dir_index = 0
         for p in items:
             abspath = os.path.join(path, p)
@@ -211,34 +197,34 @@ class FileTree(ttk.Frame):
                 oid = self.tree.insert(parent, 'end', text=p, tags='row', open=False)
 
     def on_double_click_treeview(self, event, destroy: bool = False):
-        global path
         tree = self.tree
         item = tree.identify('item', event.x, event.y)
         name = tree.item(item, 'text')
-        path = []
+        self.temp_path = []
+        self.get_parent(item)
+        self.temp_path.reverse()
+        self.temp_path.remove('')
+        self.temp_path = os.path.abspath('/'.join(self.temp_path))
+        self.opencommand(os.path.join(self.temp_path, name))
 
-        def get_parent(item):
-            parent_iid = tree.parent(item)
-            parent_text = tree.item(parent_iid, 'text')
-            path.append(parent_text)
-            if parent_text:
-                get_parent(parent_iid)
-
-        get_parent(item)
-        path.reverse()
-        path.remove('')
-        path = os.path.abspath('/'.join(path))
-        self.opencommand(os.path.join(path, name))
+    def get_parent(self, item):
+        """Find the path to item in treeview"""
+        tree = self.tree
+        parent_iid = tree.parent(item)
+        parent_text = tree.item(parent_iid, 'text')
+        self.temp_path.append(parent_text)
+        if parent_text:
+            self.get_parent(parent_iid)
     
     def right_click(self, event):
-        item = self.tree.identify('item', event.x, event.y)
-        
         menu = tk.Menu(self.master)
 
         new_cascade = tk.Menu(menu)
-        new_cascade.add_command(label='New File', command=lambda: self.new_file(item))
-        new_cascade.add_command(label='New Directory', command=lambda: self.new_folder(item))
+        new_cascade.add_command(label='New File', command=lambda: self.new_file(event))
+        new_cascade.add_command(label='New Directory', command=lambda: self.new_folder(event))
         menu.add_cascade(menu=new_cascade, label='New...')
+        menu.add_separator()
+        menu.add_command(label='Refresh', command=self.refresh_tree)
         
         menu.tk_popup(event.x_root, event.y_root)
 

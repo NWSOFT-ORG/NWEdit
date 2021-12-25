@@ -1,5 +1,0 @@
-{
-    "python.linting.flake8Enabled": true,
-    "python.linting.prospectorEnabled": false,
-    "python.linting.enabled": true
-}

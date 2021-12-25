@@ -1,0 +1,6 @@
+.DS_STORE
+src/pyplus.log
+*.pyc
+src/Backups
+src/Settings
+.PyPlus

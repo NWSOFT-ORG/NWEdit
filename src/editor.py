@@ -492,6 +492,9 @@ class Editor:
 
             self.nb.forget(selected_tab)
             self.tabs.pop(selected_tab)
+
+            if len(self.tabs) ==  0:
+                self.start_screen()
             self.mouse()
         except KeyError:
             pass

@@ -31,12 +31,12 @@ from src.constants import (
     OSX,
     logger,
 )
-from src.customenotebook import ClosableNotebook
+from src.Widgets.customenotebook import ClosableNotebook
 from src.functions import (
     is_binary_string,
     is_dark_color,
 )
-from src.hexview import HexView
+from src.Widgets.hexview import HexView
 from src.highlighter import recolorize_line
 from src.modules import (
     Path,
@@ -55,9 +55,9 @@ from src.settings import (
     RunCommand,
     Settings,
 )
-from src.statusbar import Statusbar
-from src.tktext import EnhancedText, EnhancedTextFrame, TextOpts
-from src.treeview import FileTree
+from src.Widgets.statusbar import Statusbar
+from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
+from src.Widgets.treeview import FileTree
 
 if OSX:
     from src.modules import PyTouchBar

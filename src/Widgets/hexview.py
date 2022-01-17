@@ -3,7 +3,7 @@
 from src.constants import BLOCK_HEIGHT, BLOCK_WIDTH, ENCODINGS
 from src.Dialog.commondialog import get_theme
 from src.modules import codecs, os, tk, ttk, ttkthemes
-from src.tktext import EnhancedTextFrame
+from src.Widgets.tktext import EnhancedTextFrame
 
 
 class HexView:

@@ -2,7 +2,7 @@ from src.modules import (tk, ttk, ttkthemes, os, subprocess, lexers, Path)
 from src.functions import (is_dark_color, run_in_terminal, open_system_shell)
 from src.Dialog.commondialog import (get_theme, ErrorInfoDialog)
 from src.Dialog.search import Search
-from src.console import Console
+from src.Widgets.console import Console
 from src.constants import (WINDOWS, logger, APPDIR, LINT_BATCH, RUN_BATCH)
 from src.highlighter import (recolorize, create_tags)
 

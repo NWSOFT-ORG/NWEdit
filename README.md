@@ -3,6 +3,9 @@
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FZCG-coder%2FPyPlus&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Views&edge_flat=true)](javascript:void(0);)  
 The source code of the PyPlus editor.
 
+PyPlus is a multipurpose editor, written in Python. It's not pure Python though, because it has a few components written
+in either Node.js or C#
+
 # The code
 
 The code is a modified(*enhanced*) version of  
@@ -94,14 +97,14 @@ General Public License for more details.
 Thanks to overture for the phplint tool, and thanks to people who wrote greate code on Gist and stack overflow.
 
 # Directory Structure
+
 This project is meant to be run prefectly in different OS. Until now, it supports Windows, Mac and Linux.  
-To make it run perfectly in these OS, I have to seperate their files, because the original 'cross-compatable' files are finally to big to run on Mac.  
+To make it run perfectly in these OS, I have to seperate their files, because the original 'cross-compatable' files are
+finally to big to run on Mac.  
 Currently, the only major difference between them is the different menus.  
-Windows uses a custom titlebar, so I need to make a custom menubar. But Macs won't run the custom code completely, so I have to use `tk.Menu`.  
+Windows uses a custom titlebar, so I need to make a custom menubar. But Macs won't run the custom code completely, so I
+have to use `tk.Menu`.  
 But from now on, the differnce will be bigger.  
 If you are on:
-| OS      | Directory            |
-|---------|----------------------|
-| Windows | Windows              |
-| Mac     | Mac                  |
-| Linux   | Windows (soon won’t) |
+| OS | Directory | |---------|----------------------| | Windows | Windows | | Mac | Mac | | Linux | Windows (soon won’t)
+|

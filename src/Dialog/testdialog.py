@@ -1,6 +1,6 @@
 from src.Dialog.commondialog import InputStringDialog, YesNoDialog
 from src.modules import os, tk, ttk, json, lexers
-from src.tktext import EnhancedTextFrame, TextOpts
+from src.Widgets.tktext import EnhancedTextFrame, TextOpts
 from src.functions import is_valid_name, run_in_terminal
 from src.constants import APPDIR
 from src.settings import RunCommand

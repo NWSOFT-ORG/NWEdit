@@ -1,5 +1,5 @@
 from src.modules import tk, ttk, subprocess, lexers, os
-from src.tktext import EnhancedTextFrame
+from src.Widgets.tktext import EnhancedTextFrame
 from src.constants import APPDIR
 from src.highlighter import create_tags, recolorize
 

@@ -1,7 +1,7 @@
 from src.constants import APPDIR
 from src.modules import json, tk, ttk, styles
 
-from src.tktext import EnhancedTextFrame
+from src.Widgets.tktext import EnhancedTextFrame
 
 # Need these to prevent circular imports
 def get_pygments():

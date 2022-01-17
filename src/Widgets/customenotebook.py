@@ -3,7 +3,7 @@ from src.constants import logger
 from src.functions import is_dark_color, lighten_color
 from src.modules import tk, ttk, ttkthemes
 from src.settings import Settings
-from src.statusbar import bind_events
+from src.Widgets.statusbar import bind_events
 
 
 class ClosableNotebook(ttk.Notebook):
@@ -24,15 +24,15 @@ class ClosableNotebook(ttk.Notebook):
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
         if is_dark_color(self.bg):
-            self.close_icon = tk.PhotoImage("img_close", file="Images/close.gif")
-            self.alltabs_icon = tk.PhotoImage(file="Images/all-tabs-light.gif")
-            self.nexttab_icon = tk.PhotoImage(file="Images/next-tab-light.gif")
-            self.prevtab_icon = tk.PhotoImage(file="Images/prev-tab-light.gif")
+            self.close_icon = tk.PhotoImage("img_close", file="../Images/close.gif")
+            self.alltabs_icon = tk.PhotoImage(file="../Images/all-tabs-light.gif")
+            self.nexttab_icon = tk.PhotoImage(file="../Images/next-tab-light.gif")
+            self.prevtab_icon = tk.PhotoImage(file="../Images/prev-tab-light.gif")
         else:
-            self.close_icon = tk.PhotoImage("img_close", file="Images/close-dark.gif")
-            self.alltabs_icon = tk.PhotoImage(file="Images/all-tabs.gif")
-            self.nexttab_icon = tk.PhotoImage(file="Images/next-tab.gif")
-            self.prevtab_icon = tk.PhotoImage(file="Images/prev-tab.gif")
+            self.close_icon = tk.PhotoImage("img_close", file="../Images/close-dark.gif")
+            self.alltabs_icon = tk.PhotoImage(file="../Images/all-tabs.gif")
+            self.nexttab_icon = tk.PhotoImage(file="../Images/next-tab.gif")
+            self.prevtab_icon = tk.PhotoImage(file="../Images/prev-tab.gif")
         if not self.__initialized:
             self.__initialize_custom_style()
             self.__inititialized = True

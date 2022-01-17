@@ -8,6 +8,7 @@
             <path value="file://$PROJECT_DIR$/src/Images" />
             <path value="file://$PROJECT_DIR$/src/Settings" />
             <path value="file://$PROJECT_DIR$/src/empty" />
+            <path value="file://$PROJECT_DIR$/src/Config" />
           </resourceRoots>
         </entryData>
       </entry>

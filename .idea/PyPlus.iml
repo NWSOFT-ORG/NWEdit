@@ -8,7 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.PyPlus" />
       <excludeFolder url="file://$MODULE_DIR$/node_modules" />
     </content>
-    <orderEntry type="jdk" jdkName="Pipenv (PyPlus)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Poetry (PyPlus) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">

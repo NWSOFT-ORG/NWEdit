@@ -29,7 +29,7 @@ class CodeFunctions:
             self.pyterm_icon = tk.PhotoImage(file="Images/py-term.gif")
             self.term_icon = tk.PhotoImage(file="Images/term.gif")
             self.format_icon = tk.PhotoImage(file="Images/format.gif")
-        self.run_icon = tk.PhotoImage(file="Images/run-16px.gif")
+        self.run_icon = tk.PhotoImage(file="Images/run.gif")
 
     def create_menu(self, master):
         codemenu = tk.Menu(master)

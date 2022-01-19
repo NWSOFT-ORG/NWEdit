@@ -20,7 +20,7 @@ class ReadonlyText(EnhancedTextFrame):
         super().__init__(master)
         style = styles.get_style_by_name(get_pygments())
         bgcolor = style.background_color
-        fgcolor = style.highlight_color
+        fgcolor = "#f00"
         self.text.configure(state='disabled',
                        fg=fgcolor, bg=bgcolor,
                        font=get_font())

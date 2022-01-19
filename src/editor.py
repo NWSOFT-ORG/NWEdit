@@ -46,6 +46,7 @@ from src.modules import (
     tk,
     ttk,
     ttkthemes,
+    font,
 )
 from src.settings import (
     CommentMarker,
@@ -103,13 +104,14 @@ class Editor:
             self.fg = self.style.lookup("TLabel", "foreground")
             if is_dark_color(self.bg):
                 self.close_icon = tk.PhotoImage(file="Images/close.gif")
-            else:
+                self.open_icon = tk.PhotoImage(file="Images/open.gif")
+            else: 
                 self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
+                self.open_icon = tk.PhotoImage(file="Images/open-dark.gif")
 
             self.new_icon = tk.PhotoImage(file="Images/new.gif")
-            self.open_icon = tk.PhotoImage(file="Images/open-16px.gif")
             self.reload_icon = tk.PhotoImage(file="Images/reload.gif")
-            self.save_as_icon = tk.PhotoImage(file="Images/saveas-16px.gif")
+            self.save_as_icon = tk.PhotoImage(file="Images/saveas.gif")
             logger.debug("Icons loaded")
             self.icon = tk.PhotoImage(file="Images/pyplus.gif")
             self.master.iconphoto(True, self.icon)
@@ -161,7 +163,7 @@ class Editor:
         except Exception:
             logger.exception("Error when initializing:")
             ErrorReportDialog('Error when starting.', traceback.format_exc())
-            self.restart()
+            exit(1)
 
     def click_tab(self, _=None):
         try:
@@ -186,14 +188,17 @@ class Editor:
 
     def start_screen(self) -> None:
         first_tab = tk.Canvas(self.nb, background=self.bg, highlightthickness=0)
-        first_tab.create_image(20, 20, anchor="nw", image=self.icon)
+        first_tab.icon = tk.PhotoImage(file='Images/pyplus-35px.gif')
+        
+        first_tab.create_image(20, 20, anchor="nw", image=first_tab.icon)
         fg = "#8dd9f7" if is_dark_color(self.bg) else "blue"
+        bold = font.Font(family="Arial", size=35, weight="bold")
         first_tab.create_text(
             60,
             10,
             anchor="nw",
-            text="Welcome to PyPlus!",
-            font="Arial 35",
+            text="Welcome!",
+            font=bold,
             fill=self.fg,
         )
         label1 = ttk.Label(

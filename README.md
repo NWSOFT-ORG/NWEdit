@@ -95,16 +95,3 @@ General Public License for more details.
 ```
 
 Thanks to overture for the phplint tool, and thanks to people who wrote greate code on Gist and stack overflow.
-
-# Directory Structure
-
-This project is meant to be run prefectly in different OS. Until now, it supports Windows, Mac and Linux.  
-To make it run perfectly in these OS, I have to seperate their files, because the original 'cross-compatable' files are
-finally to big to run on Mac.  
-Currently, the only major difference between them is the different menus.  
-Windows uses a custom titlebar, so I need to make a custom menubar. But Macs won't run the custom code completely, so I
-have to use `tk.Menu`.  
-But from now on, the differnce will be bigger.  
-If you are on:
-| OS | Directory | |---------|----------------------| | Windows | Windows | | Mac | Mac | | Linux | Windows (soon won’t)
-|

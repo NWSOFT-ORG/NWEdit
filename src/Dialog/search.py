@@ -56,7 +56,6 @@ class Search:
         self.text = text
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
-        bg = self._style.lookup("TLabel", "background")
         fg = self._style.lookup("TLabel", "foreground")
 
         if self.text.searchable or self.text.navigate:
@@ -78,7 +77,6 @@ class Search:
                                                            fill="y")
         self.content = tk.Entry(
             self.search_frame,
-            background=darken_color(bg, 30, 30, 30),
             foreground=fg,
             insertbackground=fg,
             highlightthickness=0,
@@ -91,12 +89,11 @@ class Search:
         self.backward = ttk.Button(self.search_frame, text=">", width=1)
         self.backward.pack(side="left")
 
-        ttk.Label(self.search_frame, text="Replacement: ").pack(side="left",
+        ttk.Label(self.search_frame, text="Replace: ").pack(side="left",
                                                                 anchor="nw",
                                                                 fill="y")
         self.repl = tk.Entry(
             self.search_frame,
-            background=darken_color(bg, 30, 30, 30),
             foreground=fg,
             insertbackground=fg,
             highlightthickness=0,
@@ -135,9 +132,8 @@ class Search:
         ttk.Button(self.search_frame, text="x",
                    command=self._exit).pack(side="right")
         self.text.searchable = True
-        
-        self.content.insert('end', 'e')
-        self.find()
+
+        self.master.add(self.search_frame, text="Search")
 
     def re_search(self, pat, text, nocase=False, full_word=False, regex=False):
         if nocase and full_word:

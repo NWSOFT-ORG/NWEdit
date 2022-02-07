@@ -69,7 +69,6 @@ def create_menu(self) -> None:
     self.codemenu = self.codefuncs.create_menu(self.master)
 
     self.viewmenu = tk.Menu(self.menubar)
-    self.viewmenu.add_command(label="Show File Tree", command=self.show_filelist)
     self.viewmenu.add_command(
         label="Unit tests",
         command=lambda: TestDialog(self.panedwin, self.filetree.path),
@@ -107,7 +106,6 @@ def create_menu(self) -> None:
     self.menubar.add_cascade(label="File", menu=self.filemenu)
     self.menubar.add_cascade(label="Edit", menu=self.editmenu)
     self.menubar.add_cascade(label="Code", menu=self.codemenu)
-    self.menubar.add_cascade(label="View", menu=self.viewmenu)
     self.menubar.add_cascade(label="Navigate", menu=self.navmenu)
     self.menubar.add_cascade(label="Git", menu=self.gitmenu)
 

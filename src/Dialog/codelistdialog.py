@@ -4,9 +4,8 @@ import traceback
 
 
 class CodeListDialog(ttk.Frame):
-    def __init__(self, parent=None, text=None, file=None):
+    def __init__(self, parent=None, text=None):
         super().__init__(parent)
-        self.file = file
         self.text = text
 
         self.state_label = ttk.Label(self, text='')
@@ -17,18 +16,15 @@ class CodeListDialog(ttk.Frame):
 
         self.show_items()
         self.pack(fill='both', expand=1)
-        parent.forget(parent.panes()[0])
-        parent.insert('0', self)
+        parent.add(self, text="Code structure")
     
     def show_items(self):
-        filename = self.file
-        with open(filename) as f:
-            try:
-                node = ast.parse(f.read())
-            except Exception:
-                self.state_label.configure(text=f'Error: Cannot parse docoment.\n {traceback.format_exc()}',
-                                           foreground='red')
-                return
+        try:
+            node = ast.parse(self.text.get('1.0', 'end'))
+        except Exception:
+            self.state_label.configure(text=f'Error: Cannot parse docoment.\n {traceback.format_exc()}',
+                                       foreground='red')
+            return
 
         functions = [_obj for _obj in node.body if isinstance(_obj, ast.FunctionDef)]
         classes = [_obj for _obj in node.body if isinstance(_obj, ast.ClassDef)]

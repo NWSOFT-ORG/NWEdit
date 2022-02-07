@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "PyPlus"
-version = "7.0.0"
+version = "7.0.0-dev"
 description = "The PyPlus Editor"
 authors = ["Andy Zhang <z-c-ge@outlook.com>"]
 

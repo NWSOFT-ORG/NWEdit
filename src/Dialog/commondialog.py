@@ -1,20 +1,12 @@
 from src.constants import APPDIR, VERSION, logger
-from src.modules import json, tk, ttk, ttkthemes, os, webbrowser, requests
+from src.modules import json, tk, ttk, ttkthemes, os, webbrowser, request
 
 
 def download_file(url, localfile="") -> str:
     """Downloads a file from remote path"""
-    local_filename = url.split("/")[-1] if not localfile else localfile
-    # NOTE the stream=True parameter below
-    with requests.get(url, stream=True, allow_redirects=True) as r:
-        r.raise_for_status()
-        with open(local_filename, "wb") as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                # If you have chunk encoded response uncomment if
-                # and set chunk_size parameter to None.
-                # if chunk:
-                f.write(chunk)
-    return local_filename
+    localfile = url.split("/")[-1] if not localfile else localfile
+    request.urlretrieve(url, localfile)
+    return localfile
 
 
 # Need these because importing settings is a circular import

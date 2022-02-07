@@ -3,15 +3,17 @@ from src.functions import (is_dark_color, run_in_terminal, open_system_shell)
 from src.Dialog.commondialog import (get_theme, ErrorInfoDialog)
 from src.Dialog.search import Search
 from src.Widgets.console import Console
+from src.Dialog.codelistdialog import CodeListDialog
 from src.constants import (WINDOWS, logger, APPDIR, LINT_BATCH, RUN_BATCH)
 from src.highlighter import (recolorize, create_tags)
 
 
 class CodeFunctions:
-    def __init__(self, master, tabs, nb):
+    def __init__(self, master, tabs, nb, bottomframe):
         self.nb = nb
         self.tabs = tabs
         self.master = master
+        self.bottomframe = bottomframe
 
         self.style = ttkthemes.ThemedStyle()
         self.style.set_theme(get_theme())
@@ -30,6 +32,10 @@ class CodeFunctions:
             self.term_icon = tk.PhotoImage(file="Images/term.gif")
             self.format_icon = tk.PhotoImage(file="Images/format.gif")
         self.run_icon = tk.PhotoImage(file="Images/run.gif")
+
+    def code_struct(self):
+        text = self.tabs[self.nb.get_tab()].textbox
+        CodeListDialog(self.bottomframe, text)
 
     def create_menu(self, master):
         codemenu = tk.Menu(master)
@@ -69,10 +75,15 @@ class CodeFunctions:
             image=self.search_icon,
             compound='left'
         )
+        codemenu.add_command(
+            label="Code Structure",
+            command=self.code_struct,
+        )
         return codemenu
     
     def search(self, _=None) -> None:
-        Search(self.master, self.tabs[self.nb.get_tab()].textbox)
+        bottomframe = self.bottomframe
+        Search(bottomframe, self.tabs[self.nb.get_tab()].textbox)
 
     def run(self, _=None) -> None:
         """Runs the file
@@ -116,7 +127,7 @@ class CodeFunctions:
         open_system_shell()
 
     def python_shell(self) -> None:
-        curr_tab = self.tabs[self.nb.get_tab()].textbox.panedwin
+        curr_tab = self.bottomframe
         shell_frame = ttk.Frame(curr_tab)
         main_window = Console(shell_frame, None, shell_frame.destroy)
         main_window.text.lexer = lexers.get_lexer_by_name("pycon")
@@ -128,7 +139,7 @@ class CodeFunctions:
         )
         main_window.pack(fill="both", expand=1)
         shell_frame.pack(fill='both', expand=1)
-        curr_tab.add(shell_frame)
+        curr_tab.add(shell_frame, text='Python Shell')
 
     def lint_source(self) -> None:
         if not self.tabs:

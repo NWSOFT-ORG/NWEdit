@@ -32,6 +32,7 @@ from src.constants import (
     logger,
 )
 from src.Widgets.customenotebook import ClosableNotebook
+from src.Widgets.panel import CustomTabs
 from src.functions import (
     is_binary_string,
     is_dark_color,
@@ -69,7 +70,11 @@ os.chdir(APPDIR)
 class Document:
     """Helper class, for the editor."""
 
-    def __init__(self, frame=None, textbox=None, file_dir: str = '', istoolwin: bool = False) -> None:
+    def __init__(self,
+                 frame=None,
+                 textbox=None,
+                 file_dir: str = '',
+                 istoolwin: bool = False) -> None:
         self.frame = frame
         self.file_dir = file_dir
         self.textbox = textbox
@@ -105,9 +110,11 @@ class Editor:
             if is_dark_color(self.bg):
                 self.close_icon = tk.PhotoImage(file="Images/close.gif")
                 self.open_icon = tk.PhotoImage(file="Images/open.gif")
+                self.clone_icon = tk.PhotoImage(file="Images/clone.gif")
             else: 
                 self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
                 self.open_icon = tk.PhotoImage(file="Images/open-dark.gif")
+                self.clone_icon = tk.PhotoImage(file="Images/clone-dark.gif")
 
             self.new_icon = tk.PhotoImage(file="Images/new.gif")
             self.reload_icon = tk.PhotoImage(file="Images/reload.gif")
@@ -123,19 +130,15 @@ class Editor:
             self.menubar = tk.Menu(self.master)
             self.panedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.panedwin.pack(fill="both", expand=1)
-            mainframe = ttk.Frame(self.master)
-            mainframe.pack(fill='both', expand=1)
+            self.mainframe = ttk.Frame(self.master)
+            self.mainframe.pack(fill='both', expand=1)
+            self.panedwin.add(self.mainframe)
 
-            self.nb = ClosableNotebook(mainframe, self.close_tab)
-            self.nb.event_add('<<Click>>', '<1>')
-            self.nb.bind("<<Click>>", self.click_tab)
-            self.filetree = FileTree(self.master, self.open_file)
-            self.panedwin.add(self.filetree)
-            self.panedwin.add(mainframe)
-            self.nb.enable_traversal()
+            self.left_panel()
+            self.bottom_panel()
             self.statusbar = Statusbar()
 
-            self.codefuncs = CodeFunctions(self.master, self.tabs, self.nb)
+            self.codefuncs = CodeFunctions(self.master, self.tabs, self.nb, self.bottom_tabs)
 
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
@@ -165,6 +168,26 @@ class Editor:
             ErrorReportDialog('Error when starting.', traceback.format_exc())
             exit(1)
 
+    def left_panel(self):
+        self.left_tabs = CustomTabs(self.panedwin)
+        self.filetree = FileTree(self.left_tabs, self.open_file)
+        self.panedwin.insert(0, self.left_tabs)
+        self.left_tabs.add(self.filetree, text='Files')
+
+    def bottom_panel(self):
+        self.bottom_panedwin = ttk.Panedwindow(self.mainframe)
+
+        self.nb = ClosableNotebook(self.bottom_panedwin, self.close_tab)
+        self.nb.event_add('<<Click>>', '<1>')
+        self.nb.bind("<<Click>>", self.click_tab)
+
+        self.nb.enable_traversal()
+
+        self.bottom_panedwin.pack(side='bottom', fill='both', expand=1)
+        self.bottom_panedwin.add(self.nb)
+        self.bottom_tabs = CustomTabs(self.bottom_panedwin)
+        self.bottom_panedwin.add(self.bottom_tabs)
+
     def click_tab(self, _=None):
         try:
             self.opts.set_text(self.get_text())
@@ -182,8 +205,7 @@ class Editor:
         self.master.protocol(
             "WM_DELETE_WINDOW", lambda: self.exit(force=True)
         )  # When the window is closed, or quit from Mac, do exit action
-        if not isinstance(self.master, tk.Toplevel):
-            self.master.createcommand("::tk::mac::Quit", self.exit)
+        self.master.createcommand("::tk::mac::Quit", self.exit)
         logger.debug("Bindings created")
 
     def start_screen(self) -> None:
@@ -224,6 +246,8 @@ class Editor:
             text="Clone",
             foreground=fg,
             background=self.bg,
+            compound="left",
+            image=self.clone_icon,
             cursor="hand2",
         )
         label4 = ttk.Label(
@@ -469,10 +493,6 @@ class Editor:
                 ErrorInfoDialog(self.master, "File read only")
         except KeyError:
             pass
-
-    def show_filelist(self):
-        self.panedwin.forget(self.panedwin.panes()[0])
-        self.panedwin.insert('0', self.filetree)
 
     def right_click(self, event) -> None:
         if self.tabs:

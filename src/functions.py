@@ -4,7 +4,7 @@ import shlex
 
 from src.constants import OSX, WINDOWS, textchars
 from src.Dialog.commondialog import ErrorInfoDialog
-from src.modules import (os, platform, requests, shutil,
+from src.modules import (os, platform, shutil,
                          subprocess, sys, iskeyword)
 
 DARK_COLOR = 128
@@ -68,21 +68,6 @@ def lighten_color(hex_code, red, green, blue) -> bool:
 
 def is_valid_name(name):
     return name.isidentifier() and not iskeyword(name)
-
-
-def download_file(url, localfile='') -> str:
-    """Downloads a file from remote path"""
-    local_filename = url.split("/")[-1] if not localfile else localfile
-    # NOTE the stream=True parameter below
-    with requests.get(url, stream=True, allow_redirects=True) as r:
-        r.raise_for_status()
-        with open(local_filename, "wb") as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                # If you have chunk encoded response uncomment if
-                # and set chunk_size parameter to None.
-                # if chunk:
-                f.write(chunk)
-    return local_filename
 
 
 def update_system_path(env, value):

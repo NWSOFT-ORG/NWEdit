@@ -20,10 +20,10 @@ import tkinter.font as font
 import tkinter.ttk as ttk
 import webbrowser
 import zipfile
+import urllib.request as request
 from pathlib import Path
 
 import json5 as json
-import requests
 import ttkthemes
 import pygments
 from pygments import lexers

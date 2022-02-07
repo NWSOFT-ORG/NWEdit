@@ -1,5 +1,4 @@
 from src.modules import tk, ttk, art
-from src.settings import Settings
 import sys
 import io
 

@@ -1,12 +1,24 @@
-from src.modules import ttk
+from src.modules import tk
+from src.Widgets.customenotebook import ClosableNotebook
 
 
-class CustomTabs(ttk.Notebook):
-    def __init__(self, master, tabpos='sw'):
-        self._init_style(tabpos)
-        super().__init__(master, style='Panel.TNotebook')
+class CustomTabs(ClosableNotebook):
+    def __init__(self, master):
+        super().__init__(master, self.close_handle)
 
-    def _init_style(self, pos):
-        self.style = ttk.Style()
-        self.style.configure('Panel.TNotebook', tabposition=pos)
-        self.style.configure('Panel.TNotebook.Tab', padding=[0, 0, 0, 0])
+    def close_handle(self, event):
+        # From editor.py
+        if self.index("end"):
+            # Close the current tab if close is selected from file menu, or
+            # keyboard shortcut.
+            if event is None or event.type == str(2):
+                selected_tab = self.get_tab()
+            # Otherwise close the tab based on coordinates of center-click.
+            else:
+                try:
+                    index = event.widget.index("@%d,%d" % (event.x, event.y))
+                    selected_tab = self.nametowidget(self.tabs()[index])
+                except tk.TclError:
+                    return
+
+        self.forget(selected_tab)

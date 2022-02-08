@@ -114,7 +114,7 @@ class ClosableNotebook(ttk.Notebook):
             index = self.index("@%d,%d" % (event.x, event.y))
 
             if "close" in element and self._active == index:
-                self.cmd()
+                self.cmd(event)
 
             self.state(["!pressed"])
             self._active = None
@@ -124,7 +124,7 @@ class ClosableNotebook(ttk.Notebook):
             logger.exception("Error:")
 
     def __initialize_custom_style(self):
-        style = ttk.Style()
+        self.style = style = ttk.Style()
         
         try:
             style.element_create("close", "image", "img_close", border=10, sticky="")

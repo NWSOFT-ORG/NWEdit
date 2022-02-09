@@ -38,6 +38,7 @@ from src.functions import (
     is_dark_color,
 )
 from src.Widgets.hexview import HexView
+from src.Widgets.winframe import WinFrame
 from src.highlighter import recolorize_line
 from src.modules import (
     Path,
@@ -60,6 +61,8 @@ from src.settings import (
 from src.Widgets.statusbar import Statusbar
 from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
 from src.Widgets.treeview import FileTree
+from src.functions import lighten_color
+
 
 if OSX:
     from src.modules import PyTouchBar
@@ -163,6 +166,7 @@ class Editor:
             self.right_click_menu = editmenus[1]
             self.create_bindings()
             self.reopen_files()
+            self.update_title()
         except Exception:
             logger.exception("Error when initializing:")
             ErrorReportDialog('Error when starting.', traceback.format_exc())
@@ -209,8 +213,12 @@ class Editor:
         logger.debug("Bindings created")
 
     def start_screen(self) -> None:
-        first_tab = tk.Canvas(self.nb, background=self.bg, highlightthickness=0)
+        frame = WinFrame(self.master, 'Start')
+
+        canvas_bg = lighten_color(self.bg, 10, 10, 10)
+        first_tab = tk.Canvas(frame, background=canvas_bg, highlightthickness=0)
         first_tab.icon = tk.PhotoImage(file='Images/pyplus-35px.gif')
+        frame.add_widget(first_tab)
         
         first_tab.create_image(20, 20, anchor="nw", image=first_tab.icon)
         fg = "#8dd9f7" if is_dark_color(self.bg) else "blue"
@@ -227,7 +235,7 @@ class Editor:
             first_tab,
             text="Open file",
             foreground=fg,
-            background=self.bg,
+            background=canvas_bg,
             cursor="hand2",
             compound="left",
             image=self.open_icon,
@@ -236,7 +244,7 @@ class Editor:
             first_tab,
             text="New...",
             foreground=fg,
-            background=self.bg,
+            background=canvas_bg,
             cursor="hand2",
             compound="left",
             image=self.new_icon,
@@ -245,32 +253,30 @@ class Editor:
             first_tab,
             text="Clone",
             foreground=fg,
-            background=self.bg,
+            background=canvas_bg,
             compound="left",
             image=self.clone_icon,
             cursor="hand2",
         )
         label4 = ttk.Label(
             first_tab,
-            text="Exit",
+            text="Close",
             foreground=fg,
-            background=self.bg,
+            background=canvas_bg,
             cursor="hand2",
             compound="left",
             image=self.close_icon,
         )
         label1.bind("<Button>", lambda _=None: self.open_file())
         label2.bind("<Button>", self.filetree.new_file)
-        label4.bind("<Button>", lambda _=None: self.exit(force=True))
+        label4.bind("<Button>", lambda _=None: frame.destroy())
         label3.bind("<Button>", lambda _=None: self.git("clone"))
 
         first_tab.create_window(50, 100, window=label1, anchor="nw")
         first_tab.create_window(50, 140, window=label2, anchor="nw")
         first_tab.create_window(50, 180, window=label3, anchor="nw")
         first_tab.create_window(50, 220, window=label4, anchor="nw")
-        self.nb.add(first_tab, text="Start")
-        self.tabs[first_tab] = Document(istoolwin=True)
-        
+
         logger.debug("Start screen created")
 
     def create_text_widget(self, frame: ttk.Frame) -> EnhancedText:

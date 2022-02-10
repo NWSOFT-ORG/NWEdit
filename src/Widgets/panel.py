@@ -22,3 +22,4 @@ class CustomTabs(ClosableNotebook):
                     return
 
         self.forget(selected_tab)
+

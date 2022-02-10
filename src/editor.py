@@ -105,7 +105,7 @@ class Editor:
             self.tabwidth = self.settings_class.get_settings("tab")
             logger.debug("Settings loaded")
 
-            # self.master.geometry("1200x800")
+            self.master.geometry("1200x800")
             self.style = ttkthemes.ThemedStyle(self.master)
             self.style.set_theme(self.theme)
             self.bg = self.style.lookup("TLabel", "background")
@@ -213,7 +213,7 @@ class Editor:
         logger.debug("Bindings created")
 
     def start_screen(self) -> None:
-        frame = WinFrame(self.master, 'Start')
+        frame = WinFrame(self.master, 'Start', self.bg)
 
         canvas_bg = lighten_color(self.bg, 10, 10, 10)
         first_tab = tk.Canvas(frame, background=canvas_bg, highlightthickness=0)

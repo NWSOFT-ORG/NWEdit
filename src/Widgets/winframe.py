@@ -15,7 +15,7 @@ class WinFrame(ttk.Frame):
         self.titlebar()
         self.close_button()
         self.window_bindings()
-        self.place(relx=.5, rely=.5, anchor="center")
+        self.place(relx=0.5, rely=0.5, anchor="center")
 
     def titlebar(self):
         self.titleframe = ttk.Frame(self)
@@ -38,15 +38,13 @@ class WinFrame(ttk.Frame):
         self.x = event.x
         self.y = event.y
 
-    def stop_move(self, event):
+    def stop_move(self, _):
         self.x = None
         self.y = None
 
     def do_move(self, event):
-        deltax = event.x - self.x
-        deltay = event.y - self.y
-        x = deltax
-        y = deltay
+        x = (event.x - self.x + self.winfo_x())
+        y = (event.y - self.y + self.winfo_y() + self.titlebar.winfo_height())
         self.place_configure(y=y, x=x)
 
     def close_button(self):

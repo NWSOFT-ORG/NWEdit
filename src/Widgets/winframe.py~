@@ -45,8 +45,8 @@ class WinFrame(ttk.Frame):
     def do_move(self, event):
         deltax = event.x - self.x
         deltay = event.y - self.y
-        x = deltax
-        y = deltay
+        x = self.winfo_x() + deltax
+        y = self.winfo_y() + deltay
         self.place_configure(y=y, x=x)
 
     def close_button(self):

@@ -41,56 +41,59 @@ class ClosableNotebook(ttk.Notebook):
 
         self._active = None
 
+        self.add_frame()
+
         self.bind("<1>", self.on_close_press, True)
         self.bind("<ButtonRelease-1>", self.on_close_release)
         self.bind("<B1-Motion>", self.move_tab)
 
-        tab_frame = ttk.Frame(self)
+    def add_frame(self):
+        self.tab_frame = tab_frame = ttk.Frame(self)
         tab_frame.place(relx=1.0, x=0, y=1, anchor='ne')
-        self.pack(expand=1, fill="both")
-
-        def show_tab_menu(event):
-            tab_menu = tk.Menu(master)
-            for tab in self.tabs():
-                tab_menu.add_command(label=self.tab(tab, option="text"),
-                                     command=lambda temp=tab: self.select(temp))
-            tab_menu.tk_popup(event.x_root, event.y_root)
-        
-        def prevtab(_=None):
-            try:
-                self.select(self.index('current') - 1)
-            except tk.TclError:
-                pass
-        
-        def nexttab(_=None):
-            try:
-                self.select(self.index('current') + 1)
-            except tk.TclError:
-                pass
 
         ttk.Separator(tab_frame, orient='vertical').pack(
             side='left', fill='y')
 
         prev_tab_label = ttk.Label(tab_frame, image=self.prevtab_icon)
         prev_tab_label.image = self.prevtab_icon
-        prev_tab_label.bind("<1>", prevtab)
+        prev_tab_label.bind("<1>", self.prevtab)
         prev_tab_label.pack(side='left')
 
         next_tab_label = ttk.Label(tab_frame, image=self.nexttab_icon)
         next_tab_label.image = self.nexttab_icon
-        next_tab_label.bind("<1>", nexttab)
+        next_tab_label.bind("<1>", self.nexttab)
         next_tab_label.pack(side='left')
 
         ttk.Separator(tab_frame, orient='vertical').pack(side='left', fill='y')
 
         allitems_label = ttk.Label(tab_frame, image=self.alltabs_icon)
         allitems_label.image = self.alltabs_icon
-        allitems_label.bind("<1>", show_tab_menu)
+        allitems_label.bind("<1>", self.show_tab_menu)
         allitems_label.pack(side='left')
         
         bind_events(prev_tab_label)
         bind_events(next_tab_label)
         bind_events(allitems_label)
+
+    def show_tab_menu(self, event):
+        tab_menu = tk.Menu(self.master)
+        for tab in self.tabs():
+            tab_menu.add_command(label=self.tab(tab, option="text"),
+                                 command=lambda temp=tab: self.select(temp))
+        tab_menu.tk_popup(event.x_root, event.y_root)
+    
+    def prevtab(self, _=None):
+        try:
+            self.select(self.index('current') - 1)
+        except tk.TclError:
+            pass
+    
+    def nexttab(self, _=None):
+        try:
+            self.select(self.index('current') + 1)
+        except tk.TclError:
+            pass
+
 
     def on_close_press(self, event):
         """Called when the button is pressed over the close button"""

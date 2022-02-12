@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module type="PYTHON_MODULE" version="4">
+<module version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/src/Backups" />
-      <excludeFolder url="file://$MODULE_DIR$/.github" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
-      <excludeFolder url="file://$MODULE_DIR$/.PyPlus" />
-      <excludeFolder url="file://$MODULE_DIR$/node_modules" />
     </content>
-    <orderEntry type="jdk" jdkName="Poetry (PyPlus) (2)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Poetry (PyPlus)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
-  <component name="PackageRequirementsSettings">
-    <option name="requirementsPath" value="$MODULE_DIR$/Pipfile" />
-    <option name="versionSpecifier" value="Don't specify version" />
+  <component name="PyDocumentationSettings">
+    <option name="format" value="PLAIN" />
+    <option name="myDocStringFormat" value="Plain" />
   </component>
 </module>

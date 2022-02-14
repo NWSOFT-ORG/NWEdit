@@ -2,5 +2,6 @@
 src/pyplus.log
 *.pyc
 src/Backups
-src/Settings
+src/Config
+PyPlus.sublime-workspace
 .PyPlus

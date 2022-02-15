@@ -5,3 +5,5 @@ while (keyInfo.Key != ConsoleKey.Enter)
 {
     keyInfo = Console.ReadKey(true);
 }
+
+Console.WriteLine("");

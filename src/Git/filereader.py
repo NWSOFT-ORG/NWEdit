@@ -24,15 +24,9 @@ def read_gitignore(path: str) -> list:
         raise NotGitRepoError
 
 
-def read_local_branches(path: str) -> list:
+def read_branches(path: str) -> list:
     """This method reads the branches"""
-    config = read_config(path)
-    branches_list = []
-
-    for section in config.sections():
-        if section.startswith('branch'):
-            branch = section.split()[1]
-            branches_list.append(eval(branch))
+    branches_list = os.listdir(os.path.join(path, '.git/refs/heads'))
     return branches_list
 
 

@@ -1,7 +1,11 @@
-.DS_STORE
-src/pyplus.log
 *.pyc
+.DS_STORE
+.PyPlus
+bin/
+node_modules/
+obj/
+PyPlus.sublime-workspace
+PyPlus.sublime-project
 src/Backups
 src/Config
-PyPlus.sublime-workspace
-.PyPlus
+src/pyplus.log

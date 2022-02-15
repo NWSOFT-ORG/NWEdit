@@ -17,10 +17,9 @@ void RunCmdWithExitCodeUnix(string cmd) {
 }
 
 string ver = Environment.OSVersion.Platform.ToString();
-Console.WriteLine(args);
 
 if (ver == "Unix") {
-    RunCmdWithExitCodeUnix("'python3 -c \\'areghqd\\''"); // Won't work with the default exit command.
+    RunCmdWithExitCodeUnix("'python3 -c eguwahuiWDgvhadhfaui'"); // Won't work with the default exit command.
 }
 else {
     RunCmdWithExitCodeWin("exit 12");

@@ -1,16 +1,10 @@
 import os
-import configparser
+from configparser import ConfigParser
 
 
 class NotGitRepoError(Exception):
     def __init__(self):
         super().__init__('Error: Not a Git Repository')
-
-
-def read_config(path: str) -> configparser.ConfigParser:
-    config = configparser.ConfigParser()
-    config.read(os.path.join(path, '.git/config'))
-    return config
 
 
 def read_gitignore(path: str) -> list:
@@ -31,11 +25,16 @@ def read_branches(path: str) -> list:
 
 
 def read_remotes(path: str) -> dict:
-    config = read_config(path)
-    remotes_list = {}
-    for section in config.sections():
-        if section.startswith('remote'):
-            remote = eval(section.split()[1])
-            url = config.get(section, 'url')
-            remotes_list[remote] = url
-    return remotes_list
+    remotes = {}
+    config = ConfigParser()
+    config_file = os.path.join(path, ".git/config")
+    config.read(config_file)
+
+    for item in config.sections():
+        if item.startswith('remote'):
+            remote = eval(item.split()[1])
+            url = config.get(item, 'url')
+            remotes[remote] = url
+    return remotes
+
+print(read_remotes('/home/runner/PyPlus'))

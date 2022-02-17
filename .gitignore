@@ -6,6 +6,4 @@ node_modules/
 obj/
 PyPlus.sublime-workspace
 PyPlus.sublime-project
-src/Backups
-src/Config
 src/pyplus.log

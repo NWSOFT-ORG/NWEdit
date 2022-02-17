@@ -21,7 +21,7 @@ from src.Dialog.commondialog import (ErrorInfoDialog, InputStringDialog, YesNoDi
 from src.Dialog.debugdialog import (ErrorReportDialog)
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog, FileSaveAsDialog
 from src.Dialog.goto import Navigate
-from src.Git.commitview import CommitView
+from src.Git.gitview import GitView
 from src.Menu.create_menu import create_menu
 from src.codefunctions import CodeFunctions
 from src.constants import (
@@ -229,6 +229,7 @@ class Editor:
             text="Welcome!",
             font=bold,
             fill=self.fg,
+            tags="link",
         )
         label1 = ttk.Label(
             first_tab,
@@ -266,16 +267,18 @@ class Editor:
             compound="left",
             image=self.close_icon,
         )
-        label1.bind("<Button>", lambda _=None: self.open_file())
+
+        links = [label1, label2, label3, label4]
+        
+        label1.bind("<Button>", lambda _: self.open_file())
         label2.bind("<Button>", self.filetree.new_file)
-        label4.bind("<Button>", lambda _=None: frame.destroy())
-        label3.bind("<Button>", lambda _=None: self.git("clone"))
+        label4.bind("<Button>", lambda _: frame.destroy())
+        label3.bind("<Button>", lambda _: self.git("clone"))
 
-        first_tab.create_window(50, 100, window=label1, anchor="nw")
-        first_tab.create_window(50, 140, window=label2, anchor="nw")
-        first_tab.create_window(50, 180, window=label3, anchor="nw")
-        first_tab.create_window(50, 220, window=label4, anchor="nw")
-
+        for y_index, item in enumerate(links):
+            first_tab.create_window(50, 100 + (y_index - 1) * 40, window=item, anchor="nw")
+            item.bind('<Button>', lambda _: frame.destroy(), add=True)
+        
         logger.debug("Start screen created")
 
     def create_text_widget(self, frame: ttk.Frame) -> EnhancedText:
@@ -320,7 +323,7 @@ class Editor:
 
     def update_statusbar(self, _=None) -> str:
         try:
-            if not self.tabs[self.nb.get_tab()].istoolwin:
+            if not self.tabs:
                 self.statusbar.label3.config(text="")
                 return "break"
             currtext = self.get_text()
@@ -330,6 +333,7 @@ class Editor:
             self.statusbar.label3.config(text=f"Line {ln} Col {col}")
             logger.debug("update_statusbar: OK")
         except:
+            self.statusbar.label3.config(text='')
             logger.exception("Error:")
         finally:
             return "break"

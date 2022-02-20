@@ -1,8 +1,8 @@
 """
-This is a setup.py script for py2app
+This is a build_mac.py script for py2app
 
 Usage:
-    python setup.py py2app
+    python build_mac.py py2app
 """
 
 from setuptools import setup

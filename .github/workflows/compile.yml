@@ -1,0 +1,25 @@
+name: Make PyInstaller
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with: 
+          python-version: 3.9
+    - name: New VirtualEnv
+      run: pip install virtualenv && virtualenv venv
+    - name: Install deps
+      run: make install-packages
+    - name: Compile
+      run: make build-pyinstaller-linux

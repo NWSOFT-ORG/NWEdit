@@ -13,8 +13,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with: 
+          python-version: 3.9
     - name: New VirtualEnv
-      run: virtualenv venv
+      run: pip install virtualenv && virtualenv venv
     - name: Install deps
       run: make install-packages
     - name: Compile

@@ -3,3 +3,4 @@ json5==0.9.6
 Pillow==9.0.1
 Pygments==2.11.2
 ttkthemes==3.2.2
+pyinstaller==4.9

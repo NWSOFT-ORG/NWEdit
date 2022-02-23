@@ -40,12 +40,19 @@ class ErrorReportDialog(tk.Toplevel):
     def __init__(self, error_name, error_message):
         super().__init__()
         self.title(error_name)
+        # noinspection PyUnresolvedReferences
         self.master.withdraw()
         ttk.Label(self, text='Please consider reporting a bug on github.').pack(anchor='nw', fill='x')
         text = ReadonlyText(self)
         text.insert('end', error_message)
         text.pack(fill='both')
+
+        self.protocol('WM_DELETE_WINDOW', self.exit)
         self.mainloop()
+
+    def exit(self):
+        self.master.destroy()
+        exit(1)
 
 
 class LogViewDialog(tk.Toplevel):

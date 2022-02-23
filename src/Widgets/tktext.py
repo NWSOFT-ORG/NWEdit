@@ -318,7 +318,7 @@ class TextOpts:
 
     def bind_events(self):
         text = self.text
-        text.bind("<<Modified>>", self.key)
+        text.bind("<KeyRelease>", self.key)
         for char in ['"', "'", "(", "[", "{"]:
             text.bind(char, self.autoinsert)
         for char in [")", "]", "}"]:

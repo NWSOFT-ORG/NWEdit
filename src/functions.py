@@ -5,7 +5,7 @@ import shlex
 from src.constants import OSX, WINDOWS, textchars
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.modules import (os, platform, shutil,
-                         subprocess, sys, iskeyword)
+                         subprocess, sys, iskeyword, tk)
 
 DARK_COLOR = 128
 
@@ -40,7 +40,7 @@ def is_dark_color(hex_code) -> bool:
     return False
 
 
-def darken_color(hex_code, red, green, blue) -> bool:
+def darken_color(hex_code, red, green, blue) -> str:
     hex_code = hex_code[1:]
     rgb = (
         hex2dec(hex_code[:2]) - red,
@@ -53,7 +53,7 @@ def darken_color(hex_code, red, green, blue) -> bool:
     return value
 
 
-def lighten_color(hex_code, red, green, blue) -> bool:
+def lighten_color(hex_code, red, green, blue) -> str:
     hex_code = hex_code[1:]
     rgb = (
         hex2dec(hex_code[:2]) + red,

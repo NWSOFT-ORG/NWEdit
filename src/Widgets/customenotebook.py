@@ -1,4 +1,5 @@
 """Closable ttk.Notebook"""
+from src.Widgets.winframe import WinFrame
 from src.constants import logger
 from src.functions import is_dark_color, lighten_color
 from src.modules import tk, ttk, ttkthemes
@@ -94,7 +95,6 @@ class ClosableNotebook(ttk.Notebook):
         except tk.TclError:
             pass
 
-
     def on_close_press(self, event):
         """Called when the button is pressed over the close button"""
 
@@ -109,26 +109,22 @@ class ClosableNotebook(ttk.Notebook):
 
     def on_close_release(self, event):
         """Called when the button is released over the close button"""
-        try:
-            if not self.instate(["pressed"]):
-                return
+        if not self.instate(["pressed"]):
+            return
 
-            element = self.identify(event.x, event.y)
-            index = self.index("@%d,%d" % (event.x, event.y))
+        element = self.identify(event.x, event.y)
+        index = self.index("@%d,%d" % (event.x, event.y))
 
-            if "close" in element and self._active == index:
-                self.cmd(event)
+        if "close" in element and self._active == index:
+            self.cmd(event)
 
-            self.state(["!pressed"])
-            self._active = None
-            logger.debug("Close tab end")
-
-        except Exception:
-            logger.exception("Error:")
+        self.state(["!pressed"])
+        self._active = None
+        logger.debug("Close tab end")
 
     def __initialize_custom_style(self):
         self.style = style = ttk.Style()
-        
+
         try:
             style.element_create("close", "image", "img_close", border=10, sticky="")
         except tk.TclError:
@@ -179,7 +175,7 @@ class ClosableNotebook(ttk.Notebook):
         )
         logger.debug("Initialized custom style.")
 
-    def move_tab(self, event: tk.EventType) -> None:
+    def move_tab(self, event: tk.Event) -> None:
         if self.index("end") > 1:
             y = self.get_tab().winfo_y() - 5
 

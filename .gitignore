@@ -2,6 +2,8 @@
 .DS_STORE
 .PyPlus
 bin/
+dist/
+.cache/
 node_modules/
 obj/
 PyPlus.sublime-workspace

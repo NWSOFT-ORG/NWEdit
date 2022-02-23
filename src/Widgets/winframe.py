@@ -2,9 +2,12 @@ from src.modules import ttk, tk
 from src.functions import is_dark_color
 
 
-class WinFrame(ttk.Frame):
+class WinFrame(tk.Toplevel):
     def __init__(self, master, title, bg, disable=True):
         super().__init__(master)
+        self.transient(master)
+        self.overrideredirect(1)
+
         self.title = title
         self.master = master
         self.bg = bg
@@ -12,12 +15,11 @@ class WinFrame(ttk.Frame):
         if disable:
             self.grab_set()
 
-        self.titlebar()
+        self.create_title()
         self.close_button()
         self.window_bindings()
-        self.place(relx=0.5, rely=0.5, anchor="center")
 
-    def titlebar(self):
+    def create_title(self):
         self.titleframe = ttk.Frame(self)
         self.titlebar = ttk.Label(self.titleframe, text=self.title)
         self.titlebar.pack(side='left', fill='both', expand=1)
@@ -26,7 +28,7 @@ class WinFrame(ttk.Frame):
 
     def add_widget(self, child_frame):
         self.child_frame = child_frame
-        self.configure(borderwidth=1, relief='ridge')
+        self.configure(borderwidth=1)
         self.child_frame.pack(fill='both')
 
     def window_bindings(self):
@@ -44,8 +46,8 @@ class WinFrame(ttk.Frame):
 
     def do_move(self, event):
         x = (event.x - self.x + self.winfo_x())
-        y = (event.y - self.y + self.winfo_y() + self.titlebar.winfo_height())
-        self.place_configure(y=y, x=x)
+        y = (event.y - self.y + self.winfo_y())
+        self.geometry(f"+{x}+{y}")
 
     def close_button(self):
         if is_dark_color(self.bg):

@@ -3,8 +3,17 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/src/LangSupport/exit_enter/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/src/LangSupport/exit_enter/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/src/LangSupport/get_exit_code/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/src/LangSupport/get_exit_code/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/src/LangSupport/Launcher/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/src/LangSupport/Launcher/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/include" />
+      <excludeFolder url="file://$MODULE_DIR$/venv/lib" />
     </content>
-    <orderEntry type="jdk" jdkName="Poetry (PyPlus)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (PyPlus)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

@@ -64,6 +64,7 @@ from src.functions import lighten_color
 
 
 if OSX:
+    # noinspection PyUnresolvedReferences
     from src.modules import PyTouchBar
 
 os.chdir(APPDIR)
@@ -187,9 +188,9 @@ class Editor:
         self.nb.enable_traversal()
 
         self.bottom_panedwin.pack(side='bottom', fill='both', expand=1)
-        self.bottom_panedwin.add(self.nb)
+        self.bottom_panedwin.add(self.nb, weight=3)
         self.bottom_tabs = CustomTabs(self.bottom_panedwin)
-        self.bottom_panedwin.add(self.bottom_tabs)
+        self.bottom_panedwin.add(self.bottom_tabs, weight=1)
 
     def click_tab(self, _=None):
         try:
@@ -332,7 +333,7 @@ class Editor:
             col = index.split(".")[1]
             self.statusbar.label3.config(text=f"Line {ln} Col {col}")
             logger.debug("update_statusbar: OK")
-        except:
+        except KeyError:
             self.statusbar.label3.config(text='')
             logger.exception("Error:")
         finally:
@@ -508,16 +509,15 @@ class Editor:
         if self.tabs:
             self.right_click_menu.tk_popup(event.x_root, event.y_root)
 
-    def close_tab(self, event=None) -> None:
+    def close_tab(self, event=None, show_startscreen=True) -> None:
         try:
-            # noinspection PyGlobalUndefined
-            global selected_tab
+            selected_tab = None
             if self.nb.index("end"):
                 # Close the current tab if close is selected from file menu, or
                 # keyboard shortcut.
                 if event is None or event.type == str(2):
                     selected_tab = self.nb.get_tab()
-                # Otherwise close the tab based on coordinates of center-click.
+                # Otherwise, close the tab based on coordinates of center-click.
                 else:
                     try:
                         index = event.widget.index("@%d,%d" % (event.x, event.y))
@@ -528,7 +528,7 @@ class Editor:
             self.nb.forget(selected_tab)
             self.tabs.pop(selected_tab)
 
-            if len(self.tabs) ==  0:
+            if len(self.tabs) == 0 and show_startscreen:
                 self.start_screen()
             self.mouse()
         except KeyError:
@@ -545,7 +545,7 @@ class Editor:
         files = []
         for tab in tabs:
             files.append(tab.file_dir)
-            self.close_tab()
+            self.close_tab(show_startscreen=False)
         for x in files:
             self.open_file(x)
         self.nb.select(curr)
@@ -589,4 +589,4 @@ class Editor:
             ErrorInfoDialog(self.master, f"Not a git repository: {Path(path).parent}")
             return
         elif action == "commit":
-            CommitView(self.panedwin, currdir)
+            GitView(self.panedwin, currdir)

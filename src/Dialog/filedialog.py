@@ -4,7 +4,7 @@ from src.Widgets.treeview import FileTree
 
 
 class FileOpenDialog(FileTree):
-    def __init__(self, opencommand: callable, action: str = "Open"):
+    def __init__(self, opencommand: callable, action: str = "Open") -> None:
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
         bg = self._style.lookup("TLabel", "background")
@@ -12,7 +12,7 @@ class FileOpenDialog(FileTree):
         self.win = tk.Toplevel()
         self.win.config(background=bg)
         self.win.title(f"{action}")
-        self.win.resizable(0, 0)
+        self.win.resizable(False, False)
         self.buttonframe = ttk.Frame(self.win)
         self.okbtn = ttk.Button(self.buttonframe, text=action, command=self.open)
         self.okbtn.pack(side="left")
@@ -38,13 +38,13 @@ class FileOpenDialog(FileTree):
         )
         self.temp_path = []
 
-    def open(self):
+    def open(self) -> any:
         item = self.tree.focus()
         item_text = self.tree.item(item, 'text')
         self.get_parent(item)
-        self.opencommand(f'{self.temp_path[0]}/{item_text}')
+        return self.opencommand(f'{self.temp_path[0]}/{item_text}')
 
-    def open_from_string(self, _=None):
+    def open_from_string(self, _: tk.Event = None) -> any:
         try:
             file = self.pathentry.get()
             if os.path.isfile(file):
@@ -56,25 +56,25 @@ class FileOpenDialog(FileTree):
                 self.path = file
                 self.refresh_tree()
             else:
-                self.opencommand(file)
-        except Exception:
+                return self.opencommand(file)
+        except tk.TclError:
             pass
 
-    def on_double_click_treeview(self, event=None, **kwargs):
+    def on_double_click_treeview(self, event: tk.Event = None, **kwargs: any):
         super().on_double_click_treeview(event, destroy=True)
 
 
 class FileSaveAsDialog(FileOpenDialog):
-    def __init__(self, savecommand: callable):
+    def __init__(self, savecommand: callable) -> None:
         super().__init__(savecommand, "Save")
 
 
 class DirectoryOpenDialog(FileOpenDialog):
-    def __init__(self, opencommand):
+    def __init__(self, opencommand: callable) -> None:
         self.opencommand = opencommand
         super().__init__(opencommand=opencommand)
 
-    def open(self):
+    def open(self) -> None:
         self.opencommand(
             os.path.join(self.path, self.tree.item(self.tree.focus(), "text"))
         )

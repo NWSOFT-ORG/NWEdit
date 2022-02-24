@@ -23,6 +23,13 @@ from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog, FileSaveA
 from src.Dialog.goto import Navigate
 from src.Git.gitview import GitView
 from src.Menu.create_menu import create_menu
+from src.Widgets.customenotebook import ClosableNotebook
+from src.Widgets.hexview import HexView
+from src.Widgets.panel import CustomTabs
+from src.Widgets.statusbar import Statusbar
+from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextEditingPlugin
+from src.Widgets.treeview import FileTree
+from src.Widgets.winframe import WinFrame
 from src.codefunctions import CodeFunctions
 from src.constants import (
     APPDIR,
@@ -30,14 +37,11 @@ from src.constants import (
     OSX,
     logger,
 )
-from src.Widgets.customenotebook import ClosableNotebook
-from src.Widgets.panel import CustomTabs
 from src.functions import (
     is_binary_string,
     is_dark_color,
 )
-from src.Widgets.hexview import HexView
-from src.Widgets.winframe import WinFrame
+from src.functions import lighten_color
 from src.highlighter import recolorize_line
 from src.modules import (
     Path,
@@ -57,21 +61,16 @@ from src.settings import (
     RunCommand,
     Settings,
 )
-from src.Widgets.statusbar import Statusbar
-from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
-from src.Widgets.treeview import FileTree
-from src.functions import lighten_color
-
 
 if OSX:
     # noinspection PyUnresolvedReferences
     from src.modules import PyTouchBar
 
-os.chdir(APPDIR)
+os.chdir(APPDIR)  # Need to change to the correct directory
 
 
 class Document:
-    """Helper class, for the editor."""
+    """Helper class, for the editor. It holds all the data which a tab has"""
 
     def __init__(self,
                  frame=None,
@@ -87,7 +86,7 @@ class Document:
 class Editor:
     """The editor class."""
 
-    def __init__(self, master) -> None:
+    def __init__(self, master: tk.Tk) -> None:
         """The editor object, the entire thing that goes in the
         window."""
         # noinspection PyBroadException
@@ -99,7 +98,7 @@ class Editor:
             self.format_settings_class = FormatCommand()
             self.commet_settings_class = CommentMarker()
             self.master = master
-            self.opts = TextOpts(keyaction=self.key)
+            self.opts = TextEditingPlugin(keyaction=self.key)
 
             self.theme = self.settings_class.get_settings("theme")
             self.tabwidth = self.settings_class.get_settings("tab")
@@ -132,9 +131,9 @@ class Editor:
 
             self.menubar = tk.Menu(self.master)
             self.panedwin = ttk.Panedwindow(self.master, orient="horizontal")
-            self.panedwin.pack(fill="both", expand=1)
+            self.panedwin.pack(fill="both", expand=True)
             self.mainframe = ttk.Frame(self.master)
-            self.mainframe.pack(fill='both', expand=1)
+            self.mainframe.pack(fill='both', expand=True)
             self.panedwin.add(self.mainframe)
 
             self.left_panel()
@@ -170,15 +169,14 @@ class Editor:
         except Exception:
             logger.exception("Error when initializing:")
             ErrorReportDialog('Error when starting.', traceback.format_exc())
-            exit(1)
 
-    def left_panel(self):
+    def left_panel(self) -> None:
         self.left_tabs = CustomTabs(self.panedwin)
         self.filetree = FileTree(self.left_tabs, self.open_file)
         self.panedwin.insert(0, self.left_tabs)
         self.left_tabs.add(self.filetree, text='Files')
 
-    def bottom_panel(self):
+    def bottom_panel(self) -> None:
         self.bottom_panedwin = ttk.Panedwindow(self.mainframe)
 
         self.nb = ClosableNotebook(self.bottom_panedwin, self.close_tab)
@@ -187,29 +185,29 @@ class Editor:
 
         self.nb.enable_traversal()
 
-        self.bottom_panedwin.pack(side='bottom', fill='both', expand=1)
+        self.bottom_panedwin.pack(side='bottom', fill='both', expand=True)
         self.bottom_panedwin.add(self.nb, weight=3)
         self.bottom_tabs = CustomTabs(self.bottom_panedwin)
         self.bottom_panedwin.add(self.bottom_tabs, weight=1)
 
-    def click_tab(self, _=None):
+    def click_tab(self, _: tk.Event = None):
         try:
             self.opts.set_text(self.get_text())
         except AttributeError:
             pass
 
-    def create_bindings(self):
+    def create_bindings(self) -> None:
         # Keyboard bindings
         self.master.bind(f"<{MAIN_KEY}-w>", self.close_tab)
-        self.master.bind(f"<{MAIN_KEY}-o>", lambda: self.open_file())
+        self.master.bind(f"<{MAIN_KEY}-o>", lambda _: self.open_file())
         # Mouse bindings
         self.master.bind("<<MouseEvent>>", self.mouse)
         self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
 
         self.master.protocol(
-            "WM_DELETE_WINDOW", lambda: self.exit(force=True)
+            "WM_DELETE_WINDOW", lambda: self.quit_editor(force=True)
         )  # When the window is closed, or quit from Mac, do exit action
-        self.master.createcommand("::tk::mac::Quit", self.exit)
+        self.master.createcommand("::tk::mac::Quit", self.quit_editor)
         logger.debug("Bindings created")
 
     def start_screen(self) -> None:
@@ -286,11 +284,11 @@ class Editor:
         """Creates a text widget in a frame."""
 
         panedwin = ttk.Panedwindow(frame)
-        panedwin.pack(fill="both", expand=1)
+        panedwin.pack(fill="both", expand=True)
 
         textframe = EnhancedTextFrame(panedwin)
         # The one with line numbers and a nice dark theme
-        textframe.pack(fill="both", expand=1, side="right")
+        textframe.pack(fill="both", expand=True, side="right")
         panedwin.add(textframe)
         textframe.panedwin = panedwin
         textframe.set_first_line(1)
@@ -310,7 +308,7 @@ class Editor:
         logger.debug("Textbox created")
         return textbox
 
-    def update_title(self, _=None) -> str:
+    def update_title(self, _: tk.Event = None) -> str:
         try:
             if self.tabs[self.nb.get_tab()].istoolwin:
                 self.master.title("PyPlus")
@@ -322,7 +320,7 @@ class Editor:
         finally:
             return "break"
 
-    def update_statusbar(self, _=None) -> str:
+    def update_statusbar(self, _: tk.Event = None) -> str:
         try:
             if not self.tabs:
                 self.statusbar.label3.config(text="")
@@ -339,7 +337,7 @@ class Editor:
         finally:
             return "break"
 
-    def key(self, _=None) -> None:
+    def key(self, _: tk.Event = None) -> None:
         """Event when a key is pressed."""
         try:
             currtext = self.get_text()
@@ -357,7 +355,7 @@ class Editor:
             self.master.bell()
             logger.exception("Error when handling keyboard event:")
 
-    def mouse(self, _=None) -> None:
+    def mouse(self, _: tk.Event = None) -> None:
         """The action done when the mouse is clicked"""
         try:
             self.update_statusbar()
@@ -368,7 +366,7 @@ class Editor:
             self.master.bell()
             logger.exception("Error when handling mouse event:")
 
-    def reopen_files(self):
+    def reopen_files(self) -> None:
         with open("Backups/recent_files.txt") as f:
             if not f.read().strip():
                 self.start_screen()
@@ -382,7 +380,7 @@ class Editor:
         self.update_title()
         self.update_statusbar()
 
-    def open_hex(self, file=""):
+    def open_hex(self, file="") -> None:
         if not file:
             FileOpenDialog(self.open_hex)
         file = os.path.abspath(file)
@@ -398,7 +396,7 @@ class Editor:
         self.update_statusbar()
         return window.textbox
 
-    def open_dir(self, directory: str = ""):
+    def open_dir(self, directory: str = "") -> None:
         if not directory:
             DirectoryOpenDialog(self.open_dir)
             return
@@ -406,13 +404,12 @@ class Editor:
         self.filetree.path = directory
         self.filetree.refresh_tree()
 
-    def open_file(self, file: str = "", askhex: bool = True):
+    def open_file(self, file: str = "", askhex: bool = True) -> [EnhancedText, None]:
         """Opens a file
         If a file is not provided, a messagebox'll
         pop up to ask the user to select the path."""
         if not file:
             FileOpenDialog(self.open_file)
-            return
 
         file = os.path.abspath(file)
         try:
@@ -490,7 +487,7 @@ class Editor:
             self.update_title()
             self.reload()
 
-    def save_file(self, _=None) -> None:
+    def save_file(self, _: tk.Event = None) -> None:
         """Save an *existing* file"""
         try:
             curr_tab = self.nb.get_tab()
@@ -505,11 +502,11 @@ class Editor:
         except KeyError:
             pass
 
-    def right_click(self, event) -> None:
+    def right_click(self, event: tk.Event) -> None:
         if self.tabs:
             self.right_click_menu.tk_popup(event.x_root, event.y_root)
 
-    def close_tab(self, event=None, show_startscreen=True) -> None:
+    def close_tab(self, event: tk.Event = None, show_startscreen: bool = True) -> None:
         try:
             selected_tab = None
             if self.nb.index("end"):
@@ -550,7 +547,7 @@ class Editor:
             self.open_file(x)
         self.nb.select(curr)
 
-    def exit(self, force=False) -> None:
+    def quit_editor(self, force: bool = False) -> None:
         with open("Backups/recent_dir.txt", "w") as f:
             f.write(self.filetree.path)
         with open("Backups/recent_files.txt", "w") as f:
@@ -565,18 +562,18 @@ class Editor:
             self.master.destroy()
 
     def restart(self) -> None:
-        self.exit(force=False)
+        self.quit_editor(force=False)
         newtk = tk.Tk()
         self.__init__(newtk)
         newtk.mainloop()
 
-    def get_text(self):
+    def get_text(self) -> EnhancedText:
         try:
             return self.tabs[self.nb.get_tab()].textbox
         except KeyError:
             pass
 
-    def git(self, action=None) -> None:
+    def git(self, action: str = '') -> None:
         currdir = self.filetree.path
         if action == "clone":
             dialog = InputStringDialog(self.master, "Clone", "Remote git url:")

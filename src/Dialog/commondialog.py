@@ -1,3 +1,4 @@
+from src.Widgets.winframe import WinFrame
 from src.constants import APPDIR, VERSION, logger
 from src.modules import json, tk, ttk, ttkthemes, os, webbrowser, request
 
@@ -9,24 +10,32 @@ def download_file(url, localfile="") -> str:
     return localfile
 
 
-# Need these because importing settings is a circular import
-def get_theme():
+# Need these because importing settings causes a circular import
+def get_theme() -> str:
     with open(APPDIR + "/Config/general-settings.json") as f:
         settings = json.load(f)
     return settings["theme"]
 
 
-def get_font():
+def get_font() -> str:
     with open(APPDIR + "/Config/general-settings.json") as f:
         settings = json.load(f)
     return settings["font"]
 
 
-class YesNoDialog(tk.Toplevel):
-    def __init__(self, parent: tk.Misc = None, title: str = "", text: str = None):
+def get_bg() -> str:
+    theme_name = get_theme()
+    theme = ttkthemes.ThemedStyle()
+    theme.set_theme(theme_name)
+    bg = theme.lookup("Tlabel", 'background')
+    return bg
+
+
+class YesNoDialog(ttk.Frame):
+    def __init__(self, parent: [tk.Tk, tk.Misc] = None, title: str = "", text: str = None):
+        self.winframe = WinFrame(parent, title, get_bg())
         self.text = text
-        super().__init__(parent)
-        self.title(title)
+        super().__init__(self.winframe)
         label1 = ttk.Label(self, text=self.text)
         label1.pack(fill="both")
 
@@ -38,29 +47,32 @@ class YesNoDialog(tk.Toplevel):
         b2.pack(side="left")
 
         box.pack(fill="x")
-        self.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.resizable(0, 0)
-        self.wait_window(self)
+
+        self.winframe.protocol("WM_DELETE_WINDOW", self.cancel)
+        self.winframe.resizable(False, False)
+        self.winframe.add_widget(self)
+
+        parent.wait_window(self)
 
     def apply(self, _=None):
         self.result = 1
-        self.destroy()
+        self.winframe.destroy()
         logger.info("apply")
 
     def cancel(self, _=None):
-        """put focus back to the parent window"""
+        """Put focus back to the parent window"""
         self.result = 0
-        self.destroy()
+        self.winframe.destroy()
         logger.info("cancel")
 
 
-class InputStringDialog(tk.Toplevel):
-    def __init__(self, parent=".", title="", text=""):
-        super().__init__(parent)
-        self.title(title)
+class InputStringDialog(ttk.Frame):
+    def __init__(self, parent: [tk.Misc, tk.Tk], title="", text=""):
+        self.winframe = WinFrame(parent, title, get_bg())
+        super().__init__(self.winframe)
         ttk.Label(self, text=text).pack(fill="x")
         self.entry = ttk.Entry(self)
-        self.entry.pack(fill="x", expand=1)
+        self.entry.pack(fill="x", expand=True)
         box = ttk.Frame(self)
 
         b1 = ttk.Button(box, text="Ok", command=self.apply)
@@ -69,32 +81,34 @@ class InputStringDialog(tk.Toplevel):
         b2.pack(side="left")
 
         box.pack(fill="x")
-        self.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.resizable(0, 0)
+
+        self.winframe.add_widget(self)
+        self.winframe.protocol("WM_DELETE_WINDOW", self.cancel)
+        self.winframe.resizable(False, False)
         self.wait_window(self)
 
     def apply(self):
         self.result = self.entry.get()
-        self.destroy()
+        self.winframe.destroy()
         logger.info("apply")
 
     def cancel(self):
         self.result = None
-        self.destroy()
+        self.winframe.destroy()
         logger.info("cancel")
 
 
 class ErrorInfoDialog(tk.Toplevel):
-    def __init__(self, parent: tk.Misc = None, text: str = None, title: str = "Error"):
+    def __init__(self, parent: [tk.Tk, tk.Misc] = None, text: str = None, title: str = "Error"):
         self.text = text
         super().__init__(parent)
         self.title(title)
         label1 = ttk.Label(self, text=self.text)
-        label1.pack(side="top", fill="both", expand=1)
+        label1.pack(side="top", fill="both", expand=True)
         b1 = ttk.Button(self, text="Ok", width=10, command=self.apply)
         b1.pack(side="left")
         self.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.resizable(0, 0)
+        self.resizable(False, False)
         self.wait_window(self)
 
     def apply(self, _=None):
@@ -106,6 +120,7 @@ class ErrorInfoDialog(tk.Toplevel):
         pass
 
 
+# noinspection PyTypeChecker
 class AboutDialog:
     def __init__(self, master):
         """Shows the version and related info of the editor."""
@@ -114,7 +129,7 @@ class AboutDialog:
 
         ver = tk.Toplevel(self.master)
         ver.transient(self.master)
-        ver.resizable(0, 0)
+        ver.resizable(False, False)
         ver.title("About PyPlus")
         ttk.Label(ver, image=self.icon).pack(fill="both")
         ttk.Label(ver, text=f"Version {VERSION}", font="Arial 30 bold").pack(
@@ -133,7 +148,8 @@ class AboutDialog:
             ttk.Label(ver, text="No updates available").pack(fill="both")
         ver.mainloop()
 
-    def check_updates(self, popup=True) -> list:
+    @staticmethod
+    def check_updates(popup=True) -> list:
         if "DEV" in VERSION:
             ErrorInfoDialog(
                 text="Updates aren't supported by develop builds,\n\
@@ -151,7 +167,7 @@ class AboutDialog:
             return [version != VERSION, newest["url"]]
         updatewin = tk.Toplevel()
         updatewin.title("Updates")
-        updatewin.resizable(0, 0)
+        updatewin.resizable(False, False)
         updatewin.transient(".")
         ttkthemes.ThemedStyle(updatewin)
         if version != VERSION:

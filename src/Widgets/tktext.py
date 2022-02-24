@@ -1,6 +1,6 @@
 """A modded version of tkinter.Text"""
 
-from src.modules import font, styles, tk, ttk, ttkthemes, EditorErr, lexers
+from src.modules import font, styles, tk, ttk, ttkthemes, lexers
 from src.settings import Settings
 from src.functions import darken_color, is_dark_color, lighten_color
 from src.constants import MAIN_KEY, logger
@@ -82,7 +82,9 @@ class EnhancedText(tk.Text):
     it generats an event, to redraw the line numbers."""
 
     def __init__(self, *args: any, **kwargs: any) -> None:
-        tk.Text.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.comment_marker = ""
+        self.opts = None
         self.searchable = False
         self.navigate = False
         self.lexer = lexers.get_lexer_by_name('text')
@@ -92,7 +94,7 @@ class EnhancedText(tk.Text):
         self.tk.call("rename", self._w, self._orig)
         self.tk.createcommand(self._w, self._proxy)
 
-    def set_lexer(self, lexer):
+    def set_lexer(self, lexer: str) -> None:
         self.lexer = lexer
 
     def _proxy(self, *args: list) -> object:
@@ -117,7 +119,7 @@ class EnhancedText(tk.Text):
             # return what the actual widget returned
 
             return result
-        except Exception:
+        except tk.TclError:
             pass
 
 
@@ -125,7 +127,7 @@ class EnhancedTextFrame(ttk.Frame):
     """An enhanced text frame to put the
     text widget with linenumbers in."""
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: any, **kwargs: any) -> None:
         ttk.Frame.__init__(self, *args, **kwargs)
         settings_class = Settings()
         self.font = settings_class.get_settings("font")
@@ -172,18 +174,18 @@ class EnhancedTextFrame(ttk.Frame):
         self.text.bind("<<Change>>", self.on_change)
         self.text.bind("<Configure>", self._on_resize)
 
-    def on_change(self, _=None) -> None:
+    def on_change(self, _: tk.Event = None) -> None:
         currline = self.text.index("insert")
         self.linenumbers.advancedredraw(first=self.first_line, line=currline)
 
-    def _on_resize(self, _=None) -> None:
+    def _on_resize(self, _: tk.Event = None) -> None:
         self.linenumbers.redraw(first=self.first_line)
 
     def set_first_line(self, line: int) -> None:
         self.first_line = line
 
 
-class TextOpts:
+class TextEditingPlugin:
     def __init__(self, bindkey: bool = False, keyaction: callable = None):
         self.keyaction = keyaction
         self.bindkey = bindkey
@@ -212,11 +214,12 @@ class TextOpts:
         self.redo_icon = tk.PhotoImage(file="Images/redo.gif")
         self.undo_icon = tk.PhotoImage(file="Images/undo.gif")
 
-    def set_text(self, text):
+    def set_text(self, text: [EnhancedText, tk.Text]) -> None:
         self.text = text
         self.bind_events()
-    
-    def create_menu(self, master):
+
+    def create_menu(self, master: tk.Tk):
+        """Creates the menu for the master"""
         menu = tk.Menu(master)
         menu.add_command(
             label="Undo",
@@ -254,13 +257,13 @@ class TextOpts:
         indent_cascade = tk.Menu(menu)
         indent_cascade.add_command(
             label="Indent",
-            command=lambda: self.indent("indent"),
+            command=lambda: self.indent(True),
             image=self.indent_icon,
             compound='left'
         )
         indent_cascade.add_command(
             label="Unident",
-            command=lambda: self.indent("unindent"),
+            command=lambda: self.indent(False),
             image=self.unindent_icon,
             compound='left'
         )
@@ -326,22 +329,22 @@ class TextOpts:
         text.bind("<BackSpace>", self.backspace)
         text.bind("<Return>", self.autoindent)
         text.bind("<Tab>", self.tab)
-        text.bind(f"<{MAIN_KEY}-i>", lambda _=None: self.indent("indent"))
-        text.bind(f"<{MAIN_KEY}-u>", lambda _=None: self.indent("unindent"))
+        text.bind(f"<{MAIN_KEY}-i>", lambda _=None: self.indent(True))
+        text.bind(f"<{MAIN_KEY}-u>", lambda _=None: self.indent(False))
         text.bind(f"<{MAIN_KEY}-Z>", self.redo)
         text.bind(f"<{MAIN_KEY}-z>", self.undo)
         text.bind(f"{MAIN_KEY}-d", self.duplicate_line)
         create_tags(text)
         recolorize(text)
 
-    def tab(self, _=None):
+    def tab(self, _: tk.Event = None):
         # Convert tabs to spaces
         self.text.insert("insert", " " * self.tabwidth)
         self.key()
         # Quit quickly, before a char is being inserted.
         return "break"
 
-    def key(self, _=None) -> None:
+    def key(self, _: tk.Event = None) -> None:
         """Event when a key is pressed."""
         if self.bindkey:
             currtext = self.text
@@ -363,7 +366,7 @@ class TextOpts:
             currtext.insert("insert", "\n" + text)
         self.key()
 
-    def indent(self, action="indent") -> None:
+    def indent(self, indent: bool = True) -> None:
         """Indent/unindent feature."""
         currtext = self.text
         if currtext.tag_ranges("sel"):
@@ -372,7 +375,7 @@ class TextOpts:
         else:
             sel_start = currtext.index("insert linestart")
             sel_end = currtext.index("insert lineend")
-        if action == "indent":
+        if indent:
             selected_text = currtext.get(sel_start, sel_end)
             indented = []
             for line in selected_text.splitlines():
@@ -382,7 +385,7 @@ class TextOpts:
             currtext.tag_remove("sel", "1.0", "end")
             currtext.tag_add("sel", sel_start, f"{sel_end} +4c")
             self.key()
-        elif action == "unindent":
+        else:
             selected_text = currtext.get(sel_start, sel_end)
             unindented = []
             for line in selected_text.splitlines():
@@ -395,10 +398,8 @@ class TextOpts:
             currtext.tag_remove("sel", "1.0", "end")
             currtext.tag_add("sel", sel_start, sel_end)
             self.key()
-        else:
-            raise EditorErr("Action undefined.")
 
-    def comment_lines(self, _=None):
+    def comment_lines(self, _: tk.Event = None):
         """Comments the selection or line"""
         try:
             currtext = self.text
@@ -419,7 +420,7 @@ class TextOpts:
                 if block:
                     if text.startswith(comment_start):
                         currtext.insert(
-                            "insert", text[len(comment_start) : -len(comment_end)]
+                            "insert", text[len(comment_start): -len(comment_end)]
                         )
                         self.key()
                         return
@@ -450,7 +451,7 @@ class TextOpts:
         except (KeyError, AttributeError):
             return
 
-    def backspace(self, _=None) -> None:
+    def backspace(self, _: tk.Event = None) -> None:
         currtext = self.text
         # Backchar
         if currtext.get("insert -1c", "insert +1c") in ["''", '""', "[]", "{}", "()"]:
@@ -460,7 +461,7 @@ class TextOpts:
             currtext.delete(f"insert -{self.tabwidth - 1}c", "insert")
         self.key()
 
-    def close_brackets(self, event: tk.EventType = None) -> str:
+    def close_brackets(self, event: tk.Event = None) -> str:
         currtext = self.text
         if (event.char in [")", "]", "}", "'", '"'] and
                 currtext.get('insert -1c', 'insert') in [")", "]", "}", "'", '"']):
@@ -562,14 +563,14 @@ class TextOpts:
         try:
             self.text.edit_undo()
             self.key()
-        except Exception:
+        except tk.TclError:  # No action needed
             return
 
     def redo(self, _=None) -> None:
         try:
             self.text.edit_redo()
             self.key()
-        except Exception:
+        except tk.TclError:  # No action needed
             return
     
     def copy(self) -> None:
@@ -600,7 +601,7 @@ class TextOpts:
                     "insert", clipboard.replace("\t", " " * self.tabwidth)
                 )
             self.key()
-        except Exception:
+        except tk.TclError:  # No clipboard
             pass
 
     def select_all(self) -> None:
@@ -687,7 +688,7 @@ class TextOpts:
         currtext.mark_set("insert", "insert +1l")
         currtext.insert("insert", text)
 
-    def swap_case(self):
+    def swap_case(self) -> None:
         currtext = self.text
         if not currtext.tag_ranges("sel"):
             return
@@ -697,7 +698,7 @@ class TextOpts:
         currtext.insert("insert", text)
         self.key()
 
-    def upper_case(self):
+    def upper_case(self) -> None:
         currtext = self.text
         if not currtext.tag_ranges("sel"):
             return
@@ -707,7 +708,7 @@ class TextOpts:
         currtext.insert("insert", text)
         self.key()
 
-    def lower_case(self):
+    def lower_case(self) -> None:
         currtext = self.text
         if not currtext.tag_ranges("sel"):
             return

@@ -27,7 +27,7 @@ class Pipe:
 class Console(ttk.Frame):
     """A tkinter widget which behaves like an interpreter"""
 
-    def __init__(self, parent: tk.Misc, _locals=None, exit_callback=None):
+    def __init__(self, parent: tk.Widget, _locals=None, exit_callback=None):
         super().__init__(parent)
         settings_class = Settings()
         self.command_history = []

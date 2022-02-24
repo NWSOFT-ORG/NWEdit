@@ -1,5 +1,6 @@
 run: ; venv/bin/python3 main.py
 install-packages: ; venv/bin/pip install -r requirements.txt
+update-packages: ; venv/bin/pip freeze > requirements.txt
 build-mac: ; venv/bin/python scripts/build_mac.py py2app -A
 build-pyinstaller-linux: ; @printf "[Compiling via PyInstaller...]\n"
 							venv/bin/pyinstaller --noconfirm --onedir --windowed --icon "src/Images/pyplus.ico" \

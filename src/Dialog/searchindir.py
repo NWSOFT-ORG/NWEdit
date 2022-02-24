@@ -20,7 +20,7 @@ def list_all(directory):
 class SearchInDir(ttk.Frame):
     def __init__(self, parent: ttk.Notebook, path: str, opencommand: callable):
         super().__init__(parent)
-        self.pack(fill='both', expand=1)
+        self.pack(fill='both', expand=True)
         parent.add(self, text='Search in Directory')
 
         self.parent = parent
@@ -82,13 +82,13 @@ class SearchInDir(ttk.Frame):
 
         treeframe = ttk.Frame(self)
         self.tree = ttk.Treeview(treeframe, show='tree')
-        self.tree.pack(side='left', fill='both', expand=1)
+        self.tree.pack(side='left', fill='both', expand=True)
 
         yscroll = ttk.Scrollbar(treeframe, command=self.tree.yview)
         yscroll.pack(side="right", fill="y")
         self.tree.config(yscrollcommand=yscroll.set)
         self.tree.bind('<Double-1>', self.on_double_click)
-        treeframe.pack(fill='both', expand=1)
+        treeframe.pack(fill='both', expand=True)
 
         for x in (self.case, self.regex, self.fullword):
             x.trace_add('write', self.find)

@@ -2,10 +2,13 @@
 .DS_STORE
 .PyPlus
 bin/
+bin/*
 dist/
+dist/*
 .cache/
+.cache/*
 node_modules/
+node_modules/*
 obj/
-PyPlus.sublime-workspace
-PyPlus.sublime-project
+obj/*
 src/pyplus.log

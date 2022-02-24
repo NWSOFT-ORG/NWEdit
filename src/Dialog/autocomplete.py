@@ -1,5 +1,7 @@
 import string
-from src.modules import ttk
+
+from src.Widgets.tktext import EnhancedText
+from src.modules import ttk, tk
 
 punc = [x for x in string.punctuation.replace('_', '')]
 whites = [x for x in string.whitespace]
@@ -16,20 +18,20 @@ def sep_words(str_to_sep: str) -> list:
     
 
 class CompleteDialog(ttk.Frame):
-    def __init__(self, master, text):
+    def __init__(self, master: tk.Misc, text: [tk.Text, EnhancedText]):
         super().__init__(master, relief='groove')
         self.completions = ttk.Treeview(self, show='tree')
-        self.completions.pack(side='left', fill='both', expand=1)
+        self.completions.pack(side='left', fill='both', expand=True)
         self.completions.bind('<1>', self.complete)
 
         yscroll = ttk.Scrollbar(self, command=self.completions.yview)
-        yscroll.pack(side='right', fill='y', expand=1)
+        yscroll.pack(side='right', fill='y', expand=True)
         self.completions['yscrollcommand'] = yscroll.set
         self.text = text
         
         text.bind('<Button-1>', lambda _: self.place_forget())
 
-    def complete(self, event=None):
+    def complete(self, event: tk.Event = None) -> None:
         item = self.completions.identify("item", event.x, event.y)
         text = self.text
         completion = self.completions.item(item, 'text')
@@ -37,7 +39,7 @@ class CompleteDialog(ttk.Frame):
         text.insert('insert', completion)
         text.opts.key()
 
-    def insert_completions(self):
+    def insert_completions(self) -> None:
         text = self.text
         dline = text.dlineinfo('insert')
         self.place_configure(x=dline[0] + dline[2], y=dline[1] + dline[3])
@@ -49,15 +51,15 @@ class CompleteDialog(ttk.Frame):
         for match in all_matches:
             if curr_word in match:
                 self.completions.insert('', 'end', text=match)
-    
-    def get_word(self):
+
+    def get_word(self) -> str:
         text = self.text
         try:
             return text.get(*self.index_word())
         except TypeError:
             pass
-    
-    def index_word(self):
+
+    def index_word(self) -> str:
         text = self.text
         try:
             content = text.get("1.0", "insert")

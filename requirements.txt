@@ -1,6 +1,16 @@
+altgraph==0.17.2
 art==5.4
+future==0.18.2
 json5==0.9.6
+numpy==1.22.2
 Pillow==9.0.1
+pycairo==1.20.1
 Pygments==2.11.2
-ttkthemes==3.2.2
 pyinstaller==4.9
+pyinstaller-hooks-contrib==2022.2
+six==1.16.0
+ttkthemes==3.2.2
+typelib==0.0.10
+whichcraft==0.6.1
+zope.event==4.5.0
+zope.interface==5.4.0

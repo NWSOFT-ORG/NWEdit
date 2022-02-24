@@ -23,7 +23,7 @@ class StyleWindow(tk.Toplevel):
     def __init__(self, text, handler):
         super().__init__()
         self.transient('.')
-        self.resizable(0, 0)
+        self.resizable(False, False)
         self.title('Insert Ascii Art')
 
         self.text = text

@@ -1,10 +1,11 @@
-from src.Dialog.commondialog import get_theme
-from src.functions import darken_color
-from src.modules import tk, ttk, ttkthemes
 import re
 
+from src.Dialog.commondialog import get_theme
+from src.Widgets.tktext import EnhancedText
+from src.modules import tk, ttk, ttkthemes
 
-def finditer_withlineno(pattern, string, flags=0):
+
+def finditer_withlineno(pattern: str, string: str, flags: int = 0) -> iter:
     """
     A version of 're.finditer' that returns '(match, line_number)' pairs.
     """
@@ -31,7 +32,7 @@ def finditer_withlineno(pattern, string, flags=0):
                (line_number + 1, m.end() - newline_offset - 1))
 
 
-def find_all(sub, string, case=True):
+def find_all(sub: str, string: str, case: bool = True) -> iter:
     start = 0
     if not case:
         sub = sub.lower()
@@ -51,12 +52,12 @@ def find_all(sub, string, case=True):
 
 
 class Search:
-    def __init__(self, master: tk.Misc, text: tk.Text):
+    def __init__(self, master: ttk.PanedWindow, text: EnhancedText) -> None:
         self.master = master
         self.text = text
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
-        fg = self._style.lookup("TLabel", "foreground")
+        self._style.lookup("TLabel", "foreground")
 
         if self.text.searchable or self.text.navigate:
             return
@@ -65,7 +66,7 @@ class Search:
             self.end = "end"
         self.starts = []
         self.search_frame = ttk.Frame(self.text.frame)
-        
+
         # Tkinter Variables
         self.case = tk.BooleanVar()
         self.regex = tk.BooleanVar()
@@ -77,8 +78,6 @@ class Search:
                                                            fill="y")
         self.content = tk.Entry(
             self.search_frame,
-            foreground=fg,
-            insertbackground=fg,
             highlightthickness=0,
         )
         self.content.pack(side="left", fill="both")
@@ -90,12 +89,10 @@ class Search:
         self.backward.pack(side="left")
 
         ttk.Label(self.search_frame, text="Replace: ").pack(side="left",
-                                                                anchor="nw",
-                                                                fill="y")
+                                                            anchor="nw",
+                                                            fill="y")
         self.repl = tk.Entry(
             self.search_frame,
-            foreground=fg,
-            insertbackground=fg,
             highlightthickness=0,
         )
         self.repl.pack(side="left", fill="both")
@@ -112,15 +109,15 @@ class Search:
         self.case_yn.pack(side="left")
 
         self.reg_yn = ttk.Checkbutton(self.search_frame,
-                                       text="RegExp",
-                                       variable=self.regex)
+                                      text="RegExp",
+                                      variable=self.regex)
         self.reg_yn.pack(side="left")
 
         self.fullw_yn = ttk.Checkbutton(self.search_frame,
-                                       text="Full Word",
-                                       variable=self.fullword)
+                                        text="Full Word",
+                                        variable=self.fullword)
         self.fullw_yn.pack(side="left")
-        
+
         for x in (self.case, self.regex, self.fullword):
             x.trace_add('write', self.find)
 
@@ -135,7 +132,9 @@ class Search:
 
         self.master.add(self.search_frame, text="Search")
 
-    def re_search(self, pat, text, nocase=False, full_word=False, regex=False):
+    # noinspection PyTypeChecker
+    @staticmethod
+    def re_search(pat: str, text: str, nocase: bool = False, full_word: bool = False, regex: bool = False) -> list:
         if nocase and full_word:
             res = [(x[0], x[1]) for x in finditer_withlineno(
                 r"\b" + re.escape(pat) +
@@ -149,13 +148,13 @@ class Search:
         elif regex:
             res = [(x[0], x[1]) for x in finditer_withlineno(
                 pat, text, re.MULTILINE)]
-        if nocase:
+        elif nocase:
             res = [(x[0], x[1]) for x in find_all(pat, text, case=False)]
         else:
             res = [(x[0], x[1]) for x in find_all(pat, text)]
         return res
 
-    def find(self, *_):
+    def find(self, *_) -> None:
         text = self.text
         text.tag_remove("found", "1.0", "end")
         s = self.content.get()
@@ -172,7 +171,7 @@ class Search:
                 text.tag_add("found", start, end)
             text.tag_config("found", foreground="red", background="yellow")
 
-    def replace(self):
+    def replace(self) -> None:
         text = self.text
         text.tag_remove("found", "1.0", "end")
         s = self.content.get()
@@ -188,11 +187,11 @@ class Search:
                 text.delete(start, end)
                 text.insert(start, r)
 
-    def clear(self):
+    def clear(self) -> None:
         text = self.text
         text.tag_remove("found", "1.0", "end")
 
-    def nav_forward(self):
+    def nav_forward(self) -> None:
         try:
             text = self.text
             curpos = text.index("insert")
@@ -200,10 +199,10 @@ class Search:
                 prev = self.starts.index(curpos) - 1
                 text.mark_set("insert", self.starts[prev])
                 text.see("insert")
-        except Exception:
+        except tk.TclError:
             pass
 
-    def nav_backward(self):
+    def nav_backward(self) -> None:
         try:
             text = self.text
             curpos = text.index("insert")
@@ -211,10 +210,10 @@ class Search:
                 prev = self.starts.index(curpos) + 1
                 text.mark_set("insert", self.starts[prev])
                 text.see("insert")
-        except Exception:
+        except tk.TclError:
             pass
 
-    def _exit(self):
+    def _exit(self) -> None:
         self.text.searchable = False
         self.search_frame.pack_forget()
         self.clear()

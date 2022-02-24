@@ -1,5 +1,5 @@
 from src.modules import (tk, ttk, ttkthemes, os, subprocess, lexers, Path)
-from src.functions import (is_dark_color, run_in_terminal, open_system_shell)
+from src.functions import (is_dark_color, open_system_shell)
 from src.Dialog.commondialog import (get_theme, ErrorInfoDialog)
 from src.Dialog.search import Search
 from src.Widgets.console import Console
@@ -59,7 +59,7 @@ class CodeFunctions:
         )
         codemenu.add_command(
             label="Open System Shell",
-            command=self.system_shell,
+            command=open_system_shell,
             image=self.term_icon,
             compound='left'
         )
@@ -103,7 +103,7 @@ class CodeFunctions:
                             )
                         )
                     )
-                run_in_terminal("run.bat && del run.bat && exit", cwd=APPDIR)
+                os.system("run.bat && del run.bat && exit", cwd=APPDIR)
             else:  # Others
                 with open(APPDIR + "/run.sh", "w") as f:
                     f.write(
@@ -118,13 +118,9 @@ class CodeFunctions:
                             )
                         )
                     )
-                run_in_terminal("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
+                os.system("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
         except Exception:
             ErrorInfoDialog(self.master, "This language is not supported.")
-
-    @staticmethod
-    def system_shell() -> None:
-        open_system_shell()
 
     def python_shell(self) -> None:
         curr_tab = self.bottomframe
@@ -137,8 +133,8 @@ class CodeFunctions:
         main_window.text.bind(
             "<KeyRelease>", lambda _=None: recolorize(main_window.text)
         )
-        main_window.pack(fill="both", expand=1)
-        shell_frame.pack(fill='both', expand=1)
+        main_window.pack(fill="both", expand=True)
+        shell_frame.pack(fill='both', expand=True)
         curr_tab.add(shell_frame, text='Python Shell')
 
     def lint_source(self) -> None:

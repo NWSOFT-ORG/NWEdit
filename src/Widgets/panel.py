@@ -8,12 +8,13 @@ class CustomTabs(ClosableNotebook):
 
     def close_handle(self, event):
         # From editor.py
+        selected_tab = None
         if self.index("end"):
             # Close the current tab if close is selected from file menu, or
             # keyboard shortcut.
             if event is None or event.type == str(2):
                 selected_tab = self.get_tab()
-            # Otherwise close the tab based on coordinates of center-click.
+            # Otherwise, close the tab based on coordinates of center-click.
             else:
                 try:
                     index = event.widget.index("@%d,%d" % (event.x, event.y))
@@ -22,4 +23,3 @@ class CustomTabs(ClosableNotebook):
                     return
 
         self.forget(selected_tab)
-

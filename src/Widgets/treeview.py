@@ -52,14 +52,14 @@ class FileTree(ttk.Frame):
         self.path = path if path != "" else os.path.expanduser("~")
         self.opencommand = opencommand
 
-        self.pack(side="left", fill="both", expand=1)
+        self.pack(side="left", fill="both", expand=True)
         self.refresh_tree()
         self.tree.bind("<Double-1>", self.on_double_click_treeview)
         self.tree.bind('<3>', self.right_click)
         self.tree.update()
         self.tree.tag_configure("row", font="Arial 10")
         self.tree.tag_configure("subfolder", foreground="#448dc4", font="Arial 10")
-        self.tree.pack(fill="both", expand=1, anchor="nw")
+        self.tree.pack(fill="both", expand=True, anchor="nw")
         self.tree.bind('<<TreeviewOpen>>', self.open_dir)
 
     def get_path(self, event):
@@ -79,7 +79,7 @@ class FileTree(ttk.Frame):
     def rename(self, event):
         try:
             path = self.get_path(event)
-            dialog = InputStringDialog(self.master, "Rename", "New name:")
+            dialog = InputStringDialog("Rename", "New name:")
             newdir = os.path.join(self.path, dialog.result)
             shutil.move(path, newdir)
             self.refresh_tree()
@@ -113,7 +113,7 @@ class FileTree(ttk.Frame):
         cdate = f"Created: {time.ctime(os.path.getctime(path))}"
         win = tk.Toplevel(master=self.master)
         win.title(f"Info of {basename}")
-        win.resizable(0, 0)
+        win.resizable(False, False)
         win.transient(".")
         ttk.Label(win, text=f"Name: {basename}").pack(side="top", anchor="nw", fill="x")
         ttk.Label(win, text=f"Path: {path}").pack(side="top", anchor="nw", fill="x")
@@ -131,7 +131,7 @@ class FileTree(ttk.Frame):
         win = tk.Toplevel(master=self.master)
         win.title("New Directory")
         win.transient(".")
-        win.resizable(0, 0)
+        win.resizable(False, False)
         win.config(background=self.bg)
         ttk.Label(win, text="Name:").pack(side="top", anchor="nw")
         filename = tk.Entry(win)
@@ -164,7 +164,7 @@ class FileTree(ttk.Frame):
         win = tk.Toplevel(self.master)
         win.title("New File")
         win.transient(".")
-        win.resizable(0, 0)
+        win.resizable(False, False)
         win.config(background=self.bg)
         ttk.Label(win, text="Name:").pack(side="top", anchor="nw")
         filename = tk.Entry(win)

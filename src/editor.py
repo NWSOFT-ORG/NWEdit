@@ -61,6 +61,7 @@ from src.settings import (
     RunCommand,
     Settings,
 )
+from src.Menu.menubar import MenuBar
 
 if OSX:
     # noinspection PyUnresolvedReferences
@@ -113,7 +114,7 @@ class Editor:
                 self.close_icon = tk.PhotoImage(file="Images/close.gif")
                 self.open_icon = tk.PhotoImage(file="Images/open.gif")
                 self.clone_icon = tk.PhotoImage(file="Images/clone.gif")
-            else: 
+            else:
                 self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
                 self.open_icon = tk.PhotoImage(file="Images/open-dark.gif")
                 self.clone_icon = tk.PhotoImage(file="Images/clone-dark.gif")
@@ -129,7 +130,7 @@ class Editor:
 
             self.tabs = {}
 
-            self.menubar = tk.Menu(self.master)
+            self.menubar = MenuBar(self.master)
             self.panedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.panedwin.pack(fill="both", expand=True)
             self.mainframe = ttk.Frame(self.master)
@@ -217,7 +218,7 @@ class Editor:
         first_tab = tk.Canvas(frame, background=canvas_bg, highlightthickness=0)
         first_tab.icon = tk.PhotoImage(file='Images/pyplus-35px.gif')
         frame.add_widget(first_tab)
-        
+
         first_tab.create_image(20, 20, anchor="nw", image=first_tab.icon)
         fg = "#8dd9f7" if is_dark_color(self.bg) else "blue"
         bold = font.Font(family="Arial", size=35, weight="bold")
@@ -268,7 +269,7 @@ class Editor:
         )
 
         links = [label1, label2, label3, label4]
-        
+
         label1.bind("<Button>", lambda _: self.open_file())
         label2.bind("<Button>", self.filetree.new_file)
         label4.bind("<Button>", lambda _: frame.destroy())
@@ -277,7 +278,7 @@ class Editor:
         for y_index, item in enumerate(links):
             first_tab.create_window(50, 100 + (y_index - 1) * 40, window=item, anchor="nw")
             item.bind('<Button>', lambda _: frame.destroy(), add=True)
-        
+
         logger.debug("Start screen created")
 
     def create_text_widget(self, frame: ttk.Frame) -> EnhancedText:

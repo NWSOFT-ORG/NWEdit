@@ -3,7 +3,11 @@ from src.functions import is_dark_color
 
 
 class WinFrame(tk.Toplevel):
-    def __init__(self, master: tk.Tk, title: str = "Title", bg: str = "#000000", disable: bool = True) -> None:
+    def __init__(self, master: tk.Tk,
+                 title: str = "Title",
+                 bg: str = "#000000",
+                 disable: bool = True,
+                 closable: bool = True) -> None:
         super().__init__(master)
         self.transient(master)
         self.overrideredirect(True)
@@ -11,14 +15,17 @@ class WinFrame(tk.Toplevel):
         self.title = title
         self.master = master
         self.bg = bg
+        self.create_title()
+        self.window_bindings()
+        self.focus_set()
 
         if disable:
             master.wait_visibility(self)
             self.grab_set()
 
-        self.create_title()
-        self.close_button()
-        self.window_bindings()
+        if closable:
+            self.close_button()
+            self.bind("<Escape>", lambda _: self.destroy())
 
     def create_title(self) -> None:
         self.titleframe = ttk.Frame(self)

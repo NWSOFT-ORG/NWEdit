@@ -1,8 +1,7 @@
 """A Hex Viewer to view non-text documents."""
-
 from src.constants import BLOCK_HEIGHT, BLOCK_WIDTH, ENCODINGS
 from src.Dialog.commondialog import get_theme
-from src.modules import codecs, os, tk, ttk, ttkthemes
+from src.modules import codecs, os, tk, ttk, ttkthemes, threading
 from src.Widgets.tktext import EnhancedTextFrame
 
 
@@ -30,6 +29,8 @@ class HexView:
         buttonframe = ttk.Frame(self.parent)
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
+        self.bg = self._style.lookup("TLabel", "bg")
+
         self.encoding_label = ttk.Label(buttonframe, text="Encoding")
         self.encoding_combobox = ttk.Combobox(
             buttonframe, values=ENCODINGS, textvariable=self.encoding, state="readonly"
@@ -84,7 +85,8 @@ class HexView:
     def open(self, filename):
         if filename and os.path.exists(filename):
             self.filename = filename
-            self.show_block()
+            t = threading.Thread(target=self.show_block, daemon=True)  # Must use daemon, else it will run slow
+            t.run()
 
     def show_block(self, *_):
         self.textbox.config(state="normal")

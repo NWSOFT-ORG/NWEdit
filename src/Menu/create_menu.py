@@ -10,7 +10,7 @@ from src.constants import logger
 
 
 def create_menu(self) -> None:
-    self.appmenu = tk.Menu(self.menubar, name='apple')
+    self.appmenu = tk.Menu(self.menubar, tearoff=0)
     self.appmenu.add_command(label="About PyPlus", command=lambda: AboutDialog(self.master))
     self.appmenu.add_cascade(label='Settings',
                              menu=self.settings_class.create_menu(self.open_file, self.master))
@@ -18,14 +18,14 @@ def create_menu(self) -> None:
     self.appmenu.add_command(label="Exit Editor", command=self.quit_editor)
     self.appmenu.add_command(label="Restart app", command=self.restart)
 
-    self.filemenu = tk.Menu(self.menubar)
+    self.filemenu = tk.Menu(self.menubar, tearoff=False)
     self.filemenu.add_command(
         label="New...",
         command=self.filetree.new_file,
         image=self.new_icon,
         compound='left'
     )
-    open_cascade = tk.Menu(self.filemenu)
+    open_cascade = tk.Menu(self.filemenu, tearoff=False)
     open_cascade.add_command(
         label="Open File",
         command=lambda: self.open_file(),
@@ -68,10 +68,10 @@ def create_menu(self) -> None:
 
     self.codemenu = self.codefuncs.create_menu(self.master)
 
-    self.viewmenu = tk.Menu(self.menubar)
+    self.viewmenu = tk.Menu(self.menubar, tearoff=False)
     self.viewmenu.add_command(
         label="Unit tests",
-        command=lambda: TestDialog(self.panedwin, self.filetree.path),
+        command=lambda: TestDialog(self.bottom_tabs, self.filetree.path),
     )
     self.viewmenu.add_command(label="Git: Commit and Push...", command=lambda: self.git("commit"))
     self.viewmenu.add_command(
@@ -88,11 +88,11 @@ def create_menu(self) -> None:
         command=lambda: SearchInDir(self.panedwin, self.filetree.path, self.open_file),
     )
 
-    self.navmenu = tk.Menu(self.menubar)
+    self.navmenu = tk.Menu(self.menubar, tearoff=False)
     self.navmenu.add_command(label="Go to ...",
                              command=lambda: Navigate(self.get_text()) if self.tabs else None)
 
-    self.gitmenu = tk.Menu(self.menubar)
+    self.gitmenu = tk.Menu(self.menubar, tearoff=False)
     self.gitmenu.add_command(label="Initialize", command=lambda:
     subprocess.Popen(
         'git init && git add . && git commit -am "Added files"',
@@ -105,6 +105,7 @@ def create_menu(self) -> None:
     self.menubar.add_cascade(label="File", menu=self.filemenu)
     self.menubar.add_cascade(label="Edit", menu=self.editmenu)
     self.menubar.add_cascade(label="Code", menu=self.codemenu)
+    self.menubar.add_cascade(label="View", menu=self.viewmenu)
     self.menubar.add_cascade(label="Navigate", menu=self.navmenu)
     self.menubar.add_cascade(label="Git", menu=self.gitmenu)
 

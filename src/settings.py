@@ -1,12 +1,15 @@
-from src.constants import APPDIR
+from pygments.lexer import Lexer
+
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog
-from src.modules import EditorErr, Path, json, lexers, os, sys, zipfile, tk
+from src.constants import APPDIR
+from src.modules import EditorErr, Path, json, lexers, os, sys, tk, zipfile
 
 
 class Settings:
     """A class to read data to/from general-settings.json"""
-    def __init__(self):
+
+    def __init__(self) -> None:
         try:
             with open(os.path.join(APPDIR, "Config/general-settings.json")) as f:
                 self.settings = json.load(f)
@@ -15,12 +18,12 @@ class Settings:
             self.tabwidth = self.settings["tabwidth"]
             self.font = self.settings["font"].split()[0]
             self.size = self.settings["font"].split()[1]
-        except Exception:
+        except ValueError:
             ErrorInfoDialog(text="Setings are corrupted.")
             sys.exit(1)
 
     @staticmethod
-    def zip_settings(backupdir):
+    def zip_settings(backupdir) -> None:
         def zipdir(path, zip_obj):
             for root, _, files in os.walk(path):
                 for file in files:
@@ -30,16 +33,16 @@ class Settings:
                     )
 
         with zipfile.ZipFile(
-            os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
+                os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
         ) as zipobj:
             zipdir("Config/", zipobj)
         ErrorInfoDialog(title="Done", text="Settings backed up.")
 
-    def zipsettings(self):
+    def zipsettings(self) -> None:
         DirectoryOpenDialog(self.zip_settings)
 
     @staticmethod
-    def unzip_settings(backupdir):
+    def unzip_settings(backupdir) -> None:
         try:
             with zipfile.ZipFile(backupdir) as zipobj:
                 zipobj.extractall(path=APPDIR)
@@ -50,10 +53,10 @@ class Settings:
         except (zipfile.BadZipFile, zipfile.BadZipfile, zipfile.LargeZipFile):
             pass
 
-    def unzipsettings(self):
+    def unzipsettings(self) -> None:
         FileOpenDialog(self.unzip_settings)
 
-    def get_settings(self, setting):
+    def get_settings(self, setting: str) -> str:
         if setting == "font":
             return f"{self.font} {self.size}"
         if setting == "theme":
@@ -64,8 +67,8 @@ class Settings:
             return self.highlight_theme
         raise EditorErr("The setting is not defined")
 
-    def create_menu(self, open_file, master):
-        menu = tk.Menu(master)
+    def create_menu(self, open_file: callable, master: [tk.Tk, tk.Toplevel]):
+        menu = tk.Menu(master, tearoff=False)
         menu.add_command(
             label="General Settings",
             command=lambda: open_file(
@@ -102,7 +105,7 @@ class Settings:
 
 
 class ExtensionSettings:
-    def __init__(self, path):
+    def __init__(self, path: str) -> None:
         with open(path) as f:
             all_settings = json.load(f)
         self.extens = []
@@ -111,20 +114,20 @@ class ExtensionSettings:
             self.extens.append(key)
             self.items.append(value)
 
-    def get_settings(self, extension):
+    def get_settings(self, extension: str):
         try:
             if self.items[self.extens.index(extension)] == "none":
-                return None
+                raise EditorErr("Setting undefined")
             return self.items[self.extens.index(extension)]
         except ValueError:
-            return None
+            raise EditorErr("No such setting")
 
 
-class Lexer(ExtensionSettings):
-    def __init__(self):
+class PygmentsLexer(ExtensionSettings):
+    def __init__(self) -> None:
         super().__init__(os.path.join(APPDIR, "Config/lexer-settings.json"))
 
-    def get_settings(self, extension: str):
+    def get_settings(self, extension: str) -> Lexer:
         try:
             return lexers.get_lexer_by_name(self.items[self.extens.index(extension)])
         except ValueError:
@@ -132,20 +135,20 @@ class Lexer(ExtensionSettings):
 
 
 class Linter(ExtensionSettings):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(os.path.join(APPDIR, "Config/linter-settings.json"))
 
 
 class FormatCommand(ExtensionSettings):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(os.path.join(APPDIR, "Config/format-settings.json"))
 
 
 class RunCommand(ExtensionSettings):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(os.path.join(APPDIR, "Config/cmd-settings.json"))
 
 
 class CommentMarker(ExtensionSettings):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(os.path.join(APPDIR, "Config/comment-markers.json"))

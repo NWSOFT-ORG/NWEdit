@@ -38,7 +38,7 @@ class CodeFunctions:
         CodeListDialog(self.bottomframe, text)
 
     def create_menu(self, master):
-        codemenu = tk.Menu(master)
+        codemenu = tk.Menu(master, tearoff=False)
         codemenu.add_command(
             label="Run",
             command=self.run,

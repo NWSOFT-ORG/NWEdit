@@ -23,9 +23,8 @@ def create_buttonframe(button_frame: ttk.Frame, save_and_close: callable, codewi
 class TestDialog(ttk.Frame):
     def __init__(self, parent: [tk.Tk, tk.Misc], path: str) -> None:
         super().__init__(parent)
-        parent.forget(parent.panes()[0])
         self.pack(fill='both', expand=True)
-        parent.insert('0', self)
+        parent.add(self, text="Unit Testing")
         self.path = path
         self.tests_listbox = ttk.Treeview(self, show="tree")
         yscroll = ttk.Scrollbar(self, command=self.tests_listbox.yview)
@@ -46,7 +45,7 @@ class TestDialog(ttk.Frame):
         ttk.Button(self.button_frame, text="...", command=self.settings).pack(
             side="left"
         )
-        self.button_frame.pack(side="bottom")
+        self.button_frame.pack(side="bottom", anchor="nw")
         
         self.cmd_settings_class = RunCommand()
 

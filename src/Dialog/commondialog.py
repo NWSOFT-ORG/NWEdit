@@ -23,12 +23,20 @@ def get_font() -> str:
     return settings["font"]
 
 
-def get_bg() -> str:
+def theme_lookup(item: str) -> str:
     theme_name = get_theme()
     theme = ttkthemes.ThemedStyle()
     theme.set_theme(theme_name)
-    bg = theme.lookup("Tlabel", 'background')
+    return theme.lookup("Tlabel", item)
+
+
+def get_bg() -> str:
+    bg = theme_lookup("background")
     return bg
+
+
+def get_fg():
+    return theme_lookup("foreground")
 
 
 class YesNoDialog(ttk.Frame):

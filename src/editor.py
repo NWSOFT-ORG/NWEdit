@@ -56,7 +56,7 @@ from src.modules import (
 from src.settings import (
     CommentMarker,
     FormatCommand,
-    Lexer,
+    PygmentsLexer,
     Linter,
     RunCommand,
     Settings,
@@ -93,7 +93,7 @@ class Editor:
         # noinspection PyBroadException
         try:
             self.settings_class = Settings()
-            self.file_settings_class = Lexer()
+            self.file_settings_class = PygmentsLexer()
             self.linter_settings_class = Linter()
             self.cmd_settings_class = RunCommand()
             self.format_settings_class = FormatCommand()

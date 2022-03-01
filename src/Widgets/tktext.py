@@ -220,7 +220,7 @@ class TextEditingPlugin:
 
     def create_menu(self, master: tk.Tk):
         """Creates the menu for the master"""
-        menu = tk.Menu(master)
+        menu = tk.Menu(master, tearoff=False)
         menu.add_command(
             label="Undo",
             command=self.undo,
@@ -254,7 +254,7 @@ class TextEditingPlugin:
         menu.add_command(
             label="Duplicate Line or Selected", command=self.duplicate_line
         )
-        indent_cascade = tk.Menu(menu)
+        indent_cascade = tk.Menu(menu, tearoff=False)
         indent_cascade.add_command(
             label="Indent",
             command=lambda: self.indent(True),
@@ -272,12 +272,12 @@ class TextEditingPlugin:
             label="Comment/Uncomment Line or Selected", command=self.comment_lines
         )
         menu.add_command(label="Join lines", command=self.join_lines)
-        case_cascade = tk.Menu(menu)
+        case_cascade = tk.Menu(menu, tearoff=False)
         case_cascade.add_command(label="Swap case", command=self.swap_case)
         case_cascade.add_command(label="Upper case", command=self.upper_case)
         case_cascade.add_command(label="Lower case", command=self.lower_case)
         menu.add_cascade(label='Case...', menu=case_cascade)
-        select_cascade = tk.Menu(menu)
+        select_cascade = tk.Menu(menu, tearoff=False)
         select_cascade.add_command(
             label="Select All",
             command=self.select_all,
@@ -289,7 +289,7 @@ class TextEditingPlugin:
         select_cascade.add_command(label="Select Prev Word", command=self.sel_word_left)
         select_cascade.add_command(label="Select Next Word", command=self.sel_word_right)
         menu.add_cascade(label='Select...', menu=select_cascade)
-        delete_cascade = tk.Menu(menu)
+        delete_cascade = tk.Menu(menu, tearoff=False)
         delete_cascade.add_command(
             label="Delete Selected",
             image=self.delete_icon,
@@ -306,7 +306,7 @@ class TextEditingPlugin:
         menu.add_command(label="Move line up", command=self.mv_line_up)
         menu.add_command(label="Move line down", command=self.mv_line_dn)
 
-        right_click_menu = tk.Menu(master)
+        right_click_menu = tk.Menu(master, tearoff=False)
         right_click_menu.add_command(label="Undo", command=self.undo)
         right_click_menu.add_command(label="Redo", command=self.redo)
         right_click_menu.add_command(label="Cut", command=self.cut)

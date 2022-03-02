@@ -11,7 +11,7 @@ in either Node.js or C#
 The code is a modified(*enhanced*) version of  
 [dh7qc/python-text-editor](https://www.github.com/dh7qc/python-text-editor), licensed after the GPL v3.0 license
 
-**The website is at [here](http://zcg-coder.github.io/NWSOFT/PyPlusWeb)**  
+**The website is [here](https://nwsoft.tk)**  
 **The website may be outdated, so please go to source release to download it.**  
 Some code is from pyro written by James Stalings, licensed after the GPL v3.0 License. Thanks him for the source
 

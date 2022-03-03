@@ -125,7 +125,6 @@ class Editor:
             logger.debug("Icons loaded")
             self.icon = tk.PhotoImage(file="Images/pyplus.gif")
             self.master.iconphoto(True, self.icon)
-            # Base64 image, this probably decreases the repo size.
             logger.debug("Theme loaded")
 
             self.tabs = {}

@@ -127,7 +127,7 @@ class PygmentsLexer(ExtensionSettings):
     def __init__(self) -> None:
         super().__init__(os.path.join(APPDIR, "Config/lexer-settings.json"))
 
-    def get_settings(self, extension: str) -> Lexer:
+    def get_settings(self, extension: str) -> str:
         try:
             return lexers.get_lexer_by_name(self.items[self.extens.index(extension)])
         except ValueError:

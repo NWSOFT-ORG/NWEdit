@@ -50,11 +50,14 @@ class TestDialog(ttk.Frame):
         self.cmd_settings_class = RunCommand()
 
     def refresh_tests(self) -> None:
-        self.tests_listbox.delete(*self.tests_listbox.get_children())
-        self.method_list = self.read_test()
-        self.write_test()
-        for test in self.method_list.keys():
-            self.tests_listbox.insert("", "end", text=test)
+        try:
+            self.tests_listbox.delete(*self.tests_listbox.get_children())
+            self.method_list = self.read_test()
+            self.write_test()
+            for test in self.method_list.keys():
+                self.tests_listbox.insert("", "end", text=test)
+        except tk.TclError:
+            pass
 
     def write_test(self) -> None:
         try:
@@ -94,7 +97,7 @@ class TestDialog(ttk.Frame):
             with open(os.path.join(self.path, SETTINGS_FILE)) as f:
                 return json.load(f)
         except (ValueError, FileNotFoundError):
-            return {"imports": "", "setup": "", "teardown": ""}
+            return {"imports": "pass", "setup": "pass", "teardown": "pass"}
 
     def modify_test(self, name: str, code: str) -> None:
         self.method_list[name] = code
@@ -151,6 +154,7 @@ class TestDialog(ttk.Frame):
         codewin.transient(self.master)
         textframe = EnhancedTextFrame(codewin)
         text = textframe.text
+        text.insert('end', 'pass')
         text.lexer = lexers.get_lexer_by_name("Python")
         TextEditingPlugin(bindkey=True).set_text(text)
         textframe.pack(fill="both", expand=True)
@@ -197,6 +201,7 @@ class TestDialog(ttk.Frame):
         self.refresh_tests()
 
     def run_test(self) -> None:
+        """Write formatted test program to the file"""
         modules = self.settings_list["imports"]
         teardown = self.settings_list["teardown"]
         setup = self.settings_list["setup"]

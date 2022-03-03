@@ -5,12 +5,14 @@ from src.Widgets.tktext import EnhancedText
 from src.modules import tk, ttk, ttkthemes
 
 
-def finditer_withlineno(pattern: str, string: str, flags: int = 0) -> iter:
+def finditer_withlineno(pattern: str, string: str, flags: int) -> iter:
     """
     A version of 're.finditer' that returns '(match, line_number)' pairs.
     """
-
-    matches = list(re.finditer(pattern, string, flags))
+    try:
+        matches = list(re.finditer(pattern, string, flags))
+    except re.error:
+        return []
     if not matches:
         return []
 
@@ -52,7 +54,7 @@ def find_all(sub: str, string: str, case: bool = True) -> iter:
 
 
 class Search:
-    def __init__(self, master: ttk.PanedWindow, text: EnhancedText) -> None:
+    def __init__(self, master: ttk.Notebook, text: EnhancedText) -> None:
         self.master = master
         self.text = text
         self._style = ttkthemes.ThemedStyle()
@@ -65,7 +67,7 @@ class Search:
             self.start = "1.0"
             self.end = "end"
         self.starts = []
-        self.search_frame = ttk.Frame(self.text.frame)
+        self.search_frame = ttk.Frame(self.master)
 
         # Tkinter Variables
         self.case = tk.BooleanVar()
@@ -138,13 +140,13 @@ class Search:
         if nocase and full_word:
             res = [(x[0], x[1]) for x in finditer_withlineno(
                 r"\b" + re.escape(pat) +
-                r"\b", text, (re.IGNORECASE, re.MULTILINE))]
+                r"\b", text, (re.IGNORECASE | re.MULTILINE))]
         elif full_word:
             res = [(x[0], x[1]) for x in finditer_withlineno(
                 r"\b" + re.escape(pat) + r"\b", text, re.MULTILINE)]
         elif nocase and regex:
             res = [(x[0], x[1]) for x in finditer_withlineno(
-                pat, text, (re.IGNORECASE, re.MULTILINE))]
+                pat, text, (re.IGNORECASE | re.MULTILINE))]
         elif regex:
             res = [(x[0], x[1]) for x in finditer_withlineno(
                 pat, text, re.MULTILINE)]

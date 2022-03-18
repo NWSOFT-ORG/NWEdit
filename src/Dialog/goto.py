@@ -12,17 +12,9 @@ class Navigate:
         self.goto_frame = ttk.Frame(self.text.frame)
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
-        bg = self._style.lookup("TLabel", "background")
-        fg = self._style.lookup("TLabel", "foreground")
         self.goto_frame.pack(anchor="nw")
         ttk.Label(self.goto_frame, text="Go to place: [Ln].[Col] ").pack(side="left")
-        self.place = tk.Entry(
-            self.goto_frame,
-            background=darken_color(bg, 30, 30, 30),
-            foreground=fg,
-            insertbackground=fg,
-            highlightthickness=0,
-        )
+        self.place = ttk.Entry(self.goto_frame)
         self.place.focus_set()
         self.place.pack(side="left", anchor="nw")
         ttk.Button(self.goto_frame, command=self._goto, text=">> Go to").pack(

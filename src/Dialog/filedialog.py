@@ -22,9 +22,7 @@ class FileOpenDialog(FileTree):
         self.cancelbtn.pack(side="right")
         self.buttonframe.pack(side="bottom", anchor="nw")
         self.entryframe = ttk.Frame(self.win)
-        self.pathentry = tk.Entry(
-            self.entryframe, insertbackground=fg, background=bg, foreground=fg
-        )
+        self.pathentry = ttk.Entry(self.entryframe)
         self.pathentry.pack(fill="x")
         self.open_from_string_btn = ttk.Button(
             self.pathentry, command=self.open_from_string, text=action

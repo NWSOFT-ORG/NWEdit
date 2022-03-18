@@ -21,6 +21,7 @@ from src.Dialog.commondialog import (ErrorInfoDialog, InputStringDialog, YesNoDi
 from src.Dialog.debugdialog import (ErrorReportDialog)
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog, FileSaveAsDialog
 from src.Dialog.goto import Navigate
+from src.Dialog.splash import SplashWindow
 from src.Git.gitview import GitView
 from src.Menu.create_menu import create_menu
 from src.codefunctions import CodeFunctions
@@ -62,7 +63,6 @@ from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
 from src.Widgets.treeview import FileTree
 from src.functions import lighten_color
 
-
 if OSX:
     from src.modules import PyTouchBar
 
@@ -90,6 +90,8 @@ class Editor:
         """The editor object, the entire thing that goes in the
         window."""
         # noinspection PyBroadException
+        splash = SplashWindow(master)
+        splash.set_section(7)
         try:
             self.settings_class = Settings()
             self.file_settings_class = Lexer()
@@ -97,23 +99,28 @@ class Editor:
             self.cmd_settings_class = RunCommand()
             self.format_settings_class = FormatCommand()
             self.commet_settings_class = CommentMarker()
+            logger.debug("Modules initialised.")
+            splash.set_progress(1)
             self.master = master
             self.opts = TextOpts(keyaction=self.key)
 
             self.theme = self.settings_class.get_settings("theme")
             self.tabwidth = self.settings_class.get_settings("tab")
             logger.debug("Settings loaded")
+            splash.set_progress(2)
 
             self.master.geometry("1200x800")
             self.style = ttkthemes.ThemedStyle(self.master)
             self.style.set_theme(self.theme)
+            logger.debug("Theme loaded")
+            splash.set_progress(3)
             self.bg = self.style.lookup("TLabel", "background")
             self.fg = self.style.lookup("TLabel", "foreground")
             if is_dark_color(self.bg):
                 self.close_icon = tk.PhotoImage(file="Images/close.gif")
                 self.open_icon = tk.PhotoImage(file="Images/open.gif")
                 self.clone_icon = tk.PhotoImage(file="Images/clone.gif")
-            else: 
+            else:
                 self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
                 self.open_icon = tk.PhotoImage(file="Images/open-dark.gif")
                 self.clone_icon = tk.PhotoImage(file="Images/clone-dark.gif")
@@ -122,10 +129,10 @@ class Editor:
             self.reload_icon = tk.PhotoImage(file="Images/reload.gif")
             self.save_as_icon = tk.PhotoImage(file="Images/saveas.gif")
             logger.debug("Icons loaded")
+            splash.set_progress(4)
             self.icon = tk.PhotoImage(file="Images/pyplus.gif")
             self.master.iconphoto(True, self.icon)
-            # Base64 image, this probably decreases the repo size.
-            logger.debug("Theme loaded")
+            splash.set_progress(5)
 
             self.tabs = {}
 
@@ -139,6 +146,8 @@ class Editor:
             self.left_panel()
             self.bottom_panel()
             self.statusbar = Statusbar()
+            logger.debug("Layout created")
+            splash.set_progress(6)
 
             self.codefuncs = CodeFunctions(self.master, self.tabs, self.nb, self.bottom_tabs)
 
@@ -166,6 +175,7 @@ class Editor:
             self.create_bindings()
             self.reopen_files()
             self.update_title()
+            splash.set_progress(7)
         except Exception:
             logger.exception("Error when initializing:")
             ErrorReportDialog('Error when starting.', traceback.format_exc())
@@ -218,7 +228,7 @@ class Editor:
         first_tab = tk.Canvas(frame, background=canvas_bg, highlightthickness=0)
         first_tab.icon = tk.PhotoImage(file='Images/pyplus-35px.gif')
         frame.add_widget(first_tab)
-        
+
         first_tab.create_image(20, 20, anchor="nw", image=first_tab.icon)
         fg = "#8dd9f7" if is_dark_color(self.bg) else "blue"
         bold = font.Font(family="Arial", size=35, weight="bold")
@@ -269,7 +279,7 @@ class Editor:
         )
 
         links = [label1, label2, label3, label4]
-        
+
         label1.bind("<Button>", lambda _: self.open_file())
         label2.bind("<Button>", self.filetree.new_file)
         label4.bind("<Button>", lambda _: frame.destroy())
@@ -278,7 +288,7 @@ class Editor:
         for y_index, item in enumerate(links):
             first_tab.create_window(50, 100 + (y_index - 1) * 40, window=item, anchor="nw")
             item.bind('<Button>', lambda _: frame.destroy(), add=True)
-        
+
         logger.debug("Start screen created")
 
     def create_text_widget(self, frame: ttk.Frame) -> EnhancedText:
@@ -528,7 +538,7 @@ class Editor:
             self.nb.forget(selected_tab)
             self.tabs.pop(selected_tab)
 
-            if len(self.tabs) ==  0:
+            if len(self.tabs) == 0:
                 self.start_screen()
             self.mouse()
         except KeyError:

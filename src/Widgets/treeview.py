@@ -25,7 +25,7 @@ class FileTree(ttk.Frame):
                 (
                     "Treeitem.padding",
                     {
-                        "sticky":   "nswe",
+                        "sticky": "nswe",
                         "children": [
                             ("Treeitem.indicator", {"side": "left", "sticky": ""}),
                             ("Treeitem.image", {"side": "left", "sticky": ""}),
@@ -134,7 +134,7 @@ class FileTree(ttk.Frame):
         win.resizable(0, 0)
         win.config(background=self.bg)
         ttk.Label(win, text="Name:").pack(side="top", anchor="nw")
-        filename = tk.Entry(win)
+        filename = ttk.Entry(win)
         filename.pack(side="top", anchor="nw")
         item = self.tree.item(self.tree.identify('item', event.x, event.y), 'text')
 
@@ -167,7 +167,7 @@ class FileTree(ttk.Frame):
         win.resizable(0, 0)
         win.config(background=self.bg)
         ttk.Label(win, text="Name:").pack(side="top", anchor="nw")
-        filename = tk.Entry(win)
+        filename = ttk.Entry(win)
         filename.pack(side="top", anchor="nw")
         try:
             item = self.tree.item(self.tree.parent(self.tree.identify('item', event.x, event.y)), "text")
@@ -267,4 +267,3 @@ class FileTree(ttk.Frame):
         root_node = self.tree.insert('', 'end', text=abspath, tags='row', open=True)
         self.process_directory(root_node, path=abspath)
         self.yscroll.set(*ypos)
-

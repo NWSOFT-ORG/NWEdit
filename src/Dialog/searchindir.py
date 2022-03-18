@@ -40,19 +40,13 @@ class SearchInDir(ttk.Frame):
         ttk.Label(self, text="Search: ").pack(side="top",
                                               anchor="nw",
                                               fill="y")
-        self.content = tk.Entry(
-            self,
-            background=bg,
-            foreground=fg,
-            insertbackground=fg,
-            highlightthickness=0,
-        )
+        self.content = ttk.Entry(self)
         self.content.pack(side="top", fill="both")
         ttk.Button(
             self,
             text='Search',
             command=lambda: threading.Thread(target=self.find).start()).pack(
-                side='top', fill='x')
+            side='top', fill='x')
 
         progressbar_frame = ttk.Frame(self)
         self.search_stat = ttk.Label(progressbar_frame,

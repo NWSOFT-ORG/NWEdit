@@ -65,7 +65,7 @@ class Search:
             self.end = "end"
         self.starts = []
         self.search_frame = ttk.Frame(self.text.frame)
-        
+
         # Tkinter Variables
         self.case = tk.BooleanVar()
         self.regex = tk.BooleanVar()
@@ -75,12 +75,7 @@ class Search:
         ttk.Label(self.search_frame, text="Search: ").pack(side="left",
                                                            anchor="nw",
                                                            fill="y")
-        self.content = tk.Entry(
-            self.search_frame,
-            foreground=fg,
-            insertbackground=fg,
-            highlightthickness=0,
-        )
+        self.content = ttk.Entry(self.search_frame)
         self.content.pack(side="left", fill="both")
 
         self.forward = ttk.Button(self.search_frame, text="<", width=1)
@@ -90,14 +85,9 @@ class Search:
         self.backward.pack(side="left")
 
         ttk.Label(self.search_frame, text="Replace: ").pack(side="left",
-                                                                anchor="nw",
-                                                                fill="y")
-        self.repl = tk.Entry(
-            self.search_frame,
-            foreground=fg,
-            insertbackground=fg,
-            highlightthickness=0,
-        )
+                                                            anchor="nw",
+                                                            fill="y")
+        self.repl = ttk.Entry(self.search_frame)
         self.repl.pack(side="left", fill="both")
 
         self.repl_button = ttk.Button(self.search_frame, text="Replace all")
@@ -112,15 +102,15 @@ class Search:
         self.case_yn.pack(side="left")
 
         self.reg_yn = ttk.Checkbutton(self.search_frame,
-                                       text="RegExp",
-                                       variable=self.regex)
+                                      text="RegExp",
+                                      variable=self.regex)
         self.reg_yn.pack(side="left")
 
         self.fullw_yn = ttk.Checkbutton(self.search_frame,
-                                       text="Full Word",
-                                       variable=self.fullword)
+                                        text="Full Word",
+                                        variable=self.fullword)
         self.fullw_yn.pack(side="left")
-        
+
         for x in (self.case, self.regex, self.fullword):
             x.trace_add('write', self.find)
 

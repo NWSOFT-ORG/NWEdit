@@ -98,7 +98,8 @@ class Editor:
             self.linter_settings_class = Linter()
             self.cmd_settings_class = RunCommand()
             self.format_settings_class = FormatCommand()
-            self.commet_settings_class = CommentMarker()
+            self.comment_settings_class = CommentMarker()
+
             logger.debug("Modules initialised.")
             splash.set_progress(1)
             self.master = master
@@ -459,7 +460,7 @@ class Editor:
             textbox.format_command = self.format_settings_class.get_settings(
                 extens
             )
-            textbox.comment_marker = self.commet_settings_class.get_settings(
+            textbox.comment_marker = self.comment_settings_class.get_settings(
                 extens
             )
 

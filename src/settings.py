@@ -6,6 +6,7 @@ from src.modules import EditorErr, Path, json, lexers, os, sys, zipfile, tk
 
 class Settings:
     """A class to read data to/from general-settings.json"""
+
     def __init__(self):
         try:
             with open(os.path.join(APPDIR, "Config/general-settings.json")) as f:
@@ -30,7 +31,7 @@ class Settings:
                     )
 
         with zipfile.ZipFile(
-            os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
+                os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
         ) as zipobj:
             zipdir("Config/", zipobj)
         ErrorInfoDialog(title="Done", text="Settings backed up.")
@@ -76,6 +77,12 @@ class Settings:
             label="Format Command Settings",
             command=lambda: open_file(
                 APPDIR + "/Config/format-settings.json"
+            ),
+        )
+        menu.add_command(
+            label="File Icon Settings",
+            command=lambda: open_file(
+                APPDIR + "/Config/file-icons.json"
             ),
         )
         menu.add_command(

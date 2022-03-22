@@ -8,7 +8,6 @@ class FileOpenDialog(FileTree):
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
         bg = self._style.lookup("TLabel", "background")
-        fg = self._style.lookup("TLabel", "foreground")
         self.win = tk.Toplevel()
         self.win.config(background=bg)
         self.win.title(f"{action}")

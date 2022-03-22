@@ -1,6 +1,29 @@
 from src.constants import APPDIR, OSX, WINDOWS, logger
 from src.Dialog.commondialog import InputStringDialog, YesNoDialog, get_theme
-from src.modules import os, shutil, time, tk, ttk, ttkthemes
+from src.modules import os, shutil, time, tk, ttk, ttkthemes, json, EditorErr
+from src.functions import is_dark_color
+import gc
+
+
+class IconSettings:
+    def __init__(self):
+        self.path = os.path.join(APPDIR, "Config/file-icons.json")
+        self.dark = False
+
+    def set_theme(self, dark: bool):
+        self.dark = dark
+
+    def get_icon(self, extension: str):
+        with open(self.path) as f:
+            settings = json.load(f)
+        try:
+            icon_name = settings[extension]
+        except KeyError:
+            icon_name = "other"
+        if self.dark:
+            return tk.PhotoImage(file=f"Images/file-icons/{icon_name}-light.gif")
+        else:
+            return tk.PhotoImage(file=f"Images/file-icons/{icon_name}.gif")
 
 
 class FileTree(ttk.Frame):
@@ -15,35 +38,15 @@ class FileTree(ttk.Frame):
             path=f'{APPDIR}/empty',
     ):
         self.temp_path = []
-        style = ttk.Style()
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
         self.bg = self._style.lookup("TLabel", "background")
-        style.layout(
-            "Treeview.Item",
-            [
-                (
-                    "Treeitem.padding",
-                    {
-                        "sticky": "nswe",
-                        "children": [
-                            ("Treeitem.indicator", {"side": "left", "sticky": ""}),
-                            ("Treeitem.image", {"side": "left", "sticky": ""}),
-                            ("Treeitem.text", {"side": "left", "sticky": ""}),
-                        ],
-                    },
-                )
-            ],
-        )
         super().__init__(master)
-        style.configure("style.Treeview", font=("Arial", 8))
-        style.configure("style.Treeview.Heading", font=("Arial", 13, "bold"))
-        self.tree = ttk.Treeview(self, style="style.Treeview", show='tree')
+        self.tree = ttk.Treeview(self, show='tree')
         self.yscroll = ttk.Scrollbar(self, command=self.tree.yview)
         self.xscroll = ttk.Scrollbar(
             self, command=self.tree.xview, orient="horizontal"
         )
-        style.configure("style.Treeview", rowheight=25, background=self.bg)
         self.yscroll.pack(side="right", fill="y")
         self.xscroll.pack(side="bottom", fill="x")
         self.tree["yscrollcommand"] = self.yscroll.set
@@ -52,13 +55,22 @@ class FileTree(ttk.Frame):
         self.path = path if path != "" else os.path.expanduser("~")
         self.opencommand = opencommand
 
+        self.icon_settings = IconSettings()
+        self.icon_settings.set_theme(is_dark_color(self.bg))
+        if is_dark_color(self.bg):
+            self.other_icon = tk.PhotoImage(file="Images/file-icons/other-light.gif")
+            self.folder_icon = tk.PhotoImage(file="Images/file-icons/folder-light.gif")
+        else:
+            self.other_icon = tk.PhotoImage(file="Images/file-icons/other.gif")
+            self.folder_icon = tk.PhotoImage(file="Images/file-icons/folder.gif")
+        self.icons = []
+
         self.pack(side="left", fill="both", expand=1)
         self.refresh_tree()
         self.tree.bind("<Double-1>", self.on_double_click_treeview)
         self.tree.bind('<3>', self.right_click)
         self.tree.update()
-        self.tree.tag_configure("row", font="Arial 10")
-        self.tree.tag_configure("subfolder", foreground="#448dc4", font="Arial 10")
+        self.tree.tag_configure("subfolder", foreground="#448dc4")
         self.tree.pack(fill="both", expand=1, anchor="nw")
         self.tree.bind('<<TreeviewOpen>>', self.open_dir)
 
@@ -100,7 +112,7 @@ class FileTree(ttk.Frame):
         elif int(size) / 1024 ** 3 >= 1 <= 2:
             size = f"{int(size) // 1024 ** 3} Gigabytes"
         elif int(size) / 1024 ** 4 >= 1 <= 2:
-            size = f"{int(size) // 1024 ** 4} Terrabytes"
+            size = f"{int(size) // 1024 ** 4} Terabytes"
         # It can go on and on, but the newest PCs won't have more than a PB storage
         #      /-------------/|
         #     /			    / /
@@ -219,12 +231,15 @@ class FileTree(ttk.Frame):
             abspath = os.path.join(path, p)
             isdir = os.path.isdir(abspath)
             if isdir:
-                oid = self.tree.insert(parent, last_dir_index, text=p, tags='subfolder', open=False)
+                oid = self.tree.insert(parent, last_dir_index, text=p, tags='subfolder', open=False,
+                                       image=self.folder_icon)
                 last_dir_index += 1
                 if not showdironly:
                     self.tree.insert(oid, 0, text='Loading...')
             else:
-                self.tree.insert(parent, 'end', text=p, tags='row', open=False)
+                extension = p.split('.')
+                self.icons.append(self.icon_settings.get_icon(extension[-1]))
+                self.tree.insert(parent, 'end', text=p, open=False, image=self.icons[-1])
 
     def on_double_click_treeview(self, event, destroy: bool = False):
         tree = self.tree
@@ -264,6 +279,6 @@ class FileTree(ttk.Frame):
         ypos = self.yscroll.get()
         self.tree.heading("#0", text=path)
         abspath = os.path.abspath(path)
-        root_node = self.tree.insert('', 'end', text=abspath, tags='row', open=True)
+        root_node = self.tree.insert('', 'end', text=abspath, open=True)
         self.process_directory(root_node, path=abspath)
         self.yscroll.set(*ypos)

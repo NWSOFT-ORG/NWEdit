@@ -117,7 +117,7 @@ class AboutDialog:
         ver.resizable(0, 0)
         ver.title("About PyPlus")
         ttk.Label(ver, image=self.icon).pack(fill="both")
-        ttk.Label(ver, text=f"Version {VERSION}", font="Arial 30 bold").pack(
+        ttk.Label(ver, text=f"Version {VERSION}", font="tkDefaultFont 30 bold").pack(
             fill="both"
         )
         if self.check_updates(popup=False)[0]:
@@ -155,7 +155,7 @@ class AboutDialog:
         updatewin.transient(".")
         ttkthemes.ThemedStyle(updatewin)
         if version != VERSION:
-            ttk.Label(updatewin, text="Update available!", font="Arial 30").pack(
+            ttk.Label(updatewin, text="Update available!", font="tkDefaultFont 30").pack(
                 fill="both"
             )
             ttk.Label(updatewin, text=version).pack(fill="both")
@@ -165,7 +165,7 @@ class AboutDialog:
                 updatewin, text="Get this update", command=lambda: webbrowser.open(url)
             ).pack()
         else:
-            ttk.Label(updatewin, text="No updates available", font="Arial 30").pack(
+            ttk.Label(updatewin, text="No updates available", font="tkDefaultFont 30").pack(
                 fill="both"
             )
         os.remove("ver.json")

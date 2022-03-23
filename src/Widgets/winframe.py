@@ -1,23 +1,39 @@
-from src.modules import ttk, tk
 from src.functions import is_dark_color
+from src.modules import ttk, tk, ttkthemes, json
 
 
-class WinFrame(ttk.Frame):
-    def __init__(self, master, title, bg, disable=True):
+# Need these because importing settings is a circular import
+def get_theme():
+    with open("Config/general-settings.json") as f:
+        settings = json.load(f)
+    return settings["theme"]
+
+
+def get_bg():
+    style = ttkthemes.ThemedStyle()
+    style.set_theme(get_theme())
+    return style.lookup("TLabel", "background")
+
+
+class WinFrame(tk.Toplevel):
+    def __init__(self, master, title, disable=True):
         super().__init__(master)
+        self.overrideredirect(False)
+        self.overrideredirect(True)
         self.title = title
         self.master = master
-        self.bg = bg
+        self.bg = get_bg()
 
         if disable:
             self.grab_set()
 
-        self.titlebar()
+        self.create_titlebar()
         self.close_button()
         self.window_bindings()
-        self.place(relx=0.5, rely=0.5, anchor="center")
+        self.focus_set()
+        self.tkraise()
 
-    def titlebar(self):
+    def create_titlebar(self):
         self.titleframe = ttk.Frame(self)
         self.titlebar = ttk.Label(self.titleframe, text=self.title)
         self.titlebar.pack(side='left', fill='both', expand=1)
@@ -44,8 +60,8 @@ class WinFrame(ttk.Frame):
 
     def do_move(self, event):
         x = (event.x - self.x + self.winfo_x())
-        y = (event.y - self.y + self.winfo_y() + self.titlebar.winfo_height())
-        self.place_configure(y=y, x=x)
+        y = event.y - self.y + self.winfo_y()
+        self.geometry(f"+{x}+{y}")
 
     def close_button(self):
         if is_dark_color(self.bg):
@@ -59,4 +75,3 @@ class WinFrame(ttk.Frame):
         close_button.pack(side='left')
 
         close_button.bind('<ButtonRelease>', lambda _: self.destroy())
-

@@ -1,4 +1,5 @@
-from src.constants import APPDIR, VERSION, logger
+from src.Widgets.winframe import WinFrame
+from src.constants import VERSION, logger
 from src.modules import json, tk, ttk, ttkthemes, os, webbrowser, request
 
 
@@ -11,22 +12,21 @@ def download_file(url, localfile="") -> str:
 
 # Need these because importing settings is a circular import
 def get_theme():
-    with open(APPDIR + "/Config/general-settings.json") as f:
+    with open("Config/general-settings.json") as f:
         settings = json.load(f)
     return settings["theme"]
 
 
 def get_font():
-    with open(APPDIR + "/Config/general-settings.json") as f:
+    with open("Config/general-settings.json") as f:
         settings = json.load(f)
     return settings["font"]
 
 
-class YesNoDialog(tk.Toplevel):
+class YesNoDialog(WinFrame):
     def __init__(self, parent: tk.Misc = None, title: str = "", text: str = None):
         self.text = text
-        super().__init__(parent)
-        self.title(title)
+        super().__init__(parent, title)
         label1 = ttk.Label(self, text=self.text)
         label1.pack(fill="both")
 
@@ -54,10 +54,9 @@ class YesNoDialog(tk.Toplevel):
         logger.info("cancel")
 
 
-class InputStringDialog(tk.Toplevel):
+class InputStringDialog(WinFrame):
     def __init__(self, parent=".", title="", text=""):
-        super().__init__(parent)
-        self.title(title)
+        super().__init__(parent, title)
         ttk.Label(self, text=text).pack(fill="x")
         self.entry = ttk.Entry(self)
         self.entry.pack(fill="x", expand=1)
@@ -70,7 +69,6 @@ class InputStringDialog(tk.Toplevel):
 
         box.pack(fill="x")
         self.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.resizable(0, 0)
         self.wait_window(self)
 
     def apply(self):
@@ -84,11 +82,10 @@ class InputStringDialog(tk.Toplevel):
         logger.info("cancel")
 
 
-class ErrorInfoDialog(tk.Toplevel):
+class ErrorInfoDialog(WinFrame):
     def __init__(self, parent: tk.Misc = None, text: str = None, title: str = "Error"):
         self.text = text
-        super().__init__(parent)
-        self.title(title)
+        super().__init__(parent, title)
         label1 = ttk.Label(self, text=self.text)
         label1.pack(side="top", fill="both", expand=1)
         b1 = ttk.Button(self, text="Ok", width=10, command=self.apply)
@@ -112,10 +109,7 @@ class AboutDialog:
         self.master = master
         self.icon = tk.PhotoImage(file="Images/pyplus.gif")
 
-        ver = tk.Toplevel(self.master)
-        ver.transient(self.master)
-        ver.resizable(0, 0)
-        ver.title("About PyPlus")
+        ver = WinFrame(self.master, "About PyPlus")
         ttk.Label(ver, image=self.icon).pack(fill="both")
         ttk.Label(ver, text=f"Version {VERSION}", font="tkDefaultFont 30 bold").pack(
             fill="both"
@@ -149,11 +143,7 @@ class AboutDialog:
         if not popup:
             os.remove("ver.json")
             return [version != VERSION, newest["url"]]
-        updatewin = tk.Toplevel()
-        updatewin.title("Updates")
-        updatewin.resizable(0, 0)
-        updatewin.transient(".")
-        ttkthemes.ThemedStyle(updatewin)
+        updatewin = WinFrame(self.master, "Updates")
         if version != VERSION:
             ttk.Label(updatewin, text="Update available!", font="tkDefaultFont 30").pack(
                 fill="both"

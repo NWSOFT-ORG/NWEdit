@@ -1,17 +1,15 @@
 from src.Dialog.commondialog import get_theme
-from src.modules import os, tk, ttk, ttkthemes
 from src.Widgets.treeview import FileTree
+from src.Widgets.winframe import WinFrame
+from src.modules import os, ttk, ttkthemes
 
 
 class FileOpenDialog(FileTree):
-    def __init__(self, opencommand: callable, action: str = "Open"):
+    def __init__(self, master=".", opencommand: callable = None, action: str = "Open"):
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
         bg = self._style.lookup("TLabel", "background")
-        self.win = tk.Toplevel()
-        self.win.config(background=bg)
-        self.win.title(f"{action}")
-        self.win.resizable(0, 0)
+        self.win = WinFrame(master, action)
         self.buttonframe = ttk.Frame(self.win)
         self.okbtn = ttk.Button(self.buttonframe, text=action, command=self.open)
         self.okbtn.pack(side="left")
@@ -28,11 +26,7 @@ class FileOpenDialog(FileTree):
         )
         self.open_from_string_btn.pack(side="right")
         self.entryframe.pack(fill="x")
-        super().__init__(
-            master=self.win,
-            opencommand=opencommand,
-            path=os.path.expanduser("~"),
-        )
+        super().__init__(master=self.win, opencommand=opencommand)
         self.temp_path = []
 
     def open(self):

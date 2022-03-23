@@ -1,16 +1,19 @@
-from src.constants import APPDIR
-from src.modules import json, tk, ttk, styles
+import sys
 
 from src.Widgets.tktext import EnhancedTextFrame
+from src.Widgets.winframe import WinFrame
+from src.modules import json, tk, ttk, styles
+
 
 # Need these to prevent circular imports
 def get_pygments():
-    with open(APPDIR + "/Config/general-settings.json") as f:
+    with open("Config/general-settings.json") as f:
         settings = json.load(f)
     return settings["pygments"]
 
+
 def get_font():
-    with open(APPDIR + "/Config/general-settings.json") as f:
+    with open("Config/general-settings.json") as f:
         settings = json.load(f)
     return settings["font"]
 
@@ -22,35 +25,36 @@ class ReadonlyText(EnhancedTextFrame):
         bgcolor = style.background_color
         fgcolor = "#f00"
         self.text.configure(state='disabled',
-                       fg=fgcolor, bg=bgcolor,
-                       font=get_font())
+                            fg=fgcolor, bg=bgcolor,
+                            font=get_font())
 
     def insert(self, pos, text):
         self.text.configure(state='normal')
         self.text.insert(pos, text)
         self.text.configure(state='disabled')
-    
+
     def delete(self, pos1, pos2):
         self.text.configure(state='normal')
         self.text.delete(pos1, pos2)
         self.text.configure(state='disabled')
 
 
-class ErrorReportDialog(tk.Toplevel):
-    def __init__(self, error_name, error_message):
-        super().__init__()
-        self.title(error_name)
-        self.master.withdraw()
+class ErrorReportDialog(WinFrame):
+    def __init__(self, master: tk.Tk, error_name, error_message):
+        super().__init__(master, error_name)
+        master.withdraw()
         ttk.Label(self, text='Please consider reporting a bug on github.').pack(anchor='nw', fill='x')
         text = ReadonlyText(self)
         text.insert('end', error_message)
         text.pack(fill='both')
+
+        self.protocol("WM_DELETE_WINDOW", lambda: sys.exit(1))
         self.mainloop()
 
 
-class LogViewDialog(tk.Toplevel):
-    def __init__(self):
-        super().__init__()
+class LogViewDialog(WinFrame):
+    def __init__(self, master):
+        super().__init__(master, "PyPlus Log")
         self.title('Log view')
         frame = ttk.Frame(self)
         frame.pack(anchor='nw', fill='x')
@@ -60,7 +64,7 @@ class LogViewDialog(tk.Toplevel):
         self.log_text.pack(fill='both', expand=1)
         self.log_text.after(10, self.update_log)
         self.mainloop()
-    
+
     def update_log(self):
         with open('pyplus.log') as f:
             log = f.read()
@@ -68,7 +72,7 @@ class LogViewDialog(tk.Toplevel):
         self.log_text.insert('end', log)
         self.log_text.text.see('end')
         self.log_text.after(10, self.update_log)
-    
+
     def copy_log(self):
         self.log_text.clipboard_clear()
         self.log_text.clipboard_append(

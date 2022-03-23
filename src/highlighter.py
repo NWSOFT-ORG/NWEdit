@@ -7,7 +7,7 @@ def create_tags(textbox: tk.Text) -> None:
     The method creates the tags associated with each distinct style element of the
     source code 'dressing'"""
     currtext = textbox
-    settings = Settings()
+    settings = Settings(".")
     bold_font = font.Font(currtext, settings.get_settings("font"))
     bold_font.configure(weight=font.BOLD)
     italic_font = font.Font(currtext, settings.get_settings("font"))
@@ -72,7 +72,7 @@ def recolorize_line(textbox: tk.Text) -> None:
     currtext = textbox
     start_index = currtext.index('insert -1c linestart')
     end_index = currtext.index('insert lineend')
-    
+
     tri_str_start = []
     tri_str_end = []
     tri_str = []

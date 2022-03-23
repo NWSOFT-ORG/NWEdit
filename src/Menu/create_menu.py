@@ -14,7 +14,7 @@ def create_menu(self) -> None:
     self.appmenu.add_command(label="About PyPlus", command=lambda: AboutDialog(self.master))
     self.appmenu.add_cascade(label='Settings',
                              menu=self.settings_class.create_menu(self.open_file, self.master))
-    self.appmenu.add_command(label='View log', command=lambda: LogViewDialog())
+    self.appmenu.add_command(label='View log', command=lambda: LogViewDialog(self.master))
     self.appmenu.add_command(label="Exit Editor", command=self.exit)
     self.appmenu.add_command(label="Restart app", command=self.restart)
 
@@ -77,12 +77,11 @@ def create_menu(self) -> None:
     self.viewmenu.add_command(
         label="Classes and functions",
         command=lambda: CodeListDialog(self.panedwin,
-                                       self.get_text(),
-                                       self.tabs[self.nb.get_tab()].file_dir) if self.tabs else None
+                                       self.get_text()) if self.tabs else None
     )
     self.viewmenu.add_command(
         label='Insert Ascii Art',
-        command=lambda: StyleWindow(self.get_text(), self.key) if self.tabs else None
+        command=lambda: StyleWindow(self.master, self.get_text(), self.key) if self.tabs else None
     )
     self.viewmenu.add_command(
         label="Search In directory",

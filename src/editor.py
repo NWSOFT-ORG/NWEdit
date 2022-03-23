@@ -24,6 +24,13 @@ from src.Dialog.goto import Navigate
 from src.Dialog.splash import SplashWindow
 from src.Git.gitview import GitView
 from src.Menu.create_menu import create_menu
+from src.Widgets.customenotebook import ClosableNotebook
+from src.Widgets.hexview import HexView
+from src.Widgets.panel import CustomTabs
+from src.Widgets.statusbar import Statusbar
+from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
+from src.Widgets.treeview import FileTree
+from src.Widgets.winframe import WinFrame
 from src.codefunctions import CodeFunctions
 from src.constants import (
     APPDIR,
@@ -31,14 +38,11 @@ from src.constants import (
     OSX,
     logger,
 )
-from src.Widgets.customenotebook import ClosableNotebook
-from src.Widgets.panel import CustomTabs
 from src.functions import (
     is_binary_string,
     is_dark_color,
 )
-from src.Widgets.hexview import HexView
-from src.Widgets.winframe import WinFrame
+from src.functions import lighten_color
 from src.highlighter import recolorize_line
 from src.modules import (
     Path,
@@ -58,10 +62,6 @@ from src.settings import (
     RunCommand,
     Settings,
 )
-from src.Widgets.statusbar import Statusbar
-from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
-from src.Widgets.treeview import FileTree
-from src.functions import lighten_color
 
 if OSX:
     from src.modules import PyTouchBar
@@ -86,14 +86,17 @@ class Document:
 class Editor:
     """The editor class."""
 
+    # noinspection PyBroadException
     def __init__(self, master) -> None:
         """The editor object, the entire thing that goes in the
         window."""
-        # noinspection PyBroadException
         splash = SplashWindow(master)
-        splash.set_section(7)
+        splash.set_section(9)
+        self.master = master
+
+        self.master.geometry("1200x800")
         try:
-            self.settings_class = Settings()
+            self.settings_class = Settings(self.master)
             self.file_settings_class = Lexer()
             self.linter_settings_class = Linter()
             self.cmd_settings_class = RunCommand()
@@ -102,15 +105,12 @@ class Editor:
 
             logger.debug("Modules initialised.")
             splash.set_progress(1)
-            self.master = master
             self.opts = TextOpts(keyaction=self.key)
 
             self.theme = self.settings_class.get_settings("theme")
             self.tabwidth = self.settings_class.get_settings("tab")
             logger.debug("Settings loaded")
             splash.set_progress(2)
-
-            self.master.geometry("1200x800")
             self.style = ttkthemes.ThemedStyle(self.master)
             self.style.set_theme(self.theme)
             logger.debug("Theme loaded")
@@ -143,22 +143,23 @@ class Editor:
             self.mainframe = ttk.Frame(self.master)
             self.mainframe.pack(fill='both', expand=1)
             self.panedwin.add(self.mainframe)
+            splash.set_progress(6)
 
             self.left_panel()
             self.bottom_panel()
             self.statusbar = Statusbar()
             logger.debug("Layout created")
-            splash.set_progress(6)
+            splash.set_progress(7)
 
             self.codefuncs = CodeFunctions(self.master, self.tabs, self.nb, self.bottom_tabs)
 
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
                 open_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/open.gif", action=lambda: self.open_file()
+                    image="Images/open.gif", action=lambda _: self.open_file()
                 )
                 save_as_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/saveas.gif", action=lambda: self.save_as()
+                    image="Images/saveas.gif", action=lambda _: self.save_as()
                 )
                 close_button = PyTouchBar.TouchBarItems.Button(
                     image="Images/close.gif", action=self.close_tab
@@ -170,16 +171,17 @@ class Editor:
                 PyTouchBar.set_touchbar(
                     [open_button, save_as_button, close_button, space, run_button]
                 )
+            splash.set_progress(8)
             create_menu(self)
             editmenus = self.opts.create_menu(self.master)
             self.right_click_menu = editmenus[1]
             self.create_bindings()
             self.reopen_files()
             self.update_title()
-            splash.set_progress(7)
+            splash.set_progress(9)
         except Exception:
             logger.exception("Error when initializing:")
-            ErrorReportDialog('Error when starting.', traceback.format_exc())
+            ErrorReportDialog(self.master, 'Error when starting.', traceback.format_exc())
             exit(1)
 
     def left_panel(self):
@@ -198,9 +200,9 @@ class Editor:
         self.nb.enable_traversal()
 
         self.bottom_panedwin.pack(side='bottom', fill='both', expand=1)
-        self.bottom_panedwin.add(self.nb)
+        self.bottom_panedwin.add(self.nb, weight=4)
         self.bottom_tabs = CustomTabs(self.bottom_panedwin)
-        self.bottom_panedwin.add(self.bottom_tabs)
+        self.bottom_panedwin.add(self.bottom_tabs, weight=1)
 
     def click_tab(self, _=None):
         try:
@@ -211,7 +213,7 @@ class Editor:
     def create_bindings(self):
         # Keyboard bindings
         self.master.bind(f"<{MAIN_KEY}-w>", self.close_tab)
-        self.master.bind(f"<{MAIN_KEY}-o>", lambda: self.open_file())
+        self.master.bind(f"<{MAIN_KEY}-o>", lambda _: self.open_file())
         # Mouse bindings
         self.master.bind("<<MouseEvent>>", self.mouse)
         self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
@@ -223,7 +225,7 @@ class Editor:
         logger.debug("Bindings created")
 
     def start_screen(self) -> None:
-        frame = WinFrame(self.master, 'Start', self.bg)
+        frame = WinFrame(self.master, 'Start')
 
         canvas_bg = lighten_color(self.bg, 10, 10, 10)
         first_tab = tk.Canvas(frame, background=canvas_bg, highlightthickness=0)
@@ -343,7 +345,7 @@ class Editor:
             col = index.split(".")[1]
             self.statusbar.label3.config(text=f"Line {ln} Col {col}")
             logger.debug("update_statusbar: OK")
-        except:
+        except KeyError:
             self.statusbar.label3.config(text='')
             logger.exception("Error:")
         finally:
@@ -384,17 +386,17 @@ class Editor:
                 self.start_screen()
                 return
             for line in f.read().split("\n"):
-                if line:
-                    self.open_file(line, askhex=False)
+                self.open_file(line, askhex=False)
         with open("Backups/recent_dir.txt") as f:
             self.filetree.path = f.read()
             self.filetree.refresh_tree()
         self.update_title()
         self.update_statusbar()
 
-    def open_hex(self, file=""):
+    def open_hex(self, file="") -> [EnhancedText, None]:
         if not file:
-            FileOpenDialog(self.open_hex)
+            FileOpenDialog(self.master, self.open_hex)
+            return
         file = os.path.abspath(file)
         logger.info("HexView: opened")
         viewer = ttk.Frame(self.master)
@@ -421,7 +423,7 @@ class Editor:
         If a file is not provided, a messagebox'll
         pop up to ask the user to select the path."""
         if not file:
-            FileOpenDialog(self.open_file)
+            FileOpenDialog(self.master, self.open_file)
             return
 
         file = os.path.abspath(file)
@@ -528,7 +530,7 @@ class Editor:
                 # keyboard shortcut.
                 if event is None or event.type == str(2):
                     selected_tab = self.nb.get_tab()
-                # Otherwise close the tab based on coordinates of center-click.
+                # Otherwise, close the tab based on coordinates of center-click.
                 else:
                     try:
                         index = event.widget.index("@%d,%d" % (event.x, event.y))
@@ -600,4 +602,4 @@ class Editor:
             ErrorInfoDialog(self.master, f"Not a git repository: {Path(path).parent}")
             return
         elif action == "commit":
-            CommitView(self.panedwin, currdir)
+            GitView(self.panedwin)

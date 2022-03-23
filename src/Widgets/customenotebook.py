@@ -52,7 +52,7 @@ class ClosableNotebook(ttk.Notebook):
         tab_frame.place(relx=1.0, x=0, y=1, anchor='ne')
 
         ttk.Separator(tab_frame, orient='vertical').pack(
-            side='left', fill='y')
+            side='left', fill='y', padx=2)
 
         prev_tab_label = ttk.Label(tab_frame, image=self.prevtab_icon)
         prev_tab_label.image = self.prevtab_icon
@@ -64,13 +64,13 @@ class ClosableNotebook(ttk.Notebook):
         next_tab_label.bind("<1>", self.nexttab)
         next_tab_label.pack(side='left')
 
-        ttk.Separator(tab_frame, orient='vertical').pack(side='left', fill='y')
+        ttk.Separator(tab_frame, orient='vertical').pack(side='left', fill='y', padx=2)
 
         allitems_label = ttk.Label(tab_frame, image=self.alltabs_icon)
         allitems_label.image = self.alltabs_icon
         allitems_label.bind("<1>", self.show_tab_menu)
         allitems_label.pack(side='left')
-        
+
         bind_events(prev_tab_label)
         bind_events(next_tab_label)
         bind_events(allitems_label)
@@ -81,19 +81,18 @@ class ClosableNotebook(ttk.Notebook):
             tab_menu.add_command(label=self.tab(tab, option="text"),
                                  command=lambda temp=tab: self.select(temp))
         tab_menu.tk_popup(event.x_root, event.y_root)
-    
+
     def prevtab(self, _=None):
         try:
             self.select(self.index('current') - 1)
         except tk.TclError:
             pass
-    
+
     def nexttab(self, _=None):
         try:
             self.select(self.index('current') + 1)
         except tk.TclError:
             pass
-
 
     def on_close_press(self, event):
         """Called when the button is pressed over the close button"""
@@ -128,7 +127,7 @@ class ClosableNotebook(ttk.Notebook):
 
     def __initialize_custom_style(self):
         self.style = style = ttk.Style()
-        
+
         try:
             style.element_create("close", "image", "img_close", border=10, sticky="")
         except tk.TclError:
@@ -179,7 +178,7 @@ class ClosableNotebook(ttk.Notebook):
         )
         logger.debug("Initialized custom style.")
 
-    def move_tab(self, event: tk.EventType) -> None:
+    def move_tab(self, event: tk.Event) -> None:
         if self.index("end") > 1:
             y = self.get_tab().winfo_y() - 5
 

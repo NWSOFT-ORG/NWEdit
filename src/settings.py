@@ -1,23 +1,25 @@
-from src.constants import APPDIR
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog
+from src.constants import APPDIR
 from src.modules import EditorErr, Path, json, lexers, os, sys, zipfile, tk
+from json import JSONDecodeError
 
 
 class Settings:
     """A class to read data to/from general-settings.json"""
 
-    def __init__(self):
+    def __init__(self, master: [tk.Tk, tk.Toplevel, tk.Misc, str] = "."):
+        self.master = master
         try:
-            with open(os.path.join(APPDIR, "Config/general-settings.json")) as f:
+            with open("Config/general-settings.json") as f:
                 self.settings = json.load(f)
             self.theme = self.settings["theme"]
             self.highlight_theme = self.settings["pygments"]
             self.tabwidth = self.settings["tabwidth"]
             self.font = self.settings["font"].split()[0]
             self.size = self.settings["font"].split()[1]
-        except Exception:
-            ErrorInfoDialog(text="Setings are corrupted.")
+        except JSONDecodeError:
+            ErrorInfoDialog(self.master, text="Setings are corrupted.")
             sys.exit(1)
 
     @staticmethod
@@ -51,8 +53,8 @@ class Settings:
         except (zipfile.BadZipFile, zipfile.BadZipfile, zipfile.LargeZipFile):
             pass
 
-    def unzipsettings(self):
-        FileOpenDialog(self.unzip_settings)
+    def unzipsettings(self, master):
+        FileOpenDialog(master, self.unzip_settings)
 
     def get_settings(self, setting):
         if setting == "font":
@@ -69,41 +71,33 @@ class Settings:
         menu = tk.Menu(master)
         menu.add_command(
             label="General Settings",
-            command=lambda: open_file(
-                APPDIR + "/Config/general-settings.json"
-            ),
+            command=lambda: open_file("Config/general-settings.json"),
         )
         menu.add_command(
             label="Format Command Settings",
-            command=lambda: open_file(
-                APPDIR + "/Config/format-settings.json"
-            ),
+            command=lambda: open_file("Config/format-settings.json"),
         )
         menu.add_command(
             label="File Icon Settings",
-            command=lambda: open_file(
-                APPDIR + "/Config/file-icons.json"
-            ),
+            command=lambda: open_file("Config/file-icons.json"),
         )
         menu.add_command(
             label="Lexer Settings",
-            command=lambda: open_file(APPDIR + "/Config/lexer-settings.json"),
+            command=lambda: open_file("Config/lexer-settings.json"),
         )
         menu.add_command(
             label="Linter Settings",
-            command=lambda: open_file(
-                APPDIR + "/Config/linter-settings" ".json"
-            ),
+            command=lambda: open_file("Config/linter-settings.json"),
         )
         menu.add_command(
             label="Run Command Settings",
-            command=lambda: open_file(APPDIR + "/Config/cmd-settings.json"),
+            command=lambda: open_file("Config/cmd-settings.json"),
         )
         menu.add_command(
             label="Backup Settings to...", command=self.zipsettings
         )
         menu.add_command(
-            label="Load Settings from...", command=self.unzipsettings
+            label="Load Settings from...", command=lambda _: self.unzipsettings(self.master)
         )
         return menu
 
@@ -129,7 +123,7 @@ class ExtensionSettings:
 
 class Lexer(ExtensionSettings):
     def __init__(self):
-        super().__init__(os.path.join(APPDIR, "Config/lexer-settings.json"))
+        super().__init__("Config/lexer-settings.json")
 
     def get_settings(self, extension: str):
         try:
@@ -140,19 +134,19 @@ class Lexer(ExtensionSettings):
 
 class Linter(ExtensionSettings):
     def __init__(self):
-        super().__init__(os.path.join(APPDIR, "Config/linter-settings.json"))
+        super().__init__("Config/linter-settings.json")
 
 
 class FormatCommand(ExtensionSettings):
     def __init__(self):
-        super().__init__(os.path.join(APPDIR, "Config/format-settings.json"))
+        super().__init__("Config/format-settings.json")
 
 
 class RunCommand(ExtensionSettings):
     def __init__(self):
-        super().__init__(os.path.join(APPDIR, "Config/cmd-settings.json"))
+        super().__init__("Config/cmd-settings.json")
 
 
 class CommentMarker(ExtensionSettings):
     def __init__(self):
-        super().__init__(os.path.join(APPDIR, "Config/comment-markers.json"))
+        super().__init__("Config/comment-markers.json")

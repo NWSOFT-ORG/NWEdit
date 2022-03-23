@@ -1,5 +1,4 @@
 """All the necessary modules"""
-# flake8: noqa
 
 import code
 import codecs

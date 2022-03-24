@@ -1,5 +1,5 @@
 from src.modules import font, styles, tk, pygments
-from src.settings import Settings
+from src.settings import GeneralSettings
 
 
 def create_tags(textbox: tk.Text) -> None:
@@ -7,7 +7,7 @@ def create_tags(textbox: tk.Text) -> None:
     The method creates the tags associated with each distinct style element of the
     source code 'dressing'"""
     currtext = textbox
-    settings = Settings(".")
+    settings = GeneralSettings(".")
     bold_font = font.Font(currtext, settings.get_settings("font"))
     bold_font.configure(weight=font.BOLD)
     italic_font = font.Font(currtext, settings.get_settings("font"))

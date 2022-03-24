@@ -60,7 +60,8 @@ from src.settings import (
     Lexer,
     Linter,
     RunCommand,
-    Settings,
+    GeneralSettings,
+    Plugins,
 )
 
 if OSX:
@@ -96,12 +97,14 @@ class Editor:
 
         self.master.geometry("1200x800")
         try:
-            self.settings_class = Settings(self.master)
+            self.settings_class = GeneralSettings(self.master)
             self.file_settings_class = Lexer()
             self.linter_settings_class = Linter()
             self.cmd_settings_class = RunCommand()
             self.format_settings_class = FormatCommand()
             self.comment_settings_class = CommentMarker()
+            self.plugins_settings_class = Plugins(master)
+            self.plugins_settings_class.load_plugins()
 
             logger.debug("Modules initialised.")
             splash.set_progress(1)
@@ -173,8 +176,7 @@ class Editor:
                 )
             splash.set_progress(8)
             create_menu(self)
-            editmenus = self.opts.create_menu(self.master)
-            self.right_click_menu = editmenus[1]
+            self.right_click_menu = self.opts.create_menu(self.master)[1]
             self.create_bindings()
             self.reopen_files()
             self.update_title()

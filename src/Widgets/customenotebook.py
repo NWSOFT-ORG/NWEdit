@@ -2,7 +2,7 @@
 from src.constants import logger
 from src.functions import is_dark_color, lighten_color
 from src.modules import tk, ttk, ttkthemes
-from src.settings import Settings
+from src.settings import GeneralSettings
 from src.Widgets.statusbar import bind_events
 
 
@@ -19,7 +19,7 @@ class ClosableNotebook(ttk.Notebook):
 
     def __init__(self, master, cmd):
         self.style = ttkthemes.ThemedStyle()
-        self.settings = Settings()
+        self.settings = GeneralSettings()
         self.style.set_theme(self.settings.get_settings("theme"))
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")

@@ -1,7 +1,7 @@
 """A modded version of tkinter.Text"""
 
 from src.modules import font, styles, tk, ttk, ttkthemes, EditorErr, lexers
-from src.settings import Settings
+from src.settings import GeneralSettings
 from src.functions import darken_color, is_dark_color, lighten_color
 from src.constants import MAIN_KEY, logger
 from src.highlighter import create_tags, recolorize, recolorize_line
@@ -105,12 +105,12 @@ class EnhancedText(tk.Text):
             # generate an event if something was added or deleted,
             # or the cursor position changed
             if (
-                args[0] in ("insert", "replace", "delete")
-                or args[0:3] == ("mark", "set", "insert")
-                or args[0:2] == ("xview", "moveto")
-                or args[0:2] == ("xview", "scroll")
-                or args[0:2] == ("yview", "moveto")
-                or args[0:2] == ("yview", "scroll")
+                    args[0] in ("insert", "replace", "delete")
+                    or args[0:3] == ("mark", "set", "insert")
+                    or args[0:2] == ("xview", "moveto")
+                    or args[0:2] == ("xview", "scroll")
+                    or args[0:2] == ("yview", "moveto")
+                    or args[0:2] == ("yview", "scroll")
             ):
                 self.event_generate("<<Change>>", when="tail")
 
@@ -127,7 +127,7 @@ class EnhancedTextFrame(ttk.Frame):
 
     def __init__(self, *args, **kwargs) -> None:
         ttk.Frame.__init__(self, *args, **kwargs)
-        settings_class = Settings()
+        settings_class = GeneralSettings()
         self.font = settings_class.get_settings("font")
         self.first_line = 1
         style = styles.get_style_by_name(settings_class.get_settings("pygments"))
@@ -187,7 +187,7 @@ class TextOpts:
     def __init__(self, bindkey: bool = False, keyaction: callable = None):
         self.keyaction = keyaction
         self.bindkey = bindkey
-        self.settings_class = Settings()
+        self.settings_class = GeneralSettings()
         self.tabwidth = self.settings_class.get_settings("tab")
         self.theme = self.settings_class.get_settings("theme")
         self.style = ttkthemes.ThemedStyle()
@@ -215,7 +215,7 @@ class TextOpts:
     def set_text(self, text):
         self.text = text
         self.bind_events()
-    
+
     def create_menu(self, master):
         menu = tk.Menu(master)
         menu.add_command(
@@ -419,7 +419,7 @@ class TextOpts:
                 if block:
                     if text.startswith(comment_start):
                         currtext.insert(
-                            "insert", text[len(comment_start) : -len(comment_end)]
+                            "insert", text[len(comment_start): -len(comment_end)]
                         )
                         self.key()
                         return
@@ -571,7 +571,7 @@ class TextOpts:
             self.key()
         except Exception:
             return
-    
+
     def copy(self) -> None:
         try:
             sel = self.text.get(tk.SEL_FIRST, tk.SEL_LAST)
@@ -610,7 +610,7 @@ class TextOpts:
             self.text.see("insert")
         except tk.TclError:
             pass
-    
+
     def nav_1cf(self) -> None:
         currtext = self.text
         currtext.mark_set("insert", "insert +1c")

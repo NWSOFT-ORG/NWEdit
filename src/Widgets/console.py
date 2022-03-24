@@ -1,6 +1,6 @@
 """Python console for the editor."""
 from src.modules import code, hashlib, io, queue, sys, threading, tk, ttk
-from src.settings import Settings
+from src.settings import GeneralSettings
 
 
 # from olisolomos's gist
@@ -29,7 +29,7 @@ class Console(ttk.Frame):
 
     def __init__(self, parent: tk.Misc, _locals=None, exit_callback=None):
         super().__init__(parent)
-        settings_class = Settings()
+        settings_class = GeneralSettings()
         self.command_history = []
         self.font = settings_class.get_settings("font")
         self.text = ConsoleText(

@@ -83,7 +83,7 @@ class InputStringDialog(WinFrame):
 
 
 class ErrorInfoDialog(WinFrame):
-    def __init__(self, parent: tk.Misc = None, text: str = None, title: str = "Error"):
+    def __init__(self, parent: [tk.Misc, str] = None, text: str = None, title: str = "Error"):
         self.text = text
         super().__init__(parent, title)
         label1 = ttk.Label(self, text=self.text)

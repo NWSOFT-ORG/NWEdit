@@ -1,11 +1,11 @@
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog
-from src.constants import APPDIR
+from src.constants import APPDIR, logger
 from src.modules import EditorErr, Path, json, lexers, os, sys, zipfile, tk
 from json import JSONDecodeError
 
 
-class Settings:
+class GeneralSettings:
     """A class to read data to/from general-settings.json"""
 
     def __init__(self, master: [tk.Tk, tk.Toplevel, tk.Misc, str] = "."):
@@ -150,3 +150,29 @@ class RunCommand(ExtensionSettings):
 class CommentMarker(ExtensionSettings):
     def __init__(self):
         super().__init__("Config/comment-markers.json")
+
+
+class Plugins:
+    def __init__(self, master):
+        self.master = master
+        self.tool_menu = tk.Menu(self.master)
+        with open("Config/plugin-data.json") as f:
+            self.settings = json.load(f)
+
+    def load_plugins(self):
+        plugins = []
+        for value in self.settings.values():
+            try:
+                exec(f"""\
+from src.{value} import Plugin
+p = Plugin(self.master)
+plugins.append(p.PLUGIN_DATA)
+del Plugin""", locals(), globals())
+            except ModuleNotFoundError:
+                logger.exception("Error, can't parse plugin settings:")
+        for plugin in plugins:
+            self.tool_menu.add_cascade(label=plugin["name"], menu=plugin["menu"])
+
+    @property
+    def create_tool_menu(self):
+        return self.tool_menu

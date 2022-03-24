@@ -106,6 +106,7 @@ def create_menu(self) -> None:
     self.menubar.add_cascade(label="Edit", menu=self.editmenu)
     self.menubar.add_cascade(label="Code", menu=self.codemenu)
     self.menubar.add_cascade(label="Navigate", menu=self.navmenu)
+    self.menubar.add_cascade(label="Tools", menu=self.plugins_settings_class.create_tool_menu)
     self.menubar.add_cascade(label="Git", menu=self.gitmenu)
 
     self.master.config(menu=self.menubar)

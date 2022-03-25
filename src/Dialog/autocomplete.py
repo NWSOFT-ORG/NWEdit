@@ -13,11 +13,12 @@ def sep_words(str_to_sep: str) -> list:
     result = list(filter(None, result.split()))
     result = list(dict.fromkeys(result))
     return result
-    
+
 
 class CompleteDialog(ttk.Frame):
-    def __init__(self, master, text):
+    def __init__(self, master, text, opts):
         super().__init__(master, relief='groove')
+        self.opts = opts
         self.completions = ttk.Treeview(self, show='tree')
         self.completions.pack(side='left', fill='both', expand=1)
         self.completions.bind('<1>', self.complete)
@@ -26,16 +27,16 @@ class CompleteDialog(ttk.Frame):
         yscroll.pack(side='right', fill='y', expand=1)
         self.completions['yscrollcommand'] = yscroll.set
         self.text = text
-        
+
         text.bind('<Button-1>', lambda _: self.place_forget())
 
     def complete(self, event=None):
         item = self.completions.identify("item", event.x, event.y)
         text = self.text
         completion = self.completions.item(item, 'text')
-        text.delete(*self.index_word())
+        text.delete(*self.index_word)
         text.insert('insert', completion)
-        text.opts.key()
+        self.opts.key()
 
     def insert_completions(self):
         text = self.text
@@ -44,20 +45,22 @@ class CompleteDialog(ttk.Frame):
         content = text.get('1.0', 'end')
         all_matches = sep_words(content)
 
-        curr_word = self.get_word()
+        curr_word = self.get_word
         self.completions.delete(*self.completions.get_children())
         for match in all_matches:
             if curr_word in match:
                 self.completions.insert('', 'end', text=match)
-    
-    def get_word(self):
+
+    @property
+    def get_word(self) -> [str, None]:
         text = self.text
         try:
-            return text.get(*self.index_word())
+            return text.get(*self.index_word)
         except TypeError:
-            pass
-    
-    def index_word(self):
+            return None
+
+    @property
+    def index_word(self) -> [str, None]:
         text = self.text
         try:
             content = text.get("1.0", "insert")
@@ -67,4 +70,4 @@ class CompleteDialog(ttk.Frame):
             startcol = endcol - len(words[-1])
             return f'{line}.{startcol}', f'{line}.{endcol}'
         except IndexError:
-            pass
+            return None

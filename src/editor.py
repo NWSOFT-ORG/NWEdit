@@ -92,7 +92,7 @@ class Editor:
         """The editor object, the entire thing that goes in the
         window."""
         splash = SplashWindow(master)
-        splash.set_section(9)
+        splash.set_section(10)
         self.master = master
 
         self.master.geometry("1200x800")
@@ -104,11 +104,10 @@ class Editor:
             self.format_settings_class = FormatCommand()
             self.comment_settings_class = CommentMarker()
             self.plugins_settings_class = Plugins(master)
-            self.plugins_settings_class.load_plugins()
 
             logger.debug("Modules initialised.")
             splash.set_progress(1)
-            self.opts = TextOpts(keyaction=self.key)
+            self.opts = TextOpts(self.master, keyaction=self.key)
 
             self.theme = self.settings_class.get_settings("theme")
             self.tabwidth = self.settings_class.get_settings("tab")
@@ -175,12 +174,16 @@ class Editor:
                     [open_button, save_as_button, close_button, space, run_button]
                 )
             splash.set_progress(8)
+            self.plugins_settings_class.load_plugins()
+            logger.debug("Plugins loaded")
+            splash.set_progress(9)
             create_menu(self)
-            self.right_click_menu = self.opts.create_menu(self.master)[1]
+            self.right_click_menu = self.opts.create_menu[1]
             self.create_bindings()
             self.reopen_files()
             self.update_title()
-            splash.set_progress(9)
+            splash.set_progress(10)
+
         except Exception:
             logger.exception("Error when initializing:")
             ErrorReportDialog(self.master, 'Error when starting.', traceback.format_exc())
@@ -227,7 +230,7 @@ class Editor:
         logger.debug("Bindings created")
 
     def start_screen(self) -> None:
-        frame = WinFrame(self.master, 'Start')
+        frame = WinFrame(self.master, 'Start', closable=False)
 
         canvas_bg = lighten_color(self.bg, 10, 10, 10)
         first_tab = tk.Canvas(frame, background=canvas_bg, highlightthickness=0)
@@ -311,7 +314,7 @@ class Editor:
 
         textbox = textframe.text  # text widget
         textbox.panedwin = panedwin
-        textbox.complete = CompleteDialog(textframe, textbox)
+        textbox.complete = CompleteDialog(textframe, textbox, self.opts)
         textbox.frame = frame  # The text will be packed into the frame.
         textbox.bind(("<Button-2>" if OSX else "<Button-3>"), self.right_click)
         textbox.bind(f"<{MAIN_KEY}-b>", self.codefuncs.run)
@@ -414,7 +417,7 @@ class Editor:
 
     def open_dir(self, directory: str = ""):
         if not directory:
-            DirectoryOpenDialog(self.open_dir)
+            DirectoryOpenDialog(self.master, self.open_dir)
             return
 
         self.filetree.path = directory
@@ -491,7 +494,7 @@ class Editor:
             if file:
                 file_dir = file
             else:
-                FileSaveAsDialog(self.save_as)
+                FileSaveAsDialog(self.master, self.save_as)
                 return
             curr_tab = self.nb.get_tab()
             if not file_dir:

@@ -2,7 +2,7 @@ from src.Dialog.commondialog import InputStringDialog, YesNoDialog, get_theme
 from src.Widgets.winframe import WinFrame
 from src.constants import OSX, WINDOWS, logger
 from src.functions import is_dark_color
-from src.modules import os, shutil, time, tk, ttk, ttkthemes, json
+from src.modules import os, shutil, time, tk, ttk, ttkthemes, json, font
 
 
 class IconSettings:
@@ -64,14 +64,19 @@ class FileTree(ttk.Frame):
             self.other_icon = tk.PhotoImage(file="Images/file-icons/other.gif")
             self.folder_icon = tk.PhotoImage(file="Images/file-icons/folder.gif")
         self.icons = []
-        self.temp_path = []
+        self.temp_path = []  # IMPORTANT! Reset after use
 
         self.pack(side="left", fill="both", expand=1)
         self.refresh_tree()
         self.tree.bind("<Double-1>", self.on_double_click_treeview)
         self.tree.bind('<Button-2>' if OSX else '<Button-3>', self.right_click)
         self.tree.update()
+
         self.tree.tag_configure("subfolder", foreground="#448dc4")
+        italic = font.Font(self)
+        italic.config(slant="italic")
+        self.tree.tag_configure("empty", font=italic)
+
         self.tree.pack(fill="both", expand=1, anchor="nw")
         self.tree.bind('<<TreeviewOpen>>', self.open_dir)
 
@@ -201,6 +206,7 @@ class FileTree(ttk.Frame):
         self.refresh_tree()
 
     def open_dir(self, _):
+        """Save time by loading directory only when needed, so we don't have to recursivly process the directories."""
         tree = self.tree
         item = tree.focus()
         item_text = tree.item(item, 'text')
@@ -218,6 +224,8 @@ class FileTree(ttk.Frame):
         if os.path.isfile(path):
             return
         items = sorted(os.listdir(path))
+        if not items:
+            self.tree.insert(parent, "end", text="Empty", tags=("empty",))
         last_dir_index = 0
         for p in items:
             abspath = os.path.join(path, p)
@@ -227,7 +235,7 @@ class FileTree(ttk.Frame):
                                        image=self.folder_icon)
                 last_dir_index += 1
                 if not showdironly:
-                    self.tree.insert(oid, 0, text='Loading...')
+                    self.tree.insert(oid, 0, text='Loading...')  # Just a placeholder, will load if needed
             else:
                 extension = p.split('.')
                 self.icons.append(self.icon_settings.get_icon(extension[-1]))
@@ -243,6 +251,9 @@ class FileTree(ttk.Frame):
         self.temp_path.remove('')
         self.temp_path = os.path.abspath('/'.join(self.temp_path))
         self.opencommand(os.path.join(self.temp_path, name))
+        self.temp_path = []
+        if destroy:
+            self.master.destroy()
 
     def get_parent(self, item):
         """Find the path to item in treeview"""

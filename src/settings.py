@@ -1,5 +1,6 @@
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog
+from src.Plugins.plugins_view import PluginView
 from src.constants import APPDIR, logger
 from src.modules import EditorErr, Path, json, lexers, os, sys, zipfile, tk
 from json import JSONDecodeError
@@ -175,4 +176,6 @@ del Plugin""", locals(), globals())
 
     @property
     def create_tool_menu(self):
+        self.tool_menu.add_separator()
+        self.tool_menu.add_command(label="Manage Plugins...", command=lambda: PluginView(self.master))
         return self.tool_menu

@@ -11,7 +11,7 @@ class TextLineNumbers(tk.Canvas):
     """Line numbers class for tkinter text widgets. From stackoverflow."""
 
     def __init__(self, *args: any, **kwargs: any) -> None:
-        tk.Canvas.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.textwidget = None
 
     def attach(self, text_widget: tk.Text) -> None:
@@ -47,7 +47,7 @@ class TextLineNumbers(tk.Canvas):
                     y,
                     anchor="nw",
                     text=linenum,
-                    fill=self.textwidget["fg"],
+                    fill=lighten_color(self.textwidget["fg"], 40, 40, 40),
                     font=self.textwidget["font"],
                 )
             i = self.textwidget.index("%s+1line" % i)
@@ -82,7 +82,7 @@ class EnhancedText(tk.Text):
     it generats an event, to redraw the line numbers."""
 
     def __init__(self, *args: any, **kwargs: any) -> None:
-        tk.Text.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.searchable = False
         self.navigate = False
         self.lexer = lexers.get_lexer_by_name('text')
@@ -184,9 +184,11 @@ class EnhancedTextFrame(ttk.Frame):
 
 
 class TextOpts:
-    def __init__(self, bindkey: bool = False, keyaction: callable = None):
+    def __init__(self, master, bindkey: bool = False, keyaction: callable = None):
         self.keyaction = keyaction
         self.bindkey = bindkey
+        self.master = master
+
         self.settings_class = GeneralSettings()
         self.tabwidth = self.settings_class.get_settings("tab")
         self.theme = self.settings_class.get_settings("theme")
@@ -216,8 +218,9 @@ class TextOpts:
         self.text = text
         self.bind_events()
 
-    def create_menu(self, master):
-        menu = tk.Menu(master)
+    @property
+    def create_menu(self):
+        menu = tk.Menu(self.master)
         menu.add_command(
             label="Undo",
             command=self.undo,
@@ -303,7 +306,7 @@ class TextOpts:
         menu.add_command(label="Move line up", command=self.mv_line_up)
         menu.add_command(label="Move line down", command=self.mv_line_dn)
 
-        right_click_menu = tk.Menu(master)
+        right_click_menu = tk.Menu(self.master)
         right_click_menu.add_command(label="Undo", command=self.undo)
         right_click_menu.add_command(label="Redo", command=self.redo)
         right_click_menu.add_command(label="Cut", command=self.cut)
@@ -318,7 +321,7 @@ class TextOpts:
 
     def bind_events(self):
         text = self.text
-        text.bind("<<Modified>>", self.key)
+        text.bind("<KeyRelease>", self.key)
         for char in ['"', "'", "(", "[", "{"]:
             text.bind(char, self.autoinsert)
         for char in [")", "]", "}"]:

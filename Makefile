@@ -1,5 +1,4 @@
 run: install-packages; python3 main.py
-activate-virtualenv
 install-packages: ; pip install -r requirements.txt
 build-mac: install-packages; python3 scripts/build_mac.py py2app -A
 build-pyinstaller-linux: install-packages; @printf "[Compiling via PyInstaller...]\n"

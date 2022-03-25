@@ -1,11 +1,11 @@
 from src.Dialog.commondialog import get_theme
-from src.functions import darken_color
+from src.Widgets.tktext import EnhancedText
 from src.modules import tk, ttk, ttkthemes
 
 
 class Navigate:
     def __init__(self, text: tk.Text):
-        self.text: tk.Text = text
+        self.text: EnhancedText = text
         if self.text.navigate or self.text.searchable:
             return
         self.text.navigate = True

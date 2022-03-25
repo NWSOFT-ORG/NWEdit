@@ -37,8 +37,9 @@ class CodeFunctions:
         text = self.tabs[self.nb.get_tab()].textbox
         CodeListDialog(self.bottomframe, text)
 
-    def create_menu(self, master):
-        codemenu = tk.Menu(master)
+    @property
+    def create_menu(self):
+        codemenu = tk.Menu(self.master)
         codemenu.add_command(
             label="Run",
             command=self.run,
@@ -80,7 +81,7 @@ class CodeFunctions:
             command=self.code_struct,
         )
         return codemenu
-    
+
     def search(self, _=None) -> None:
         bottomframe = self.bottomframe
         Search(bottomframe, self.tabs[self.nb.get_tab()].textbox)

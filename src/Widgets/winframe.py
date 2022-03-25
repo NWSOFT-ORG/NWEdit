@@ -16,34 +16,51 @@ def get_bg():
 
 
 class WinFrame(tk.Toplevel):
-    def __init__(self, master, title, disable=True):
+    def __init__(self, master: [tk.Tk, tk.Toplevel, str], title: str, disable: bool = True, closable: bool = True):
         super().__init__(master)
-        self.overrideredirect(False)
+        self.overrideredirect(False)  # Macs will need 2 calls to remove the border
         self.overrideredirect(True)
-        self.title = title
+        self.title_text = title
+        self.title(title)  # Need a decent message to show on the taskbar
         self.master = master
         self.bg = get_bg()
 
         if disable:
-            self.grab_set()
+            self.wait_visibility(self)
+            self.grab_set()  # Linux WMs might fail to grab the window
 
         self.create_titlebar()
-        self.close_button()
+        if closable:
+            self.close_button()
+            self.bind("<Escape>", lambda _: self.destroy())
         self.window_bindings()
         self.focus_set()
-        self.tkraise()
+        self.attributes("-topmost", True)
+        self.master.bind("<FocusIn>", lambda _: self.attributes("-topmost", True))  # Put it on the top
+        self.master.bind("<FocusOut>", lambda _: self.attributes("-topmost", True))
+        self.bind("<Destroy>", self.on_exit)
+
+        size = ttk.Sizegrip(self)
+        size.bind("<B1-Motion>", self.resize)
+        size.pack(side="bottom", anchor="se")
+
+    def on_exit(self, _):
+        # Fix destroy issues, need to relink events.
+        self.master.bind("<FocusIn>", lambda _: None)
+        self.master.bind("<FocusOut>", lambda _: None)
+        self.grab_release()
+        self.destroy()
 
     def create_titlebar(self):
         self.titleframe = ttk.Frame(self)
-        self.titlebar = ttk.Label(self.titleframe, text=self.title)
+        self.titlebar = ttk.Label(self.titleframe, text=self.title_text)
         self.titlebar.pack(side='left', fill='both', expand=1)
 
         self.titleframe.pack(fill='x', side='top')
 
     def add_widget(self, child_frame):
         self.child_frame = child_frame
-        self.configure(borderwidth=1, relief='ridge')
-        self.child_frame.pack(fill='both')
+        self.child_frame.pack(fill='both', expand=True)
 
     def window_bindings(self):
         self.titlebar.bind("<ButtonPress-1>", self.start_move)
@@ -62,6 +79,14 @@ class WinFrame(tk.Toplevel):
         x = (event.x - self.x + self.winfo_x())
         y = event.y - self.y + self.winfo_y()
         self.geometry(f"+{x}+{y}")
+
+    def resize(self, event: tk.Event):
+        cursor_x = event.x_root
+        cursor_y = event.y_root
+        window_x = self.winfo_rootx()
+        window_y = self.winfo_rooty()
+        self.geometry(f"{cursor_x - window_x}x{cursor_y - window_y}")
+        return
 
     def close_button(self):
         if is_dark_color(self.bg):

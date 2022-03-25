@@ -63,10 +63,9 @@ def create_menu(self) -> None:
         image=self.reload_icon,
         compound='left'
     )
-    editmenus = self.opts.create_menu(self.master)
-    self.editmenu = editmenus[0]
+    self.editmenu = self.opts.create_menu[0]
 
-    self.codemenu = self.codefuncs.create_menu(self.master)
+    self.codemenu = self.codefuncs.create_menu
 
     self.viewmenu = tk.Menu(self.menubar)
     self.viewmenu.add_command(

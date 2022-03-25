@@ -38,8 +38,8 @@ class YesNoDialog(WinFrame):
         b2.pack(side="left")
 
         box.pack(fill="x")
+        self.result = 0
         self.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.resizable(0, 0)
         self.wait_window(self)
 
     def apply(self, _=None):
@@ -91,7 +91,6 @@ class ErrorInfoDialog(WinFrame):
         b1 = ttk.Button(self, text="Ok", width=10, command=self.apply)
         b1.pack(side="left")
         self.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.resizable(0, 0)
         self.wait_window(self)
 
     def apply(self, _=None):
@@ -100,7 +99,7 @@ class ErrorInfoDialog(WinFrame):
 
     @staticmethod
     def cancel(_=None):
-        pass
+        return
 
 
 class AboutDialog:

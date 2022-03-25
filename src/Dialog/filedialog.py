@@ -8,7 +8,6 @@ class FileOpenDialog(FileTree):
     def __init__(self, master=".", opencommand: callable = None, action: str = "Open"):
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
-        bg = self._style.lookup("TLabel", "background")
         self.win = WinFrame(master, action)
         self.buttonframe = ttk.Frame(self.win)
         self.okbtn = ttk.Button(self.buttonframe, text=action, command=self.open)
@@ -34,6 +33,7 @@ class FileOpenDialog(FileTree):
         item_text = self.tree.item(item, 'text')
         self.get_parent(item)
         self.opencommand(f'{self.temp_path[0]}/{item_text}')
+        self.master.destroy()
 
     def open_from_string(self, _=None):
         try:
@@ -48,22 +48,24 @@ class FileOpenDialog(FileTree):
                 self.refresh_tree()
             else:
                 self.opencommand(file)
-        except Exception:
+        except FileNotFoundError:
             pass
+        finally:
+            self.master.destroy()
 
     def on_double_click_treeview(self, event=None, **kwargs):
         super().on_double_click_treeview(event, destroy=True)
 
 
 class FileSaveAsDialog(FileOpenDialog):
-    def __init__(self, savecommand: callable):
-        super().__init__(savecommand, "Save")
+    def __init__(self, master, savecommand: callable):
+        super().__init__(master, savecommand, "Save")
 
 
 class DirectoryOpenDialog(FileOpenDialog):
-    def __init__(self, opencommand):
+    def __init__(self, master, opencommand):
         self.opencommand = opencommand
-        super().__init__(opencommand=opencommand)
+        super().__init__(master, opencommand=opencommand)
 
     def open(self):
         self.opencommand(

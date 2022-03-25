@@ -66,6 +66,7 @@ def recolorize(textbox: tk.Text) -> None:
             'range_start', 'range_end')
 
 
+# noinspection DuplicatedCode
 def recolorize_line(textbox: tk.Text) -> None:
     """
     This method colors and styles the prepared tags"""

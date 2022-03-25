@@ -28,9 +28,10 @@ class SplashWindow(tk.Toplevel):
     def __init__(self, master: tk.Tk):
         """The splash window, which welcomes user to use PyPlus"""
         super().__init__(master, cursor="watch")
+        self.title("")
         master.withdraw()
-        self.overrideredirect(0)
-        self.overrideredirect(1)
+        self.overrideredirect(False)
+        self.overrideredirect(True)
 
         self.image = tk.PhotoImage(file="Images/splash.gif")
         self.h = h = self.image.height()

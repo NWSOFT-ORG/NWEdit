@@ -58,7 +58,7 @@ class InputStringDialog(WinFrame):
     def __init__(self, parent=".", title="", text=""):
         super().__init__(parent, title)
         ttk.Label(self, text=text).pack(fill="x")
-        self.entry = ttk.Entry(self)
+        self.entry = tk.Entry(self)
         self.entry.pack(fill="x", expand=1)
         box = ttk.Frame(self)
 

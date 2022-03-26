@@ -29,6 +29,7 @@ from pygments import lexers
 from pygments import styles
 from keyword import iskeyword
 import art
+import send2trash
 
 if sys.platform == "darwin":
     import PyTouchBar

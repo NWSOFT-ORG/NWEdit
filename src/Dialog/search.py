@@ -75,7 +75,7 @@ class Search:
         ttk.Label(self.search_frame, text="Search: ").pack(side="left",
                                                            anchor="nw",
                                                            fill="y")
-        self.content = ttk.Entry(self.search_frame)
+        self.content = tk.Entry(self.search_frame)
         self.content.pack(side="left", fill="both")
 
         self.forward = ttk.Button(self.search_frame, text="<", width=1)
@@ -87,7 +87,7 @@ class Search:
         ttk.Label(self.search_frame, text="Replace: ").pack(side="left",
                                                             anchor="nw",
                                                             fill="y")
-        self.repl = ttk.Entry(self.search_frame)
+        self.repl = tk.Entry(self.search_frame)
         self.repl.pack(side="left", fill="both")
 
         self.repl_button = ttk.Button(self.search_frame, text="Replace all")

@@ -2,7 +2,7 @@ from src.Dialog.commondialog import InputStringDialog, YesNoDialog, get_theme
 from src.Widgets.winframe import WinFrame
 from src.constants import OSX, WINDOWS, logger
 from src.functions import is_dark_color
-from src.modules import os, shutil, time, tk, ttk, ttkthemes, json, font
+from src.modules import os, shutil, time, tk, ttk, ttkthemes, json, font, send2trash
 
 
 class IconSettings:
@@ -82,14 +82,8 @@ class FileTree(ttk.Frame):
 
     def remove(self, item):
         path = self.get_path(item)
-        if YesNoDialog(
-                title="Warning!", text="This file/directory will be deleted immediately!"
-        ):
-            if os.path.isdir(path):
-                shutil.rmtree(path)
-            else:
-                os.remove(path)
-            self.refresh_tree()
+        send2trash.send2trash(path)
+        self.refresh_tree()
 
     def rename(self, event):
         try:
@@ -147,7 +141,7 @@ class FileTree(ttk.Frame):
         win.resizable(False, False)
         win.config(background=self.bg)
         ttk.Label(win, text="Name:").pack(side="top", anchor="nw")
-        filename = ttk.Entry(win)
+        filename = tk.Entry(win)
         filename.pack(side="top", anchor="nw")
         item = self.tree.item(self.tree.identify('item', event.x, event.y), 'text')
 
@@ -176,7 +170,7 @@ class FileTree(ttk.Frame):
     def new_file(self, event=None):
         win = WinFrame(self.master, "New File", False)
         ttk.Label(win, text="Name:").pack(side="top", anchor="nw")
-        filename = ttk.Entry(win)
+        filename = tk.Entry(win)
         filename.pack(side="top", anchor="nw")
         try:
             item = self.tree.item(self.tree.parent(self.tree.identify('item', event.x, event.y)), "text")

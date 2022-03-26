@@ -40,7 +40,7 @@ class SearchInDir(ttk.Frame):
         ttk.Label(self, text="Search: ").pack(side="top",
                                               anchor="nw",
                                               fill="y")
-        self.content = ttk.Entry(self)
+        self.content = tk.Entry(self)
         self.content.pack(side="top", fill="both")
         ttk.Button(
             self,

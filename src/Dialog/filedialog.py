@@ -1,7 +1,7 @@
 from src.Dialog.commondialog import get_theme
 from src.Widgets.treeview import FileTree
 from src.Widgets.winframe import WinFrame
-from src.modules import os, ttk, ttkthemes
+from src.modules import os, ttk, ttkthemes, tk
 
 
 class FileOpenDialog(FileTree):
@@ -18,10 +18,10 @@ class FileOpenDialog(FileTree):
         self.cancelbtn.pack(side="right")
         self.buttonframe.pack(side="bottom", anchor="nw")
         self.entryframe = ttk.Frame(self.win)
-        self.pathentry = ttk.Entry(self.entryframe)
-        self.pathentry.pack(fill="x")
+        self.pathentry = tk.Entry(self.entryframe)
+        self.pathentry.pack(side="left")
         self.open_from_string_btn = ttk.Button(
-            self.pathentry, command=self.open_from_string, text=action
+            self.entryframe, command=self.open_from_string, text=action
         )
         self.open_from_string_btn.pack(side="right")
         self.entryframe.pack(fill="x")
@@ -66,6 +66,9 @@ class DirectoryOpenDialog(FileOpenDialog):
     def __init__(self, master, opencommand):
         self.opencommand = opencommand
         super().__init__(master, opencommand=opencommand)
+
+    def process_directory(self, parent, showdironly: bool = False, path: str = ''):
+        super().process_directory(parent, True, path)
 
     def open(self):
         self.opencommand(

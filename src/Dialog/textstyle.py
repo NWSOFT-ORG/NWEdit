@@ -24,7 +24,7 @@ class StyleWindow(WinFrame):
 
         self.text = text
 
-        self.entry = ttk.Entry(self)
+        self.entry = tk.Entry(self)
         self.entry.pack(fill='x')
         self.entry.insert('end', 'Hello, World')
 

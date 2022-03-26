@@ -1,3 +1,4 @@
+from src.constants import OSX
 from src.functions import is_dark_color
 from src.modules import ttk, tk, ttkthemes, json
 
@@ -18,8 +19,16 @@ def get_bg():
 class WinFrame(tk.Toplevel):
     def __init__(self, master: [tk.Tk, tk.Toplevel, str], title: str, disable: bool = True, closable: bool = True):
         super().__init__(master)
-        self.overrideredirect(False)  # Macs will need 2 calls to remove the border
-        self.overrideredirect(True)
+        # alert, moveableAlert, modal, moveableModal, floating, document, utility, help, sheet, toolbar, plain, overlay, sheetAlert, altPlain, simple, or drawer
+        if OSX:
+            self.tk.call("::tk::unsupported::MacWindowStyle", "style", self._w, "alert")
+        else:
+            self.create_titlebar()
+            if closable:
+                self.close_button()
+                self.bind("<Escape>", lambda _: self.destroy())
+            self.window_bindings()
+
         self.title_text = title
         self.title(title)  # Need a decent message to show on the taskbar
         self.master = master
@@ -29,15 +38,11 @@ class WinFrame(tk.Toplevel):
             self.wait_visibility(self)
             self.grab_set()  # Linux WMs might fail to grab the window
 
-        self.create_titlebar()
-        if closable:
-            self.close_button()
-            self.bind("<Escape>", lambda _: self.destroy())
-        self.window_bindings()
         self.focus_set()
         self.attributes("-topmost", True)
-        self.master.bind("<FocusIn>", lambda _: self.attributes("-topmost", True))  # Put it on the top
-        self.master.bind("<FocusOut>", lambda _: self.attributes("-topmost", True))
+        self.master.bind("<FocusIn>", lambda _: self.attributes("-topmost", True))
+        # Put it on topmost if the root is active
+        self.master.bind("<FocusOut>", lambda _: self.attributes("-topmost", False))
         self.bind("<Destroy>", self.on_exit)
 
         size = ttk.Sizegrip(self)

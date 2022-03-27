@@ -20,38 +20,28 @@ class FileOpenDialog(FileTree):
         self.entryframe = ttk.Frame(self.win)
         self.pathentry = tk.Entry(self.entryframe)
         self.pathentry.pack(side="left")
-        self.open_from_string_btn = ttk.Button(
-            self.entryframe, command=self.open_from_string, text=action
+        self.set_path_btn = ttk.Button(
+            self.entryframe, command=self.set_path, text="Go", takefocus=False
         )
-        self.open_from_string_btn.pack(side="right")
+        self.set_path_btn.pack(side="right")
         self.entryframe.pack(fill="x")
         super().__init__(master=self.win, opencommand=opencommand)
         self.temp_path = []
 
     def open(self):
         item = self.tree.focus()
-        item_text = self.tree.item(item, 'text')
+        item_text = self.tree.item(item, "text")
         self.get_parent(item)
-        self.opencommand(f'{self.temp_path[0]}/{item_text}')
+        self.opencommand(f"{self.temp_path[0]}/{item_text}")
         self.master.destroy()
 
-    def open_from_string(self, _=None):
+    def set_path(self, _=None):
+        old_path = self.path
+        self.path = self.pathentry.get()
         try:
-            file = self.pathentry.get()
-            if os.path.isfile(file):
-                self.opencommand(file)
-                return
-            path = self.path
-            file = os.path.join(path, self.pathentry.get())
-            if os.path.isdir(file):
-                self.path = file
-                self.refresh_tree()
-            else:
-                self.opencommand(file)
+            self.refresh_tree()
         except FileNotFoundError:
-            pass
-        finally:
-            self.master.destroy()
+            self.path = old_path
 
     def on_double_click_treeview(self, event=None, **kwargs):
         super().on_double_click_treeview(event, destroy=True)
@@ -67,7 +57,7 @@ class DirectoryOpenDialog(FileOpenDialog):
         self.opencommand = opencommand
         super().__init__(master, opencommand=opencommand)
 
-    def process_directory(self, parent, showdironly: bool = False, path: str = ''):
+    def process_directory(self, parent, showdironly: bool = False, path: str = ""):
         super().process_directory(parent, True, path)
 
     def open(self):

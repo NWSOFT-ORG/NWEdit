@@ -2,7 +2,7 @@
 
 from src.modules import font, styles, tk, ttk, ttkthemes, EditorErr, lexers
 from src.settings import GeneralSettings
-from src.functions import darken_color, is_dark_color, lighten_color
+from src.Utils.color_utils import darken_color, is_dark_color, lighten_color
 from src.constants import MAIN_KEY, logger
 from src.highlighter import create_tags, recolorize, recolorize_line
 
@@ -47,7 +47,7 @@ class TextLineNumbers(tk.Canvas):
                     y,
                     anchor="nw",
                     text=linenum,
-                    fill=lighten_color(self.textwidget["fg"], 40, 40, 40),
+                    fill=lighten_color(self.textwidget["fg"], 40),
                     font=self.textwidget["font"],
                 )
             i = self.textwidget.index("%s+1line" % i)
@@ -81,11 +81,12 @@ class EnhancedText(tk.Text):
     If you hit a key, or the text widget's content has changed,
     it generats an event, to redraw the line numbers."""
 
-    def __init__(self, *args: any, **kwargs: any) -> None:
+    def __init__(self, *args: [None, list], **kwargs: [None, dict]) -> None:
         super().__init__(*args, **kwargs)
-        self.searchable = False
+        self.frame = self.master
+        self.search = False
         self.navigate = False
-        self.lexer = lexers.get_lexer_by_name('text')
+        self.lexer = lexers.get_lexer_by_name("text")
 
         # create a proxy for the underlying widget
         self._orig = self._w + "_orig"
@@ -134,11 +135,11 @@ class EnhancedTextFrame(ttk.Frame):
         bgcolor = style.background_color
         fgcolor = style.highlight_color
         if is_dark_color(bgcolor):
-            bg = lighten_color(bgcolor, 30, 30, 30)
-            fg = lighten_color(fgcolor, 40, 40, 40)
+            bg = lighten_color(bgcolor, 30)
+            fg = lighten_color(fgcolor, 40)
         else:
-            bg = darken_color(bgcolor, 30, 30, 30)
-            fg = darken_color(fgcolor, 40, 40, 40)
+            bg = darken_color(bgcolor, 30)
+            fg = darken_color(fgcolor, 40)
         self.text = EnhancedText(
             self,
             bg=bgcolor,
@@ -222,34 +223,19 @@ class TextOpts:
     def create_menu(self):
         menu = tk.Menu(self.master)
         menu.add_command(
-            label="Undo",
-            command=self.undo,
-            image=self.undo_icon,
-            compound='left'
+            label="Undo", command=self.undo, image=self.undo_icon, compound="left"
         )
         menu.add_command(
-            label="Redo",
-            command=self.redo,
-            image=self.redo_icon,
-            compound='left'
+            label="Redo", command=self.redo, image=self.redo_icon, compound="left"
         )
         menu.add_command(
-            label="Cut",
-            command=self.cut,
-            image=self.cut_icon,
-            compound='left'
+            label="Cut", command=self.cut, image=self.cut_icon, compound="left"
         )
         menu.add_command(
-            label="Copy",
-            command=self.copy,
-            image=self.copy_icon,
-            compound='left'
+            label="Copy", command=self.copy, image=self.copy_icon, compound="left"
         )
         menu.add_command(
-            label="Paste",
-            command=self.paste,
-            image=self.paste_icon,
-            compound='left'
+            label="Paste", command=self.paste, image=self.paste_icon, compound="left"
         )
         menu.add_command(
             label="Duplicate Line or Selected", command=self.duplicate_line
@@ -259,15 +245,15 @@ class TextOpts:
             label="Indent",
             command=lambda: self.indent("indent"),
             image=self.indent_icon,
-            compound='left'
+            compound="left",
         )
         indent_cascade.add_command(
             label="Unident",
             command=lambda: self.indent("unindent"),
             image=self.unindent_icon,
-            compound='left'
+            compound="left",
         )
-        menu.add_cascade(label='Indent...', menu=indent_cascade)
+        menu.add_cascade(label="Indent...", menu=indent_cascade)
         menu.add_command(
             label="Comment/Uncomment Line or Selected", command=self.comment_lines
         )
@@ -276,29 +262,33 @@ class TextOpts:
         case_cascade.add_command(label="Swap case", command=self.swap_case)
         case_cascade.add_command(label="Upper case", command=self.upper_case)
         case_cascade.add_command(label="Lower case", command=self.lower_case)
-        menu.add_cascade(label='Case...', menu=case_cascade)
+        menu.add_cascade(label="Case...", menu=case_cascade)
         select_cascade = tk.Menu(menu)
         select_cascade.add_command(
             label="Select All",
             command=self.select_all,
             image=self.sel_all_icon,
-            compound='left'
+            compound="left",
         )
         select_cascade.add_command(label="Select Line", command=self.sel_line)
         select_cascade.add_command(label="Select Word", command=self.sel_word)
         select_cascade.add_command(label="Select Prev Word", command=self.sel_word_left)
-        select_cascade.add_command(label="Select Next Word", command=self.sel_word_right)
-        menu.add_cascade(label='Select...', menu=select_cascade)
+        select_cascade.add_command(
+            label="Select Next Word", command=self.sel_word_right
+        )
+        menu.add_cascade(label="Select...", menu=select_cascade)
         delete_cascade = tk.Menu(menu)
         delete_cascade.add_command(
             label="Delete Selected",
             image=self.delete_icon,
             command=self.delete,
-            compound='left'
+            compound="left",
         )
         delete_cascade.add_command(label="Delete Word", command=self.del_word)
         delete_cascade.add_command(label="Delete Prev Word", command=self.del_word_left)
-        delete_cascade.add_command(label="Delete Next Word", command=self.del_word_right)
+        delete_cascade.add_command(
+            label="Delete Next Word", command=self.del_word_right
+        )
         menu.add_command(label="-1 char", command=self.nav_1cb)
         menu.add_command(label="+1 char", command=self.nav_1cf)
         menu.add_command(label="Word end", command=self.nav_wordend)
@@ -313,9 +303,7 @@ class TextOpts:
         right_click_menu.add_command(label="Copy", command=self.copy)
         right_click_menu.add_command(label="Paste", command=self.paste)
         right_click_menu.add_command(label="Delete", command=self.delete)
-        right_click_menu.add_command(
-            label="Select All", command=self.select_all
-        )
+        right_click_menu.add_command(label="Select All", command=self.select_all)
         logger.debug("Right-click menu created")
         return [menu, right_click_menu]
 
@@ -465,12 +453,13 @@ class TextOpts:
 
     def close_brackets(self, event: tk.EventType = None) -> str:
         currtext = self.text
-        if (event.char in [")", "]", "}", "'", '"'] and
-                currtext.get('insert -1c', 'insert') in [")", "]", "}", "'", '"']):
+        if event.char in [")", "]", "}", "'", '"'] and currtext.get(
+                "insert -1c", "insert"
+        ) in [")", "]", "}", "'", '"']:
             currtext.mark_set("insert", "insert +1c")
             self.key()
             return "break"
-        currtext.delete("insert", 'insert +1c')
+        currtext.delete("insert", "insert +1c")
         self.key()
 
     def autoinsert(self, event=None) -> str:
@@ -600,7 +589,7 @@ class TextOpts:
             clipboard = self.text.clipboard_get()
             if clipboard:
                 self.text.insert(
-                    "insert", clipboard.replace("\t", " " * self.tabwidth)
+                    "insert", clipboard.replace_all("\t", " " * self.tabwidth)
                 )
             self.key()
         except Exception:
@@ -608,7 +597,7 @@ class TextOpts:
 
     def select_all(self) -> None:
         try:
-            self.text.tag_add('sel', "1.0", 'end')
+            self.text.tag_add("sel", "1.0", "end")
             self.text.mark_set("insert", "end")
             self.text.see("insert")
         except tk.TclError:

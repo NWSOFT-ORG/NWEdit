@@ -173,9 +173,9 @@ class ConsoleText(tk.Text):
     def prompt(self):
         """Insert a prompt"""
         self.mark_set("prompt_end", "end-1c")
-        self.mark_gravity("prompt_end", 'left')
+        self.mark_gravity("prompt_end", "left")
         self.write(">>> ")
-        self.mark_gravity("prompt_end", 'right')
+        self.mark_gravity("prompt_end", "right")
 
     def commit_all(self):
         """Mark all text as committed"""
@@ -186,7 +186,7 @@ class ConsoleText(tk.Text):
         if self.index(pos) in (self.index("end-1c"), self.index("end")):
             # don't let text become un-committed
             self.mark_set("committed_text", "end-1c")
-            self.mark_gravity("committed_text", 'left')
+            self.mark_gravity("committed_text", "left")
         else:
             # if text is added before the last prompt (">>> "),
             # update the stored position of the tag
@@ -224,9 +224,9 @@ class ConsoleText(tk.Text):
         text, and if it is revert the change"""
         if self.get_committed_text_hash() != self.committed_hash:
             # revert change
-            self.mark_gravity("committed_text", 'right')
+            self.mark_gravity("committed_text", "right")
             self.replace(1.0, "committed_text", self.committed_text_backup)
-            self.mark_gravity("committed_text", 'left')
+            self.mark_gravity("committed_text", "left")
 
             # re-apply colours
             for tag_name, _start, _end in self.console_tags:

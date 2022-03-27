@@ -1,4 +1,4 @@
-art==5.4
+art==5.5
 json5==0.9.6
 Pillow==9.0.1
 Pygments==2.11.2

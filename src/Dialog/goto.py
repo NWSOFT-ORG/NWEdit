@@ -6,7 +6,7 @@ from src.modules import tk, ttk, ttkthemes
 class Navigate:
     def __init__(self, text: tk.Text):
         self.text: EnhancedText = text
-        if self.text.navigate or self.text.searchable:
+        if self.text.navigate or self.text.search:
             return
         self.text.navigate = True
         self.goto_frame = ttk.Frame(self.text.frame)

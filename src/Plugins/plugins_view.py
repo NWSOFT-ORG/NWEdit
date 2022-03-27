@@ -19,11 +19,20 @@ class PluginView(WinFrame):
         self.update_plugins()
 
     def update_plugins(self):
-        node = self.plugins.insert("", "end", values=("Bundled", "Comes with PyPlus, you cannot uninstall."), open=True)
+        node = self.plugins.insert(
+            "",
+            "end",
+            values=("Bundled", "Comes with PyPlus, you cannot uninstall."),
+            open=True,
+        )
         docs = []
         for index, item in enumerate(self.settings.keys()):
-            exec(f"""\
+            exec(
+                f"""\
 from src.{self.settings[item]} import Plugin
 doc = Plugin.__doc__
-docs.append(doc)""", locals(), globals())
+docs.append(doc)""",
+                locals(),
+                globals(),
+            )
             self.plugins.insert(node, "end", values=(item, docs[index]))

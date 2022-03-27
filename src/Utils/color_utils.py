@@ -1,13 +1,6 @@
-"""Useful functions"""
-
-from src.constants import textchars
-from src.modules import (iskeyword)
+"""Provides convenient color utilities"""
 
 DARK_COLOR = 128
-
-
-def is_binary_string(byte) -> bool:
-    return bool(byte.translate(None, textchars))
 
 
 def hex2dec(hex_code) -> int:
@@ -36,12 +29,12 @@ def is_dark_color(hex_code) -> bool:
     return False
 
 
-def darken_color(hex_code, red, green, blue) -> str:
+def darken_color(hex_code, decrement) -> str:
     hex_code = hex_code[1:]
     rgb = (
-        hex2dec(hex_code[:2]) - red,
-        hex2dec(hex_code[2:4]) - green,
-        hex2dec(hex_code[4:]) - blue,
+        hex2dec(hex_code[:2]) - decrement,
+        hex2dec(hex_code[2:4]) - decrement,
+        hex2dec(hex_code[4:]) - decrement,
     )
     value = "#"
     for x in rgb:
@@ -49,28 +42,14 @@ def darken_color(hex_code, red, green, blue) -> str:
     return value
 
 
-def lighten_color(hex_code, red, green, blue) -> str:
+def lighten_color(hex_code, increment) -> str:
     hex_code = hex_code[1:]
     rgb = (
-        hex2dec(hex_code[:2]) + red,
-        hex2dec(hex_code[2:4]) + green,
-        hex2dec(hex_code[4:]) + blue,
+        hex2dec(hex_code[:2]) + increment,
+        hex2dec(hex_code[2:4]) + increment,
+        hex2dec(hex_code[4:]) + increment,
     )
     value = "#"
     for x in rgb:
         value += dec2hex(x)[2:]
     return value
-
-
-def is_valid_name(name):
-    return name.isidentifier() and not iskeyword(name)
-
-
-def run_in_terminal(*args, **kwargs):
-    # FIXME: Replace with browser embed
-    print(args, kwargs)
-
-
-def open_system_shell(*args, **kwargs):
-    # FIXME: Replace with browser embed
-    print(args, kwargs)

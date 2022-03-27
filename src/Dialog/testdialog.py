@@ -1,7 +1,7 @@
 from src.Dialog.commondialog import InputStringDialog, YesNoDialog
 from src.modules import os, tk, ttk, json, lexers
 from src.Widgets.tktext import EnhancedTextFrame, TextOpts
-from src.functions import is_valid_name, run_in_terminal
+from src.Utils.functions import is_valid_name, run_in_terminal
 from src.constants import APPDIR
 from src.settings import RunCommand
 
@@ -13,8 +13,8 @@ class TestDialog(ttk.Frame):
     def __init__(self, parent, path):
         super().__init__(parent)
         parent.forget(parent.panes()[0])
-        self.pack(fill='both', expand=1)
-        parent.insert('0', self)
+        self.pack(fill="both", expand=1)
+        parent.insert("0", self)
         self.path = path = path
         self.tests_listbox = ttk.Treeview(self, show="tree")
         yscroll = ttk.Scrollbar(self, command=self.tests_listbox.yview)
@@ -36,7 +36,7 @@ class TestDialog(ttk.Frame):
             side="left"
         )
         self.button_frame.pack(side="bottom")
-        
+
         self.cmd_settings_class = RunCommand()
 
     def refresh_tests(self):
@@ -213,12 +213,12 @@ class TestMain(unittest.TestCase):
     def {key}():
 {values}
 """
-        res += '''
+        res += """
 if __name__ == '__main__':
-    unittest.main()'''
+    unittest.main()"""
         with open(os.path.join(self.path, "test.py"), "w") as f:
             f.write(res)
             filename = f.name
-            
-        cmd = self.cmd_settings_class.get_settings('py')
+
+        cmd = self.cmd_settings_class.get_settings("py")
         run_in_terminal(f"{cmd} {filename} && exit", cwd=APPDIR)

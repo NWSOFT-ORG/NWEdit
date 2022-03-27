@@ -1,14 +1,14 @@
 """Closable ttk.Notebook"""
 from src.constants import logger
-from src.functions import is_dark_color, lighten_color
+from src.Utils.color_utils import is_dark_color, lighten_color
 from src.modules import tk, ttk, ttkthemes
 from src.settings import GeneralSettings
 from src.Widgets.statusbar import bind_events
 
 
 class ClosableNotebook(ttk.Notebook):
-    """A ttk Notebook with close buttons on each tab
-    images drawn by me using the mspaint app (the rubbish in many people's opinion)
+    """A ttk Notebook with close buttons on each tab's
+    image drawn by me using the mspaint app (the rubbish in many people's opinion)
 
     Change the layout, makes it look like this:
     +------------+
@@ -49,27 +49,26 @@ class ClosableNotebook(ttk.Notebook):
 
     def add_frame(self):
         self.tab_frame = tab_frame = ttk.Frame(self)
-        tab_frame.place(relx=1.0, x=0, y=1, anchor='ne')
+        tab_frame.place(relx=1.0, x=0, y=1, anchor="ne")
 
-        ttk.Separator(tab_frame, orient='vertical').pack(
-            side='left', fill='y', padx=2)
+        ttk.Separator(tab_frame, orient="vertical").pack(side="left", fill="y", padx=2)
 
         prev_tab_label = ttk.Label(tab_frame, image=self.prevtab_icon)
         prev_tab_label.image = self.prevtab_icon
         prev_tab_label.bind("<1>", self.prevtab)
-        prev_tab_label.pack(side='left')
+        prev_tab_label.pack(side="left")
 
         next_tab_label = ttk.Label(tab_frame, image=self.nexttab_icon)
         next_tab_label.image = self.nexttab_icon
         next_tab_label.bind("<1>", self.nexttab)
-        next_tab_label.pack(side='left')
+        next_tab_label.pack(side="left")
 
-        ttk.Separator(tab_frame, orient='vertical').pack(side='left', fill='y', padx=2)
+        ttk.Separator(tab_frame, orient="vertical").pack(side="left", fill="y", padx=2)
 
         allitems_label = ttk.Label(tab_frame, image=self.alltabs_icon)
         allitems_label.image = self.alltabs_icon
         allitems_label.bind("<1>", self.show_tab_menu)
-        allitems_label.pack(side='left')
+        allitems_label.pack(side="left")
 
         bind_events(prev_tab_label)
         bind_events(next_tab_label)
@@ -78,19 +77,21 @@ class ClosableNotebook(ttk.Notebook):
     def show_tab_menu(self, event):
         tab_menu = tk.Menu(self.master)
         for tab in self.tabs():
-            tab_menu.add_command(label=self.tab(tab, option="text"),
-                                 command=lambda temp=tab: self.select(temp))
+            tab_menu.add_command(
+                label=self.tab(tab, option="text"),
+                command=lambda temp=tab: self.select(temp),
+            )
         tab_menu.tk_popup(event.x_root, event.y_root)
 
     def prevtab(self, _=None):
         try:
-            self.select(self.index('current') - 1)
+            self.select(self.index("current") - 1)
         except tk.TclError:
             pass
 
     def nexttab(self, _=None):
         try:
-            self.select(self.index('current') + 1)
+            self.select(self.index("current") + 1)
         except tk.TclError:
             pass
 
@@ -133,7 +134,7 @@ class ClosableNotebook(ttk.Notebook):
         except tk.TclError:
             pass
         style.configure(
-            "CustomNotebook.Tab", background=lighten_color(self.bg, 20, 20, 20)
+            "CustomNotebook.Tab", background=lighten_color(self.bg, 20)
         )
         style.layout(
             "CustomNotebook",
@@ -152,13 +153,13 @@ class ClosableNotebook(ttk.Notebook):
                 (
                     "CustomNotebook.tab",
                     {
-                        "sticky": "nswe",
+                        "sticky"  : "nswe",
                         "children": [
                             (
                                 "CustomNotebook.padding",
                                 {
-                                    "side": "top",
-                                    "sticky": "nswe",
+                                    "side"    : "top",
+                                    "sticky"  : "nswe",
                                     "children": [
                                         (
                                             "CustomNotebook.label",
@@ -183,9 +184,7 @@ class ClosableNotebook(ttk.Notebook):
             y = self.get_tab().winfo_y() - 5
 
             try:
-                self.insert(
-                    event.widget.index("@%d,%d" % (event.x, y)), self.select()
-                )
+                self.insert(event.widget.index("@%d,%d" % (event.x, y)), self.select())
             except tk.TclError:
                 return
 

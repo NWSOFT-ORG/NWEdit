@@ -44,10 +44,14 @@ class SplashWindow(tk.Toplevel):
         self.canvas.create_image(0, 0, anchor="nw", image=self.image)
 
         self.progressbar = ProgressBar(self)
-        self.set_section, self.set_progress = self.progressbar.set_sections, \
-                                              self.progressbar.set_progress
+        self.set_section, self.set_progress = (
+            self.progressbar.set_sections,
+            self.progressbar.set_progress,
+        )
 
-        master.createcommand("tk::mac::Quit", lambda: 0)  # Don't let the window close on start
+        master.createcommand(
+            "tk::mac::Quit", lambda: 0
+        )  # Don't let the window close on start
         self.protocol("WM_DELETE_WINDOW", lambda: 0)  # Sort of javascript:void(0);
         self.bind("<Destroy>", lambda _: master.deiconify())
 

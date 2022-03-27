@@ -24,29 +24,29 @@ class ReadonlyText(EnhancedTextFrame):
         style = styles.get_style_by_name(get_pygments())
         bgcolor = style.background_color
         fgcolor = "#f00"
-        self.text.configure(state='disabled',
-                            fg=fgcolor, bg=bgcolor,
-                            font=get_font())
+        self.text.configure(state="disabled", fg=fgcolor, bg=bgcolor, font=get_font())
 
     def insert(self, pos, text):
-        self.text.configure(state='normal')
+        self.text.configure(state="normal")
         self.text.insert(pos, text)
-        self.text.configure(state='disabled')
+        self.text.configure(state="disabled")
 
     def delete(self, pos1, pos2):
-        self.text.configure(state='normal')
+        self.text.configure(state="normal")
         self.text.delete(pos1, pos2)
-        self.text.configure(state='disabled')
+        self.text.configure(state="disabled")
 
 
 class ErrorReportDialog(WinFrame):
     def __init__(self, master: tk.Tk, error_name, error_message):
-        super().__init__(master, error_name)
+        super().__init__(master, error_name, closable=False)
         master.withdraw()
-        ttk.Label(self, text='Please consider reporting a bug on github.').pack(anchor='nw', fill='x')
+        ttk.Label(self, text="Please consider reporting a bug on github.").pack(
+            anchor="nw", fill="x"
+        )
         text = ReadonlyText(self)
-        text.insert('end', error_message)
-        text.pack(fill='both')
+        text.insert("end", error_message)
+        text.pack(fill="both")
 
         self.protocol("WM_DELETE_WINDOW", lambda: sys.exit(1))
         self.mainloop()
@@ -55,26 +55,26 @@ class ErrorReportDialog(WinFrame):
 class LogViewDialog(WinFrame):
     def __init__(self, master):
         super().__init__(master, "PyPlus Log")
-        self.title('Log view')
+        self.title("Log view")
         frame = ttk.Frame(self)
-        frame.pack(anchor='nw', fill='x')
-        ttk.Label(frame, text='Debug log').pack(anchor='nw', side='left')
-        ttk.Button(frame, text='Copy', command=self.copy_log).pack(side='right')
+        frame.pack(anchor="nw", fill="x")
+        ttk.Label(frame, text="Debug log").pack(anchor="nw", side="left")
+        ttk.Button(frame, text="Copy", command=self.copy_log, takefocus=False).pack(
+            side="right"
+        )
         self.log_text = ReadonlyText(self)
-        self.log_text.pack(fill='both', expand=1)
+        self.log_text.pack(fill="both", expand=1)
         self.log_text.after(10, self.update_log)
         self.mainloop()
 
     def update_log(self):
-        with open('pyplus.log') as f:
+        with open("pyplus.log") as f:
             log = f.read()
-        self.log_text.delete('1.0', 'end')
-        self.log_text.insert('end', log)
-        self.log_text.text.see('end')
+        self.log_text.delete("1.0", "end")
+        self.log_text.insert("end", log)
+        self.log_text.text.see("end")
         self.log_text.after(10, self.update_log)
 
     def copy_log(self):
         self.log_text.clipboard_clear()
-        self.log_text.clipboard_append(
-            self.log_text.get('1.0', 'end')
-        )
+        self.log_text.clipboard_append(self.log_text.get("1.0", "end"))

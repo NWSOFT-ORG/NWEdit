@@ -17,8 +17,8 @@ Also, it's cross-compatible!
 import traceback
 
 from src.Dialog.autocomplete import CompleteDialog
-from src.Dialog.commondialog import (ErrorInfoDialog, InputStringDialog, YesNoDialog)
-from src.Dialog.debugdialog import (ErrorReportDialog)
+from src.Dialog.commondialog import ErrorInfoDialog, InputStringDialog, YesNoDialog
+from src.Dialog.debugdialog import ErrorReportDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog, FileSaveAsDialog
 from src.Dialog.goto import Navigate
 from src.Dialog.splash import SplashWindow
@@ -29,7 +29,7 @@ from src.Widgets.hexview import HexView
 from src.Widgets.panel import CustomTabs
 from src.Widgets.statusbar import Statusbar
 from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
-from src.Widgets.treeview import FileTree
+from src.Widgets.treeview import FileTree, IconSettings
 from src.Widgets.winframe import WinFrame
 from src.codefunctions import CodeFunctions
 from src.constants import (
@@ -38,11 +38,8 @@ from src.constants import (
     OSX,
     logger,
 )
-from src.functions import (
-    is_binary_string,
-    is_dark_color,
-)
-from src.functions import lighten_color
+from src.Utils.functions import is_binary_string
+from src.Utils.color_utils import lighten_color, is_dark_color
 from src.highlighter import recolorize_line
 from src.modules import (
     Path,
@@ -73,11 +70,9 @@ os.chdir(APPDIR)
 class Document:
     """Helper class, for the editor."""
 
-    def __init__(self,
-                 frame=None,
-                 textbox=None,
-                 file_dir: str = '',
-                 istoolwin: bool = False) -> None:
+    def __init__(
+            self, frame=None, textbox=None, file_dir: str = "", istoolwin: bool = False
+    ) -> None:
         self.frame = frame
         self.file_dir = file_dir
         self.textbox = textbox
@@ -119,6 +114,8 @@ class Editor:
             splash.set_progress(3)
             self.bg = self.style.lookup("TLabel", "background")
             self.fg = self.style.lookup("TLabel", "foreground")
+
+            self.icon_settings_class = IconSettings()
             if is_dark_color(self.bg):
                 self.close_icon = tk.PhotoImage(file="Images/close.gif")
                 self.open_icon = tk.PhotoImage(file="Images/open.gif")
@@ -143,7 +140,7 @@ class Editor:
             self.panedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.panedwin.pack(fill="both", expand=1)
             self.mainframe = ttk.Frame(self.master)
-            self.mainframe.pack(fill='both', expand=1)
+            self.mainframe.pack(fill="both", expand=1)
             self.panedwin.add(self.mainframe)
             splash.set_progress(6)
 
@@ -153,7 +150,9 @@ class Editor:
             logger.debug("Layout created")
             splash.set_progress(7)
 
-            self.codefuncs = CodeFunctions(self.master, self.tabs, self.nb, self.bottom_tabs)
+            self.codefuncs = CodeFunctions(
+                self.master, self.tabs, self.nb, self.bottom_tabs
+            )
 
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
@@ -186,25 +185,27 @@ class Editor:
 
         except Exception:
             logger.exception("Error when initializing:")
-            ErrorReportDialog(self.master, 'Error when starting.', traceback.format_exc())
+            ErrorReportDialog(
+                self.master, "Error when starting.", traceback.format_exc()
+            )
             exit(1)
 
     def left_panel(self):
         self.left_tabs = CustomTabs(self.panedwin)
         self.filetree = FileTree(self.left_tabs, self.open_file)
         self.panedwin.insert(0, self.left_tabs)
-        self.left_tabs.add(self.filetree, text='Files')
+        self.left_tabs.add(self.filetree, text="Files")
 
     def bottom_panel(self):
         self.bottom_panedwin = ttk.Panedwindow(self.mainframe)
 
         self.nb = ClosableNotebook(self.bottom_panedwin, self.close_tab)
-        self.nb.event_add('<<Click>>', '<1>')
+        self.nb.event_add("<<Click>>", "<1>")
         self.nb.bind("<<Click>>", self.click_tab)
 
         self.nb.enable_traversal()
 
-        self.bottom_panedwin.pack(side='bottom', fill='both', expand=1)
+        self.bottom_panedwin.pack(side="bottom", fill="both", expand=1)
         self.bottom_panedwin.add(self.nb, weight=4)
         self.bottom_tabs = CustomTabs(self.bottom_panedwin)
         self.bottom_panedwin.add(self.bottom_tabs, weight=1)
@@ -230,11 +231,11 @@ class Editor:
         logger.debug("Bindings created")
 
     def start_screen(self) -> None:
-        frame = WinFrame(self.master, 'Start', closable=False)
+        frame = WinFrame(self.master, "Start", closable=False)
 
-        canvas_bg = lighten_color(self.bg, 10, 10, 10)
+        canvas_bg = lighten_color(self.bg, 10)
         first_tab = tk.Canvas(frame, background=canvas_bg, highlightthickness=0)
-        first_tab.icon = tk.PhotoImage(file='Images/pyplus-35px.gif')
+        first_tab.icon = tk.PhotoImage(file="Images/pyplus-35px.gif")
         frame.add_widget(first_tab)
 
         first_tab.create_image(20, 20, anchor="nw", image=first_tab.icon)
@@ -294,8 +295,10 @@ class Editor:
         label3.bind("<Button>", lambda _: self.git("clone"))
 
         for y_index, item in enumerate(links):
-            first_tab.create_window(50, 100 + (y_index - 1) * 40, window=item, anchor="nw")
-            item.bind('<Button>', lambda _: frame.destroy(), add=True)
+            first_tab.create_window(
+                50, 100 + (y_index - 1) * 40, window=item, anchor="nw"
+            )
+            item.bind("<Button>", lambda _: frame.destroy(), add=True)
 
         logger.debug("Start screen created")
 
@@ -351,7 +354,7 @@ class Editor:
             self.statusbar.label3.config(text=f"Line {ln} Col {col}")
             logger.debug("update_statusbar: OK")
         except KeyError:
-            self.statusbar.label3.config(text='')
+            self.statusbar.label3.config(text="")
             logger.exception("Error:")
         finally:
             return "break"
@@ -464,12 +467,8 @@ class Editor:
             textbox.set_lexer(self.file_settings_class.get_settings(extens))
             textbox.lint_cmd = self.linter_settings_class.get_settings(extens)
             textbox.cmd = self.cmd_settings_class.get_settings(extens)
-            textbox.format_command = self.format_settings_class.get_settings(
-                extens
-            )
-            textbox.comment_marker = self.comment_settings_class.get_settings(
-                extens
-            )
+            textbox.format_command = self.format_settings_class.get_settings(extens)
+            textbox.comment_marker = self.comment_settings_class.get_settings(extens)
 
             textbox.see("insert")
             textbox.event_generate("<<Key>>")
@@ -481,7 +480,7 @@ class Editor:
             return textbox
         except Exception as e:
             name = type(e).__name__
-            if name == 'IsADirectoryError':
+            if name == "IsADirectoryError":
                 pass
             elif name != "ValueError":
                 logger.exception("Error when opening file:")
@@ -538,7 +537,7 @@ class Editor:
                 # Otherwise, close the tab based on coordinates of center-click.
                 else:
                     try:
-                        index = event.widget.index("@%d,%d" % (event.x, event.y))
+                        index = event.widget.index(f"@{event.x},{event.y}")
                         selected_tab = self.nb.nametowidget(self.nb.tabs()[index])
                     except tk.TclError:
                         return

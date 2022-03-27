@@ -83,7 +83,9 @@ class InputStringDialog(WinFrame):
 
 
 class ErrorInfoDialog(WinFrame):
-    def __init__(self, parent: [tk.Misc, str] = None, text: str = None, title: str = "Error"):
+    def __init__(
+        self, parent: [tk.Misc, str] = None, text: str = None, title: str = "Error"
+    ):
         self.text = text
         super().__init__(parent, title)
         label1 = ttk.Label(self, text=self.text)
@@ -142,11 +144,11 @@ class AboutDialog:
         if not popup:
             os.remove("ver.json")
             return [version != VERSION, newest["url"]]
-        updatewin = WinFrame(self.master, "Updates")
+        updatewin = WinFrame(self.master, "Updates", closable=False)
         if version != VERSION:
-            ttk.Label(updatewin, text="Update available!", font="tkDefaultFont 30").pack(
-                fill="both"
-            )
+            ttk.Label(
+                updatewin, text="Update available!", font="tkDefaultFont 30"
+            ).pack(fill="both")
             ttk.Label(updatewin, text=version).pack(fill="both")
             ttk.Label(updatewin, text=newest["details"]).pack(fill="both")
             url = newest["url"]
@@ -154,8 +156,8 @@ class AboutDialog:
                 updatewin, text="Get this update", command=lambda: webbrowser.open(url)
             ).pack()
         else:
-            ttk.Label(updatewin, text="No updates available", font="tkDefaultFont 30").pack(
-                fill="both"
-            )
+            ttk.Label(
+                updatewin, text="No updates available", font="tkDefaultFont 30"
+            ).pack(fill="both")
         os.remove("ver.json")
         updatewin.mainloop()

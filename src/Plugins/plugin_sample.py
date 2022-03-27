@@ -22,5 +22,9 @@ class Plugin:  # Every Plugin main file should be a class called 'Plugin'
     def __init__(self, master):
         self.menu = tk.Menu(master)
         self.menu.add_command(label="Testing", command=lambda: main(master))
-        self.PLUGIN_DATA = {"name": "Sample", "menu": self.menu, "onstart": lambda: None}
+        self.PLUGIN_DATA = {
+            "name": "Sample",
+            "menu": self.menu,
+            "onstart": lambda: None,
+        }
         # Should be {"name": "...", "menu": tk.Menu, "onstart": callable, "cascade": bool}

@@ -34,7 +34,7 @@ class GeneralSettings:
                     )
 
         with zipfile.ZipFile(
-                os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
+            os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
         ) as zipobj:
             zipdir("Config/", zipobj)
         ErrorInfoDialog(title="Done", text="Settings backed up.")
@@ -94,11 +94,10 @@ class GeneralSettings:
             label="Run Command Settings",
             command=lambda: open_file("Config/cmd-settings.json"),
         )
+        menu.add_command(label="Backup Settings to...", command=self.zipsettings)
         menu.add_command(
-            label="Backup Settings to...", command=self.zipsettings
-        )
-        menu.add_command(
-            label="Load Settings from...", command=lambda _: self.unzipsettings(self.master)
+            label="Load Settings from...",
+            command=lambda _: self.unzipsettings(self.master),
         )
         return menu
 
@@ -164,11 +163,15 @@ class Plugins:
         plugins = []
         for value in self.settings.values():
             try:
-                exec(f"""\
+                exec(
+                    f"""\
 from src.{value} import Plugin
 p = Plugin(self.master)
 plugins.append(p.PLUGIN_DATA)
-del Plugin""", locals(), globals())
+del Plugin""",
+                    locals(),
+                    globals(),
+                )
             except ModuleNotFoundError:
                 logger.exception("Error, can't parse plugin settings:")
         for plugin in plugins:
@@ -177,5 +180,7 @@ del Plugin""", locals(), globals())
     @property
     def create_tool_menu(self):
         self.tool_menu.add_separator()
-        self.tool_menu.add_command(label="Manage Plugins...", command=lambda: PluginView(self.master))
+        self.tool_menu.add_command(
+            label="Manage Plugins...", command=lambda: PluginView(self.master)
+        )
         return self.tool_menu

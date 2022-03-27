@@ -1,5 +1,5 @@
 from src.constants import OSX
-from src.functions import is_dark_color
+from src.Utils.color_utils import is_dark_color
 from src.modules import ttk, tk, ttkthemes, json
 
 
@@ -17,32 +17,37 @@ def get_bg():
 
 
 class WinFrame(tk.Toplevel):
-    def __init__(self, master: [tk.Tk, tk.Toplevel, str], title: str, disable: bool = True, closable: bool = True):
-        super().__init__(master)
-        # alert, moveableAlert, modal, moveableModal, floating, document, utility, help, sheet, toolbar, plain, overlay, sheetAlert, altPlain, simple, or drawer
+    def __init__(
+        self,
+        master: [tk.Tk, tk.Toplevel, str],
+        title: str,
+        disable: bool = True,
+        closable: bool = True,
+    ):
+        super().__init__(master, takefocus=True)
         if OSX:
-            self.tk.call("::tk::unsupported::MacWindowStyle", "style", self._w, "alert")
+            self.tk.call(
+                "::tk::unsupported::MacWindowStyle", "style", self._w, "simple"
+            )
         else:
-            self.create_titlebar()
-            if closable:
-                self.close_button()
-                self.bind("<Escape>", lambda _: self.destroy())
-            self.window_bindings()
+            self.overrideredirect(True)
 
         self.title_text = title
         self.title(title)  # Need a decent message to show on the taskbar
         self.master = master
         self.bg = get_bg()
+        self.create_titlebar()
+        if closable:
+            self.close_button()
+            self.bind("<Escape>", lambda _: self.destroy())
+        self.window_bindings()
 
         if disable:
             self.wait_visibility(self)
             self.grab_set()  # Linux WMs might fail to grab the window
 
-        self.focus_set()
+        self.focus_force()
         self.attributes("-topmost", True)
-        self.master.bind("<FocusIn>", lambda _: self.attributes("-topmost", True))
-        # Put it on topmost if the root is active
-        self.master.bind("<FocusOut>", lambda _: self.attributes("-topmost", False))
         self.bind("<Destroy>", self.on_exit)
 
         size = ttk.Sizegrip(self)
@@ -54,23 +59,23 @@ class WinFrame(tk.Toplevel):
         self.master.bind("<FocusIn>", lambda _: None)
         self.master.bind("<FocusOut>", lambda _: None)
         self.grab_release()
-        self.destroy()
 
     def create_titlebar(self):
         self.titleframe = ttk.Frame(self)
         self.titlebar = ttk.Label(self.titleframe, text=self.title_text)
-        self.titlebar.pack(side='left', fill='both', expand=1)
+        self.titlebar.pack(side="left", fill="both", expand=1)
 
-        self.titleframe.pack(fill='x', side='top')
+        self.titleframe.pack(fill="x", side="top")
 
     def add_widget(self, child_frame):
         self.child_frame = child_frame
-        self.child_frame.pack(fill='both', expand=True)
+        self.child_frame.pack(fill="both", expand=True)
 
     def window_bindings(self):
         self.titlebar.bind("<ButtonPress-1>", self.start_move)
         self.titlebar.bind("<ButtonRelease-1>", self.stop_move)
         self.titlebar.bind("<B1-Motion>", self.do_move)
+        self.master.bind("<FocusIn>", lambda _: self.focus_force())
 
     def start_move(self, event):
         self.x = event.x
@@ -81,7 +86,7 @@ class WinFrame(tk.Toplevel):
         self.y = None
 
     def do_move(self, event):
-        x = (event.x - self.x + self.winfo_x())
+        x = event.x - self.x + self.winfo_x()
         y = event.y - self.y + self.winfo_y()
         self.geometry(f"+{x}+{y}")
 
@@ -95,13 +100,13 @@ class WinFrame(tk.Toplevel):
 
     def close_button(self):
         if is_dark_color(self.bg):
-            close_icon = tk.PhotoImage(file='Images/close.gif')
+            close_icon = tk.PhotoImage(file="Images/close.gif")
         else:
-            close_icon = tk.PhotoImage(file='Images/close-dark.gif')
+            close_icon = tk.PhotoImage(file="Images/close-dark.gif")
 
         close_button = ttk.Label(self.titleframe)
         close_button.image = close_icon
         close_button.config(image=close_icon)
-        close_button.pack(side='left')
+        close_button.pack(side="left")
 
-        close_button.bind('<ButtonRelease>', lambda _: self.destroy())
+        close_button.bind("<ButtonRelease>", lambda _: self.destroy())

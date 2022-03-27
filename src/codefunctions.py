@@ -1,11 +1,12 @@
-from src.modules import (tk, ttk, ttkthemes, os, subprocess, lexers, Path)
-from src.functions import (is_dark_color, run_in_terminal, open_system_shell)
-from src.Dialog.commondialog import (get_theme, ErrorInfoDialog)
+from src.modules import tk, ttk, ttkthemes, os, subprocess, lexers, Path
+from src.Utils.color_utils import is_dark_color
+from src.Utils.functions import run_in_terminal, open_system_shell
+from src.Dialog.commondialog import get_theme, ErrorInfoDialog
 from src.Dialog.search import Search
 from src.Widgets.console import Console
 from src.Dialog.codelistdialog import CodeListDialog
-from src.constants import (WINDOWS, logger, APPDIR, LINT_BATCH, RUN_BATCH)
-from src.highlighter import (recolorize, create_tags)
+from src.constants import WINDOWS, logger, APPDIR, LINT_BATCH, RUN_BATCH
+from src.highlighter import recolorize, create_tags
 
 
 class CodeFunctions:
@@ -41,40 +42,37 @@ class CodeFunctions:
     def create_menu(self):
         codemenu = tk.Menu(self.master)
         codemenu.add_command(
-            label="Run",
-            command=self.run,
-            image=self.run_icon,
-            compound='left'
+            label="Run", command=self.run, image=self.run_icon, compound="left"
         )
         codemenu.add_command(
             label="Lint",
             command=self.lint_source,
             image=self.lint_icon,
-            compound='left'
+            compound="left",
         )
         codemenu.add_command(
             label="Auto-format",
             command=self.autopep,
             image=self.format_icon,
-            compound='left'
+            compound="left",
         )
         codemenu.add_command(
             label="Open System Shell",
             command=self.system_shell,
             image=self.term_icon,
-            compound='left'
+            compound="left",
         )
         codemenu.add_command(
             label="Python Shell",
             command=self.python_shell,
             image=self.pyterm_icon,
-            compound='left'
+            compound="left",
         )
         codemenu.add_command(
             label="Find and replace",
             command=self.search,
             image=self.search_icon,
-            compound='left'
+            compound="left",
         )
         codemenu.add_command(
             label="Code Structure",
@@ -139,8 +137,8 @@ class CodeFunctions:
             "<KeyRelease>", lambda _=None: recolorize(main_window.text)
         )
         main_window.pack(fill="both", expand=1)
-        shell_frame.pack(fill='both', expand=1)
-        curr_tab.add(shell_frame, text='Python Shell')
+        shell_frame.pack(fill="both", expand=1)
+        curr_tab.add(shell_frame, text="Python Shell")
 
     def lint_source(self) -> None:
         if not self.tabs:

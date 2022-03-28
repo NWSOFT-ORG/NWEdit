@@ -5,13 +5,14 @@ from src.constants import OSX
 
 if __name__ == "__main__":
     if OSX:
+        # noinspection PyUnresolvedReferences
         from Foundation import NSBundle
 
         bundle = NSBundle.mainBundle()
         if bundle:
             info = bundle.localizedInfoDictionary() or bundle.infoDictionary()
-            if info and info['CFBundleName'] == 'Python':
-                info['CFBundleName'] = "PyPlus"
+            if info:
+                info["CFBundleName"] = "PyPlus"
     root = tk.Tk()
 
     editor.Editor(master=root)  # Starts the Editor

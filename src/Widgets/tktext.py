@@ -50,7 +50,7 @@ class TextLineNumbers(tk.Canvas):
                     fill=lighten_color(self.textwidget["fg"], 40),
                     font=self.textwidget["font"],
                 )
-            i = self.textwidget.index("%s+1line" % i)
+            i = self.textwidget.index(f"{i}+1line")
 
     def redraw(self, first: int) -> None:
         """redraw line numbers"""
@@ -73,7 +73,7 @@ class TextLineNumbers(tk.Canvas):
                 fill=self.textwidget["fg"],
                 font=self.textwidget["font"],
             )
-            i = self.textwidget.index("%s+1line" % i)
+            i = self.textwidget.index(f"{i}+1line")
 
 
 class EnhancedText(tk.Text):

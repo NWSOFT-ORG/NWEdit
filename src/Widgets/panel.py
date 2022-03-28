@@ -16,7 +16,7 @@ class CustomTabs(ClosableNotebook):
             # Otherwise close the tab based on coordinates of center-click.
             else:
                 try:
-                    index = event.widget.index("@%d,%d" % (event.x, event.y))
+                    index = event.widget.index(f"@{event.x},{event.y}")
                     selected_tab = self.nametowidget(self.tabs()[index])
                 except tk.TclError:
                     return

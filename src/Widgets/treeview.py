@@ -69,19 +69,26 @@ class FileTree(ttk.Frame):
         self.tree.tag_configure("subfolder", foreground="#448dc4")
         italic = font.Font(self)
         italic.config(slant="italic")
-        self.tree.tag_configure("empty", font=italic)
+        self.tree.tag_configure("empty", font=italic, foreground="#C2FF74")
 
         self.tree.pack(fill="both", expand=1, anchor="nw")
         self.tree.bind("<<TreeviewOpen>>", self.open_dir)
 
     def remove(self, item):
-        path = self.get_path(item)
-        send2trash.send2trash(path)
+        path = self.get_path(item, True)
+        try:
+            send2trash.send2trash(path)  # Send to trash is a good idea if possible
+        except (send2trash.TrashPermissionError, OSError):
+            # Linux OSs might have problems with the trash bin
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+            else:
+                os.remove(path)
         self.refresh_tree()
 
     def rename(self, event):
         try:
-            path = self.get_path(event)
+            path = self.get_path(event, True)
             dialog = InputStringDialog(self.master, "Rename", "New name:")
             newdir = os.path.join(self.path, dialog.result)
             shutil.move(path, newdir)
@@ -91,7 +98,7 @@ class FileTree(ttk.Frame):
 
     def get_info(self, item, is_path=False):
         if not is_path:
-            path = f"{self.get_path(item)}/{self.tree.item(item, 'text')}"
+            path = self.get_path(item, True)
         else:
             path = self.tree.item(item, "text")
         basename = os.path.basename(path)
@@ -101,18 +108,18 @@ class FileTree(ttk.Frame):
             size += " Bytes"
         elif int(size) / 1024 >= 1 <= 2:
             size = f"{int(size) // 1024} Kilobytes"
-        elif int(size) / 1024**2 >= 1 <= 2:
+        elif int(size) / 1024 ** 2 >= 1 <= 2:
             size = f"{int(size) // 1024 ** 2} Megabytes"
-        elif int(size) / 1024**3 >= 1 <= 2:
+        elif int(size) / 1024 ** 3 >= 1 <= 2:
             size = f"{int(size) // 1024 ** 3} Gigabytes"
-        elif int(size) / 1024**4 >= 1 <= 2:
+        elif int(size) / 1024 ** 4 >= 1 <= 2:
             size = f"{int(size) // 1024 ** 4} Terabytes"
         # It can go on and on, but the newest PCs won't have more than a PB storage
         #      /-------------/|
-        #     /			    / /
-        #    /  SSD		   / /
-        #   /   10 TB  	  / /
-        #  /	    	 / /
+        #     /                / /
+        #    /  SSD           / /
+        #   /   10 TB        / /
+        #  /             / /
         # /             / /
         # \=============\/
         mdate = f"Last modified: {time.ctime(os.path.getmtime(path))}"
@@ -147,8 +154,8 @@ class FileTree(ttk.Frame):
                 os.mkdir(path)
             except FileExistsError:
                 if YesNoDialog(
-                    title="This directory already exsists!",
-                    text="Do you want to overwrite?",
+                        title="This directory already exsists!",
+                        text="Do you want to overwrite?",
                 ).result:
                     shutil.rmtree(path, ignore_errors=True)
                     os.mkdir(path)
@@ -244,14 +251,8 @@ class FileTree(ttk.Frame):
     def on_double_click_treeview(self, event, destroy: bool = False):
         tree = self.tree
         item = tree.identify("item", event.x, event.y)
-        name = tree.item(item, "text")
-        self.temp_path = []
-        self.get_parent(item)
-        self.temp_path.reverse()
-        self.temp_path.remove("")
-        self.temp_path = os.path.abspath("/".join(self.temp_path))
-        self.opencommand(os.path.join(self.temp_path, name))
-        self.temp_path = []
+        name = self.get_path(item, True)
+        self.opencommand(name)
         if destroy:
             self.master.destroy()
 
@@ -264,11 +265,13 @@ class FileTree(ttk.Frame):
         if parent_text:
             self.get_parent(parent_iid)
 
-    def get_path(self, item):
+    def get_path(self, item, append_name: bool = False):
         self.temp_path = []
         self.get_parent(item)
         self.temp_path.reverse()
         self.temp_path.remove("")
+        if append_name:
+            self.temp_path.append(self.tree.item(item, "text"))
         return os.path.abspath("/".join(self.temp_path))
 
     def right_click(self, event):
@@ -287,6 +290,7 @@ class FileTree(ttk.Frame):
         menu.add_cascade(menu=new_cascade, label="New...")
         menu.add_separator()
         menu.add_command(label="Get Info", command=lambda: self.get_info(item, is_path))
+        menu.add_command(label="Move to Trash", command=lambda: self.remove(item))
         menu.add_separator()
         menu.add_command(label="Refresh", command=self.refresh_tree)
 

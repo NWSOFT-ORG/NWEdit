@@ -100,7 +100,7 @@ class ClosableNotebook(ttk.Notebook):
 
         element = self.identify(event.x, event.y)
         if "close" in element:
-            index = self.index("@%d,%d" % (event.x, event.y))
+            index = self.index(f"@{event.x},{event.y}")
             self.state(["pressed"])
             self._active = index
         else:
@@ -114,7 +114,7 @@ class ClosableNotebook(ttk.Notebook):
                 return
 
             element = self.identify(event.x, event.y)
-            index = self.index("@%d,%d" % (event.x, event.y))
+            index = self.index(f"@{event.x},{event.y}")
 
             if "close" in element and self._active == index:
                 self.cmd(event)
@@ -133,9 +133,7 @@ class ClosableNotebook(ttk.Notebook):
             style.element_create("close", "image", "img_close", border=10, sticky="")
         except tk.TclError:
             pass
-        style.configure(
-            "CustomNotebook.Tab", background=lighten_color(self.bg, 20)
-        )
+        style.configure("CustomNotebook.Tab", background=lighten_color(self.bg, 20))
         style.layout(
             "CustomNotebook",
             [
@@ -184,7 +182,7 @@ class ClosableNotebook(ttk.Notebook):
             y = self.get_tab().winfo_y() - 5
 
             try:
-                self.insert(event.widget.index("@%d,%d" % (event.x, y)), self.select())
+                self.insert(event.widget.index(f"@{event.x},{y}"), self.select())
             except tk.TclError:
                 return
 

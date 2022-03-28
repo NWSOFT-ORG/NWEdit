@@ -332,11 +332,14 @@ class Editor:
 
     def update_title(self, _=None) -> str:
         try:
+            path = self.tabs[self.nb.get_tab()].file_dir
             if self.tabs[self.nb.get_tab()].istoolwin:
                 self.master.title("PyPlus")
                 logger.debug("update_title: Finished early")
                 return "break"
-            self.master.title(f"PyPlus -- {self.tabs[self.nb.get_tab()].file_dir}")
+            if OSX:
+                self.master.attributes("-titlepath", path)
+            self.master.title(f"PyPlus — {path}")
         except KeyError:
             self.master.title("PyPlus")
         finally:

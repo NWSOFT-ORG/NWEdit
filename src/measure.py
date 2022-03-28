@@ -17,4 +17,4 @@ try:
             "Command taken {} seconds.".format(round(float(second) - float(first), 2))
         )
 except IndexError:
-    print("This script needs a parameter.")
+    sys.stderr.write("This script needs a parameter.\n")

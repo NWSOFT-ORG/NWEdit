@@ -1,4 +1,5 @@
 from src.Dialog.commondialog import get_theme
+from src.Widgets.tkentry import Entry
 from src.Widgets.tktext import EnhancedText
 from src.modules import tk, ttk, ttkthemes
 
@@ -14,7 +15,7 @@ class Navigate:
         self._style.set_theme(get_theme())
         self.goto_frame.pack(anchor="nw")
         ttk.Label(self.goto_frame, text="Go to place: [Ln].[Col] ").pack(side="left")
-        self.place = tk.Entry(self.goto_frame)
+        self.place = Entry(self.goto_frame)
         self.place.focus_set()
         self.place.pack(side="left", anchor="nw")
         ttk.Button(self.goto_frame, command=self._goto, text=">> Go to").pack(

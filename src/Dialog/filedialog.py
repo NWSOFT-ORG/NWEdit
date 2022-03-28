@@ -1,7 +1,8 @@
 from src.Dialog.commondialog import get_theme
+from src.Widgets.tkentry import Entry
 from src.Widgets.treeview import FileTree
 from src.Widgets.winframe import WinFrame
-from src.modules import os, ttk, ttkthemes, tk
+from src.modules import os, ttk, ttkthemes
 
 
 class FileOpenDialog(FileTree):
@@ -18,7 +19,7 @@ class FileOpenDialog(FileTree):
         self.cancelbtn.pack(side="right")
         self.buttonframe.pack(side="bottom", anchor="nw")
         self.entryframe = ttk.Frame(self.win)
-        self.pathentry = tk.Entry(self.entryframe)
+        self.pathentry = Entry(self.entryframe)
         self.pathentry.pack(side="left")
         self.set_path_btn = ttk.Button(
             self.entryframe, command=self.set_path, text="Go", takefocus=False

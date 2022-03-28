@@ -1,4 +1,5 @@
 from src.modules import tk, ttk, art, sys, io
+from src.Widgets.tkentry import Entry
 from src.Widgets.winframe import WinFrame
 
 
@@ -24,7 +25,7 @@ class StyleWindow(WinFrame):
 
         self.text = text
 
-        self.entry = tk.Entry(self)
+        self.entry = Entry(self)
         self.entry.pack(fill="x")
         self.entry.insert("end", "Hello, World")
 

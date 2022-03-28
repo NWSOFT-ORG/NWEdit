@@ -3,6 +3,8 @@ from src.modules import tk, ttk, ttkthemes, os, threading
 from src.Dialog.search import finditer_withlineno, find_all
 import re
 
+from src.Widgets.tkentry import Entry
+
 
 def list_all(directory):
     itemslist = os.listdir(directory)
@@ -38,7 +40,7 @@ class SearchInDir(ttk.Frame):
 
         self.found = {}
         ttk.Label(self, text="Search: ").pack(side="top", anchor="nw", fill="y")
-        self.content = tk.Entry(self)
+        self.content = Entry(self)
         self.content.pack(side="top", fill="both")
         ttk.Button(
             self,

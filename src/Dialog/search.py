@@ -1,5 +1,6 @@
 from src.Dialog.commondialog import get_theme
 from src.Utils.color_utils import is_dark_color
+from src.Widgets.tkentry import Entry
 from src.Widgets.tktext import EnhancedText
 from src.modules import tk, ttk, ttkthemes
 import re
@@ -88,7 +89,7 @@ class Search:
         ttk.Label(self.search_frame, text="Search for:").pack(
             side="left", anchor="nw", fill="y"
         )
-        self.content = tk.Entry(self.search_frame)
+        self.content = Entry(self.search_frame)
         self.content.pack(side="left", fill="both")
 
         self.forward = ttk.Button(
@@ -116,7 +117,7 @@ class Search:
         ttk.Label(self.replace_frame, text="Replace with:").pack(
             side="left", anchor="nw", fill="y"
         )
-        self.replace_with = tk.Entry(self.replace_frame)
+        self.replace_with = Entry(self.replace_frame)
         self.replace_with.pack(side="left", fill="both")
 
         self.replace_all_button = ttk.Button(

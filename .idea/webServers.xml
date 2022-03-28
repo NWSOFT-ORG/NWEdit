@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="6be149d2-5f49-4d9e-b988-9eb8afda5d9e" name="vagrant@localhost:2222" url="http:///">
+        <fileTransfer accessType="SFTP" host="localhost" port="2222" sshConfigId="684fd038-caf2-4da9-965f-4e1fe355434e" sshConfig="vagrant@localhost:2222 key" keyPair="true" />
+      </webServer>
+    </option>
+  </component>
+</project>

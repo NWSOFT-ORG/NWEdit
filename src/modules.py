@@ -30,6 +30,7 @@ from pygments import styles
 from keyword import iskeyword
 import art
 import send2trash
+import mimetypes
 
 if sys.platform == "darwin":
     import PyTouchBar

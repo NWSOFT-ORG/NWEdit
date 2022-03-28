@@ -1,6 +1,7 @@
 from src.Widgets.winframe import WinFrame
+from src.Widgets.tkentry import Entry
 from src.constants import VERSION, logger
-from src.modules import json, tk, ttk, ttkthemes, os, webbrowser, request
+from src.modules import json, tk, ttk, os, webbrowser, request
 
 
 def download_file(url, localfile="") -> str:
@@ -58,7 +59,7 @@ class InputStringDialog(WinFrame):
     def __init__(self, parent=".", title="", text=""):
         super().__init__(parent, title)
         ttk.Label(self, text=text).pack(fill="x")
-        self.entry = tk.Entry(self)
+        self.entry = Entry(self)
         self.entry.pack(fill="x", expand=1)
         box = ttk.Frame(self)
 
@@ -84,7 +85,7 @@ class InputStringDialog(WinFrame):
 
 class ErrorInfoDialog(WinFrame):
     def __init__(
-        self, parent: [tk.Misc, str] = None, text: str = None, title: str = "Error"
+            self, parent: [tk.Misc, str] = None, text: str = None, title: str = "Error"
     ):
         self.text = text
         super().__init__(parent, title)

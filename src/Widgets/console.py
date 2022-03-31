@@ -61,7 +61,7 @@ class Console(ttk.Frame):
         self.command_running = False
         self.exit_callback = exit_callback
 
-        # replace all input and output
+        # replace all inputs and outputs
         sys.stdout = Pipe()
         sys.stderr = Pipe()
         sys.stdin = Pipe()
@@ -142,8 +142,8 @@ class Console(ttk.Frame):
 
 class ConsoleText(tk.Text):
     """
-    A Text widget which handles some application logic,
-    e.g. having a line of input at the end with everything else being un-editable"""
+    A Text widget that handles some application logic,
+    e.g., having a line of input at the end with everything else being un-editable"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -165,7 +165,7 @@ class ConsoleText(tk.Text):
         # used when inserting command output and errors
         self.mark_set("prompt_end", 1.0)
 
-        # keep track of where user input/commands start and the committed text ends
+        # keep track of where user input/commands starts, and the committed text ends
         self.committed_hash = None
         self.committed_text_backup = ""
         self.commit_all()
@@ -178,17 +178,17 @@ class ConsoleText(tk.Text):
         self.mark_gravity("prompt_end", "right")
 
     def commit_all(self):
-        """Mark all text as committed"""
+        """Mark all texts as committed"""
         self.commit_to("end-1c")
 
     def commit_to(self, pos):
-        """Mark all text up to a certain position as committed"""
+        """Mark all texts up to a certain position as committed"""
         if self.index(pos) in (self.index("end-1c"), self.index("end")):
             # don't let text become un-committed
             self.mark_set("committed_text", "end-1c")
             self.mark_gravity("committed_text", "left")
         else:
-            # if text is added before the last prompt (">>> "),
+            # if the text is added before the last prompt (">>> "),
             # update the stored position of the tag
             for i, (tag_name, _, _) in reversed(list(enumerate(self.console_tags))):
                 if tag_name == "prompt":
@@ -201,7 +201,7 @@ class ConsoleText(tk.Text):
         self.committed_text_backup = self.get_committed_text()
 
     def get_committed_text_hash(self):
-        """Get the hash of the committed area -
+        """Get the hash of the committed area —
         used for detecting an attempt to edit it"""
         return hashlib.md5(self.get_committed_text().encode()).digest()
 

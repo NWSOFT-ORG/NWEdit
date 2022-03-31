@@ -1,4 +1,5 @@
-from src.Dialog.commondialog import InputStringDialog, YesNoDialog
+from src.Dialog.codeinputdialog import CodeInputDialog
+from src.Dialog.commondialog import StringInputDialog, YesNoDialog
 from src.modules import os, tk, ttk, json, lexers
 from src.Widgets.tktext import EnhancedTextFrame, TextOpts
 from src.Utils.functions import is_valid_name, run_in_terminal
@@ -10,12 +11,11 @@ SETTINGS_FILE = ".PyPlus/Tests/settings.json"
 
 
 class TestDialog(ttk.Frame):
-    def __init__(self, parent, path):
+    def __init__(self, parent: ttk.Notebook, path):
         super().__init__(parent)
-        parent.forget(parent.panes()[0])
         self.pack(fill="both", expand=1)
-        parent.insert("0", self)
-        self.path = path = path
+        parent.add(self, text="Unit testing")
+        self.path = path
         self.tests_listbox = ttk.Treeview(self, show="tree")
         yscroll = ttk.Scrollbar(self, command=self.tests_listbox.yview)
         yscroll.pack(side="right", fill="y")
@@ -101,9 +101,9 @@ class TestDialog(ttk.Frame):
         imports = EnhancedTextFrame(settingswin)
         setup = EnhancedTextFrame(settingswin)
         teardown = EnhancedTextFrame(settingswin)
-        TextOpts(bindkey=True).set_text(imports.text)
-        TextOpts(bindkey=True).set_text(setup.text)
-        TextOpts(bindkey=True).set_text(teardown.text)
+        TextOpts(settingswin, bindkey=True).set_text(imports.text)
+        TextOpts(settingswin, bindkey=True).set_text(setup.text)
+        TextOpts(settingswin, bindkey=True).set_text(teardown.text)
         imports.text["height"] = 3
         setup.text["height"] = 3
         teardown.text["height"] = 3
@@ -128,34 +128,15 @@ class TestDialog(ttk.Frame):
         settingswin.mainloop()
 
     def new(self):
-        dialog = InputStringDialog(self, "New", "Name")
+        dialog = StringInputDialog(self, "New", "Name")
         name = dialog.result
         if not name:
             return
         name = "test_" + name
         if not is_valid_name(name):
             return
-        codewin = tk.Toplevel(self)
-        codewin.title(name)
-        codewin.transient(self)
-        textframe = EnhancedTextFrame(codewin)
-        text = textframe.text
-        text.lexer = lexers.get_lexer_by_name("Python")
-        TextOpts(bindkey=True).set_text(text)
-        textframe.pack(fill="both", expand=1)
-        button_frame = ttk.Frame(codewin)
-
-        def save_and_close():
-            self.modify_test(name, text.get("1.0", "end"))
-            codewin.destroy()
-            self.refresh_tests()
-
-        okbtn = ttk.Button(button_frame, text="OK", command=save_and_close)
-        okbtn.pack(side="left")
-        cancelbtn = ttk.Button(button_frame, text="Cancel", command=codewin.destroy)
-        cancelbtn.pack(side="left")
-        button_frame.pack(fill="x")
-        codewin.mainloop()
+        win = CodeInputDialog(self, name, lambda: self.modify_test(name, win.text.get("1.0", "end")))
+        self.refresh_tests()
 
     def delete(self):
         sel = self.tests_listbox.item(self.tests_listbox.focus(), "text")
@@ -170,27 +151,10 @@ class TestDialog(ttk.Frame):
         name = self.tests_listbox.item(self.tests_listbox.focus(), "text")
         if not name:
             return
-        codewin = tk.Toplevel(self)
-        codewin.title(name)
-        codewin.transient(self)
-        textframe = EnhancedTextFrame(codewin)
-        text: tk.Text = textframe.text
-        text.lexer = lexers.get_lexer_by_name("Python")
-        text.insert("end", self.method_list[name])
-        TextOpts(bindkey=True).set_text(text)
-        textframe.pack(fill="both", expand=1)
-        button_frame = ttk.Frame(codewin)
+        win = CodeInputDialog(self, f"Editing {name}", lambda: self.modify_test(name, win.text.get("1.0", "end")))
+        win.text.insert("end", self.method_list[name])
+        win.mainloop()
 
-        def save_and_close():
-            self.modify_test(name, text.get("1.0", "end"))
-            codewin.destroy()
-
-        okbtn = ttk.Button(button_frame, text="OK", command=save_and_close)
-        okbtn.pack(side="left")
-        cancelbtn = ttk.Button(button_frame, text="Cancel", command=codewin.destroy)
-        cancelbtn.pack(side="left")
-        button_frame.pack(fill="x")
-        codewin.mainloop()
         self.refresh_tests()
 
     def run_test(self):

@@ -13,9 +13,13 @@ class FileInfoDialog(WinFrame):
         cdate = f"Created: {time.ctime(os.path.getctime(path))}"
         mime_type = f"MIME: {self.mime_type}"
 
-        ttk.Label(self, text=f"Name: {basename}").pack(side="top", anchor="nw", fill="x")
+        ttk.Label(self, text=f"Name: {basename}").pack(
+            side="top", anchor="nw", fill="x"
+        )
         ttk.Label(self, text=f"Path: {path}").pack(side="top", anchor="nw", fill="x")
-        ttk.Label(self, text=f"Size: {self.size}").pack(side="top", anchor="nw", fill="x")
+        ttk.Label(self, text=f"Size: {self.size}").pack(
+            side="top", anchor="nw", fill="x"
+        )
         ttk.Label(self, text=mime_type).pack(side="top", anchor="nw", fill="x")
         ttk.Separator(self).pack(fill="x")
         ttk.Label(self, text=mdate).pack(side="top", anchor="nw", fill="x")

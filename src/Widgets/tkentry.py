@@ -8,7 +8,15 @@ class Entry(ttk.Frame):
         self.bg = bg = style.lookup("TLabel", "background")
         self.fg = fg = style.lookup("TLabel", "foreground")
 
-        self.entry = tk.Entry(self, bg=bg, fg=fg, insertbackground=fg, insertwidth=3, highlightthickness=0, bd=0)
+        self.entry = tk.Entry(
+            self,
+            bg=bg,
+            fg=fg,
+            insertbackground=fg,
+            insertwidth=3,
+            highlightthickness=0,
+            bd=0,
+        )
         self.entry.pack(fill="x", expand=True)
         self.entry.focus_set()
 
@@ -28,3 +36,9 @@ class Entry(ttk.Frame):
 
     def entry_on_focus_out(self, _):
         self.border.config(bg=self.bg)
+
+    def get(self):
+        return self.entry.get()
+
+    def insert(self, pos: str = "end", text: str = ""):
+        self.entry.insert(pos, text)

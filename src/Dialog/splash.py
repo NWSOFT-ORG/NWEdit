@@ -2,7 +2,7 @@ from src.modules import tk, EditorErr
 
 
 class ProgressBar(tk.Canvas):
-    def __init__(self, master: tk.Toplevel):
+    def __init__(self, master: tk.Toplevel) -> None:
         """A slim progressbar for the splash loading"""
         super().__init__(master, highlightthickness=0, bd=0, bg="black", height=5)
         self.master = master
@@ -10,11 +10,14 @@ class ProgressBar(tk.Canvas):
         self.update()
         self.width = self.winfo_width()
 
-    def set_sections(self, sections: int):
+        self.sections = 1
+        self.width_per_sec = 0
+
+    def set_sections(self, sections: int) -> None:
         self.sections = sections
         self.width_per_sec = self.width // sections
 
-    def set_progress(self, number: int):
+    def set_progress(self, number: int) -> None:
         if number > self.sections:
             raise EditorErr("Section id is too big!")
         self.create_line(0, 0, self.width_per_sec * number, 0, width=5, fill="white")
@@ -25,7 +28,7 @@ class ProgressBar(tk.Canvas):
 
 
 class SplashWindow(tk.Toplevel):
-    def __init__(self, master: tk.Tk):
+    def __init__(self, master: tk.Tk) -> None:
         """The splash window, which welcomes user to use PyPlus"""
         super().__init__(master, cursor="watch")
         self.title("")
@@ -55,7 +58,7 @@ class SplashWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", lambda: 0)  # Sort of javascript:void(0);
         self.bind("<Destroy>", lambda _: master.deiconify())
 
-    def place_center(self):
+    def place_center(self) -> None:
         screen_height = self.winfo_screenheight()
         screen_width = self.winfo_screenwidth()
         offset_x = (screen_width - self.w) // 2

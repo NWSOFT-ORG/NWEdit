@@ -2,8 +2,15 @@
 <module version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/Dialog" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Git" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Menu" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Plugins" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Utils" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Widgets" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/src/Backups" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10 (PyPlus)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -11,5 +18,17 @@
   <component name="PyDocumentationSettings">
     <option name="format" value="PLAIN" />
     <option name="myDocStringFormat" value="Plain" />
+  </component>
+  <component name="PyNamespacePackagesService">
+    <option name="namespacePackageFolders">
+      <list>
+        <option value="$MODULE_DIR$/src/Dialog" />
+        <option value="$MODULE_DIR$/src/Git" />
+        <option value="$MODULE_DIR$/src/Menu" />
+        <option value="$MODULE_DIR$/src/Plugins" />
+        <option value="$MODULE_DIR$/src/Utils" />
+        <option value="$MODULE_DIR$/src/Widgets" />
+      </list>
+    </option>
   </component>
 </module>

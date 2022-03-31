@@ -14,10 +14,12 @@
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 Also, it's cross-compatible!
 """
+import json
+import sys
 import traceback
 
 from src.Dialog.autocomplete import CompleteDialog
-from src.Dialog.commondialog import ErrorInfoDialog, InputStringDialog, YesNoDialog
+from src.Dialog.commondialog import ErrorInfoDialog, StringInputDialog, YesNoDialog
 from src.Dialog.debugdialog import ErrorReportDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog, FileSaveAsDialog
 from src.Dialog.goto import Navigate
@@ -86,6 +88,9 @@ class Editor:
     def __init__(self, master) -> None:
         """The editor object, the entire thing that goes in the
         window."""
+        empty_menu = tk.Menu(master)
+        master.config(menu=empty_menu)
+        # Create an empty menu to prevent mess-ups
         splash = SplashWindow(master)
         splash.set_section(10)
         self.master = master
@@ -212,7 +217,7 @@ class Editor:
 
     def click_tab(self, _=None):
         try:
-            self.opts.set_text(self.get_text())
+            self.opts.set_text(self.get_text)
         except AttributeError:
             pass
 
@@ -290,7 +295,7 @@ class Editor:
         links = [label1, label2, label3, label4]
 
         label1.bind("<Button>", lambda _: self.open_file())
-        label2.bind("<Button>", self.filetree.new_file)
+        label2.bind("<Button>", lambda _: self.filetree.new_file(*self.decide_new_file))
         label4.bind("<Button>", lambda _: frame.destroy())
         label3.bind("<Button>", lambda _: self.git("clone"))
 
@@ -301,6 +306,20 @@ class Editor:
             item.bind("<Button>", lambda _: frame.destroy(), add=True)
 
         logger.debug("Start screen created")
+
+    @property
+    def decide_new_file(self) -> tuple:
+        """Decide where the element should go to"""
+        selected = self.filetree.tree.focus()
+        if not selected:
+            selected = self.filetree.root_node
+            isdir = True
+        else:
+            path = self.filetree.get_path(selected, True)
+            isdir = os.path.isdir(path)
+            print(path)
+        print(selected, isdir)
+        return selected, isdir
 
     def create_text_widget(self, frame: ttk.Frame) -> EnhancedText:
         """Creates a text widget in a frame."""
@@ -322,18 +341,18 @@ class Editor:
         textbox.bind(("<Button-2>" if OSX else "<Button-3>"), self.right_click)
         textbox.bind(f"<{MAIN_KEY}-b>", self.codefuncs.run)
         textbox.bind(f"<{MAIN_KEY}-f>", self.codefuncs.search)
-        textbox.bind(f"<{MAIN_KEY}-n>", self.filetree.new_file)
-        textbox.bind(f"<{MAIN_KEY}-N>", lambda _=None: Navigate(self.get_text()))
+        textbox.bind(f"<{MAIN_KEY}-n>", lambda _: self.filetree.new_file(*self.decide_new_file))
+        textbox.bind(f"<{MAIN_KEY}-N>", lambda _: Navigate(self.get_text))
         textbox.bind(f"<{MAIN_KEY}-r>", self.reload)
-        textbox.bind(f"<{MAIN_KEY}-S>", lambda _=None: self.save_as())
+        textbox.bind(f"<{MAIN_KEY}-S>", lambda _: self.save_as())
         textbox.focus_set()
         logger.debug("Textbox created")
         return textbox
 
     def update_title(self, _=None) -> str:
         try:
-            path = self.tabs[self.nb.get_tab()].file_dir
-            if self.tabs[self.nb.get_tab()].istoolwin:
+            path = self.tabs[self.nb.get_tab].file_dir
+            if self.tabs[self.nb.get_tab].istoolwin:
                 self.master.title("PyPlus")
                 logger.debug("update_title: Finished early")
                 return "break"
@@ -350,7 +369,7 @@ class Editor:
             if not self.tabs:
                 self.statusbar.label3.config(text="")
                 return "break"
-            currtext = self.get_text()
+            currtext = self.get_text
             index = currtext.index("insert")
             ln = index.split(".")[0]
             col = index.split(".")[1]
@@ -365,7 +384,7 @@ class Editor:
     def key(self, _=None) -> None:
         """Event when a key is pressed."""
         try:
-            currtext = self.get_text()
+            currtext = self.get_text
             recolorize_line(currtext)
             currtext.edit_separator()
             currtext.see("insert")
@@ -392,12 +411,14 @@ class Editor:
             logger.exception("Error when handling mouse event:")
 
     def reopen_files(self):
-        with open("Backups/recent_files.txt") as f:
-            if not f.read().strip():
+        with open("Backups/recent_files.json") as f:
+            files_list = json.load(f)
+            if not files_list:
                 self.start_screen()
                 return
-            for line in f.read().split("\n"):
-                self.open_file(line, askhex=False)
+            for file, cur_pos in files_list.items():
+                self.open_file(file, askhex=False)
+                self.tabs[self.nb.get_tab].textbox.mark_set("insert", cur_pos)
         with open("Backups/recent_dir.txt") as f:
             self.filetree.path = f.read()
             self.filetree.refresh_tree()
@@ -451,9 +472,9 @@ class Editor:
                     if dialog.result:
                         self.open_hex(file)
                     logging.info("User pressed No.")
-                    return self.get_text()
+                    return self.get_text
                 self.open_hex(file)
-                return self.get_text()
+                return self.get_text
 
             extens = file.split(".")[-1]
             new_tab = ttk.Frame(self.nb)
@@ -498,7 +519,7 @@ class Editor:
             else:
                 FileSaveAsDialog(self.master, self.save_as)
                 return
-            curr_tab = self.nb.get_tab()
+            curr_tab = self.nb.get_tab
             if not file_dir:
                 return
 
@@ -512,7 +533,7 @@ class Editor:
     def save_file(self, _=None) -> None:
         """Save an *existing* file"""
         try:
-            curr_tab = self.nb.get_tab()
+            curr_tab = self.nb.get_tab
             if not os.path.exists(self.tabs[curr_tab].file_dir):
                 self.save_as()
                 return
@@ -536,7 +557,7 @@ class Editor:
                 # Close the current tab if close is selected from file menu, or
                 # keyboard shortcut.
                 if event is None or event.type == str(2):
-                    selected_tab = self.nb.get_tab()
+                    selected_tab = self.nb.get_tab
                 # Otherwise, close the tab based on coordinates of center-click.
                 else:
                     try:
@@ -572,34 +593,36 @@ class Editor:
 
     def exit(self, force=False) -> None:
         with open("Backups/recent_dir.txt", "w") as f:
-            f.write(self.filetree.path)
-        with open("Backups/recent_files.txt", "w") as f:
-            file_list = ""
+            root_node = self.filetree.root_node
+            tree = self.filetree.tree
+
+            path = tree.item(root_node, "text")
+            f.write(path)
+        with open("Backups/recent_files.json", "w") as f:
+            file_list = {}
             for tab in self.tabs.values():
-                file_list += tab.file_dir + "\n"
-            f.write(file_list)
+                cursor_pos = tab.textbox.index("insert")
+                file_list[tab.file_dir] = cursor_pos
+            json.dump(file_list, f)
         if not force:
-            self.master.destroy()
             logger.info("Window is destroyed")
-        else:
-            self.master.destroy()
+        sys.exit(0)
 
-    def restart(self) -> None:
-        self.exit(force=False)
-        newtk = tk.Tk()
-        self.__init__(newtk)
-        newtk.mainloop()
+    @staticmethod
+    def restart() -> None:
+        os.execv(sys.executable, [""] + sys.argv)
 
-    def get_text(self):
+    @property
+    def get_text(self) -> [EnhancedText, None]:
         try:
-            return self.tabs[self.nb.get_tab()].textbox
+            return self.tabs[self.nb.get_tab].textbox
         except KeyError:
             pass
 
     def git(self, action=None) -> None:
         currdir = self.filetree.path
         if action == "clone":
-            dialog = InputStringDialog(self.master, "Clone", "Remote git url:")
+            dialog = StringInputDialog(self.master, "Clone", "Remote git url:")
             url = dialog.result
             if not url:
                 return

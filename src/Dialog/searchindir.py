@@ -1,12 +1,9 @@
-from src.Dialog.commondialog import get_theme
-from src.modules import tk, ttk, ttkthemes, os, threading
-from src.Dialog.search import finditer_withlineno, find_all
-import re
-
+from src.Dialog.search import re_search
+from src.modules import os, threading, tk, ttk
 from src.Widgets.tkentry import Entry
 
 
-def list_all(directory):
+def list_all(directory: str) -> list:
     itemslist = os.listdir(directory)
     files = []
     for file in itemslist:
@@ -28,10 +25,6 @@ class SearchInDir(ttk.Frame):
         self.parent = parent
         self.path = path
         self.opencommand = opencommand
-        self._style = ttkthemes.ThemedStyle()
-        self._style.set_theme(get_theme())
-        bg = self._style.lookup("TLabel", "background")
-        fg = self._style.lookup("TLabel", "foreground")
 
         # Tkinter Variables
         self.case = tk.BooleanVar()
@@ -91,34 +84,6 @@ class SearchInDir(ttk.Frame):
 
         self.content.insert("end", "e")
 
-    def re_search(self, pat, text, nocase=False, full_word=False, regex=False):
-        if nocase and full_word:
-            res = [
-                (x[0], x[1])
-                for x in finditer_withlineno(
-                    r"\b" + re.escape(pat) + r"\b", text, (re.IGNORECASE, re.MULTILINE)
-                )
-            ]
-        elif full_word:
-            res = [
-                (x[0], x[1])
-                for x in finditer_withlineno(
-                    r"\b" + re.escape(pat) + r"\b", text, re.MULTILINE
-                )
-            ]
-        elif nocase and regex:
-            res = [
-                (x[0], x[1])
-                for x in finditer_withlineno(pat, text, (re.IGNORECASE, re.MULTILINE))
-            ]
-        elif regex:
-            res = [(x[0], x[1]) for x in finditer_withlineno(pat, text, re.MULTILINE)]
-        if nocase:
-            res = [(x[0], x[1]) for x in find_all(pat, text, case=False)]
-        else:
-            res = [(x[0], x[1]) for x in find_all(pat, text)]
-        return res
-
     def find(self, *_):
         path = self.path
         files = list_all(path)
@@ -137,7 +102,7 @@ class SearchInDir(ttk.Frame):
                 )
                 try:
                     with open(file, "rb") as f:
-                        matches = self.re_search(
+                        matches = re_search(
                             s,
                             f.read().decode("utf-8"),
                             nocase=not (self.case.get()),
@@ -148,7 +113,7 @@ class SearchInDir(ttk.Frame):
                 if not matches:
                     continue
                 self.found[file] = [
-                    ((f"{x[0][0]}.{x[0][1]}", f"{x[1][0]}.{x[1][1]}")) for x in matches
+                    (f"{x[0][0]}.{x[0][1]}", f"{x[1][0]}.{x[1][1]}") for x in matches
                 ]
             self.search_stat.config(text="Search Completed!")
             self.update_treeview()
@@ -158,14 +123,15 @@ class SearchInDir(ttk.Frame):
         self.tree.delete(*self.tree.get_children())
         found_list = self.found.keys()
         for k in found_list:
-            parent = self.tree.insert("", "end", text=k)
+            parent = self.tree.insert("", "end", text=k, open=True)
             for pos in self.found[k]:
-                self.tree.insert(parent, "end", text=" - ".join(pos))
+                pos = pos[0]
+                self.tree.insert(parent, "end", text=f"Line {pos}")
         self.search_stat.config(text="Finished! Press Search to search again.")
 
-    def on_double_click(self, _=None):
+    def on_double_click(self, event: tk.Event = None):
         try:
-            item = self.tree.focus()
+            item = self.tree.identify("item", event.x, event.y)
             text = self.tree.item(item, "text")
 
             if os.path.isfile(text):
@@ -181,5 +147,5 @@ class SearchInDir(ttk.Frame):
                 textbox.tag_add("sel", start, end)
                 textbox.mark_set("insert", start)
                 textbox.see("insert")
-        except Exception:
+        except tk.TclError:
             pass

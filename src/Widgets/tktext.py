@@ -23,13 +23,19 @@ class TextLineNumbers(tk.Canvas):
 
         i = self.textwidget.index("@0,0")
         w = len(self.textwidget.index("end-1c linestart"))
-        self.config(width=w * 10)
         while True:
             dline = self.textwidget.dlineinfo(i)
             if dline is None:
                 break
             y = dline[1]
             linenum = str(int(str(i).split(".")[0]) + first - 1)
+
+            light_fg = lighten_color(self.textwidget["fg"], 40)
+            dark_fg = darken_color(self.textwidget["fg"], 5)
+
+            test_font = font.Font(family=self.textwidget["font"], weight="bold")
+            width = test_font.measure("0" * w) + 3
+            self.config(width=width)
 
             if int(linenum) == int(float(line)):
                 bold = font.Font(family=self.textwidget["font"], weight="bold")
@@ -38,7 +44,7 @@ class TextLineNumbers(tk.Canvas):
                     y,
                     anchor="nw",
                     text=linenum,
-                    fill=self.textwidget["fg"],
+                    fill=light_fg,
                     font=bold,
                 )
             else:
@@ -47,7 +53,7 @@ class TextLineNumbers(tk.Canvas):
                     y,
                     anchor="nw",
                     text=linenum,
-                    fill=lighten_color(self.textwidget["fg"], 40),
+                    fill=dark_fg,
                     font=self.textwidget["font"],
                 )
             i = self.textwidget.index(f"{i}+1line")
@@ -116,9 +122,8 @@ class EnhancedText(tk.Text):
                 self.event_generate("<<Change>>", when="tail")
 
             # return what the actual widget returned
-
             return result
-        except Exception:
+        except tk.TclError:
             pass
 
 

@@ -179,12 +179,13 @@ class ClosableNotebook(ttk.Notebook):
 
     def move_tab(self, event: tk.Event) -> None:
         if self.index("end") > 1:
-            y = self.get_tab().winfo_y() - 5
+            y = self.get_tab.winfo_y() - 5
 
             try:
                 self.insert(event.widget.index(f"@{event.x},{y}"), self.select())
             except tk.TclError:
                 return
 
-    def get_tab(self):
+    @property
+    def get_tab(self) -> tk.Widget:
         return self.nametowidget(self.select())

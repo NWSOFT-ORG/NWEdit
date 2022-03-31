@@ -12,7 +12,7 @@ class CustomTabs(ClosableNotebook):
             # Close the current tab if close is selected from file menu, or
             # keyboard shortcut.
             if event is None or event.type == str(2):
-                selected_tab = self.get_tab()
+                selected_tab = self.get_tab
             # Otherwise close the tab based on coordinates of center-click.
             else:
                 try:

@@ -6,7 +6,7 @@ from src.modules import tk, ttk, ttkthemes
 import re
 
 
-def finditer_withlineno(pattern, string, flags=0):
+def finditer_withlineno(pattern, string, flags: [re.RegexFlag, int] = 0) -> iter:
     """
     A version of re.finditer that returns '(match, line_number)' pairs.
     """
@@ -35,7 +35,7 @@ def finditer_withlineno(pattern, string, flags=0):
         )
 
 
-def find_all(sub, string, case=True):
+def find_all(sub: str, string: str, case: bool = True):
     start = 0
     if not case:
         sub = sub.lower()
@@ -54,6 +54,35 @@ def find_all(sub, string, case=True):
             (lines_ahead + 1, end - newline_offset - 1),
         )
         start = end
+
+
+def re_search(pat, text, nocase=False, full_word=False, regex=False):
+    if nocase and full_word:
+        res = [
+            (x[0], x[1])
+            for x in finditer_withlineno(
+                r"\b" + re.escape(pat) + r"\b", text, (re.IGNORECASE | re.MULTILINE)
+            )
+        ]
+    elif full_word:
+        res = [
+            (x[0], x[1])
+            for x in finditer_withlineno(
+                r"\b" + re.escape(pat) + r"\b", text, re.MULTILINE
+            )
+        ]
+    elif nocase and regex:
+        res = [
+            (x[0], x[1])
+            for x in finditer_withlineno(pat, text, (re.IGNORECASE | re.MULTILINE))
+        ]
+    elif regex:
+        res = [(x[0], x[1]) for x in finditer_withlineno(pat, text, re.MULTILINE)]
+    elif nocase:
+        res = [(x[0], x[1]) for x in find_all(pat, text, case=False)]
+    else:
+        res = [(x[0], x[1]) for x in find_all(pat, text)]
+    return res
 
 
 class Search:
@@ -162,42 +191,13 @@ class Search:
 
         self.master.add(self.main_frame, text="Search")
 
-    @staticmethod
-    def re_search(pat, text, nocase=False, full_word=False, regex=False):
-        if nocase and full_word:
-            res = [
-                (x[0], x[1])
-                for x in finditer_withlineno(
-                    r"\b" + re.escape(pat) + r"\b", text, (re.IGNORECASE | re.MULTILINE)
-                )
-            ]
-        elif full_word:
-            res = [
-                (x[0], x[1])
-                for x in finditer_withlineno(
-                    r"\b" + re.escape(pat) + r"\b", text, re.MULTILINE
-                )
-            ]
-        elif nocase and regex:
-            res = [
-                (x[0], x[1])
-                for x in finditer_withlineno(pat, text, (re.IGNORECASE | re.MULTILINE))
-            ]
-        elif regex:
-            res = [(x[0], x[1]) for x in finditer_withlineno(pat, text, re.MULTILINE)]
-        elif nocase:
-            res = [(x[0], x[1]) for x in find_all(pat, text, case=False)]
-        else:
-            res = [(x[0], x[1]) for x in find_all(pat, text)]
-        return res
-
     def find(self, *_):
         text = self.text
         text.tag_remove("found", "1.0", "end")
         s = self.content.get()
         self.starts.clear()
         if s:
-            matches = self.re_search(
+            matches = re_search(
                 s,
                 text.get("1.0", "end"),
                 nocase=not (self.case.get()),

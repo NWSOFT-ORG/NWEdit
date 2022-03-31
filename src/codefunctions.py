@@ -7,10 +7,17 @@ from src.Widgets.console import Console
 from src.Dialog.codelistdialog import CodeListDialog
 from src.constants import WINDOWS, logger, APPDIR, LINT_BATCH, RUN_BATCH
 from src.highlighter import recolorize, create_tags
+from src.Widgets.customenotebook import ClosableNotebook
 
 
 class CodeFunctions:
-    def __init__(self, master, tabs, nb, bottomframe):
+    def __init__(
+            self,
+            master: tk.Misc,
+            tabs: dict,
+            nb: ClosableNotebook,
+            bottomframe: ttk.Notebook,
+    ) -> None:
         self.nb = nb
         self.tabs = tabs
         self.master = master
@@ -34,12 +41,12 @@ class CodeFunctions:
             self.format_icon = tk.PhotoImage(file="Images/format.gif")
         self.run_icon = tk.PhotoImage(file="Images/run.gif")
 
-    def code_struct(self):
-        text = self.tabs[self.nb.get_tab()].textbox
+    def code_struct(self) -> None:
+        text = self.tabs[self.nb.get_tab].textbox
         CodeListDialog(self.bottomframe, text)
 
     @property
-    def create_menu(self):
+    def create_menu(self) -> tk.Menu:
         codemenu = tk.Menu(self.master)
         codemenu.add_command(
             label="Run", command=self.run, image=self.run_icon, compound="left"
@@ -82,7 +89,7 @@ class CodeFunctions:
 
     def search(self, _=None) -> None:
         bottomframe = self.bottomframe
-        Search(bottomframe, self.tabs[self.nb.get_tab()].textbox)
+        Search(bottomframe, self.tabs[self.nb.get_tab].textbox)
 
     def run(self, _=None) -> None:
         """Runs the file
@@ -97,8 +104,8 @@ class CodeFunctions:
                         (
                             RUN_BATCH.format(
                                 dir=APPDIR,
-                                file=self.tabs[self.nb.get_tab()].file_dir,
-                                cmd=self.tabs[self.nb.get_tab()].textbox.cmd,
+                                file=self.tabs[self.nb.get_tab].file_dir,
+                                cmd=self.tabs[self.nb.get_tab].textbox.cmd,
                             )
                         )
                     )
@@ -109,16 +116,17 @@ class CodeFunctions:
                         (
                             RUN_BATCH.format(
                                 dir=APPDIR,
-                                file=self.tabs[self.nb.get_tab()].file_dir,
-                                cmd=self.tabs[self.nb.get_tab()].textbox.cmd,
+                                file=self.tabs[self.nb.get_tab].file_dir,
+                                cmd=self.tabs[self.nb.get_tab].textbox.cmd,
                                 script_dir=Path(
-                                    self.tabs[self.nb.get_tab()].file_dir
+                                    self.tabs[self.nb.get_tab].file_dir
                                 ).parent,
                             )
                         )
                     )
                 run_in_terminal("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
-        except Exception:
+        except Exception as e:
+            print(e)
             ErrorInfoDialog(self.master, "This language is not supported.")
 
     @staticmethod
@@ -144,13 +152,13 @@ class CodeFunctions:
         if not self.tabs:
             return
         try:
-            if self.tabs[self.nb.get_tab()].textbox.lint_cmd:
-                currdir = self.tabs[self.nb.get_tab()].file_dir
+            if self.tabs[self.nb.get_tab].textbox.lint_cmd:
+                currdir = self.tabs[self.nb.get_tab].file_dir
                 if WINDOWS:
                     with open("lint.bat", "w") as f:
                         f.write(
                             LINT_BATCH.format(
-                                cmd=self.tabs[self.nb.get_tab()].textbox.lint_cmd
+                                cmd=self.tabs[self.nb.get_tab].textbox.lint_cmd
                             )
                         )
                     subprocess.call(f'lint.bat "{currdir}"', shell=True)
@@ -159,7 +167,7 @@ class CodeFunctions:
                     with open("lint.sh", "w") as f:
                         f.write(
                             LINT_BATCH.format(
-                                cmd=self.tabs[self.nb.get_tab()].textbox.lint_cmd
+                                cmd=self.tabs[self.nb.get_tab].textbox.lint_cmd
                             )
                         )
                     subprocess.call(
@@ -175,8 +183,8 @@ class CodeFunctions:
     def autopep(self) -> None:
         """Auto Pretty-Format the document"""
         try:
-            currtext = self.tabs[self.nb.get_tab()].textbox
-            currdir = self.tabs[self.nb.get_tab()].file_dir
+            currtext = self.tabs[self.nb.get_tab].textbox
+            currdir = self.tabs[self.nb.get_tab].file_dir
             if currtext.format_command:
                 subprocess.Popen(
                     f'{currtext.format_command} "{currdir}" > {os.devnull}', shell=True

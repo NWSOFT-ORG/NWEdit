@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebResourcesPaths">
+    <contentEntries>
+      <entry url="file://$PROJECT_DIR$">
+        <entryData>
+          <resourceRoots>
+            <path value="file://$PROJECT_DIR$/src/Config" />
+            <path value="file://$PROJECT_DIR$/src/empty" />
+            <path value="file://$PROJECT_DIR$/src/Images" />
+            <path value="file://$PROJECT_DIR$/src/LangSupport" />
+            <path value="file://$PROJECT_DIR$/venv" />
+            <path value="file://$PROJECT_DIR$/src/Backups" />
+            <path value="file://$PROJECT_DIR$/.vagrant" />
+          </resourceRoots>
+        </entryData>
+      </entry>
+    </contentEntries>
+  </component>
+</project>

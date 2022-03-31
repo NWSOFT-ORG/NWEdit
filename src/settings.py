@@ -1,8 +1,10 @@
+import pygments.lexer
+
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog
 from src.Plugins.plugins_view import PluginView
 from src.constants import APPDIR, logger
-from src.modules import EditorErr, Path, json, lexers, os, sys, zipfile, tk
+from src.modules import EditorErr, Path, json, lexers, os, sys, zipfile, tk, pygments
 from json import JSONDecodeError
 
 
@@ -103,7 +105,9 @@ class GeneralSettings:
 
 
 class ExtensionSettings:
-    def __init__(self, path):
+    """An inheratiable class"""
+
+    def __init__(self, path: str) -> None:
         with open(path) as f:
             all_settings = json.load(f)
         self.extens = []
@@ -112,7 +116,7 @@ class ExtensionSettings:
             self.extens.append(key)
             self.items.append(value)
 
-    def get_settings(self, extension):
+    def get_settings(self, extension) -> [str, None]:
         try:
             if self.items[self.extens.index(extension)] == "none":
                 return None
@@ -122,10 +126,10 @@ class ExtensionSettings:
 
 
 class Lexer(ExtensionSettings):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Config/lexer-settings.json")
 
-    def get_settings(self, extension: str):
+    def get_settings(self, extension: str) -> pygments.lexer.Lexer:
         try:
             return lexers.get_lexer_by_name(self.items[self.extens.index(extension)])
         except ValueError:
@@ -133,33 +137,33 @@ class Lexer(ExtensionSettings):
 
 
 class Linter(ExtensionSettings):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Config/linter-settings.json")
 
 
 class FormatCommand(ExtensionSettings):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Config/format-settings.json")
 
 
 class RunCommand(ExtensionSettings):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Config/cmd-settings.json")
 
 
 class CommentMarker(ExtensionSettings):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Config/comment-markers.json")
 
 
 class Plugins:
-    def __init__(self, master):
+    def __init__(self, master) -> None:
         self.master = master
         self.tool_menu = tk.Menu(self.master)
         with open("Config/plugin-data.json") as f:
             self.settings = json.load(f)
 
-    def load_plugins(self):
+    def load_plugins(self) -> None:
         plugins = []
         for value in self.settings.values():
             try:
@@ -178,7 +182,7 @@ del Plugin""",
             self.tool_menu.add_cascade(label=plugin["name"], menu=plugin["menu"])
 
     @property
-    def create_tool_menu(self):
+    def create_tool_menu(self) -> tk.Menu:
         self.tool_menu.add_separator()
         self.tool_menu.add_command(
             label="Manage Plugins...", command=lambda: PluginView(self.master)

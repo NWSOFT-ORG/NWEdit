@@ -3,21 +3,21 @@
 DARK_COLOR = 128
 
 
-def hex2dec(hex_code) -> int:
+def hex2dec(hex_code: str) -> int:
     hex_code = str(hex_code)
     if hex_code.startswith("#"):
         hex_code = hex_code[1:]
     return int(hex_code, 16)
 
 
-def dec2hex(dec, color_code: bool = False) -> str:
+def dec2hex(dec: int, color_code: bool = False) -> str:
     dec = hex(dec)
     if color_code:
         dec = "#" + dec[2:]
     return dec
 
 
-def is_dark_color(hex_code) -> bool:
+def is_dark_color(hex_code: str) -> bool:
     if hex_code.startswith("#"):
         hex_code = hex_code[1:]
     if (

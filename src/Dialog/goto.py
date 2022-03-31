@@ -5,8 +5,8 @@ from src.modules import tk, ttk, ttkthemes
 
 
 class Navigate:
-    def __init__(self, text: tk.Text):
-        self.text: EnhancedText = text
+    def __init__(self, text: EnhancedText):
+        self.text = text
         if self.text.navigate or self.text.search:
             return
         self.text.navigate = True
@@ -35,7 +35,7 @@ class Navigate:
             return False
         return True
 
-    def _goto(self):
+    def _goto(self) -> None:
         try:
             if self.check():
                 currtext = self.text

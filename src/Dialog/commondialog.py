@@ -4,7 +4,7 @@ from src.constants import VERSION, logger
 from src.modules import json, tk, ttk, os, webbrowser, request
 
 
-def download_file(url, localfile="") -> str:
+def download_file(url: str, localfile="") -> str:
     """Downloads a file from remote path"""
     localfile = url.split("/")[-1] if not localfile else localfile
     request.urlretrieve(url, localfile)
@@ -12,20 +12,22 @@ def download_file(url, localfile="") -> str:
 
 
 # Need these because importing settings is a circular import
-def get_theme():
+def get_theme() -> str:
     with open("Config/general-settings.json") as f:
         settings = json.load(f)
     return settings["theme"]
 
 
-def get_font():
+def get_font() -> None:
     with open("Config/general-settings.json") as f:
         settings = json.load(f)
     return settings["font"]
 
 
 class YesNoDialog(WinFrame):
-    def __init__(self, parent: tk.Misc = None, title: str = "", text: str = None):
+    def __init__(
+            self, parent: tk.Misc = None, title: str = "", text: str = None
+    ) -> None:
         self.text = text
         super().__init__(parent, title)
         label1 = ttk.Label(self, text=self.text)
@@ -43,21 +45,22 @@ class YesNoDialog(WinFrame):
         self.protocol("WM_DELETE_WINDOW", self.cancel)
         self.wait_window(self)
 
-    def apply(self, _=None):
+    def apply(self, _=None) -> None:
         self.result = 1
         self.destroy()
         logger.info("apply")
 
-    def cancel(self, _=None):
+    def cancel(self, _=None) -> None:
         """put focus back to the parent window"""
         self.result = 0
         self.destroy()
         logger.info("cancel")
 
 
-class InputStringDialog(WinFrame):
-    def __init__(self, parent=".", title="", text=""):
+class StringInputDialog(WinFrame):
+    def __init__(self, parent=".", title="", text="") -> None:
         super().__init__(parent, title)
+        self.result = ""
         ttk.Label(self, text=text).pack(fill="x")
         self.entry = Entry(self)
         self.entry.pack(fill="x", expand=1)
@@ -72,13 +75,13 @@ class InputStringDialog(WinFrame):
         self.protocol("WM_DELETE_WINDOW", self.cancel)
         self.wait_window(self)
 
-    def apply(self):
+    def apply(self) -> None:
         self.result = self.entry.get()
         self.destroy()
         logger.info("apply")
 
-    def cancel(self):
-        self.result = None
+    def cancel(self) -> None:
+        self.result = ""
         self.destroy()
         logger.info("cancel")
 
@@ -86,27 +89,22 @@ class InputStringDialog(WinFrame):
 class ErrorInfoDialog(WinFrame):
     def __init__(
             self, parent: [tk.Misc, str] = None, text: str = None, title: str = "Error"
-    ):
+    ) -> None:
         self.text = text
         super().__init__(parent, title)
         label1 = ttk.Label(self, text=self.text)
         label1.pack(side="top", fill="both", expand=1)
         b1 = ttk.Button(self, text="Ok", width=10, command=self.apply)
         b1.pack(side="left")
-        self.protocol("WM_DELETE_WINDOW", self.cancel)
         self.wait_window(self)
 
-    def apply(self, _=None):
+    def apply(self, _=None) -> None:
         self.destroy()
         logger.info("apply")
 
-    @staticmethod
-    def cancel(_=None):
-        return
-
 
 class AboutDialog:
-    def __init__(self, master):
+    def __init__(self, master: tk.Misc):
         """Shows the version and related info of the editor."""
         self.master = master
         self.icon = tk.PhotoImage(file="Images/pyplus.gif")
@@ -129,7 +127,7 @@ class AboutDialog:
             ttk.Label(ver, text="No updates available").pack(fill="both")
         ver.mainloop()
 
-    def check_updates(self, popup=True) -> list:
+    def check_updates(self, popup: bool = True) -> list:
         if "DEV" in VERSION:
             ErrorInfoDialog(
                 text="Updates aren't supported by develop builds,\n\

@@ -3,7 +3,7 @@ from configparser import ConfigParser
 
 
 class NotGitRepoError(Exception):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Error: Not a Git Repository")
 
 

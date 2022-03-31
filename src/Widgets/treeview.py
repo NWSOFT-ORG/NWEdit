@@ -1,19 +1,19 @@
 from src.constants import logger, OSX
-from src.Dialog.commondialog import get_theme, InputStringDialog
+from src.Dialog.commondialog import get_theme, StringInputDialog
 from src.Dialog.fileinfodialog import FileInfoDialog
 from src.modules import font, json, os, send2trash, shutil, tk, ttk, ttkthemes
 from src.Utils.color_utils import is_dark_color
 
 
 class IconSettings:
-    def __init__(self):
+    def __init__(self) -> None:
         self.path = "Config/file-icons.json"
         self.dark = False
 
-    def set_theme(self, dark: bool):
+    def set_theme(self, dark: bool) -> None:
         self.dark = dark
 
-    def get_icon(self, extension: str):
+    def get_icon(self, extension: str) -> tk.PhotoImage:
         with open(self.path) as f:
             settings = json.load(f)
         try:
@@ -83,7 +83,7 @@ class FileTree(ttk.Frame):
         self.tree.pack(fill="both", expand=1, anchor="nw")
         self.tree.bind("<<TreeviewOpen>>", self.open_dir)
 
-    def remove(self, item):
+    def remove(self, item: str) -> None:
         path = self.get_path(item, True)
         try:
             send2trash.send2trash(path)  # Send to trash is a good idea if possible
@@ -95,30 +95,33 @@ class FileTree(ttk.Frame):
                 os.remove(path)
         self.refresh_tree()
 
-    def rename(self, event):
+    def rename(self, item: str) -> None:
+        path = self.get_path(item, True)
+        dialog = StringInputDialog(self.master, "Rename", "New name:")
+        if not dialog.result:
+            return
         try:
-            path = self.get_path(event, True)
-            dialog = InputStringDialog(self.master, "Rename", "New name:")
             newdir = os.path.join(self.path, dialog.result)
             shutil.move(path, newdir)
-            self.refresh_tree()
         except (IsADirectoryError, FileExistsError):
             pass
+        finally:
+            self.refresh_tree()
 
-    def get_info(self, item):
+    def get_info(self, item: str) -> None:
         path = self.get_path(item, True)
         FileInfoDialog(self.master, path)
 
-    def new_folder(self, item, isdir):
-        win = InputStringDialog(self.master, "New Folder", "Name:")
+    def new_folder(self, item: str, isdir: bool) -> None:
+        win = StringInputDialog(self.master, "New Folder", "Name:")
         if name := win.result:
             item_path = self.get_path(item, isdir)
             path = os.path.join(item_path, name)
             os.mkdir(path)
         self.refresh_tree()
 
-    def new_file(self, item, isdir):
-        win = InputStringDialog(self.master, "New File", "Name:")
+    def new_file(self, item: str, isdir: bool) -> None:
+        win = StringInputDialog(self.master, "New File", "Name:")
         if name := win.result:
             item_path = self.get_path(item, isdir)
             path = os.path.join(item_path, name)
@@ -126,7 +129,7 @@ class FileTree(ttk.Frame):
                 f.write("")
         self.refresh_tree()
 
-    def open_dir(self, _):
+    def open_dir(self, _) -> None:
         """Save time by loading directory only when needed, so we don't have to recursivly process the directories."""
         tree = self.tree
         item = tree.focus()
@@ -141,7 +144,9 @@ class FileTree(ttk.Frame):
         tree.delete(*tree.get_children(item))
         self.process_directory(item, path=self.path)
 
-    def process_directory(self, parent, showdironly: bool = False, path: str = ""):
+    def process_directory(
+            self, parent: str, showdironly: bool = False, path: str = ""
+    ) -> None:
         if os.path.isfile(path):
             return
         items = sorted(os.listdir(path))
@@ -178,7 +183,7 @@ class FileTree(ttk.Frame):
                     tags=("file",),
                 )
 
-    def on_double_click_treeview(self, event, destroy: bool = False):
+    def on_double_click_treeview(self, event: tk.Event, destroy: bool = False) -> None:
         tree = self.tree
         item = tree.identify("item", event.x, event.y)
         name = self.get_path(item, True)
@@ -186,7 +191,7 @@ class FileTree(ttk.Frame):
         if destroy:
             self.master.destroy()
 
-    def get_parent(self, item):
+    def get_parent(self, item: str) -> None:
         """Find the path to item in treeview"""
         tree = self.tree
         parent_iid = tree.parent(item)
@@ -195,7 +200,7 @@ class FileTree(ttk.Frame):
         if parent_text:
             self.get_parent(parent_iid)
 
-    def get_path(self, item, append_name: bool = False):
+    def get_path(self, item: str, append_name: bool = False) -> str:
         self.temp_path = []
         self.get_parent(item)
         self.temp_path.reverse()
@@ -204,9 +209,10 @@ class FileTree(ttk.Frame):
             self.temp_path.append(self.tree.item(item, "text"))
         return os.path.abspath("/".join(self.temp_path))
 
-    def right_click(self, event, isdir):
+    def right_click(self, event: tk.Event, isdir: bool) -> None:
         menu = tk.Menu(self.master)
         item = self.tree.identify("item", event.x, event.y)
+        self.tree.focus(item)
 
         new_cascade = tk.Menu(menu)
         new_cascade.add_command(
@@ -219,14 +225,14 @@ class FileTree(ttk.Frame):
         menu.add_separator()
         menu.add_command(label="Get Info", command=lambda: self.get_info(item))
         menu.add_separator()
-        menu.add_command(label="Rename file")
+        menu.add_command(label="Rename file", command=lambda: self.rename(item))
         menu.add_command(label="Move to Trash", command=lambda: self.remove(item))
         menu.add_separator()
         menu.add_command(label="Refresh", command=self.refresh_tree)
 
         menu.tk_popup(event.x_root, event.y_root)
 
-    def refresh_tree(self):
+    def refresh_tree(self) -> None:
         path = self.path
         self.tree.delete(*self.tree.get_children())
         ypos = self.yscroll.get()

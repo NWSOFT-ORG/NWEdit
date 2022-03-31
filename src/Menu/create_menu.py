@@ -76,32 +76,32 @@ def create_menu(self) -> None:
     self.viewmenu = tk.Menu(self.menubar)
     self.viewmenu.add_command(
         label="Unit tests",
-        command=lambda: TestDialog(self.panedwin, self.filetree.path),
+        command=lambda: TestDialog(self.bottom_tabs, self.filetree.path),
     )
     self.viewmenu.add_command(
         label="Git: Commit and Push...", command=lambda: self.git("commit")
     )
     self.viewmenu.add_command(
         label="Classes and functions",
-        command=lambda: CodeListDialog(self.panedwin, self.get_text())
+        command=lambda: CodeListDialog(self.bottom_tabs, self.get_text)
         if self.tabs
         else None,
     )
     self.viewmenu.add_command(
         label="Insert Ascii Art",
-        command=lambda: StyleWindow(self.master, self.get_text(), self.key)
+        command=lambda: StyleWindow(self.master, self.get_text, self.key)
         if self.tabs
         else None,
     )
     self.viewmenu.add_command(
         label="Search In directory",
-        command=lambda: SearchInDir(self.panedwin, self.filetree.path, self.open_file),
+        command=lambda: SearchInDir(self.bottom_tabs, self.filetree.path, self.open_file),
     )
 
     self.navmenu = tk.Menu(self.menubar)
     self.navmenu.add_command(
         label="Go to ...",
-        command=lambda: Navigate(self.get_text()) if self.tabs else None,
+        command=lambda: Navigate(self.get_text) if self.tabs else None,
     )
 
     self.gitmenu = tk.Menu(self.menubar)
@@ -119,6 +119,7 @@ def create_menu(self) -> None:
     self.menubar.add_cascade(label="File", menu=self.filemenu)
     self.menubar.add_cascade(label="Edit", menu=self.editmenu)
     self.menubar.add_cascade(label="Code", menu=self.codemenu)
+    self.menubar.add_cascade(label="View", menu=self.viewmenu)
     self.menubar.add_cascade(label="Navigate", menu=self.navmenu)
     self.menubar.add_cascade(
         label="Tools", menu=self.plugins_settings_class.create_tool_menu

@@ -1,4 +1,5 @@
 """Provides convenient color utilities"""
+from src.modules import tk
 
 DARK_COLOR = 128
 
@@ -29,12 +30,22 @@ def is_dark_color(hex_code: str) -> bool:
     return False
 
 
-def darken_color(hex_code, decrement) -> str:
-    hex_code = hex_code[1:]
+def check_hex(color):
+    """Converts via winfo_rgb()"""
+    checking_win = tk.Toplevel()
+    rgb = checking_win.winfo_rgb(color)
+    checking_win.destroy()
+
+    rgb = [dec2hex(color // 257) for color in rgb]
+    return rgb
+
+
+def darken_color(hex_code: str, decrement) -> str:
+    hex_code = check_hex(hex_code)
     rgb = (
-        hex2dec(hex_code[:2]) - decrement,
-        hex2dec(hex_code[2:4]) - decrement,
-        hex2dec(hex_code[4:]) - decrement,
+        hex2dec(hex_code[0]) - decrement,
+        hex2dec(hex_code[1]) - decrement,
+        hex2dec(hex_code[2]) - decrement,
     )
     value = "#"
     for x in rgb:
@@ -43,11 +54,11 @@ def darken_color(hex_code, decrement) -> str:
 
 
 def lighten_color(hex_code, increment) -> str:
-    hex_code = hex_code[1:]
+    hex_code = check_hex(hex_code)
     rgb = (
-        hex2dec(hex_code[:2]) + increment,
-        hex2dec(hex_code[2:4]) + increment,
-        hex2dec(hex_code[4:]) + increment,
+        hex2dec(hex_code[0]) + increment,
+        hex2dec(hex_code[1]) + increment,
+        hex2dec(hex_code[2]) + increment,
     )
     value = "#"
     for x in rgb:

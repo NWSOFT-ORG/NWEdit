@@ -10,7 +10,7 @@
             <path value="file://$PROJECT_DIR$/src/Images" />
             <path value="file://$PROJECT_DIR$/src/LangSupport" />
             <path value="file://$PROJECT_DIR$/venv" />
-            <path value="file://$PROJECT_DIR$/src/Backups" />
+            <path value="file://$PROJECT_DIR$/src/EditorStatus" />
             <path value="file://$PROJECT_DIR$/.vagrant" />
           </resourceRoots>
         </entryData>

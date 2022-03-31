@@ -1,3 +1,4 @@
+from color_utils import darken_color, lighten_color
 from src.modules import tk, ttk
 
 
@@ -19,12 +20,11 @@ class Entry(ttk.Frame):
         )
         self.entry.pack(fill="x", expand=True)
         self.entry.focus_set()
-
-        self.border = tk.Canvas(self, height=2, takefocus=False, bg=fg, borderwidth=0)
-        self.border.pack(fill="x", expand=True, side="bottom")
-
         self.entry.bind("<FocusIn>", self.entry_on_focus)
         self.entry.bind("<FocusOut>", self.entry_on_focus_out)
+
+        self.border = tk.Canvas(self, height=2, takefocus=False, bg=fg, highlightthickness=0)
+        self.border.pack(fill="x", expand=True, side="bottom")
 
     @property
     def widget_width(self):
@@ -35,7 +35,8 @@ class Entry(ttk.Frame):
         self.border.config(bg=self.fg)
 
     def entry_on_focus_out(self, _):
-        self.border.config(bg=self.bg)
+        darker_bg = lighten_color(self.bg, 40)
+        self.border.config(bg=darker_bg)
 
     def get(self):
         return self.entry.get()

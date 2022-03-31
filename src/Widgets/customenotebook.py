@@ -36,7 +36,7 @@ class ClosableNotebook(ttk.Notebook):
         if not self.__initialized:
             self.__initialize_custom_style()
             self.__inititialized = True
-        super().__init__(master=master, style="CustomNotebook")
+        super().__init__(master=master, style="CustomNotebook", takefocus=False)
         self.cmd = cmd
 
         self._active = None

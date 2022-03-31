@@ -212,7 +212,7 @@ class FileTree(ttk.Frame):
     def right_click(self, event: tk.Event, isdir: bool) -> None:
         menu = tk.Menu(self.master)
         item = self.tree.identify("item", event.x, event.y)
-        self.tree.focus(item)
+        self.tree.selection_set(item)
 
         new_cascade = tk.Menu(menu)
         new_cascade.add_command(

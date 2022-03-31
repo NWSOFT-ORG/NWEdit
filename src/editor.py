@@ -411,15 +411,17 @@ class Editor:
             logger.exception("Error when handling mouse event:")
 
     def reopen_files(self):
-        with open("Backups/recent_files.json") as f:
+        with open("EditorStatus/recent_files.json") as f:
             files_list = json.load(f)
             if not files_list:
                 self.start_screen()
                 return
             for file, cur_pos in files_list.items():
                 self.open_file(file, askhex=False)
-                self.tabs[self.nb.get_tab].textbox.mark_set("insert", cur_pos)
-        with open("Backups/recent_dir.txt") as f:
+                textbox = self.tabs[self.nb.get_tab].textbox
+                textbox.mark_set("insert", cur_pos)
+                textbox.see("insert")
+        with open("EditorStatus/recent_dir.txt") as f:
             self.filetree.path = f.read()
             self.filetree.refresh_tree()
         self.update_title()
@@ -592,13 +594,13 @@ class Editor:
         self.nb.select(curr)
 
     def exit(self, force=False) -> None:
-        with open("Backups/recent_dir.txt", "w") as f:
+        with open("EditorStatus/recent_dir.txt", "w") as f:
             root_node = self.filetree.root_node
             tree = self.filetree.tree
 
             path = tree.item(root_node, "text")
             f.write(path)
-        with open("Backups/recent_files.json", "w") as f:
+        with open("EditorStatus/recent_files.json", "w") as f:
             file_list = {}
             for tab in self.tabs.values():
                 cursor_pos = tab.textbox.index("insert")

@@ -31,7 +31,7 @@ from src.Widgets.hexview import HexView
 from src.Widgets.panel import CustomTabs
 from src.Widgets.statusbar import Statusbar
 from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
-from src.Widgets.treeview import FileTree, IconSettings
+from src.Widgets.treeview import FileTree
 from src.Widgets.winframe import WinFrame
 from src.codefunctions import CodeFunctions
 from src.constants import (
@@ -53,15 +53,12 @@ from src.modules import (
     ttkthemes,
     font,
 )
-from src.settings import (
-    CommentMarker,
-    FormatCommand,
-    Lexer,
-    Linter,
+from src.SettingsParser.plugin_settings import Plugins
+from src.SettingsParser.extension_settings import (
+    CommentMarker, FormatCommand, FileTreeIconSettings, PygmentsLexer, Linter,
     RunCommand,
-    GeneralSettings,
-    Plugins,
 )
+from src.SettingsParser.general_settings import GeneralSettings
 
 if OSX:
     from src.modules import PyTouchBar
@@ -98,7 +95,7 @@ class Editor:
         self.master.geometry("1200x800")
         try:
             self.settings_class = GeneralSettings(self.master)
-            self.file_settings_class = Lexer()
+            self.file_settings_class = PygmentsLexer()
             self.linter_settings_class = Linter()
             self.cmd_settings_class = RunCommand()
             self.format_settings_class = FormatCommand()
@@ -120,7 +117,7 @@ class Editor:
             self.bg = self.style.lookup("TLabel", "background")
             self.fg = self.style.lookup("TLabel", "foreground")
 
-            self.icon_settings_class = IconSettings()
+            self.icon_settings_class = FileTreeIconSettings()
             if is_dark_color(self.bg):
                 self.close_icon = tk.PhotoImage(file="Images/close.gif")
                 self.open_icon = tk.PhotoImage(file="Images/open.gif")
@@ -421,9 +418,8 @@ class Editor:
                 textbox = self.tabs[self.nb.get_tab].textbox
                 textbox.mark_set("insert", cur_pos)
                 textbox.see("insert")
-        with open("EditorStatus/recent_dir.txt") as f:
-            self.filetree.path = f.read()
-            self.filetree.refresh_tree()
+        with open("EditorStatus/treeview_stat.json") as f:
+            self.filetree.load_status(f)
         self.update_title()
         self.update_statusbar()
 
@@ -594,12 +590,8 @@ class Editor:
         self.nb.select(curr)
 
     def exit(self, force=False) -> None:
-        with open("EditorStatus/recent_dir.txt", "w") as f:
-            root_node = self.filetree.root_node
-            tree = self.filetree.tree
-
-            path = tree.item(root_node, "text")
-            f.write(path)
+        with open("EditorStatus/treeview_stat.json", "w") as f:
+            self.filetree.write_status(f)
         with open("EditorStatus/recent_files.json", "w") as f:
             file_list = {}
             for tab in self.tabs.values():
@@ -612,7 +604,7 @@ class Editor:
 
     @staticmethod
     def restart() -> None:
-        os.execv(sys.executable, [""] + sys.argv)
+        os.execv(sys.executable, [__file__] + sys.argv)
 
     @property
     def get_text(self) -> [EnhancedText, None]:

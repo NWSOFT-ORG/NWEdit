@@ -4,7 +4,7 @@ from src.modules import os, tk, ttk, json, lexers
 from src.Widgets.tktext import EnhancedTextFrame, TextOpts
 from src.Utils.functions import is_valid_name, run_in_terminal
 from src.constants import APPDIR
-from src.settings import RunCommand
+from src.SettingsParser.extension_settings import RunCommand
 
 TESTS_FILE = ".PyPlus/Tests/tests.json"
 SETTINGS_FILE = ".PyPlus/Tests/settings.json"

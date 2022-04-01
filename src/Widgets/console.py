@@ -1,6 +1,6 @@
 """Python console for the editor."""
 from src.modules import code, hashlib, io, queue, sys, threading, tk, ttk
-from src.settings import GeneralSettings
+from src.SettingsParser.general_settings import GeneralSettings
 
 
 # from olisolomos's gist

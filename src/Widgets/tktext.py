@@ -1,7 +1,7 @@
 """A modded version of tkinter.Text"""
 
 from src.modules import font, styles, tk, ttk, ttkthemes, EditorErr, lexers
-from src.settings import GeneralSettings
+from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.color_utils import darken_color, is_dark_color, lighten_color
 from src.constants import MAIN_KEY, logger
 from src.highlighter import create_tags, recolorize, recolorize_line

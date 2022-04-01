@@ -1,4 +1,4 @@
-from color_utils import darken_color, lighten_color
+from src.Utils.color_utils import darken_color, lighten_color
 from src.modules import tk, ttk
 
 

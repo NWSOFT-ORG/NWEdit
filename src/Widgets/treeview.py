@@ -1,29 +1,10 @@
 from src.constants import logger, OSX
 from src.Dialog.commondialog import get_theme, StringInputDialog
 from src.Dialog.fileinfodialog import FileInfoDialog
-from src.modules import font, json, os, send2trash, shutil, tk, ttk, ttkthemes
+from src.modules import font, os, send2trash, shutil, tk, ttk, ttkthemes, json, io
+from src.SettingsParser.extension_settings import FileTreeIconSettings
+from src.SettingsParser.interval_settings import IntervalSettings
 from src.Utils.color_utils import is_dark_color
-
-
-class IconSettings:
-    def __init__(self) -> None:
-        self.path = "Config/file-icons.json"
-        self.dark = False
-
-    def set_theme(self, dark: bool) -> None:
-        self.dark = dark
-
-    def get_icon(self, extension: str) -> tk.PhotoImage:
-        with open(self.path) as f:
-            settings = json.load(f)
-        try:
-            icon_name = settings[extension]
-        except KeyError:
-            icon_name = "other"
-        if self.dark:
-            return tk.PhotoImage(file=f"Images/file-icons/{icon_name}-light.gif")
-        else:
-            return tk.PhotoImage(file=f"Images/file-icons/{icon_name}.gif")
 
 
 class FileTree(ttk.Frame):
@@ -32,6 +13,7 @@ class FileTree(ttk.Frame):
     """
 
     def __init__(self, master=None, opencommand=None):
+        self.expanded = []
         self.temp_path = []
         self._style = ttkthemes.ThemedStyle()
         self._style.set_theme(get_theme())
@@ -49,7 +31,7 @@ class FileTree(ttk.Frame):
         self.opencommand = opencommand
         self.root_node = None
 
-        self.icon_settings = IconSettings()
+        self.icon_settings = FileTreeIconSettings()
         self.icon_settings.set_theme(is_dark_color(self.bg))
         if is_dark_color(self.bg):
             self.other_icon = tk.PhotoImage(file="Images/file-icons/other-light.gif")
@@ -59,6 +41,9 @@ class FileTree(ttk.Frame):
             self.folder_icon = tk.PhotoImage(file="Images/file-icons/folder.gif")
         self.icons = []
         self.temp_path = []  # IMPORTANT! Reset after use
+
+        self.interval_settings = IntervalSettings()
+        self.refresh_interval = self.interval_settings.get_settings("TreeviewRefresh")
 
         self.pack(side="left", fill="both", expand=1)
         self.refresh_tree()
@@ -82,6 +67,7 @@ class FileTree(ttk.Frame):
 
         self.tree.pack(fill="both", expand=1, anchor="nw")
         self.tree.bind("<<TreeviewOpen>>", self.open_dir)
+        self.tree.bind("<<TreeviewClose>>", self.open_dir)
 
     def remove(self, item: str) -> None:
         path = self.get_path(item, True)
@@ -129,11 +115,20 @@ class FileTree(ttk.Frame):
                 f.write("")
         self.refresh_tree()
 
+    def close_dir(self):
+        tree = self.tree
+        item = self.tree.focus()
+
+        self.expanded.remove(item)
+
     def open_dir(self, _) -> None:
         """Save time by loading directory only when needed, so we don't have to recursivly process the directories."""
         tree = self.tree
         item = tree.focus()
+        self.expanded.append(item)
+
         item_text = tree.item(item, "text")
+
         self.temp_path = []
         self.get_parent(item)
         path = f'{"/".join(reversed(self.temp_path))[1:]}/{item_text}'
@@ -172,6 +167,8 @@ class FileTree(ttk.Frame):
                         oid, 0, text="Loading..."
                     )  # Just a placeholder, will load if needed
             else:
+                if showdironly:
+                    return
                 extension = p.split(".")
                 self.icons.append(self.icon_settings.get_icon(extension[-1]))
                 self.tree.insert(
@@ -201,7 +198,6 @@ class FileTree(ttk.Frame):
             self.get_parent(parent_iid)
 
     def get_path(self, item: str, append_name: bool = False) -> str:
-        self.temp_path = []
         self.get_parent(item)
         self.temp_path.reverse()
         self.temp_path.remove("")
@@ -232,8 +228,13 @@ class FileTree(ttk.Frame):
 
         menu.tk_popup(event.x_root, event.y_root)
 
+    @property
+    def root_node_path(self) -> str:
+        text = self.tree.item("", "text")
+        return text
+
     def refresh_tree(self) -> None:
-        path = self.path
+        path = self.root_node_path
         self.tree.delete(*self.tree.get_children())
         ypos = self.yscroll.get()
         abspath = os.path.abspath(path)
@@ -242,3 +243,27 @@ class FileTree(ttk.Frame):
         )
         self.process_directory(self.root_node, path=abspath)
         self.yscroll.set(*ypos)
+
+        self.expanded = [self.root_node]
+
+        # self.after(self.refresh_interval, self.refresh_tree)
+
+    def write_status(self, fp: io.FileIO):
+        state = {
+            "path"         : self.root_node_path,
+            "expandedNodes": self.expanded
+        }
+
+        with fp as f:
+            json.dump(state, f)
+
+    def load_status(self, fp: io.FileIO):
+        with fp as f:
+            status = json.load(f)
+        self.path = status["path"]
+        print(self.path, flush=True)
+        print(status["expandedNodes"], flush=True)
+        self.refresh_tree()
+
+        for item in status["expandedNodes"]:
+            self.tree.item(item, open=True)

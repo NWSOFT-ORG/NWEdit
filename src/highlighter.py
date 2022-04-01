@@ -1,5 +1,5 @@
 from src.modules import font, styles, tk, pygments
-from src.settings import GeneralSettings
+from src.SettingsParser.general_settings import GeneralSettings
 
 
 def create_tags(textbox: tk.Text) -> None:

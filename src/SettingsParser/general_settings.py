@@ -1,11 +1,8 @@
-import pygments.lexer
-
+from json import JSONDecodeError
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog
-from src.Plugins.plugins_view import PluginView
-from src.constants import APPDIR, logger
-from src.modules import EditorErr, Path, json, lexers, os, sys, zipfile, tk, pygments
-from json import JSONDecodeError
+from src.constants import APPDIR
+from src.modules import EditorErr, tk, Path, os, sys, zipfile, json
 
 
 class GeneralSettings:
@@ -36,13 +33,13 @@ class GeneralSettings:
                     )
 
         with zipfile.ZipFile(
-            os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
+                os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
         ) as zipobj:
             zipdir("Config/", zipobj)
         ErrorInfoDialog(title="Done", text="Settings backed up.")
 
     def zipsettings(self):
-        DirectoryOpenDialog(self.zip_settings)
+        DirectoryOpenDialog(self.master, self.zip_settings)
 
     @staticmethod
     def unzip_settings(backupdir):
@@ -56,8 +53,8 @@ class GeneralSettings:
         except (zipfile.BadZipFile, zipfile.BadZipfile, zipfile.LargeZipFile):
             pass
 
-    def unzipsettings(self, master):
-        FileOpenDialog(master, self.unzip_settings)
+    def unzipsettings(self):
+        FileOpenDialog(self.master, self.unzip_settings)
 
     def get_settings(self, setting):
         if setting == "font":
@@ -99,92 +96,6 @@ class GeneralSettings:
         menu.add_command(label="Backup Settings to...", command=self.zipsettings)
         menu.add_command(
             label="Load Settings from...",
-            command=lambda _: self.unzipsettings(self.master),
+            command=lambda _: self.unzipsettings(),
         )
         return menu
-
-
-class ExtensionSettings:
-    """An inheratiable class"""
-
-    def __init__(self, path: str) -> None:
-        with open(path) as f:
-            all_settings = json.load(f)
-        self.extens = []
-        self.items = []
-        for key, value in all_settings.items():
-            self.extens.append(key)
-            self.items.append(value)
-
-    def get_settings(self, extension) -> [str, None]:
-        try:
-            if self.items[self.extens.index(extension)] == "none":
-                return None
-            return self.items[self.extens.index(extension)]
-        except ValueError:
-            return None
-
-
-class Lexer(ExtensionSettings):
-    def __init__(self) -> None:
-        super().__init__("Config/lexer-settings.json")
-
-    def get_settings(self, extension: str) -> pygments.lexer.Lexer:
-        try:
-            return lexers.get_lexer_by_name(self.items[self.extens.index(extension)])
-        except ValueError:
-            return lexers.get_lexer_by_name("Text")
-
-
-class Linter(ExtensionSettings):
-    def __init__(self) -> None:
-        super().__init__("Config/linter-settings.json")
-
-
-class FormatCommand(ExtensionSettings):
-    def __init__(self) -> None:
-        super().__init__("Config/format-settings.json")
-
-
-class RunCommand(ExtensionSettings):
-    def __init__(self) -> None:
-        super().__init__("Config/cmd-settings.json")
-
-
-class CommentMarker(ExtensionSettings):
-    def __init__(self) -> None:
-        super().__init__("Config/comment-markers.json")
-
-
-class Plugins:
-    def __init__(self, master) -> None:
-        self.master = master
-        self.tool_menu = tk.Menu(self.master)
-        with open("Config/plugin-data.json") as f:
-            self.settings = json.load(f)
-
-    def load_plugins(self) -> None:
-        plugins = []
-        for value in self.settings.values():
-            try:
-                exec(
-                    f"""\
-from src.{value} import Plugin
-p = Plugin(self.master)
-plugins.append(p.PLUGIN_DATA)
-del Plugin""",
-                    locals(),
-                    globals(),
-                )
-            except ModuleNotFoundError:
-                logger.exception("Error, can't parse plugin settings:")
-        for plugin in plugins:
-            self.tool_menu.add_cascade(label=plugin["name"], menu=plugin["menu"])
-
-    @property
-    def create_tool_menu(self) -> tk.Menu:
-        self.tool_menu.add_separator()
-        self.tool_menu.add_command(
-            label="Manage Plugins...", command=lambda: PluginView(self.master)
-        )
-        return self.tool_menu

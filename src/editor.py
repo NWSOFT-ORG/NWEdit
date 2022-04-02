@@ -418,8 +418,6 @@ class Editor:
                 textbox = self.tabs[self.nb.get_tab].textbox
                 textbox.mark_set("insert", cur_pos)
                 textbox.see("insert")
-        with open("EditorStatus/treeview_stat.json") as f:
-            self.filetree.load_status(f)
         self.update_title()
         self.update_statusbar()
 

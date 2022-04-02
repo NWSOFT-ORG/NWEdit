@@ -66,8 +66,12 @@ class FileTree(ttk.Frame):
         self.tree.tag_configure("empty", font=italic, foreground="#C2FF74")
 
         self.tree.pack(fill="both", expand=1, anchor="nw")
-        self.tree.bind("<<TreeviewOpen>>", self.open_dir)
-        self.tree.bind("<<TreeviewClose>>", self.open_dir)
+        self.tree.bind("<<TreeviewOpen>>", lambda _: self.open_dir())
+        self.tree.bind("<<TreeviewClose>>", lambda _: self.close_dir())
+        
+                        
+        with open("EditorStatus/treeview_stat.json") as f:
+            self.load_status(f)
 
     def remove(self, item: str) -> None:
         path = self.get_path(item, True)
@@ -121,10 +125,13 @@ class FileTree(ttk.Frame):
 
         self.expanded.remove(item)
 
-    def open_dir(self, _) -> None:
+    def open_dir(self, directory_item="") -> None:
         """Save time by loading directory only when needed, so we don't have to recursivly process the directories."""
         tree = self.tree
-        item = tree.focus()
+        if directory_item:
+            item = directory_item
+        else:
+            item = tree.focus()
         self.expanded.append(item)
 
         item_text = tree.item(item, "text")
@@ -164,7 +171,7 @@ class FileTree(ttk.Frame):
                 last_dir_index += 1
                 if not showdironly:
                     self.tree.insert(
-                        oid, 0, text="Loading..."
+                        oid, 0, text="Loading...", tags=("empty",)
                     )  # Just a placeholder, will load if needed
             else:
                 if showdironly:
@@ -244,14 +251,16 @@ class FileTree(ttk.Frame):
         self.process_directory(self.root_node, path=abspath)
         self.yscroll.set(*ypos)
 
-        self.expanded = [self.root_node]
+        self.expanded = []
 
         # self.after(self.refresh_interval, self.refresh_tree)
 
     def write_status(self, fp: io.FileIO):
         state = {
-            "path"         : self.root_node_path,
-            "expandedNodes": self.expanded
+            "path"              : self.root_node_path,
+            "expandedNodes"     : self.expanded,
+            "yScrollbarLocation": self.yscroll.get(),
+            "xScrollbarLocation": self.xscroll.get()
         }
 
         with fp as f:
@@ -261,9 +270,13 @@ class FileTree(ttk.Frame):
         with fp as f:
             status = json.load(f)
         self.path = status["path"]
-        print(self.path, flush=True)
-        print(status["expandedNodes"], flush=True)
         self.refresh_tree()
 
         for item in status["expandedNodes"]:
             self.tree.item(item, open=True)
+            self.open_dir(item)
+                        
+        y_scroll_location = status["yScrollbarLocation"]
+        x_scroll_location = status["xScrollbarLocation"]
+        self.tree.yview_moveto(y_scroll_location[0])
+        self.tree.xview_moveto(x_scroll_location[0])

@@ -1,0 +1,157 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXFileReference section */
+		A1C25A9A27F70CD600C456C5 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		A1C25A9B27F70CD600C456C5 /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
+		A1C25A9C27F70CD600C456C5 /* Vagrantfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; fileEncoding = 4; path = Vagrantfile; sourceTree = "<group>"; };
+		A1C25A9D27F70CD700C456C5 /* test.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = test.py; sourceTree = "<group>"; };
+		A1C25A9E27F70CD700C456C5 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		A1C25A9F27F70CD700C456C5 /* venv */ = {isa = PBXFileReference; lastKnownFileType = folder; path = venv; sourceTree = "<group>"; };
+		A1C25AA027F70CD700C456C5 /* requirements.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = requirements.txt; sourceTree = "<group>"; };
+		A1C25AA127F70CD700C456C5 /* pyvenv.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pyvenv.cfg; sourceTree = "<group>"; };
+		A1C25AA227F70CD700C456C5 /* CONTRIBUTING.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
+		A1C25AA327F70CD700C456C5 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
+		A1C25AA427F70CD700C456C5 /* CODE_OF_CONDUCT.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CODE_OF_CONDUCT.md; sourceTree = "<group>"; };
+		A1C25AA527F70CD800C456C5 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		A1C25AA627F70CD800C456C5 /* main.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = main.py; sourceTree = "<group>"; };
+		A1C25AA727F70CD800C456C5 /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = scripts; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		A1C25A8027F6F93F00C456C5 = {
+			isa = PBXGroup;
+			children = (
+				A1C25AA327F70CD700C456C5 /* __init__.py */,
+				A1C25AA427F70CD700C456C5 /* CODE_OF_CONDUCT.md */,
+				A1C25AA227F70CD700C456C5 /* CONTRIBUTING.md */,
+				A1C25A9A27F70CD600C456C5 /* LICENSE */,
+				A1C25AA627F70CD800C456C5 /* main.py */,
+				A1C25AA527F70CD800C456C5 /* Makefile */,
+				A1C25AA127F70CD700C456C5 /* pyvenv.cfg */,
+				A1C25A9E27F70CD700C456C5 /* README.md */,
+				A1C25AA027F70CD700C456C5 /* requirements.txt */,
+				A1C25AA727F70CD800C456C5 /* scripts */,
+				A1C25A9B27F70CD600C456C5 /* src */,
+				A1C25A9D27F70CD700C456C5 /* test.py */,
+				A1C25A9C27F70CD600C456C5 /* Vagrantfile */,
+				A1C25A9F27F70CD700C456C5 /* venv */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		A1C25A8527F6F93F00C456C5 /* PyPlus */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = main.py;
+			buildConfigurationList = A1C25A8827F6F93F00C456C5 /* Build configuration list for PBXLegacyTarget "PyPlus" */;
+			buildPhases = (
+			);
+			buildToolPath = "$(SRCROOT)/venv/bin/python";
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = PyPlus;
+			passBuildSettingsInEnvironment = 0;
+			productName = PyPlus;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		A1C25A8127F6F93F00C456C5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1330;
+				TargetAttributes = {
+					A1C25A8527F6F93F00C456C5 = {
+						CreatedOnToolsVersion = 13.3;
+					};
+				};
+			};
+			buildConfigurationList = A1C25A8427F6F93F00C456C5 /* Build configuration list for PBXProject "PyPlus" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A1C25A8027F6F93F00C456C5;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1C25A8527F6F93F00C456C5 /* PyPlus */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		A1C25A8627F6F93F00C456C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		A1C25A8727F6F93F00C456C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		A1C25A8927F6F93F00C456C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A1C25A8A27F6F93F00C456C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A1C25A8427F6F93F00C456C5 /* Build configuration list for PBXProject "PyPlus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1C25A8627F6F93F00C456C5 /* Debug */,
+				A1C25A8727F6F93F00C456C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A1C25A8827F6F93F00C456C5 /* Build configuration list for PBXLegacyTarget "PyPlus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1C25A8927F6F93F00C456C5 /* Debug */,
+				A1C25A8A27F6F93F00C456C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A1C25A8127F6F93F00C456C5 /* Project object */;
+}

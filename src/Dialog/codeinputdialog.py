@@ -1,10 +1,12 @@
+from typing import Text, Callable
+
 from src.Widgets.tktext import EnhancedTextFrame, TextOpts
 from src.modules import tk, ttk, lexers
 from src.Widgets.winframe import WinFrame
 
 
 class CodeInputDialog(WinFrame):
-    def __init__(self, parent, title, onsave):
+    def __init__(self, parent: [tk.Misc, tk.Tk, tk.Toplevel], title: Text, onsave: Callable) -> None:
         super().__init__(parent, title, closable=False)
 
         self.save = self.add_destroy_action(onsave)
@@ -26,13 +28,13 @@ class CodeInputDialog(WinFrame):
         cancelbtn.pack(side="left")
         button_frame.pack(fill="x")
 
-    def insert(self, pos: str, text: str) -> None:
+    def insert(self, pos: Text, text: Text) -> None:
         self.text.insert(pos, text)
 
-    def get(self, pos1, pos2) -> str:
+    def get(self, pos1: Text, pos2: Text) -> str:
         return self.text.get(pos1, pos2)
 
-    def add_destroy_action(self, function: callable) -> callable:
+    def add_destroy_action(self, function: Callable) -> callable:
         def new():
             function()
             self.destroy()

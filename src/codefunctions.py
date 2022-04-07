@@ -1,7 +1,7 @@
 from src.modules import tk, ttk, ttkthemes, os, subprocess, lexers, Path
 from src.Utils.color_utils import is_dark_color
 from src.Utils.functions import run_in_terminal, open_system_shell
-from src.Dialog.commondialog import get_theme, ErrorInfoDialog
+from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.search import Search
 from src.Widgets.console import Console
 from src.Dialog.codelistdialog import CodeListDialog
@@ -23,8 +23,7 @@ class CodeFunctions:
         self.master = master
         self.bottomframe = bottomframe
 
-        self.style = ttkthemes.ThemedStyle()
-        self.style.set_theme(get_theme())
+        self.style = ttk.Style(master)
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
         if is_dark_color(self.bg):

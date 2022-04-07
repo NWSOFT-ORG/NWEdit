@@ -1,10 +1,10 @@
-from src.modules import ttk
+from typing import Text
+from src.modules import ttk, tk, traceback
 import ast
-import traceback
 
 
 class CodeListDialog(ttk.Frame):
-    def __init__(self, parent=None, text=None):
+    def __init__(self, parent: ttk.Notebook = None, text: tk.Text = None) -> None:
         super().__init__(parent)
         self.text = text
 
@@ -18,7 +18,7 @@ class CodeListDialog(ttk.Frame):
         self.pack(fill="both", expand=1)
         parent.add(self, text="Code structure")
 
-    def show_items(self):
+    def show_items(self) -> None:
         # noinspection PyBroadException
         try:
             self.state_label.configure(foreground="")
@@ -54,7 +54,7 @@ class CodeListDialog(ttk.Frame):
         for var in defined_vars:
             self.show_var("", var)
 
-    def show_info(self, parent, _obj, _type=""):
+    def show_info(self, parent, _obj, _type="") -> Text:
         return self.tree.insert(
             parent,
             "end",
@@ -62,13 +62,13 @@ class CodeListDialog(ttk.Frame):
             tags=[_type],
         )
 
-    def show_var(self, parent, _obj):
+    def show_var(self, parent, _obj) -> None:
         for item in _obj.targets:
             self.tree.insert(
                 parent, "end", text=f"{item.id} [{item.lineno}:{item.col_offset}]"
             )
 
-    def double_click(self, event=None):
+    def double_click(self, event=None) -> None:
         try:
             item = self.tree.identify("item", event.x, event.y)
             text = self.tree.item(item, "text")

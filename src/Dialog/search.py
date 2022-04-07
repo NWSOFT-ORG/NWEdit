@@ -1,12 +1,12 @@
-from src.Dialog.commondialog import get_theme
+from typing import Iterable, List, Tuple, Text
 from src.Utils.color_utils import is_dark_color
 from src.Widgets.tkentry import Entry
 from src.Widgets.tktext import EnhancedText
-from src.modules import tk, ttk, ttkthemes
+from src.modules import tk, ttk
 import re
 
 
-def finditer_withlineno(pattern, string, flags: [re.RegexFlag, int] = 0) -> iter:
+def finditer_withlineno(pattern, string, flags: [re.RegexFlag, int] = 0) -> Iterable[Tuple[int]]:
     """
     A version of re.finditer that returns '(match, line_number)' pairs.
     """
@@ -35,7 +35,7 @@ def finditer_withlineno(pattern, string, flags: [re.RegexFlag, int] = 0) -> iter
         )
 
 
-def find_all(sub: str, string: str, case: bool = True):
+def find_all(sub: Text, string: Text, case: bool = True) -> Iterable[Tuple[int]]:
     start = 0
     if not case:
         sub = sub.lower()
@@ -56,7 +56,7 @@ def find_all(sub: str, string: str, case: bool = True):
         start = end
 
 
-def re_search(pat, text, nocase=False, full_word=False, regex=False):
+def re_search(pat: Text, text: Text, nocase: bool = False, full_word: bool = False, regex: bool = False) -> List:
     if nocase and full_word:
         res = [
             (x[0], x[1])
@@ -86,11 +86,10 @@ def re_search(pat, text, nocase=False, full_word=False, regex=False):
 
 
 class Search:
-    def __init__(self, master: ttk.Notebook, text: EnhancedText):
+    def __init__(self, master: ttk.Notebook, text: EnhancedText) -> None:
         self.master = master
         self.text = text
-        self._style = ttkthemes.ThemedStyle()
-        self._style.set_theme(get_theme())
+        self._style = ttk.Style()
         bg = self._style.lookup("TLabel", "background")
 
         if self.text.search or self.text.navigate:
@@ -191,7 +190,7 @@ class Search:
 
         self.master.add(self.main_frame, text="Search")
 
-    def find(self, *_):
+    def find(self, *_) -> None:
         text = self.text
         text.tag_remove("found", "1.0", "end")
         s = self.content.get()
@@ -210,7 +209,7 @@ class Search:
                 text.tag_add("found", start, end)
             text.tag_config("found", foreground="red", background="yellow")
 
-    def replace_all(self):
+    def replace_all(self) -> None:
         text = self.text
         r = self.replace_with.get()
         self.find()
@@ -221,7 +220,7 @@ class Search:
             text.delete(match_index, next(ranges))
             text.insert(match_index, r)
 
-    def replace_this(self):
+    def replace_this(self) -> None:
         text = self.text
         r = self.replace_with.get()
         self.find()
@@ -236,11 +235,11 @@ class Search:
                 text.delete(match_index, next(ranges))
                 text.insert(match_index, r)
 
-    def clear(self):
+    def clear(self) -> None:
         text = self.text
         text.tag_remove("found", "1.0", "end")
 
-    def nav_forward(self):
+    def nav_forward(self) -> None:
         try:
             text = self.text
             curpos = text.index("insert")
@@ -253,7 +252,7 @@ class Search:
         except tk.TclError:
             pass
 
-    def nav_backward(self):
+    def nav_backward(self) -> None:
         try:
             text = self.text
             curpos = text.index("insert")
@@ -266,7 +265,7 @@ class Search:
         except tk.TclError:
             pass
 
-    def _exit(self, _=None):
+    def _exit(self, _=None) -> None:
         self.text.unbind("<Escape>")
         self.main_frame.unbind("<Escape>")
         self.text.search = False

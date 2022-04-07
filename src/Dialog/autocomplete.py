@@ -1,11 +1,14 @@
 import string
-from src.modules import ttk
+from typing import Text
+
+from src.modules import ttk, tk
+from src.Widgets.tktext import TextOpts
 
 punc = [x for x in string.punctuation.replace("_", "")]
 whites = [x for x in string.whitespace]
 
 
-def sep_words(str_to_sep: str) -> list:
+def sep_words(str_to_sep: Text) -> list:
     result = str_to_sep
     for char in (*punc, *whites):
         result = result.replace(char, " ")
@@ -16,7 +19,7 @@ def sep_words(str_to_sep: str) -> list:
 
 
 class CompleteDialog(ttk.Frame):
-    def __init__(self, master, text, opts):
+    def __init__(self, master: tk.Misc, text: tk.Text, opts: TextOpts):
         super().__init__(master, relief="groove")
         self.opts = opts
         self.completions = ttk.Treeview(self, show="tree")
@@ -30,7 +33,7 @@ class CompleteDialog(ttk.Frame):
 
         text.bind("<Button-1>", lambda _: self.place_forget())
 
-    def complete(self, event=None):
+    def complete(self, event: tk.Event = None):
         item = self.completions.identify("item", event.x, event.y)
         text = self.text
         completion = self.completions.item(item, "text")
@@ -52,7 +55,7 @@ class CompleteDialog(ttk.Frame):
                 self.completions.insert("", "end", text=match)
 
     @property
-    def get_word(self) -> [str, None]:
+    def get_word(self) -> [Text, None]:
         text = self.text
         try:
             return text.get(*self.index_word)
@@ -60,7 +63,7 @@ class CompleteDialog(ttk.Frame):
             return None
 
     @property
-    def index_word(self) -> [str, None]:
+    def index_word(self) -> [Text, None]:
         text = self.text
         try:
             content = text.get("1.0", "insert")

@@ -39,7 +39,7 @@ def check_hex(color):
     return rgb
 
 
-def darken_color(hex_code: str, decrement) -> str:
+def darken_color(hex_code: str, decrement: int) -> str:
     hex_code = check_hex(hex_code)
     rgb = (
         hex2dec(hex_code[0]) - decrement,
@@ -49,8 +49,7 @@ def darken_color(hex_code: str, decrement) -> str:
     value = "#"
     for x in rgb:
         if x < 0:
-            x = 0  # Don't make the value smaller, else won't be a valid color
-            value += dec2hex(x)[2:]
+            value += "00"
             continue
         value += dec2hex(x)[2:]
     return value
@@ -66,8 +65,7 @@ def lighten_color(hex_code, increment) -> str:
     value = "#"
     for x in rgb:
         if x > 255:
-            x = 255  # Don't make the value bigger, else won't be a valid color
-            value += dec2hex(x)[2:]
+            value += "ff"
             continue
         value += dec2hex(x)[2:]
     return value

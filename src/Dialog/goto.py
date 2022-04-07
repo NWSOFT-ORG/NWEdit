@@ -1,7 +1,6 @@
-from src.Dialog.commondialog import get_theme
 from src.Widgets.tkentry import Entry
 from src.Widgets.tktext import EnhancedText
-from src.modules import tk, ttk, ttkthemes
+from src.modules import tk, ttk
 
 
 class Navigate:
@@ -11,8 +10,7 @@ class Navigate:
             return
         self.text.navigate = True
         self.goto_frame = ttk.Frame(self.text.frame)
-        self._style = ttkthemes.ThemedStyle()
-        self._style.set_theme(get_theme())
+        self._style = ttk.Style()
         self.goto_frame.pack(anchor="nw")
         ttk.Label(self.goto_frame, text="Go to place: [Ln].[Col] ").pack(side="left")
         self.place = Entry(self.goto_frame)

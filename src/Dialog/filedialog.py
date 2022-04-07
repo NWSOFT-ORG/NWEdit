@@ -1,14 +1,12 @@
-from src.Dialog.commondialog import get_theme
 from src.Widgets.tkentry import Entry
 from src.Widgets.treeview import FileTree
 from src.Widgets.winframe import WinFrame
-from src.modules import os, ttk, ttkthemes
+from src.modules import os, ttk, tk
 
 
 class FileOpenDialog(FileTree):
-    def __init__(self, master=".", opencommand: callable = None, action: str = "Open"):
-        self._style = ttkthemes.ThemedStyle()
-        self._style.set_theme(get_theme())
+    def __init__(self, master: [tk.Misc] = ".", opencommand: callable = None, action: str = "Open"):
+        self._style = ttk.Style()
         self.win = WinFrame(master, action)
         self.buttonframe = ttk.Frame(self.win)
         self.okbtn = ttk.Button(self.buttonframe, text=action, command=self.open)

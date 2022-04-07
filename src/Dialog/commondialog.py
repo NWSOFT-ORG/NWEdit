@@ -1,27 +1,16 @@
+from os import PathLike
 from src.Widgets.winframe import WinFrame
 from src.Widgets.tkentry import Entry
 from src.constants import VERSION, logger
 from src.modules import json, tk, ttk, os, webbrowser, request
+from typing import Text, Literal, List
 
 
-def download_file(url: str, localfile="") -> str:
+def download_file(url: Text, localfile: PathLike = "") -> str:
     """Downloads a file from remote path"""
     localfile = url.split("/")[-1] if not localfile else localfile
     request.urlretrieve(url, localfile)
     return localfile
-
-
-# Need these because importing settings is a circular import
-def get_theme() -> str:
-    with open("Config/general-settings.json") as f:
-        settings = json.load(f)
-    return settings["theme"]
-
-
-def get_font() -> None:
-    with open("Config/general-settings.json") as f:
-        settings = json.load(f)
-    return settings["font"]
 
 
 class YesNoDialog(WinFrame):
@@ -58,7 +47,7 @@ class YesNoDialog(WinFrame):
 
 
 class StringInputDialog(WinFrame):
-    def __init__(self, parent=".", title="", text="") -> None:
+    def __init__(self, parent: [Literal["."], tk.Misc] = ".", title: Text = "", text: Text = "") -> None:
         super().__init__(parent, title)
         self.result = ""
         ttk.Label(self, text=text).pack(fill="x")
@@ -88,7 +77,7 @@ class StringInputDialog(WinFrame):
 
 class ErrorInfoDialog(WinFrame):
     def __init__(
-            self, parent: [tk.Misc, str] = None, text: str = None, title: str = "Error"
+            self, parent: [tk.Misc, Literal["."]] = None, text: Text = None, title: Text = "Error"
     ) -> None:
         self.text = text
         super().__init__(parent, title)
@@ -98,13 +87,13 @@ class ErrorInfoDialog(WinFrame):
         b1.pack(side="left")
         self.wait_window(self)
 
-    def apply(self, _=None) -> None:
+    def apply(self, _: tk.Event = None) -> None:
         self.destroy()
         logger.info("apply")
 
 
 class AboutDialog:
-    def __init__(self, master: tk.Misc):
+    def __init__(self, master: tk.Misc) -> None:
         """Shows the version and related info of the editor."""
         self.master = master
         self.icon = tk.PhotoImage(file="Images/pyplus.gif")
@@ -127,7 +116,7 @@ class AboutDialog:
             ttk.Label(ver, text="No updates available").pack(fill="both")
         ver.mainloop()
 
-    def check_updates(self, popup: bool = True) -> list:
+    def check_updates(self, popup: bool = True) -> List:
         if "DEV" in VERSION:
             ErrorInfoDialog(
                 text="Updates aren't supported by develop builds,\n\

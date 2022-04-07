@@ -1,5 +1,5 @@
 from src.constants import logger, OSX
-from src.Dialog.commondialog import get_theme, StringInputDialog
+from src.Dialog.commondialog import StringInputDialog
 from src.Dialog.fileinfodialog import FileInfoDialog
 from src.modules import font, os, send2trash, shutil, tk, ttk, ttkthemes, json, io
 from src.SettingsParser.extension_settings import FileTreeIconSettings
@@ -15,8 +15,7 @@ class FileTree(ttk.Frame):
     def __init__(self, master=None, opencommand=None):
         self.expanded = []
         self.temp_path = []
-        self._style = ttkthemes.ThemedStyle()
-        self._style.set_theme(get_theme())
+        self._style = ttk.Style()
         self.bg = self._style.lookup("TLabel", "background")
         super().__init__(master)
         self.tree = ttk.Treeview(self, show="tree")
@@ -68,8 +67,7 @@ class FileTree(ttk.Frame):
         self.tree.pack(fill="both", expand=1, anchor="nw")
         self.tree.bind("<<TreeviewOpen>>", lambda _: self.open_dir())
         self.tree.bind("<<TreeviewClose>>", lambda _: self.close_dir())
-        
-                        
+
         with open("EditorStatus/treeview_stat.json") as f:
             self.load_status(f)
 
@@ -205,6 +203,7 @@ class FileTree(ttk.Frame):
             self.get_parent(parent_iid)
 
     def get_path(self, item: str, append_name: bool = False) -> str:
+        self.temp_path = []
         self.get_parent(item)
         self.temp_path.reverse()
         self.temp_path.remove("")
@@ -231,7 +230,7 @@ class FileTree(ttk.Frame):
         menu.add_command(label="Rename file", command=lambda: self.rename(item))
         menu.add_command(label="Move to Trash", command=lambda: self.remove(item))
         menu.add_separator()
-        menu.add_command(label="Refresh", command=self.refresh_tree)
+        menu.add_command(label="Refresh", command=self.advanced_refresh)
 
         menu.tk_popup(event.x_root, event.y_root)
 
@@ -243,19 +242,20 @@ class FileTree(ttk.Frame):
     def refresh_tree(self) -> None:
         path = self.root_node_path
         self.tree.delete(*self.tree.get_children())
-        ypos = self.yscroll.get()
         abspath = os.path.abspath(path)
         self.root_node = self.tree.insert(
             "", "end", text=abspath, open=True, tags=("root",)
         )
         self.process_directory(self.root_node, path=abspath)
-        self.yscroll.set(*ypos)
 
-        self.expanded = []
+    def advanced_refresh(self):
+        path = self.root_node_path
+        with open("EditorStatus/treeview_stat.json", "w") as f:
+            self.write_status(f)
+        with open("EditorStatus/treeview_stat.json") as f:
+            self.load_status(f)
 
-        # self.after(self.refresh_interval, self.refresh_tree)
-
-    def write_status(self, fp: io.FileIO):
+    def write_status(self, fp):
         state = {
             "path"              : self.root_node_path,
             "expandedNodes"     : self.expanded,
@@ -266,7 +266,7 @@ class FileTree(ttk.Frame):
         with fp as f:
             json.dump(state, f)
 
-    def load_status(self, fp: io.FileIO):
+    def load_status(self, fp):
         with fp as f:
             status = json.load(f)
         self.path = status["path"]
@@ -275,7 +275,9 @@ class FileTree(ttk.Frame):
         for item in status["expandedNodes"]:
             self.tree.item(item, open=True)
             self.open_dir(item)
-                        
+
+        self.expanded = status["expandedNodes"]
+
         y_scroll_location = status["yScrollbarLocation"]
         x_scroll_location = status["xScrollbarLocation"]
         self.tree.yview_moveto(y_scroll_location[0])

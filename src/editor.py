@@ -14,9 +14,6 @@
 + =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
 Also, it's cross-compatible!
 """
-import json
-import sys
-import traceback
 
 from src.Dialog.autocomplete import CompleteDialog
 from src.Dialog.commondialog import ErrorInfoDialog, StringInputDialog, YesNoDialog
@@ -52,6 +49,9 @@ from src.modules import (
     ttk,
     ttkthemes,
     font,
+    sys,
+    traceback,
+    json,
 )
 from src.SettingsParser.plugin_settings import Plugins
 from src.SettingsParser.extension_settings import (
@@ -82,7 +82,7 @@ class Editor:
     """The editor class."""
 
     # noinspection PyBroadException
-    def __init__(self, master) -> None:
+    def __init__(self, master: tk.Tk) -> None:
         """The editor object, the entire thing that goes in the
         window."""
         empty_menu = tk.Menu(master)
@@ -92,7 +92,6 @@ class Editor:
         splash.set_section(10)
         self.master = master
 
-        self.master.geometry("1200x800")
         try:
             self.settings_class = GeneralSettings(self.master)
             self.file_settings_class = PygmentsLexer()
@@ -227,7 +226,7 @@ class Editor:
         self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
 
         self.master.protocol(
-            "WM_DELETE_WINDOW", lambda: self.exit(force=True)
+            "WM_DELETE_WINDOW", lambda: self.exit()
         )  # When the window is closed, or quit from Mac, do exit action
         self.master.createcommand("::tk::mac::Quit", self.exit)
         logger.debug("Bindings created")
@@ -237,20 +236,18 @@ class Editor:
 
         canvas_bg = lighten_color(self.bg, 10)
         first_tab = tk.Canvas(frame, background=canvas_bg, highlightthickness=0)
-        first_tab.icon = tk.PhotoImage(file="Images/pyplus-35px.gif")
         frame.add_widget(first_tab)
 
-        first_tab.create_image(20, 20, anchor="nw", image=first_tab.icon)
-        fg = "#8dd9f7" if is_dark_color(self.bg) else "blue"
+        first_tab.create_image(20, 20, anchor="nw", image=self.icon)
+        fg = "#8dd9f7" if is_dark_color(self.bg) else "#499CD5"
         bold = font.Font(family="Arial", size=35, weight="bold")
         first_tab.create_text(
-            60,
-            10,
+            80,
+            20,
             anchor="nw",
             text="Welcome!",
             font=bold,
-            fill=self.fg,
-            tags="link",
+            fill=self.fg
         )
         label1 = ttk.Label(
             first_tab,
@@ -284,7 +281,7 @@ class Editor:
             text="Close",
             foreground=fg,
             background=canvas_bg,
-            cursor="hand2",
+            cursor="pointinghand",
             compound="left",
             image=self.close_icon,
         )
@@ -298,7 +295,7 @@ class Editor:
 
         for y_index, item in enumerate(links):
             first_tab.create_window(
-                50, 100 + (y_index - 1) * 40, window=item, anchor="nw"
+                80, 100 + (y_index - 1) * 25, window=item, anchor="nw"
             )
             item.bind("<Button>", lambda _: frame.destroy(), add=True)
 
@@ -314,7 +311,6 @@ class Editor:
         else:
             path = self.filetree.get_path(selected, True)
             isdir = os.path.isdir(path)
-            print(path)
         print(selected, isdir)
         return selected, isdir
 
@@ -325,7 +321,7 @@ class Editor:
         panedwin.pack(fill="both", expand=1)
 
         textframe = EnhancedTextFrame(panedwin)
-        # The one with line numbers and a nice dark theme
+        # The one with line numbers, and a nice dark theme
         textframe.pack(fill="both", expand=1, side="right")
         panedwin.add(textframe)
         textframe.panedwin = panedwin
@@ -397,7 +393,7 @@ class Editor:
             logger.exception("Error when handling keyboard event:")
 
     def mouse(self, _=None) -> None:
-        """The action done when the mouse is clicked"""
+        """The action when the mouse is clicked"""
         try:
             self.update_statusbar()
             # Update statusbar and title bar
@@ -408,7 +404,7 @@ class Editor:
             logger.exception("Error when handling mouse event:")
 
     def reopen_files(self):
-        with open("EditorStatus/recent_files.json") as f:
+        with open("EditorStatus/open_files.json") as f:
             files_list = json.load(f)
             if not files_list:
                 self.start_screen()
@@ -418,6 +414,11 @@ class Editor:
                 textbox = self.tabs[self.nb.get_tab].textbox
                 textbox.mark_set("insert", cur_pos)
                 textbox.see("insert")
+        with open("EditorStatus/window_status.json") as f:
+            geometry = json.load(f)
+            geometry = geometry["windowGeometry"]
+            geometry = f"{geometry[0]}x{geometry[1]}"
+            self.master.geometry(geometry)
         self.update_title()
         self.update_statusbar()
 
@@ -431,7 +432,7 @@ class Editor:
         viewer.focus_set()
         window = HexView(viewer)
         window.open(file)
-        self.tabs[viewer] = Document(viewer, EnhancedText, file)
+        self.tabs[viewer] = Document(viewer, EnhancedText, file, istoolwin=True)
         self.nb.add(viewer, text=f"Hex -- {os.path.basename(file)}")
         self.nb.select(viewer)
         self.update_title()
@@ -550,7 +551,7 @@ class Editor:
             # noinspection PyGlobalUndefined
             global selected_tab
             if self.nb.index("end"):
-                # Close the current tab if close is selected from file menu, or
+                # Close the current tab if close is selected from the file menu, or
                 # keyboard shortcut.
                 if event is None or event.type == str(2):
                     selected_tab = self.nb.get_tab
@@ -587,17 +588,30 @@ class Editor:
             self.open_file(x)
         self.nb.select(curr)
 
-    def exit(self, force=False) -> None:
+    def exit(self) -> None:
         with open("EditorStatus/treeview_stat.json", "w") as f:
             self.filetree.write_status(f)
-        with open("EditorStatus/recent_files.json", "w") as f:
+        with open("EditorStatus/open_files.json", "w") as f:
             file_list = {}
-            for tab in self.tabs.values():
-                cursor_pos = tab.textbox.index("insert")
-                file_list[tab.file_dir] = cursor_pos
+
+            if self.tabs:
+                for tab in self.tabs.values():
+                    if tab.istoolwin:
+                        continue
+                    cursor_pos = tab.textbox.index("insert")
+                    file_list[tab.file_dir] = cursor_pos
+                file_list[self.tabs[self.nb.get_tab].file_dir] = self.tabs[self.nb.get_tab].textbox.index(
+                    "insert")  # Open the current file
             json.dump(file_list, f)
-        if not force:
-            logger.info("Window is destroyed")
+        with open("EditorStatus/window_status.json", "w") as f:
+            status = {}
+            self.master.update()
+            width = self.master.winfo_width()
+            height = self.master.winfo_height()
+            status["windowGeometry"] = [width, height]
+            json.dump(status, f)
+        logger.info("Window is destroyed")
+        self.master.quit()
         sys.exit(0)
 
     @staticmethod
@@ -624,4 +638,4 @@ class Editor:
             ErrorInfoDialog(self.master, f"Not a git repository: {Path(path).parent}")
             return
         elif action == "commit":
-            GitView(self.panedwin)
+            GitView(self.bottom_tabs)

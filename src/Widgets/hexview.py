@@ -1,8 +1,7 @@
 """A Hex Viewer to view non-text documents."""
 
 from src.constants import BLOCK_HEIGHT, BLOCK_WIDTH, ENCODINGS
-from src.Dialog.commondialog import get_theme
-from src.modules import codecs, os, tk, ttk, ttkthemes
+from src.modules import codecs, os, tk, ttk
 from src.Widgets.tktext import EnhancedTextFrame
 
 
@@ -28,8 +27,7 @@ class HexView:
         self.encoding.set(ENCODINGS[0])
 
         buttonframe = ttk.Frame(self.parent)
-        self._style = ttkthemes.ThemedStyle()
-        self._style.set_theme(get_theme())
+        self._style = ttk.Style(self.parent)
         self.encoding_label = ttk.Label(buttonframe, text="Encoding")
         self.encoding_combobox = ttk.Combobox(
             buttonframe, values=ENCODINGS, textvariable=self.encoding, state="readonly"
@@ -93,7 +91,7 @@ class HexView:
             return
         with open(self.filename, "rb") as file:
             block = file.read()
-        rows = [block[i : i + BLOCK_WIDTH] for i in range(0, len(block), BLOCK_WIDTH)]
+        rows = [block[i: i + BLOCK_WIDTH] for i in range(0, len(block), BLOCK_WIDTH)]
         for row in rows:
             self.show_bytes(row)
             self.show_line(row)

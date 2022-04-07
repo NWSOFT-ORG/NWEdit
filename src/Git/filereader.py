@@ -1,5 +1,6 @@
 import os
 from configparser import ConfigParser
+from typing import Text
 
 
 class NotGitRepoError(Exception):
@@ -7,7 +8,7 @@ class NotGitRepoError(Exception):
         super().__init__("Error: Not a Git Repository")
 
 
-def read_gitignore(path: str) -> list:
+def read_gitignore(path: Text) -> list:
     """This method reads a .gitignore file"""
     try:
         with open(os.path.join(path, ".gitignore")) as f:
@@ -18,13 +19,13 @@ def read_gitignore(path: str) -> list:
         raise NotGitRepoError
 
 
-def read_branches(path: str) -> list:
+def read_branches(path: Text) -> list:
     """This method reads the branches"""
     branches_list = os.listdir(os.path.join(path, ".git/refs/heads"))
     return branches_list
 
 
-def read_remotes(path: str) -> dict:
+def read_remotes(path: Text) -> dict:
     remotes = {}
     config = ConfigParser()
     config_file = os.path.join(path, ".git/config")

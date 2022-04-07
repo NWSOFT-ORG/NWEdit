@@ -31,6 +31,7 @@ from keyword import iskeyword
 import art
 import send2trash
 import mimetypes
+import traceback
 
 if sys.platform == "darwin":
     import PyTouchBar

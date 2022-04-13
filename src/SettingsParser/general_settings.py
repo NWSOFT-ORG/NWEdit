@@ -16,8 +16,8 @@ class GeneralSettings:
             self.theme = self.settings["theme"]
             self.highlight_theme = self.settings["pygments"]
             self.tabwidth = self.settings["tabwidth"]
-            self.font = self.settings["font"].split()[0]
-            self.size = self.settings["font"].split()[1]
+            self.font = self.settings["font"]
+            self.size = self.settings["fontSize"]
         except JSONDecodeError:
             ErrorInfoDialog(self.master, text="Setings are corrupted.")
             sys.exit(1)

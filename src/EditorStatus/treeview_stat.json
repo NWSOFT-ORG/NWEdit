@@ -1,16 +1,1 @@
-{
-    path: "",
-    expandedNodes: [
-        "I031",
-        "I035",
-        "I03E"
-    ],
-    yScrollbarLocation: [
-        0.2926829268292683,
-        1.0
-    ],
-    xScrollbarLocation: [
-        0.0,
-        1.0
-    ]
-}
+{path: "", expandedNodes: [], yScrollbarLocation: [0.0, 1.0], xScrollbarLocation: [0.0, 1.0]}

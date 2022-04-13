@@ -1,7 +1,7 @@
 from src.constants import logger, OSX
 from src.Dialog.commondialog import StringInputDialog
 from src.Dialog.fileinfodialog import FileInfoDialog
-from src.modules import font, os, send2trash, shutil, tk, ttk, ttkthemes, json, io
+from src.modules import font, os, send2trash, shutil, tk, ttk, ttkthemes, json
 from src.SettingsParser.extension_settings import FileTreeIconSettings
 from src.SettingsParser.interval_settings import IntervalSettings
 from src.Utils.color_utils import is_dark_color
@@ -45,7 +45,6 @@ class FileTree(ttk.Frame):
         self.refresh_interval = self.interval_settings.get_settings("TreeviewRefresh")
 
         self.pack(side="left", fill="both", expand=1)
-        self.refresh_tree()
         self.tree.bind("<Double-1>", self.on_double_click_treeview)
         self.tree.tag_bind(
             "file",
@@ -68,9 +67,6 @@ class FileTree(ttk.Frame):
         self.tree.bind("<<TreeviewOpen>>", lambda _: self.open_dir())
         self.tree.bind("<<TreeviewClose>>", lambda _: self.close_dir())
 
-        with open("EditorStatus/treeview_stat.json") as f:
-            self.load_status(f)
-
     def remove(self, item: str) -> None:
         path = self.get_path(item, True)
         try:
@@ -81,7 +77,7 @@ class FileTree(ttk.Frame):
                 shutil.rmtree(path)
             else:
                 os.remove(path)
-        self.refresh_tree()
+        self.refresh_tree(True)  # Reset to root path to avoid any problems
 
     def rename(self, item: str) -> None:
         path = self.get_path(item, True)
@@ -94,7 +90,7 @@ class FileTree(ttk.Frame):
         except (IsADirectoryError, FileExistsError):
             pass
         finally:
-            self.refresh_tree()
+            self.refresh_tree(True)
 
     def get_info(self, item: str) -> None:
         path = self.get_path(item, True)
@@ -106,6 +102,7 @@ class FileTree(ttk.Frame):
             item_path = self.get_path(item, isdir)
             path = os.path.join(item_path, name)
             os.mkdir(path)
+            self.path = path
         self.refresh_tree()
 
     def new_file(self, item: str, isdir: bool) -> None:
@@ -211,9 +208,10 @@ class FileTree(ttk.Frame):
             self.temp_path.append(self.tree.item(item, "text"))
         return os.path.abspath("/".join(self.temp_path))
 
-    def right_click(self, event: tk.Event, isdir: bool) -> None:
+    def right_click(self, event: tk.Event, isdir: bool, item: str = "") -> None:
         menu = tk.Menu(self.master)
-        item = self.tree.identify("item", event.x, event.y)
+        if not item:
+            item = self.tree.identify("item", event.x, event.y)
         self.tree.selection_set(item)
 
         new_cascade = tk.Menu(menu)
@@ -239,10 +237,21 @@ class FileTree(ttk.Frame):
         text = self.tree.item("", "text")
         return text
 
-    def refresh_tree(self) -> None:
-        path = self.root_node_path
+    def refresh_tree(self, reset=False) -> None:
         self.tree.delete(*self.tree.get_children())
-        abspath = os.path.abspath(path)
+        if reset:
+            abspath = os.path.abspath(self.root_node_path)
+        else:
+            abspath = os.path.abspath(self.path)
+        self.root_node = self.tree.insert(
+            "", "end", text=abspath, open=True, tags=("root",)
+        )
+        self.process_directory(self.root_node, path=abspath)
+
+    def set_path(self, new_path: os.PathLike):
+        self.tree.delete(*self.tree.get_children())
+        abspath = os.path.abspath(new_path)
+        self.path = new_path
         self.root_node = self.tree.insert(
             "", "end", text=abspath, open=True, tags=("root",)
         )
@@ -270,7 +279,7 @@ class FileTree(ttk.Frame):
         with fp as f:
             status = json.load(f)
         self.path = status["path"]
-        self.refresh_tree()
+        self.refresh_tree(True)
 
         for item in status["expandedNodes"]:
             self.tree.item(item, open=True)

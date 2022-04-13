@@ -404,6 +404,8 @@ class Editor:
             logger.exception("Error when handling mouse event:")
 
     def reopen_files(self):
+        with open("EditorStatus/treeview_stat.json") as f:
+            self.filetree.load_status(f)
         with open("EditorStatus/open_files.json") as f:
             files_list = json.load(f)
             if not files_list:
@@ -444,8 +446,7 @@ class Editor:
             DirectoryOpenDialog(self.master, self.open_dir)
             return
 
-        self.filetree.path = directory
-        self.filetree.refresh_tree()
+        self.filetree.set_path(directory)
 
     def open_file(self, file: str = "", askhex: bool = True):
         """Opens a file

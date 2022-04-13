@@ -4,7 +4,8 @@ Please follow the instructions as comments.
 */
 {
     // Must be a valid TK font
-    "font": "Menlo 13",
+    "font": "Menlo",
+    "fontSize": 13,
     // Must be a valid TTK theme
     "theme": "black",
     // Must be a valid Pygments theme

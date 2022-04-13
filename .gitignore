@@ -3,7 +3,5 @@
 .PyPlus
 bin/
 node_modules/
-obj/
-PyPlus.sublime-workspace
-PyPlus.sublime-project
+.cache/
 src/pyplus.log

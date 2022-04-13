@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="main-local" type="PythonConfigurationType" factoryName="Python" show_console_on_std_err="true">
     <module name="PyPlus" />
-    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="INTERPRETER_OPTIONS" value="-Xfrozen_modules=off" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />

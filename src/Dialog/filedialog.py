@@ -20,7 +20,7 @@ class FileOpenDialog(FileTree):
         self.pathentry = Entry(self.entryframe)
         self.pathentry.pack(side="left")
         self.set_path_btn = ttk.Button(
-            self.entryframe, command=self.set_path, text="Go", takefocus=False
+            self.entryframe, command=self.goto_path, text="Go", takefocus=False
         )
         self.set_path_btn.pack(side="right")
         self.entryframe.pack(fill="x")
@@ -34,11 +34,11 @@ class FileOpenDialog(FileTree):
         self.opencommand(f"{self.temp_path[0]}/{item_text}")
         self.master.destroy()
 
-    def set_path(self, _=None):
+    def goto_path(self, _=None):
         old_path = self.path
-        self.path = self.pathentry.get()
+        path = self.pathentry.get()
         try:
-            self.refresh_tree()
+            self.set_path(path)
         except FileNotFoundError:
             self.path = old_path
 
@@ -57,10 +57,15 @@ class DirectoryOpenDialog(FileOpenDialog):
         super().__init__(master, opencommand=opencommand)
 
     def process_directory(self, parent, showdironly: bool = False, path: str = ""):
-        super().process_directory(parent, True, path)
+        super().process_directory(parent, False, path)
 
     def open(self):
+        if not self.tree.focus():
+            path = self.root_node_path
+            self.opencommand(path)
+            self.master.destroy()
+            return
         self.opencommand(
-            os.path.join(self.path, self.tree.item(self.tree.focus(), "text"))
+            self.get_path(self.tree.focus(), append_name=True)
         )
         self.master.destroy()

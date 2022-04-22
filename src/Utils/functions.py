@@ -12,13 +12,3 @@ def is_binary_string(byte) -> bool:
 
 def is_valid_name(name) -> bool:
     return name.isidentifier() and not iskeyword(name)
-
-
-def run_in_terminal(*args, **kwargs):
-    # FIXME: Replace with browser embed
-    print(args, kwargs)
-
-
-def open_system_shell(*args, **kwargs):
-    # FIXME: Replace with browser embed
-    print(args, kwargs)

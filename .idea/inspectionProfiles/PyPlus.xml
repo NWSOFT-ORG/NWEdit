@@ -11,9 +11,19 @@
     <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredPackages">
         <value>
-          <list size="2">
+          <list size="12">
             <item index="0" class="java.lang.String" itemvalue="Foundation" />
             <item index="1" class="java.lang.String" itemvalue="filetype" />
+            <item index="2" class="java.lang.String" itemvalue="pyinstaller" />
+            <item index="3" class="java.lang.String" itemvalue="Pillow" />
+            <item index="4" class="java.lang.String" itemvalue="altgraph" />
+            <item index="5" class="java.lang.String" itemvalue="art" />
+            <item index="6" class="java.lang.String" itemvalue="Pygments" />
+            <item index="7" class="java.lang.String" itemvalue="ttkthemes" />
+            <item index="8" class="java.lang.String" itemvalue="json5" />
+            <item index="9" class="java.lang.String" itemvalue="macholib" />
+            <item index="10" class="java.lang.String" itemvalue="Send2Trash" />
+            <item index="11" class="java.lang.String" itemvalue="pyinstaller-hooks-contrib" />
           </list>
         </value>
       </option>

@@ -1,8 +1,9 @@
 from src.Dialog.codeinputdialog import CodeInputDialog
 from src.Dialog.commondialog import StringInputDialog, YesNoDialog
-from src.modules import os, tk, ttk, json, lexers
+from src.modules import os, tk, ttk, json
 from src.Widgets.tktext import EnhancedTextFrame, TextOpts
-from src.Utils.functions import is_valid_name, run_in_terminal
+from src.Utils.functions import is_valid_name
+from src.LangSupport.WebTerm.TerminalUi import run_shell_command
 from src.constants import APPDIR
 from src.SettingsParser.extension_settings import RunCommand
 
@@ -185,4 +186,4 @@ if __name__ == '__main__':
             filename = f.name
 
         cmd = self.cmd_settings_class.get_settings("py")
-        run_in_terminal(f"{cmd} {filename} && exit", cwd=APPDIR)
+        run_shell_command(f"{cmd} {filename} && exit", cwd=APPDIR)

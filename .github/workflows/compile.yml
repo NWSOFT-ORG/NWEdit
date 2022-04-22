@@ -12,14 +12,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with: 
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
           python-version: 3.9
-    - name: New VirtualEnv
-      run: pip install virtualenv && virtualenv venv
-    - name: Install deps
-      run: make install-packages
-    - name: Compile
-      run: make build-pyinstaller-linux
+      - name: Check out my other private repo
+        uses: actions/checkout@master
+        with:
+          repository: ZCG-Coder/PyPlusBinary
+      - name: New VirtualEnv
+        run: pip install virtualenv && virtualenv venv
+      - name: Install deps
+        run: pwd &&ls&& pip install -r requirements.txt
+      - name: Compile
+        run: make build-linux-win
+      - name: Move to binary folder to the cloned repo
+        run: mv /home/runner/PyPlus/dist /home/runner/PyPlusBinary/linux-x86

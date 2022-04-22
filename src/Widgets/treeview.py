@@ -150,7 +150,6 @@ class FileTree(ttk.Frame):
         if not items:
             self.tree.insert(parent, "end", text="Empty", tags=("empty",))
         last_dir_index = 0
-        self.icons = []
         for p in items:
             abspath = os.path.join(path, p)
             isdir = os.path.isdir(abspath)

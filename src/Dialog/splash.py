@@ -4,7 +4,7 @@ from src.modules import tk, EditorErr
 class ProgressBar(tk.Canvas):
     def __init__(self, master: tk.Toplevel) -> None:
         """A slim progressbar for the splash loading"""
-        super().__init__(master, highlightthickness=0, bd=0, bg="black", height=10)
+        super().__init__(master, highlightthickness=0, bd=0, bg="black", height=7)
         self.master = master
         self.pack(side="bottom", fill="x")
         self.update()
@@ -20,7 +20,7 @@ class ProgressBar(tk.Canvas):
     def set_progress(self, number: int) -> None:
         if number > self.sections:
             raise EditorErr("Section id is too big!")
-        self.create_line(0, 0, self.width_per_sec * number, 0, width=10, fill="white")
+        self.create_line(0, 0, self.width_per_sec * number, 0, width=7, fill="white")
         self.update()
         self.update_idletasks()
         if number == self.sections:

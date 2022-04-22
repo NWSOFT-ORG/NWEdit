@@ -164,11 +164,11 @@ class Editor:
                     image="Images/saveas.gif", action=lambda _: self.save_as()
                 )
                 close_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/close.gif", action=self.close_tab
+                    image="Images/close.gif", action=lambda _: self.close_tab
                 )
                 space = PyTouchBar.TouchBarItems.Space.Flexible()
                 run_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/run.gif", action=self.codefuncs.run
+                    image="Images/run.gif", action=lambda _: self.codefuncs.run
                 )
                 PyTouchBar.set_touchbar(
                     [open_button, save_as_button, close_button, space, run_button]

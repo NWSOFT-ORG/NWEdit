@@ -1,7 +1,16 @@
+altgraph==0.17.2
 art==5.5
 json5==0.9.6
-Pillow==9.0.1
+macholib==1.16; sys_platform == "darwin"
+Pillow==9.1.0
+proxy-tools==0.1.0
 Pygments==2.11.2
+pyinstaller==5.0
+pyinstaller-hooks-contrib==2022.4
+pyobjc-core==8.5; sys_platform == "darwin"
+pyobjc-framework-Cocoa==8.5; sys_platform == "darwin"
+pyobjc-framework-WebKit==8.5; sys_platform == "darwin"
+pywebview==3.6.3
+Send2Trash==1.8.0
 ttkthemes==3.2.2
-pyinstaller==4.5.1
-send2trash==1.8.0
+pytouchbar==0.2.0; sys_platform == "darwin"

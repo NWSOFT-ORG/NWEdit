@@ -10,8 +10,10 @@
       <sourceFolder url="file://$MODULE_DIR$/src/Widgets" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/PyPlus/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/PyPlus" />
     </content>
-    <orderEntry type="jdk" jdkName="Local" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.10 (PyPlus)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

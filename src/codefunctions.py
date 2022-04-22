@@ -1,6 +1,6 @@
-from src.modules import tk, ttk, ttkthemes, os, subprocess, lexers, Path
+from src.modules import tk, ttk, os, subprocess, lexers, Path
 from src.Utils.color_utils import is_dark_color
-from src.Utils.functions import run_in_terminal, open_system_shell
+from src.LangSupport.WebTerm.TerminalUi import run_shell_command, open_shell
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.search import Search
 from src.Widgets.console import Console
@@ -108,7 +108,7 @@ class CodeFunctions:
                             )
                         )
                     )
-                run_in_terminal("run.bat && del run.bat && exit", cwd=APPDIR)
+                run_shell_command("run.bat && del run.bat && exit", cwd=APPDIR)
             else:  # Others
                 with open(APPDIR + "/run.sh", "w") as f:
                     f.write(
@@ -123,14 +123,14 @@ class CodeFunctions:
                             )
                         )
                     )
-                run_in_terminal("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
+                run_shell_command("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
         except Exception as e:
             print(e)
             ErrorInfoDialog(self.master, "This language is not supported.")
 
     @staticmethod
     def system_shell() -> None:
-        open_system_shell()
+        open_shell()
 
     def python_shell(self) -> None:
         curr_tab = self.bottomframe

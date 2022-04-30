@@ -35,11 +35,6 @@ class Console(ttk.Frame):
         self.text = ConsoleText(
             self,
             wrap="none",
-            bg="black",
-            fg="white",
-            insertbackground="white",
-            selectforeground="black",
-            selectbackground="white",
             highlightthickness=0,
             font=self.font,
             insertwidth=3,

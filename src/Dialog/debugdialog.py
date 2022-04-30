@@ -40,6 +40,7 @@ class ReadonlyText(EnhancedTextFrame):
 class ErrorReportDialog(WinFrame):
     def __init__(self, master: tk.Tk, error_name: Text, error_message: Text) -> None:
         super().__init__(master, error_name, closable=False)
+        print(error_message)
         master.withdraw()
         ttk.Label(self, text="Please consider reporting a bug on github.").pack(
             anchor="nw", fill="x"

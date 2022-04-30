@@ -6,14 +6,12 @@ build-mac: install-packages; @printf "[Compiling via PyInstaller...]\n"
 							--hidden-import "tkinter.font" --hidden-import "tkinter.ttk" \
 							--hidden-import "json5" --hidden-import "ttkthemes" \
 							--hidden-import "pygments" \
-							--hidden-import "pywebview" \
 							--hidden-import "art" \
 							--hidden-import "send2trash" \
 							--hidden-import "PyTouchBar" \
-							--hidden-import "pyobjc" \
+							--hidden-import "Foundation" \
 							--hidden-import "json" \
 							 "./main.py" \
-							 --target-architecture "universal2" \
 							 --clean > /dev/null
 							 rm -rf build main.spec
 							 @printf "\033[36m[Build complete] \033[0m\n"

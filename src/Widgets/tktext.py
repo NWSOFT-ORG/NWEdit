@@ -132,7 +132,7 @@ class EnhancedTextFrame(ttk.Frame):
     text widget with linenumbers in."""
 
     def __init__(self, *args, **kwargs) -> None:
-        ttk.Frame.__init__(self, *args, **kwargs)
+        super().__init__(self, *args, **kwargs)
         settings_class = GeneralSettings()
         self.font = settings_class.get_settings("font")
         self.first_line = 1

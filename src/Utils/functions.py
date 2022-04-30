@@ -1,7 +1,8 @@
 """Useful functions"""
 
 from src.constants import textchars
-from src.modules import iskeyword
+from src.modules import iskeyword, tk
+from tkterminal import Terminal
 
 DARK_COLOR = 128
 
@@ -12,3 +13,18 @@ def is_binary_string(byte) -> bool:
 
 def is_valid_name(name) -> bool:
     return name.isidentifier() and not iskeyword(name)
+
+
+def shell_command(command, cwd="~"):
+    window = tk.Toplevel()
+    terminal = Terminal(window, padx=5, pady=5)
+    terminal.shell = True
+    terminal.run_command(command)
+    terminal.pack(fill="both", expand=True)
+
+
+def open_shell():
+    window = tk.Toplevel()
+    terminal = Terminal(window, padx=5, pady=5)
+    terminal.shell = True
+    terminal.pack(fill="both", expand=True)

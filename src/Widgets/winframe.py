@@ -1,6 +1,7 @@
 from src.constants import OSX
-from src.Utils.color_utils import is_dark_color
+from src.Utils.images import get_image
 from src.modules import ttk, tk, ttkthemes, json
+from typing import *
 
 
 # Need these because importing settings is a circular import
@@ -19,7 +20,7 @@ def get_bg():
 class WinFrame(tk.Toplevel):
     def __init__(
         self,
-        master: [tk.Tk, tk.Toplevel, str],
+        master: Union[tk.Tk, tk.Toplevel, str],
         title: str,
         disable: bool = True,
         closable: bool = True,
@@ -99,14 +100,8 @@ class WinFrame(tk.Toplevel):
         return
 
     def close_button(self):
-        if is_dark_color(self.bg):
-            close_icon = tk.PhotoImage(file="Images/close.gif")
-        else:
-            close_icon = tk.PhotoImage(file="Images/close-dark.gif")
-
         close_button = ttk.Label(self.titleframe)
-        close_button.image = close_icon
-        close_button.config(image=close_icon)
+        close_button.config(image=get_image("close"))
         close_button.pack(side="left")
 
         close_button.bind("<ButtonRelease>", lambda _: self.destroy())

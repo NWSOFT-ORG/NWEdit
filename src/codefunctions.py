@@ -1,12 +1,12 @@
-from src.modules import tk, ttk, os, subprocess, lexers, Path
-from src.Utils.color_utils import is_dark_color
-from src.Utils.functions import shell_command, open_shell
+from src.constants import APPDIR, LINT_BATCH, RUN_BATCH, WINDOWS, logger
+from src.Dialog.codelistdialog import CodeListDialog
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.search import Search
+from src.highlighter import create_tags, recolorize
+from src.modules import Path, lexers, os, subprocess, tk, ttk
+from src.Utils.functions import open_shell, shell_command
+from src.Utils.images import get_image
 from src.Widgets.console import Console
-from src.Dialog.codelistdialog import CodeListDialog
-from src.constants import WINDOWS, logger, APPDIR, LINT_BATCH, RUN_BATCH
-from src.highlighter import recolorize, create_tags
 from src.Widgets.customenotebook import ClosableNotebook
 
 
@@ -26,19 +26,6 @@ class CodeFunctions:
         self.style = ttk.Style(master)
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
-        if is_dark_color(self.bg):
-            self.lint_icon = tk.PhotoImage(file="Images/lint-light.gif")
-            self.search_icon = tk.PhotoImage(file="Images/search-light.gif")
-            self.pyterm_icon = tk.PhotoImage(file="Images/py-term-light.gif")
-            self.term_icon = tk.PhotoImage(file="Images/term-light.gif")
-            self.format_icon = tk.PhotoImage(file="Images/format-light.gif")
-        else:
-            self.lint_icon = tk.PhotoImage(file="Images/lint.gif")
-            self.search_icon = tk.PhotoImage(file="Images/search.gif")
-            self.pyterm_icon = tk.PhotoImage(file="Images/py-term.gif")
-            self.term_icon = tk.PhotoImage(file="Images/term.gif")
-            self.format_icon = tk.PhotoImage(file="Images/format.gif")
-        self.run_icon = tk.PhotoImage(file="Images/run.gif")
 
     def code_struct(self) -> None:
         text = self.tabs[self.nb.get_tab].textbox
@@ -48,36 +35,36 @@ class CodeFunctions:
     def create_menu(self) -> tk.Menu:
         codemenu = tk.Menu(self.master)
         codemenu.add_command(
-            label="Run", command=self.run, image=self.run_icon, compound="left"
+            label="Run", command=self.run, image=get_image("run"), compound="left"
         )
         codemenu.add_command(
             label="Lint",
             command=self.lint_source,
-            image=self.lint_icon,
+            image=get_image("lint"),
             compound="left",
         )
         codemenu.add_command(
             label="Auto-format",
             command=self.autopep,
-            image=self.format_icon,
+            image=get_image("format"),
             compound="left",
         )
         codemenu.add_command(
             label="Open System Shell",
             command=self.system_shell,
-            image=self.term_icon,
+            image=get_image("term"),
             compound="left",
         )
         codemenu.add_command(
             label="Python Shell",
             command=self.python_shell,
-            image=self.pyterm_icon,
+            image=get_image("py-term"),
             compound="left",
         )
         codemenu.add_command(
             label="Find and replace",
             command=self.search,
-            image=self.search_icon,
+            image=get_image("search"),
             compound="left",
         )
         codemenu.add_command(

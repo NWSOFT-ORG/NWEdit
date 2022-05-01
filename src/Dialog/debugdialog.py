@@ -1,5 +1,5 @@
 import sys
-from typing import Text, Literal
+from typing import *
 from src.Widgets.tktext import EnhancedTextFrame
 from src.Widgets.winframe import WinFrame
 from src.modules import json, tk, ttk, styles
@@ -19,7 +19,7 @@ def get_font() -> Text:
 
 
 class ReadonlyText(EnhancedTextFrame):
-    def __init__(self, master: [Literal["."], tk.Misc]) -> None:
+    def __init__(self, master: Union[Literal["."], tk.Misc]) -> None:
         super().__init__(master)
         style = styles.get_style_by_name(get_pygments())
         bgcolor = style.background_color

@@ -1,11 +1,12 @@
+from typing import *
 from src.Widgets.tkentry import Entry
 from src.Widgets.treeview import FileTree
 from src.Widgets.winframe import WinFrame
-from src.modules import os, ttk, tk
+from src.modules import ttk, tk
 
 
 class FileOpenDialog(FileTree):
-    def __init__(self, master: [tk.Misc] = ".", opencommand: callable = None, action: str = "Open"):
+    def __init__(self, master: Union[Literal["."], tk.Misc] = ".", opencommand: callable = None, action: str = "Open"):
         self._style = ttk.Style()
         self.win = WinFrame(master, action)
         self.buttonframe = ttk.Frame(self.win)

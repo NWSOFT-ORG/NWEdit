@@ -3,12 +3,13 @@ from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog
 from src.constants import APPDIR
 from src.modules import EditorErr, tk, Path, os, sys, zipfile, json
+from typing import *
 
 
 class GeneralSettings:
     """A class to read data to/from general-settings.json"""
 
-    def __init__(self, master: [tk.Tk, tk.Toplevel, tk.Misc, str] = "."):
+    def __init__(self, master: Union[tk.Tk, tk.Toplevel, tk.Misc, str] = "."):
         self.master = master
         try:
             with open("Config/general-settings.json") as f:

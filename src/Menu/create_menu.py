@@ -5,6 +5,7 @@ from src.Dialog.goto import Navigate
 from src.Dialog.searchindir import SearchInDir
 from src.Dialog.testdialog import TestDialog
 from src.Dialog.textstyle import StyleWindow
+from src.Utils.images import get_image
 from src.modules import tk, subprocess
 from src.constants import logger
 
@@ -28,45 +29,45 @@ def create_menu(self) -> None:
     self.filemenu.add_command(
         label="New...",
         command=self.filetree.new_file,
-        image=self.new_icon,
+        image=get_image("new"),
         compound="left",
     )
     open_cascade = tk.Menu(self.filemenu)
     open_cascade.add_command(
         label="Open File",
         command=lambda: self.open_file(),
-        image=self.open_icon,
+        image=get_image("open"),
         compound="left",
     )
     open_cascade.add_command(
         label="Open File in Hex",
         command=lambda: self.open_hex(),
-        image=self.open_icon,
+        image=get_image("open"),
         compound="left",
     )
     open_cascade.add_command(
         label="Open Folder/Project",
         command=lambda: self.open_dir(),
-        image=self.open_icon,
+        image=get_image("open"),
         compound="left",
     )
     self.filemenu.add_cascade(label="Open...", menu=open_cascade)
     self.filemenu.add_command(
         label="Save Copy to...",
         command=lambda: self.save_as(),
-        image=self.save_as_icon,
+        image=get_image("saveas"),
         compound="left",
     )
     self.filemenu.add_command(
         label="Close Tab",
         command=self.close_tab,
-        image=self.close_icon,
+        image=get_image("close"),
         compound="left",
     )
     self.filemenu.add_command(
         label="Reload all files from disk",
         command=self.reload,
-        image=self.reload_icon,
+        image=get_image("reload"),
         compound="left",
     )
     self.editmenu = self.opts.create_menu[0]

@@ -1,6 +1,6 @@
 """Closable ttk.Notebook"""
 from src.constants import logger
-from src.Utils.color_utils import darken_color, is_dark_color
+from src.Utils.images import get_image
 from src.modules import tk, ttk, ttkthemes
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Widgets.statusbar import bind_events
@@ -23,16 +23,6 @@ class ClosableNotebook(ttk.Notebook):
         self.style.set_theme(self.settings.get_settings("theme"))
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
-        if is_dark_color(self.bg):
-            self.close_icon = tk.PhotoImage("img_close", file="Images/close.gif")
-            self.alltabs_icon = tk.PhotoImage(file="Images/all-tabs-light.gif")
-            self.nexttab_icon = tk.PhotoImage(file="Images/next-tab-light.gif")
-            self.prevtab_icon = tk.PhotoImage(file="Images/prev-tab-light.gif")
-        else:
-            self.close_icon = tk.PhotoImage("img_close", file="Images/close-dark.gif")
-            self.alltabs_icon = tk.PhotoImage(file="Images/all-tabs.gif")
-            self.nexttab_icon = tk.PhotoImage(file="Images/next-tab.gif")
-            self.prevtab_icon = tk.PhotoImage(file="Images/prev-tab.gif")
         if not self.__initialized:
             self.__initialize_custom_style()
             self.__inititialized = True
@@ -53,20 +43,17 @@ class ClosableNotebook(ttk.Notebook):
 
         ttk.Separator(tab_frame, orient="vertical").pack(side="left", fill="y", padx=2)
 
-        prev_tab_label = ttk.Label(tab_frame, image=self.prevtab_icon)
-        prev_tab_label.image = self.prevtab_icon
+        prev_tab_label = ttk.Label(tab_frame, image=get_image("prev-tab"))
         prev_tab_label.bind("<1>", self.prevtab)
         prev_tab_label.pack(side="left")
 
-        next_tab_label = ttk.Label(tab_frame, image=self.nexttab_icon)
-        next_tab_label.image = self.nexttab_icon
+        next_tab_label = ttk.Label(tab_frame, image=get_image("next-tab"))
         next_tab_label.bind("<1>", self.nexttab)
         next_tab_label.pack(side="left")
 
         ttk.Separator(tab_frame, orient="vertical").pack(side="left", fill="y", padx=2)
 
-        allitems_label = ttk.Label(tab_frame, image=self.alltabs_icon)
-        allitems_label.image = self.alltabs_icon
+        allitems_label = ttk.Label(tab_frame, image=get_image("all-tabs"))
         allitems_label.bind("<1>", self.show_tab_menu)
         allitems_label.pack(side="left")
 
@@ -130,7 +117,7 @@ class ClosableNotebook(ttk.Notebook):
         self.style = style = ttk.Style()
 
         try:
-            style.element_create("close", "image", "img_close", border=10, sticky="")
+            style.element_create("close", "image", get_image("close"), border=10, sticky="")
         except tk.TclError:
             pass
         style.layout(

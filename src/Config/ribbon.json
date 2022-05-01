@@ -1,0 +1,9 @@
+{
+    "File": {
+        "Open...": {
+            "type": "Group",
+            "texts": ["Open File...", "Open Folder/Project..."],
+            "images": [""]
+        }
+    }
+}

@@ -1,9 +1,10 @@
 from os import PathLike
+from src.Utils.images import get_image
 from src.Widgets.winframe import WinFrame
 from src.Widgets.tkentry import Entry
 from src.constants import VERSION, logger
 from src.modules import json, tk, ttk, os, webbrowser, request
-from typing import Text, Literal, List
+from typing import *
 
 
 def download_file(url: Text, localfile: PathLike = "") -> str:
@@ -47,7 +48,7 @@ class YesNoDialog(WinFrame):
 
 
 class StringInputDialog(WinFrame):
-    def __init__(self, parent: [Literal["."], tk.Misc] = ".", title: Text = "", text: Text = "") -> None:
+    def __init__(self, parent: Union[Literal["."], tk.Misc] = ".", title: Text = "", text: Text = "") -> None:
         super().__init__(parent, title)
         self.result = ""
         ttk.Label(self, text=text).pack(fill="x")
@@ -77,7 +78,7 @@ class StringInputDialog(WinFrame):
 
 class ErrorInfoDialog(WinFrame):
     def __init__(
-            self, parent: [tk.Misc, Literal["."]] = None, text: Text = None, title: Text = "Error"
+            self, parent: Union[tk.Misc, Literal["."]] = None, text: Text = None, title: Text = "Error"
     ) -> None:
         self.text = text
         super().__init__(parent, title)
@@ -96,10 +97,9 @@ class AboutDialog:
     def __init__(self, master: tk.Misc) -> None:
         """Shows the version and related info of the editor."""
         self.master = master
-        self.icon = tk.PhotoImage(file="Images/pyplus.gif")
 
         ver = WinFrame(self.master, "About PyPlus")
-        ttk.Label(ver, image=self.icon).pack(fill="both")
+        ttk.Label(ver, image=get_image("pyplus-35px")).pack(fill="both")
         ttk.Label(ver, text=f"Version {VERSION}", font="tkDefaultFont 30 bold").pack(
             fill="both"
         )

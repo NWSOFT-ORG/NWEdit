@@ -1,12 +1,14 @@
-from typing import Iterable, List, Tuple, Text
-from src.Utils.color_utils import is_dark_color
+import re
+from tokenize import Number
+from typing import *
+
+from src.modules import tk, ttk
+from src.Utils.images import get_image
 from src.Widgets.tkentry import Entry
 from src.Widgets.tktext import EnhancedText
-from src.modules import tk, ttk
-import re
 
 
-def finditer_withlineno(pattern, string, flags: [re.RegexFlag, int] = 0) -> Iterable[Tuple[int]]:
+def finditer_withlineno(pattern, string, flags: Union[re.RegexFlag, int] = 0) -> Iterable[Tuple[int]]:
     """
     A version of re.finditer that returns '(match, line_number)' pairs.
     """
@@ -101,14 +103,6 @@ class Search:
         self.main_frame = ttk.Frame(self.master, takefocus=True)
         self.search_frame = ttk.Frame(self.main_frame)
 
-        if is_dark_color(bg):
-            self.next_icon = tk.PhotoImage(file="Images/next-tab-light.gif")
-            self.prev_icon = tk.PhotoImage(file="Images/prev-tab-light.gif")
-            self.close_icon = tk.PhotoImage(file="Images/close.gif")
-        else:
-            self.next_icon = tk.PhotoImage(file="Images/next-tab.gif")
-            self.prev_icon = tk.PhotoImage(file="Images/prev-tab.gif")
-            self.prev_icon = tk.PhotoImage(file="Images/close-dark.gif")
         # Tkinter Variables
         self.case = tk.BooleanVar()
         self.regex = tk.BooleanVar()
@@ -122,7 +116,7 @@ class Search:
 
         self.forward = ttk.Button(
             self.search_frame,
-            image=self.prev_icon,
+            image=get_image("prev-tab"),
             width=1,
             takefocus=False,
             command=self.nav_forward,
@@ -131,7 +125,7 @@ class Search:
 
         self.backward = ttk.Button(
             self.search_frame,
-            image=self.next_icon,
+            image=get_image("next-tab"),
             width=1,
             takefocus=False,
             command=self.nav_forward,
@@ -180,7 +174,7 @@ class Search:
             variable.trace_add("write", self.find)
 
         self.content.bind("<KeyRelease>", self.find)
-        ttk.Button(self.main_frame, image=self.close_icon, command=self._exit).pack(
+        ttk.Button(self.main_frame, image=get_image("close"), command=self._exit).pack(
             side="right", anchor="se"
         )
         self.text.search = True

@@ -1,4 +1,4 @@
-from typing import Text, Callable
+from typing import *
 
 from src.Widgets.tktext import EnhancedTextFrame, TextOpts
 from src.modules import tk, ttk, lexers
@@ -6,7 +6,7 @@ from src.Widgets.winframe import WinFrame
 
 
 class CodeInputDialog(WinFrame):
-    def __init__(self, parent: [tk.Misc, tk.Tk, tk.Toplevel], title: Text, onsave: Callable) -> None:
+    def __init__(self, parent: Union[tk.Misc, tk.Tk, tk.Toplevel], title: Text, onsave: Callable) -> None:
         super().__init__(parent, title, closable=False)
 
         self.save = self.add_destroy_action(onsave)

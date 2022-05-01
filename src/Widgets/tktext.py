@@ -3,8 +3,10 @@
 from src.modules import font, styles, tk, ttk, ttkthemes, EditorErr, lexers
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.color_utils import darken_color, is_dark_color, lighten_color
+from src.Utils.images import get_image
 from src.constants import MAIN_KEY, logger
 from src.highlighter import create_tags, recolorize, recolorize_line
+from typing import *
 
 
 class TextLineNumbers(tk.Canvas):
@@ -87,7 +89,7 @@ class EnhancedText(tk.Text):
     If you hit a key, or the text widget's content has changed,
     it generats an event, to redraw the line numbers."""
 
-    def __init__(self, *args: [None, list], **kwargs: [None, dict]) -> None:
+    def __init__(self, *args: Union[None, list], **kwargs: Union[None, dict]) -> None:
         super().__init__(*args, **kwargs)
         self.frame = self.master
         self.search = False
@@ -132,7 +134,7 @@ class EnhancedTextFrame(ttk.Frame):
     text widget with linenumbers in."""
 
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         settings_class = GeneralSettings()
         self.font = settings_class.get_settings("font")
         self.first_line = 1
@@ -202,23 +204,6 @@ class TextOpts:
         self.style.set_theme(self.theme)
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
-        if is_dark_color(self.bg):
-            self.copy_icon = tk.PhotoImage(file="Images/copy-light.gif")
-            self.delete_icon = tk.PhotoImage(file="Images/delete-light.gif")
-            self.indent_icon = tk.PhotoImage(file="Images/indent-light.gif")
-            self.paste_icon = tk.PhotoImage(file="Images/paste-light.gif")
-            self.unindent_icon = tk.PhotoImage(file="Images/unindent-light.gif")
-            self.sel_all_icon = tk.PhotoImage(file="Images/sel-all-light.gif")
-        else:
-            self.copy_icon = tk.PhotoImage(file="Images/copy.gif")
-            self.delete_icon = tk.PhotoImage(file="Images/delete.gif")
-            self.indent_icon = tk.PhotoImage(file="Images/indent.gif")
-            self.paste_icon = tk.PhotoImage(file="Images/paste.gif")
-            self.unindent_icon = tk.PhotoImage(file="Images/unindent.gif")
-            self.sel_all_icon = tk.PhotoImage(file="Images/sel-all.gif")
-        self.cut_icon = tk.PhotoImage(file="Images/cut.gif")
-        self.redo_icon = tk.PhotoImage(file="Images/redo.gif")
-        self.undo_icon = tk.PhotoImage(file="Images/undo.gif")
 
     def set_text(self, text):
         self.text = text
@@ -228,19 +213,19 @@ class TextOpts:
     def create_menu(self):
         menu = tk.Menu(self.master)
         menu.add_command(
-            label="Undo", command=self.undo, image=self.undo_icon, compound="left"
+            label="Undo", command=self.undo, image=get_image("undo"), compound="left"
         )
         menu.add_command(
-            label="Redo", command=self.redo, image=self.redo_icon, compound="left"
+            label="Redo", command=self.redo, image=get_image("redo"), compound="left"
         )
         menu.add_command(
-            label="Cut", command=self.cut, image=self.cut_icon, compound="left"
+            label="Cut", command=self.cut, image=get_image("cut"), compound="left"
         )
         menu.add_command(
-            label="Copy", command=self.copy, image=self.copy_icon, compound="left"
+            label="Copy", command=self.copy, image=get_image("copy"), compound="left"
         )
         menu.add_command(
-            label="Paste", command=self.paste, image=self.paste_icon, compound="left"
+            label="Paste", command=self.paste, image=get_image("paste"), compound="left"
         )
         menu.add_command(
             label="Duplicate Line or Selected", command=self.duplicate_line
@@ -249,13 +234,13 @@ class TextOpts:
         indent_cascade.add_command(
             label="Indent",
             command=lambda: self.indent("indent"),
-            image=self.indent_icon,
+            image=get_image("indent"),
             compound="left",
         )
         indent_cascade.add_command(
             label="Unident",
             command=lambda: self.indent("unindent"),
-            image=self.unindent_icon,
+            image=get_image("unindent"),
             compound="left",
         )
         menu.add_cascade(label="Indent...", menu=indent_cascade)
@@ -272,7 +257,7 @@ class TextOpts:
         select_cascade.add_command(
             label="Select All",
             command=self.select_all,
-            image=self.sel_all_icon,
+            image=get_image("sel-all"),
             compound="left",
         )
         select_cascade.add_command(label="Select Line", command=self.sel_line)
@@ -285,7 +270,7 @@ class TextOpts:
         delete_cascade = tk.Menu(menu)
         delete_cascade.add_command(
             label="Delete Selected",
-            image=self.delete_icon,
+            image=get_image("delete"),
             command=self.delete,
             compound="left",
         )

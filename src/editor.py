@@ -15,14 +15,32 @@
 Also, it's cross-compatible!
 """
 
+from typing import *
+from src.Widgets.link import Link
+from src.codefunctions import CodeFunctions
+from src.constants import APPDIR, MAIN_KEY, OSX, logger
 from src.Dialog.autocomplete import CompleteDialog
-from src.Dialog.commondialog import ErrorInfoDialog, StringInputDialog, YesNoDialog
+from src.Dialog.commondialog import (ErrorInfoDialog, StringInputDialog,
+                                     YesNoDialog)
 from src.Dialog.debugdialog import ErrorReportDialog
-from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog, FileSaveAsDialog
+from src.Dialog.filedialog import (DirectoryOpenDialog, FileOpenDialog,
+                                   FileSaveAsDialog)
 from src.Dialog.goto import Navigate
 from src.Dialog.splash import SplashWindow
 from src.Git.gitview import GitView
+from src.highlighter import recolorize_line
 from src.Menu.create_menu import create_menu
+from src.modules import (Path, font, json, logging, os, subprocess, sys, tk,
+                         traceback, ttk, ttkthemes)
+from src.SettingsParser.extension_settings import (CommentMarker,
+                                                   FileTreeIconSettings,
+                                                   FormatCommand, Linter,
+                                                   PygmentsLexer, RunCommand)
+from src.SettingsParser.general_settings import GeneralSettings
+from src.SettingsParser.plugin_settings import Plugins
+from src.Utils.color_utils import is_dark_color, lighten_color
+from src.Utils.functions import is_binary_string
+from src.Utils.images import init_images, get_image
 from src.Widgets.customenotebook import ClosableNotebook
 from src.Widgets.hexview import HexView
 from src.Widgets.panel import CustomTabs
@@ -30,35 +48,6 @@ from src.Widgets.statusbar import Statusbar
 from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
 from src.Widgets.treeview import FileTree
 from src.Widgets.winframe import WinFrame
-from src.codefunctions import CodeFunctions
-from src.constants import (
-    APPDIR,
-    MAIN_KEY,
-    OSX,
-    logger,
-)
-from src.Utils.functions import is_binary_string
-from src.Utils.color_utils import lighten_color, is_dark_color
-from src.highlighter import recolorize_line
-from src.modules import (
-    Path,
-    logging,
-    os,
-    subprocess,
-    tk,
-    ttk,
-    ttkthemes,
-    font,
-    sys,
-    traceback,
-    json,
-)
-from src.SettingsParser.plugin_settings import Plugins
-from src.SettingsParser.extension_settings import (
-    CommentMarker, FormatCommand, FileTreeIconSettings, PygmentsLexer, Linter,
-    RunCommand,
-)
-from src.SettingsParser.general_settings import GeneralSettings
 
 if OSX:
     from src.modules import PyTouchBar
@@ -85,6 +74,7 @@ class Editor:
     def __init__(self, master: tk.Tk) -> None:
         """The editor object, the entire thing that goes in the
         window."""
+        init_images()
         empty_menu = tk.Menu(master)
         master.config(menu=empty_menu)
         # Create an empty menu to prevent mess-ups
@@ -117,21 +107,9 @@ class Editor:
             self.fg = self.style.lookup("TLabel", "foreground")
 
             self.icon_settings_class = FileTreeIconSettings()
-            if is_dark_color(self.bg):
-                self.close_icon = tk.PhotoImage(file="Images/close.gif")
-                self.open_icon = tk.PhotoImage(file="Images/open.gif")
-                self.clone_icon = tk.PhotoImage(file="Images/clone.gif")
-            else:
-                self.close_icon = tk.PhotoImage(file="Images/close-dark.gif")
-                self.open_icon = tk.PhotoImage(file="Images/open-dark.gif")
-                self.clone_icon = tk.PhotoImage(file="Images/clone-dark.gif")
-
-            self.new_icon = tk.PhotoImage(file="Images/new.gif")
-            self.reload_icon = tk.PhotoImage(file="Images/reload.gif")
-            self.save_as_icon = tk.PhotoImage(file="Images/saveas.gif")
             logger.debug("Icons loaded")
             splash.set_progress(4)
-            self.icon = tk.PhotoImage(file="Images/pyplus.gif")
+            self.icon = get_image("pyplus")
             self.master.iconphoto(True, self.icon)
             splash.set_progress(5)
 
@@ -234,13 +212,11 @@ class Editor:
     def start_screen(self) -> None:
         frame = WinFrame(self.master, "Start", closable=False)
 
-        canvas_bg = lighten_color(self.bg, 10)
-        first_tab = tk.Canvas(frame, background=canvas_bg, highlightthickness=0)
+        first_tab = tk.Canvas(frame, background=self.bg, highlightthickness=0)
         frame.add_widget(first_tab)
 
         first_tab.create_image(20, 20, anchor="nw", image=self.icon)
-        fg = "#8dd9f7" if is_dark_color(self.bg) else "#499CD5"
-        bold = font.Font(family="Arial", size=35, weight="bold")
+        bold = font.Font(family="tkDefaultFont", size=35, weight="bold")
         first_tab.create_text(
             80,
             20,
@@ -249,41 +225,25 @@ class Editor:
             font=bold,
             fill=self.fg
         )
-        label1 = ttk.Label(
+        label1 = Link(
             first_tab,
             text="Open file",
-            foreground=fg,
-            background=canvas_bg,
-            cursor="hand2",
-            compound="left",
-            image=self.open_icon,
+            image=get_image("open"),
         )
-        label2 = ttk.Label(
+        label2 = Link(
             first_tab,
             text="New...",
-            foreground=fg,
-            background=canvas_bg,
-            cursor="hand2",
-            compound="left",
-            image=self.new_icon,
+            image=get_image("new"),
         )
-        label3 = ttk.Label(
+        label3 = Link(
             first_tab,
             text="Clone",
-            foreground=fg,
-            background=canvas_bg,
-            compound="left",
-            image=self.clone_icon,
-            cursor="hand2",
+            image=get_image("clone"),
         )
-        label4 = ttk.Label(
+        label4 = Link(
             first_tab,
             text="Close",
-            foreground=fg,
-            background=canvas_bg,
-            cursor="pointinghand",
-            compound="left",
-            image=self.close_icon,
+            image=get_image("close"),
         )
 
         links = [label1, label2, label3, label4]
@@ -424,7 +384,7 @@ class Editor:
         self.update_title()
         self.update_statusbar()
 
-    def open_hex(self, file="") -> [EnhancedText, None]:
+    def open_hex(self, file="") -> Union[EnhancedText, None]:
         if not file:
             FileOpenDialog(self.master, self.open_hex)
             return
@@ -620,7 +580,7 @@ class Editor:
         os.execv(sys.executable, [__file__] + sys.argv)
 
     @property
-    def get_text(self) -> [EnhancedText, None]:
+    def get_text(self) -> Union[EnhancedText, None]:
         try:
             return self.tabs[self.nb.get_tab].textbox
         except KeyError:

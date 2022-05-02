@@ -1,3 +1,4 @@
+from src.constants import logger
 from src.Dialog.codelistdialog import CodeListDialog
 from src.Dialog.commondialog import AboutDialog
 from src.Dialog.debugdialog import LogViewDialog
@@ -5,9 +6,8 @@ from src.Dialog.goto import Navigate
 from src.Dialog.searchindir import SearchInDir
 from src.Dialog.testdialog import TestDialog
 from src.Dialog.textstyle import StyleWindow
+from src.modules import subprocess, tk
 from src.Utils.images import get_image
-from src.modules import tk, subprocess
-from src.constants import logger
 
 
 def create_menu(self) -> None:

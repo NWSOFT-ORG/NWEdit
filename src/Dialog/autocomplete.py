@@ -1,7 +1,7 @@
 import string
 from typing import Text
 
-from src.modules import ttk, tk
+from src.modules import tk, ttk
 from src.Widgets.tktext import TextOpts
 
 punc = [x for x in string.punctuation.replace("_", "")]

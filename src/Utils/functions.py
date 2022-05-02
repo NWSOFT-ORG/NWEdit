@@ -1,8 +1,9 @@
 """Useful functions"""
 
+from tkterminal import Terminal
+
 from src.constants import textchars
 from src.modules import iskeyword, tk
-from tkterminal import Terminal
 
 DARK_COLOR = 128
 

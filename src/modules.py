@@ -5,6 +5,7 @@ import codecs
 import hashlib
 import io
 import logging
+import mimetypes
 import os
 import platform
 import queue
@@ -17,21 +18,19 @@ import time
 import tkinter as tk
 import tkinter.font as font
 import tkinter.ttk as ttk
+import traceback
+import urllib.request as request
 import webbrowser
 import zipfile
-import urllib.request as request
+from keyword import iskeyword
 from pathlib import Path
 
-import json5 as json
-import ttkthemes
-import pygments
-from pygments import lexers
-from pygments import styles
-from keyword import iskeyword
 import art
+import json5 as json
+import pygments
 import send2trash
-import mimetypes
-import traceback
+import ttkthemes
+from pygments import lexers, styles
 
 if sys.platform == "darwin":
     import PyTouchBar

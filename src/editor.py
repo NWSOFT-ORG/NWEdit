@@ -16,7 +16,7 @@ Also, it's cross-compatible!
 """
 
 from typing import *
-from src.Widgets.link import Link
+
 from src.codefunctions import CodeFunctions
 from src.constants import APPDIR, MAIN_KEY, OSX, logger
 from src.Dialog.autocomplete import CompleteDialog
@@ -40,9 +40,10 @@ from src.SettingsParser.general_settings import GeneralSettings
 from src.SettingsParser.plugin_settings import Plugins
 from src.Utils.color_utils import is_dark_color, lighten_color
 from src.Utils.functions import is_binary_string
-from src.Utils.images import init_images, get_image
+from src.Utils.images import get_image, init_images
 from src.Widgets.customenotebook import ClosableNotebook
 from src.Widgets.hexview import HexView
+from src.Widgets.link import Link
 from src.Widgets.panel import CustomTabs
 from src.Widgets.statusbar import Statusbar
 from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
@@ -271,7 +272,6 @@ class Editor:
         else:
             path = self.filetree.get_path(selected, True)
             isdir = os.path.isdir(path)
-        print(selected, isdir)
         return selected, isdir
 
     def create_text_widget(self, frame: ttk.Frame) -> EnhancedText:
@@ -364,8 +364,6 @@ class Editor:
             logger.exception("Error when handling mouse event:")
 
     def reopen_files(self):
-        with open("EditorStatus/treeview_stat.json") as f:
-            self.filetree.load_status(f)
         with open("EditorStatus/open_files.json") as f:
             files_list = json.load(f)
             if not files_list:

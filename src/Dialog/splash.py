@@ -1,4 +1,4 @@
-from src.modules import tk, EditorErr
+from src.modules import EditorErr, tk
 
 
 class ProgressBar(tk.Canvas):

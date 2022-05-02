@@ -1,4 +1,4 @@
-from src.modules import tk, ttk, art, sys, io
+from src.modules import art, io, sys, tk, ttk
 from src.Widgets.tkentry import Entry
 from src.Widgets.winframe import WinFrame
 

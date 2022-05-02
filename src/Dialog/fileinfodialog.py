@@ -1,5 +1,5 @@
-from src.modules import os, ttk, time, tk, mimetypes
 from src.constants import OSX, WINDOWS
+from src.modules import mimetypes, os, time, tk, ttk
 from src.Widgets.winframe import WinFrame
 
 

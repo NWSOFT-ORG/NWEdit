@@ -1,11 +1,10 @@
+from src.constants import APPDIR
 from src.Dialog.codeinputdialog import CodeInputDialog
 from src.Dialog.commondialog import StringInputDialog, YesNoDialog
-from src.modules import os, tk, ttk, json
-from src.Widgets.tktext import EnhancedTextFrame, TextOpts
-from src.Utils.functions import is_valid_name
-from src.Utils.functions import shell_command
-from src.constants import APPDIR
+from src.modules import json, os, tk, ttk
 from src.SettingsParser.extension_settings import RunCommand
+from src.Utils.functions import is_valid_name, shell_command
+from src.Widgets.tktext import EnhancedTextFrame, TextOpts
 
 TESTS_FILE = ".PyPlus/Tests/tests.json"
 SETTINGS_FILE = ".PyPlus/Tests/settings.json"

@@ -1,5 +1,5 @@
-from src.Widgets.winframe import WinFrame
 from src.modules import tk  # You may import from PyPlus Libraries
+from src.Widgets.winframe import WinFrame
 
 
 class Sample(WinFrame):

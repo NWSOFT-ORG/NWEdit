@@ -1,9 +1,9 @@
 """A ribbon tool meant to simulate the Microsoft Ribbon UX design"""
 
-from typing import *
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
+from typing import *
 
 
 def font_height():

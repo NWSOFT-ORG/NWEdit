@@ -1,5 +1,6 @@
 from pygments.lexer import Lexer
-from src.modules import json, tk, lexers
+
+from src.modules import json, lexers, tk
 
 
 class ExtensionSettings:

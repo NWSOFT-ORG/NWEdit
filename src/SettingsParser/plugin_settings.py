@@ -1,6 +1,6 @@
-from src.Plugins.plugins_view import PluginView
 from src.constants import logger
-from src.modules import tk, json
+from src.modules import json, tk
+from src.Plugins.plugins_view import PluginView
 
 
 class Plugins:

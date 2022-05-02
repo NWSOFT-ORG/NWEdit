@@ -1,7 +1,7 @@
 from typing import *
 
+from src.modules import lexers, tk, ttk
 from src.Widgets.tktext import EnhancedTextFrame, TextOpts
-from src.modules import tk, ttk, lexers
 from src.Widgets.winframe import WinFrame
 
 

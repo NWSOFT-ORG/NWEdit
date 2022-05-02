@@ -1,6 +1,6 @@
+from src.modules import tk, ttk
 from src.Widgets.tkentry import Entry
 from src.Widgets.tktext import EnhancedText
-from src.modules import tk, ttk
 
 
 class Navigate:

@@ -1,8 +1,8 @@
 """Closable ttk.Notebook"""
 from src.constants import logger
-from src.Utils.images import get_image
 from src.modules import tk, ttk, ttkthemes
 from src.SettingsParser.general_settings import GeneralSettings
+from src.Utils.images import get_image
 from src.Widgets.statusbar import bind_events
 
 

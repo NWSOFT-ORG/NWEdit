@@ -1,9 +1,10 @@
 from json import JSONDecodeError
+from typing import *
+
+from src.constants import APPDIR
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog
-from src.constants import APPDIR
-from src.modules import EditorErr, tk, Path, os, sys, zipfile, json
-from typing import *
+from src.modules import EditorErr, Path, json, os, sys, tk, zipfile
 
 
 class GeneralSettings:

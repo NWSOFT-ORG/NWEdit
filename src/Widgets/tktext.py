@@ -1,12 +1,13 @@
 """A modded version of tkinter.Text"""
 
-from src.modules import font, styles, tk, ttk, ttkthemes, EditorErr, lexers
+from typing import *
+
+from src.constants import MAIN_KEY, logger
+from src.highlighter import create_tags, recolorize, recolorize_line
+from src.modules import EditorErr, font, lexers, styles, tk, ttk, ttkthemes
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.color_utils import darken_color, is_dark_color, lighten_color
 from src.Utils.images import get_image
-from src.constants import MAIN_KEY, logger
-from src.highlighter import create_tags, recolorize, recolorize_line
-from typing import *
 
 
 class TextLineNumbers(tk.Canvas):

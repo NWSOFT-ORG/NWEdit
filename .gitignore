@@ -1,7 +1,8 @@
 *.pyc
 .DS_STORE
-.PyPlus
+.PyPlus/
 bin/
 node_modules/
 .cache/
 src/pyplus.log
+.vscode/

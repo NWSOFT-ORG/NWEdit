@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from src import editor
-from src.modules import tk
 from src.constants import OSX
+from src.modules import tk
 
 if __name__ == "__main__":
     if OSX:

@@ -1,7 +1,8 @@
-from src.constants import OSX
-from src.Utils.images import get_image
-from src.modules import ttk, tk, ttkthemes, json
 from typing import *
+
+from src.constants import OSX
+from src.modules import json, tk, ttk, ttkthemes
+from src.Utils.images import get_image
 
 
 # Need these because importing settings is a circular import

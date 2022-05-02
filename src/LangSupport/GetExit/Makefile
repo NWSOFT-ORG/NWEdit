@@ -1,1 +1,0 @@
-build: ; pyinstaller main.py --noconfirm --onefile

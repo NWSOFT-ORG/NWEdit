@@ -1,6 +1,7 @@
-from typing import Text
-from src.modules import ttk, tk, traceback
 import ast
+from typing import Text
+
+from src.modules import tk, traceback, ttk
 
 
 class CodeListDialog(ttk.Frame):

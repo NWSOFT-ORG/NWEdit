@@ -1,8 +1,9 @@
 import sys
 from typing import *
+
+from src.modules import json, styles, tk, ttk
 from src.Widgets.tktext import EnhancedTextFrame
 from src.Widgets.winframe import WinFrame
-from src.modules import json, tk, ttk, styles
 
 
 # Need these to prevent circular imports

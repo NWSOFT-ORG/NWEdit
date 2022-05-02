@@ -1,10 +1,11 @@
 from os import PathLike
-from src.Utils.images import get_image
-from src.Widgets.winframe import WinFrame
-from src.Widgets.tkentry import Entry
-from src.constants import VERSION, logger
-from src.modules import json, tk, ttk, os, webbrowser, request
 from typing import *
+
+from src.constants import VERSION, logger
+from src.modules import json, os, request, tk, ttk, webbrowser
+from src.Utils.images import get_image
+from src.Widgets.tkentry import Entry
+from src.Widgets.winframe import WinFrame
 
 
 def download_file(url: Text, localfile: PathLike = "") -> str:

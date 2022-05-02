@@ -1,7 +1,8 @@
 from typing import *
-from src.Utils.color_utils import is_dark_color
-from src.modules import tk, ttk
+
 from src.constants import OSX
+from src.modules import tk, ttk
+from src.Utils.color_utils import is_dark_color
 
 
 class Link(ttk.Label):

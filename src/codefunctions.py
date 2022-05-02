@@ -112,7 +112,6 @@ class CodeFunctions:
                     )
                 shell_command("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
         except Exception as e:
-            print(e)
             ErrorInfoDialog(self.master, "This language is not supported.")
 
     @staticmethod

@@ -1,4 +1,4 @@
-from src.modules import font, styles, tk, pygments
+from src.modules import font, pygments, styles, tk
 from src.SettingsParser.general_settings import GeneralSettings
 
 

@@ -37,6 +37,3 @@ def read_remotes(path: Text) -> dict:
             url = config.get(item, "url")
             remotes[remote] = url
     return remotes
-
-
-print(read_remotes("/home/runner/PyPlus"))

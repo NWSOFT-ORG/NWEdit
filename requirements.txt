@@ -12,3 +12,4 @@ pyobjc-framework-Cocoa==8.5; sys_platform == "darwin"
 Send2Trash==1.8.0
 ttkthemes==3.2.2
 pytouchbar==0.2.0; sys_platform == "darwin"
+tkterminal==0.1.0

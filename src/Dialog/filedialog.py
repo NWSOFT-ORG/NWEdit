@@ -1,8 +1,9 @@
 from typing import *
+
+from src.modules import tk, ttk
 from src.Widgets.tkentry import Entry
 from src.Widgets.treeview import FileTree
 from src.Widgets.winframe import WinFrame
-from src.modules import ttk, tk
 
 
 class FileOpenDialog(FileTree):

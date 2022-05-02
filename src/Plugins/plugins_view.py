@@ -1,5 +1,4 @@
 from src.modules import json, ttk
-
 from src.Widgets.winframe import WinFrame
 
 

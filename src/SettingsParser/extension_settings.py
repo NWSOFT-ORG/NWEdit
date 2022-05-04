@@ -1,3 +1,4 @@
+from typing import *
 from pygments.lexer import Lexer
 
 from src.modules import json, lexers, tk
@@ -15,7 +16,7 @@ class ExtensionSettings:
             self.extens.append(key)
             self.items.append(value)
 
-    def get_settings(self, extension) -> [str, None]:
+    def get_settings(self, extension) -> Union[str, None]:
         try:
             if self.items[self.extens.index(extension)] == "none":
                 return None
@@ -59,6 +60,7 @@ class FileTreeIconSettings:
     def __init__(self) -> None:
         self.path = "Config/file-icons.json"
         self.dark = False
+        self.folder_icon = tk.PhotoImage(file="Images/file-icons/folder.png")
 
     def set_theme(self, dark: bool) -> None:
         self.dark = dark
@@ -70,7 +72,4 @@ class FileTreeIconSettings:
             icon_name = settings[extension]
         except KeyError:
             icon_name = "other"
-        if self.dark:
-            return tk.PhotoImage(file=f"Images/file-icons/{icon_name}-light.gif")
-        else:
-            return tk.PhotoImage(file=f"Images/file-icons/{icon_name}.gif")
+        return tk.PhotoImage(file=f"Images/file-icons/{icon_name}.png")

@@ -1,8 +1,10 @@
+from re import L
 from typing import *
 
 from src.constants import OSX
-from src.modules import json, tk, ttk, ttkthemes
+from src.modules import json, tk, ttk, ttkthemes, font
 from src.Utils.images import get_image
+from PIL import Image, ImageTk
 
 
 # Need these because importing settings is a circular import
@@ -21,19 +23,31 @@ def get_bg():
 class WinFrame(tk.Toplevel):
     def __init__(
         self,
-        master: Union[tk.Tk, tk.Toplevel, str],
-        title: str,
+        master: Union[tk.Tk, tk.Toplevel, Literal["."]],
+        title: Text,
         disable: bool = True,
         closable: bool = True,
+        icon: tk.PhotoImage = None
     ):
-        super().__init__(master, takefocus=True)
+        super().__init__(master)
+        FONT_HEIGHT = font.Font().metrics("linespace")
+
         if OSX:
             self.tk.call(
                 "::tk::unsupported::MacWindowStyle", "style", self._w, "simple"
             )
         else:
             self.overrideredirect(True)
+        if icon:
+            icon_path = icon.cget("file")
+            image = Image.open(icon_path)
+            image = image.convert("RGBA")
+            image = image.resize((FONT_HEIGHT + 3, FONT_HEIGHT + 3))
 
+            icon = ImageTk.PhotoImage(image=image)
+        else:
+            icon = None
+        self.icon = icon
         self.title_text = title
         self.title(title)  # Need a decent message to show on the taskbar
         self.master = master
@@ -57,14 +71,14 @@ class WinFrame(tk.Toplevel):
         size.pack(side="bottom", anchor="se")
 
     def on_exit(self, _):
-        # Fix destroy issues, need to relink events.
-        self.master.bind("<FocusIn>", lambda _: None)
-        self.master.bind("<FocusOut>", lambda _: None)
+        # Release Grab to prevent issues
         self.grab_release()
 
     def create_titlebar(self):
         self.titleframe = ttk.Frame(self)
-        self.titlebar = ttk.Label(self.titleframe, text=self.title_text)
+        self.titlebar = ttk.Label(self.titleframe, text=self.title_text, compound="left")
+        self.titlebar.image = self.icon
+        self.titlebar["image"] = self.icon
         self.titlebar.pack(side="left", fill="both", expand=1)
 
         self.titleframe.pack(fill="x", side="top")
@@ -77,7 +91,6 @@ class WinFrame(tk.Toplevel):
         self.titlebar.bind("<ButtonPress-1>", self.start_move)
         self.titlebar.bind("<ButtonRelease-1>", self.stop_move)
         self.titlebar.bind("<B1-Motion>", self.do_move)
-        self.master.bind("<FocusIn>", lambda _: self.focus_force())
 
     def start_move(self, event):
         self.x = event.x

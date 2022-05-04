@@ -20,7 +20,7 @@ def listfonts():
 
 
 class StyleWindow(WinFrame):
-    def __init__(self, master, text, handler):
+    def __init__(self, master, text):
         super().__init__(master, "Insert Ascii Art")
 
         self.text = text

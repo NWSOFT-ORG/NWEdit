@@ -1,3 +1,4 @@
+from src.Utils.images import get_image
 from src.modules import EditorErr, tk
 
 
@@ -36,7 +37,7 @@ class SplashWindow(tk.Toplevel):
         self.overrideredirect(False)
         self.overrideredirect(True)
 
-        self.image = tk.PhotoImage(file="Images/splash.gif")
+        self.image = get_image("splash")
         self.h = h = self.image.height()
         self.w = w = self.image.width()
         self.geometry(f"{w}x{h}")

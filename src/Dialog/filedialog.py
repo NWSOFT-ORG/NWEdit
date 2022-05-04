@@ -4,12 +4,13 @@ from src.modules import tk, ttk
 from src.Widgets.tkentry import Entry
 from src.Widgets.treeview import FileTree
 from src.Widgets.winframe import WinFrame
+from src.Utils.images import get_image
 
 
 class FileOpenDialog(FileTree):
     def __init__(self, master: Union[Literal["."], tk.Misc] = ".", opencommand: callable = None, action: str = "Open"):
         self._style = ttk.Style()
-        self.win = WinFrame(master, action)
+        self.win = WinFrame(master, action, icon=get_image("open"))
         self.buttonframe = ttk.Frame(self.win)
         self.okbtn = ttk.Button(self.buttonframe, text=action, command=self.open)
         self.okbtn.pack(side="left")
@@ -51,6 +52,7 @@ class FileOpenDialog(FileTree):
 class FileSaveAsDialog(FileOpenDialog):
     def __init__(self, master, savecommand: callable):
         super().__init__(master, savecommand, "Save")
+        self.win.titlebar["image"] = get_image("save-as")
 
 
 class DirectoryOpenDialog(FileOpenDialog):

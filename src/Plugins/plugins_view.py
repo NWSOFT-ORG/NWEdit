@@ -1,10 +1,11 @@
 from src.modules import json, ttk
 from src.Widgets.winframe import WinFrame
+from src.Utils.images import get_image
 
 
 class PluginView(WinFrame):
     def __init__(self, master):
-        super().__init__(master, "Plugins")
+        super().__init__(master, "Plugins", icon=get_image("info"))
         with open("Config/plugin-data.json") as f:
             self.settings = json.load(f)
         self.plugins = ttk.Treeview(self, columns=("name", "desc"))

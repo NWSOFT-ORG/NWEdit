@@ -20,7 +20,7 @@ class YesNoDialog(WinFrame):
             self, parent: tk.Misc = None, title: str = "", text: str = None
     ) -> None:
         self.text = text
-        super().__init__(parent, title)
+        super().__init__(parent, title, icon=get_image("question"))
         label1 = ttk.Label(self, text=self.text)
         label1.pack(fill="both")
 
@@ -50,7 +50,7 @@ class YesNoDialog(WinFrame):
 
 class StringInputDialog(WinFrame):
     def __init__(self, parent: Union[Literal["."], tk.Misc] = ".", title: Text = "", text: Text = "") -> None:
-        super().__init__(parent, title)
+        super().__init__(parent, title, icon=get_image("question"))
         self.result = ""
         ttk.Label(self, text=text).pack(fill="x")
         self.entry = Entry(self)
@@ -82,7 +82,7 @@ class ErrorInfoDialog(WinFrame):
             self, parent: Union[tk.Misc, Literal["."]] = None, text: Text = None, title: Text = "Error"
     ) -> None:
         self.text = text
-        super().__init__(parent, title)
+        super().__init__(parent, title, icon=get_image("question"))
         label1 = ttk.Label(self, text=self.text)
         label1.pack(side="top", fill="both", expand=1)
         b1 = ttk.Button(self, text="Ok", width=10, command=self.apply)
@@ -99,7 +99,7 @@ class AboutDialog:
         """Shows the version and related info of the editor."""
         self.master = master
 
-        ver = WinFrame(self.master, "About PyPlus")
+        ver = WinFrame(self.master, "About PyPlus", icon=get_image("info"))
         ttk.Label(ver, image=get_image("pyplus-35px")).pack(fill="both")
         ttk.Label(ver, text=f"Version {VERSION}", font="tkDefaultFont 30 bold").pack(
             fill="both"
@@ -133,7 +133,7 @@ class AboutDialog:
         if not popup:
             os.remove("ver.json")
             return [version != VERSION, newest["url"]]
-        updatewin = WinFrame(self.master, "Updates", closable=False)
+        updatewin = WinFrame(self.master, "Updates", closable=False, icon=get_image("info"))
         if version != VERSION:
             ttk.Label(
                 updatewin, text="Update available!", font="tkDefaultFont 30"

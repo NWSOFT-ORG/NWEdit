@@ -1,7 +1,7 @@
 from src.constants import OSX, logger
 from src.Dialog.commondialog import StringInputDialog
 from src.Dialog.fileinfodialog import FileInfoDialog
-from src.modules import font, json, os, send2trash, shutil, tk, ttk, ttkthemes
+from src.modules import font, json, os, send2trash, shutil, tk, ttk
 from src.SettingsParser.extension_settings import FileTreeIconSettings
 from src.SettingsParser.interval_settings import IntervalSettings
 from src.Utils.color_utils import is_dark_color
@@ -31,12 +31,6 @@ class FileTree(ttk.Frame):
 
         self.icon_settings = FileTreeIconSettings()
         self.icon_settings.set_theme(is_dark_color(self.bg))
-        if is_dark_color(self.bg):
-            self.other_icon = tk.PhotoImage(file="Images/file-icons/other-light.gif")
-            self.folder_icon = tk.PhotoImage(file="Images/file-icons/folder-light.gif")
-        else:
-            self.other_icon = tk.PhotoImage(file="Images/file-icons/other.gif")
-            self.folder_icon = tk.PhotoImage(file="Images/file-icons/folder.gif")
         self.icons = []
         self.temp_path = []  # IMPORTANT! Reset after use
 
@@ -162,7 +156,7 @@ class FileTree(ttk.Frame):
                     text=p,
                     tags=("subfolder",),
                     open=False,
-                    image=self.folder_icon,
+                    image=self.icon_settings.folder_icon,
                 )
                 last_dir_index += 1
                 if not showdironly:

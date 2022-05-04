@@ -55,7 +55,7 @@ def create_menu(self) -> None:
     self.filemenu.add_command(
         label="Save Copy to...",
         command=lambda: self.save_as(),
-        image=get_image("saveas"),
+        image=get_image("save-as"),
         compound="left",
     )
     self.filemenu.add_command(

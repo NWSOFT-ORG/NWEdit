@@ -31,6 +31,7 @@ import pygments
 import send2trash
 import ttkthemes
 from pygments import lexers, styles
+from PIL import Image, ImageTk
 
 if sys.platform == "darwin":
     import PyTouchBar

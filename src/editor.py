@@ -137,17 +137,17 @@ class Editor:
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
                 open_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/open.gif", action=lambda _: self.open_file()
+                    image="Images/open.png", action=lambda _: self.open_file()
                 )
                 save_as_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/saveas.gif", action=lambda _: self.save_as()
+                    image="Images/save-as.png", action=lambda _: self.save_as()
                 )
                 close_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/close.gif", action=lambda _: self.close_tab
+                    image="Images/close.png", action=lambda _: self.close_tab
                 )
                 space = PyTouchBar.TouchBarItems.Space.Flexible()
                 run_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/run.gif", action=lambda _: self.codefuncs.run
+                    image="Images/run.png", action=lambda _: self.codefuncs.run
                 )
                 PyTouchBar.set_touchbar(
                     [open_button, save_as_button, close_button, space, run_button]
@@ -162,7 +162,6 @@ class Editor:
             self.reopen_files()
             self.update_title()
             splash.set_progress(10)
-
         except Exception:
             logger.exception("Error when initializing:")
             ErrorReportDialog(
@@ -211,7 +210,7 @@ class Editor:
         logger.debug("Bindings created")
 
     def start_screen(self) -> None:
-        frame = WinFrame(self.master, "Start", closable=False)
+        frame = WinFrame(self.master, "Start", closable=False, icon=self.icon)
 
         first_tab = tk.Canvas(frame, background=self.bg, highlightthickness=0)
         frame.add_widget(first_tab)
@@ -314,6 +313,7 @@ class Editor:
             self.master.title(f"PyPlus — {path}")
         except KeyError:
             self.master.title("PyPlus")
+            self.master.attributes("-titlepath", "")
         finally:
             return "break"
 

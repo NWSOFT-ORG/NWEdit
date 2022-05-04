@@ -4,6 +4,7 @@ from typing import *
 from src.modules import json, styles, tk, ttk
 from src.Widgets.tktext import EnhancedTextFrame
 from src.Widgets.winframe import WinFrame
+from src.Utils.images import get_image
 
 
 # Need these to prevent circular imports
@@ -40,8 +41,7 @@ class ReadonlyText(EnhancedTextFrame):
 
 class ErrorReportDialog(WinFrame):
     def __init__(self, master: tk.Tk, error_name: Text, error_message: Text) -> None:
-        super().__init__(master, error_name, closable=False)
-        print(error_message)
+        super().__init__(master, error_name, closable=False, icon=get_image("error"))
         master.withdraw()
         ttk.Label(self, text="Please consider reporting a bug on github.").pack(
             anchor="nw", fill="x"
@@ -56,7 +56,7 @@ class ErrorReportDialog(WinFrame):
 
 class LogViewDialog(WinFrame):
     def __init__(self, master: tk.Tk) -> None:
-        super().__init__(master, "PyPlus Log")
+        super().__init__(master, "PyPlus Log", icon=get_image("info"))
         self.title("Log view")
         frame = ttk.Frame(self)
         frame.pack(anchor="nw", fill="x")

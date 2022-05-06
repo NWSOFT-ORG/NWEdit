@@ -91,14 +91,15 @@ class Editor:
             self.format_settings_class = FormatCommand()
             self.comment_settings_class = CommentMarker()
             self.plugins_settings_class = Plugins(master)
+            self.icon_settings_class = FileTreeIconSettings()
 
-            logger.debug("Modules initialised.")
+            logger.debug("Settings classes initialised")
             splash.set_progress(1)
-            self.opts = TextOpts(self.master, keyaction=self.key)
 
+            self.opts = TextOpts(self.master, keyaction=self.key)
             self.theme = self.settings_class.get_settings("theme")
             self.tabwidth = self.settings_class.get_settings("tab")
-            logger.debug("Settings loaded")
+            logger.debug("Code settings loaded")
             splash.set_progress(2)
             self.style = ttkthemes.ThemedStyle(self.master)
             self.style.set_theme(self.theme)
@@ -107,12 +108,9 @@ class Editor:
             self.bg = self.style.lookup("TLabel", "background")
             self.fg = self.style.lookup("TLabel", "foreground")
 
-            self.icon_settings_class = FileTreeIconSettings()
-            logger.debug("Icons loaded")
-            splash.set_progress(4)
             self.icon = get_image("pyplus")
             self.master.iconphoto(True, self.icon)
-            splash.set_progress(5)
+            splash.set_progress(4)
 
             self.tabs = {}
 
@@ -122,13 +120,14 @@ class Editor:
             self.mainframe = ttk.Frame(self.master)
             self.mainframe.pack(fill="both", expand=1)
             self.panedwin.add(self.mainframe)
-            splash.set_progress(6)
+            logger.debug("UI initialised")
+            splash.set_progress(5)
 
             self.left_panel()
             self.bottom_panel()
             self.statusbar = Statusbar()
             logger.debug("Layout created")
-            splash.set_progress(7)
+            splash.set_progress(6)
 
             self.codefuncs = CodeFunctions(
                 self.master, self.tabs, self.nb, self.bottom_tabs
@@ -152,12 +151,17 @@ class Editor:
                 PyTouchBar.set_touchbar(
                     [open_button, save_as_button, close_button, space, run_button]
                 )
-            splash.set_progress(8)
+                logger.debug(f"{OSX = }, therefore enable TouchBar support")
+            splash.set_progress(7)
             self.plugins_settings_class.load_plugins()
             logger.debug("Plugins loaded")
-            splash.set_progress(9)
+            splash.set_progress(8)
+
             create_menu(self)
             self.right_click_menu = self.opts.create_menu[1]
+            logger.debug("All menus loaded.")
+            splash.set_progress(9)
+
             self.create_bindings()
             self.reopen_files()
             self.update_title()

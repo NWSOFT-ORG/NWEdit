@@ -96,7 +96,9 @@ def create_menu(self) -> None:
     )
     self.viewmenu.add_command(
         label="Search In directory",
-        command=lambda: SearchInDir(self.bottom_tabs, self.filetree.path, self.open_file),
+        command=lambda: SearchInDir(
+            self.bottom_tabs, self.filetree.path, self.open_file
+        ),
     )
 
     self.navmenu = tk.Menu(self.menubar)
@@ -128,4 +130,3 @@ def create_menu(self) -> None:
     self.menubar.add_cascade(label="Git", menu=self.gitmenu)
 
     self.master.config(menu=self.menubar)
-    logger.debug("Menu created")

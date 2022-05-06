@@ -1,5 +1,6 @@
 from typing import *
 from pygments.lexer import Lexer
+from src.Utils.photoimage import PhotoImage
 
 from src.modules import json, lexers, tk
 
@@ -60,7 +61,7 @@ class FileTreeIconSettings:
     def __init__(self) -> None:
         self.path = "Config/file-icons.json"
         self.dark = False
-        self.folder_icon = tk.PhotoImage(file="Images/file-icons/folder.png")
+        self.folder_icon = PhotoImage(file="Images/file-icons/folder.png")
 
     def set_theme(self, dark: bool) -> None:
         self.dark = dark

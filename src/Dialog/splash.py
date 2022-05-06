@@ -37,7 +37,7 @@ class SplashWindow(tk.Toplevel):
         self.overrideredirect(False)
         self.overrideredirect(True)
 
-        self.image = get_image("splash")
+        self.image = get_image("splash", img_type="image")
         self.h = h = self.image.height()
         self.w = w = self.image.width()
         self.geometry(f"{w}x{h}")

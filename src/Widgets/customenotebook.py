@@ -26,7 +26,7 @@ class ClosableNotebook(ttk.Notebook):
         if not self.__initialized:
             self.__initialize_custom_style()
             self.__inititialized = True
-        super().__init__(master=master, style="CustomNotebook", takefocus=False)
+        super().__init__(master=master, style="ClosableNotebook", takefocus=False)
         self.cmd = cmd
 
         self._active = None
@@ -121,10 +121,10 @@ class ClosableNotebook(ttk.Notebook):
         except tk.TclError:
             pass
         style.layout(
-            "CustomNotebook",
+            "ClosableNotebook",
             [
                 (
-                    "CustomNotebook.client",
+                    "ClosableNotebook.client",
                     {
                         "sticky": "nswe",
                     },
@@ -132,25 +132,25 @@ class ClosableNotebook(ttk.Notebook):
             ],
         )
         style.layout(
-            "CustomNotebook.Tab",
+            "ClosableNotebook.Tab",
             [
                 (
-                    "CustomNotebook.tab",
+                    "ClosableNotebook.tab",
                     {
                         "sticky"  : "nswe",
                         "children": [
                             (
-                                "CustomNotebook.padding",
+                                "ClosableNotebook.padding",
                                 {
                                     "side"    : "top",
                                     "sticky"  : "nswe",
                                     "children": [
                                         (
-                                            "CustomNotebook.label",
+                                            "ClosableNotebook.label",
                                             {"side": "left", "sticky": ""},
                                         ),
                                         (
-                                            "CustomNotebook.close",
+                                            "ClosableNotebook.close",
                                             {"side": "left", "sticky": ""},
                                         ),
                                     ],

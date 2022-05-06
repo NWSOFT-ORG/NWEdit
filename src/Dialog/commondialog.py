@@ -100,7 +100,7 @@ class AboutDialog:
         self.master = master
 
         ver = WinFrame(self.master, "About PyPlus", icon=get_image("info"))
-        ttk.Label(ver, image=get_image("pyplus-35px")).pack(fill="both")
+        ttk.Label(ver, image=get_image("pyplus-35px", img_type="image")).pack(fill="both")
         ttk.Label(ver, text=f"Version {VERSION}", font="tkDefaultFont 30 bold").pack(
             fill="both"
         )

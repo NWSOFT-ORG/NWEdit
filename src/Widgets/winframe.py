@@ -1,10 +1,10 @@
 from re import L
 from typing import *
+from src.Utils.photoimage import IconImage
 
 from src.constants import OSX
-from src.modules import json, tk, ttk, ttkthemes, font
+from src.modules import json, tk, ttk, ttkthemes
 from src.Utils.images import get_image
-from PIL import Image, ImageTk
 
 
 # Need these because importing settings is a circular import
@@ -27,10 +27,9 @@ class WinFrame(tk.Toplevel):
         title: Text,
         disable: bool = True,
         closable: bool = True,
-        icon: tk.PhotoImage = None
+        icon: IconImage = None
     ):
         super().__init__(master)
-        FONT_HEIGHT = font.Font().metrics("linespace")
 
         if OSX:
             self.tk.call(
@@ -38,15 +37,6 @@ class WinFrame(tk.Toplevel):
             )
         else:
             self.overrideredirect(True)
-        if icon:
-            icon_path = icon.cget("file")
-            image = Image.open(icon_path)
-            image = image.convert("RGBA")
-            image = image.resize((FONT_HEIGHT + 3, FONT_HEIGHT + 3))
-
-            icon = ImageTk.PhotoImage(image=image)
-        else:
-            icon = None
         self.icon = icon
         self.title_text = title
         self.title(title)  # Need a decent message to show on the taskbar

@@ -115,12 +115,12 @@ class EnhancedText(tk.Text):
             # generate an event if something was added or deleted,
             # or the cursor position changed
             if (
-                    args[0] in ("insert", "replace", "delete")
-                    or args[0:3] == ("mark", "set", "insert")
-                    or args[0:2] == ("xview", "moveto")
-                    or args[0:2] == ("xview", "scroll")
-                    or args[0:2] == ("yview", "moveto")
-                    or args[0:2] == ("yview", "scroll")
+                args[0] in ("insert", "replace", "delete")
+                or args[0:3] == ("mark", "set", "insert")
+                or args[0:2] == ("xview", "moveto")
+                or args[0:2] == ("xview", "scroll")
+                or args[0:2] == ("yview", "moveto")
+                or args[0:2] == ("yview", "scroll")
             ):
                 self.event_generate("<<Change>>", when="tail")
 
@@ -251,8 +251,18 @@ class TextOpts:
         menu.add_command(label="Join lines", command=self.join_lines)
         case_cascade = tk.Menu(menu)
         case_cascade.add_command(label="Swap case", command=self.swap_case)
-        case_cascade.add_command(label="Upper case", command=self.upper_case)
-        case_cascade.add_command(label="Lower case", command=self.lower_case)
+        case_cascade.add_command(
+            label="Upper case",
+            command=self.upper_case,
+            image=get_image("upper"),
+            compound="left",
+        )
+        case_cascade.add_command(
+            label="Lower case",
+            command=self.lower_case,
+            image=get_image("lower"),
+            compound="left",
+        )
         menu.add_cascade(label="Case...", menu=case_cascade)
         select_cascade = tk.Menu(menu)
         select_cascade.add_command(
@@ -401,7 +411,7 @@ class TextOpts:
                 if block:
                     if text.startswith(comment_start):
                         currtext.insert(
-                            "insert", text[len(comment_start): -len(comment_end)]
+                            "insert", text[len(comment_start) : -len(comment_end)]
                         )
                         self.key()
                         return
@@ -445,7 +455,7 @@ class TextOpts:
     def close_brackets(self, event: tk.EventType = None) -> str:
         currtext = self.text
         if event.char in [")", "]", "}", "'", '"'] and currtext.get(
-                "insert -1c", "insert"
+            "insert -1c", "insert"
         ) in [")", "]", "}", "'", '"']:
             currtext.mark_set("insert", "insert +1c")
             self.key()
@@ -533,7 +543,7 @@ class TextOpts:
         if linetext.endswith("\\"):
             indentation += " " * self.tabwidth
         if "return" in linetext or "break" in linetext:
-            indentation = indentation[self.tabwidth:]
+            indentation = indentation[self.tabwidth :]
         if linetext.endswith("(") or linetext.endswith(", ") or linetext.endswith(","):
             indentation += " " * self.tabwidth
 

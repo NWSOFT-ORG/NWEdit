@@ -69,3 +69,7 @@ def lighten_color(hex_code, increment) -> str:
             continue
         value += dec2hex(x)[2:]
     return value
+
+
+def replace_color(image: tk.PhotoImage, color, replace):
+    pass

@@ -16,7 +16,9 @@ class Args:
                 arg_dict[arg] = next(args)
             except StopIteration:
                 error("Invalid Arguments")
-                sys.exit(1)  # If the args are not specified like "-a b", it will be Invalid
+                sys.exit(
+                    1
+                )  # If the args are not specified like "-a b", it will be Invalid
 
         self.arg_list = arg_dict
 
@@ -24,5 +26,5 @@ class Args:
         pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     Args(sys.argv[1:])

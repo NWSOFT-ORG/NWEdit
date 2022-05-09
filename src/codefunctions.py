@@ -12,11 +12,11 @@ from src.Widgets.customenotebook import ClosableNotebook
 
 class CodeFunctions:
     def __init__(
-            self,
-            master: tk.Misc,
-            tabs: dict,
-            nb: ClosableNotebook,
-            bottomframe: ttk.Notebook,
+        self,
+        master: tk.Misc,
+        tabs: dict,
+        nb: ClosableNotebook,
+        bottomframe: ttk.Notebook,
     ) -> None:
         self.nb = nb
         self.tabs = tabs

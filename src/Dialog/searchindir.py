@@ -1,5 +1,6 @@
 from src.Dialog.search import re_search
 from src.modules import os, threading, tk, ttk
+from src.Widgets.scrollbar import Scrollbar
 from src.Widgets.tkentry import Entry
 
 
@@ -73,7 +74,7 @@ class SearchInDir(ttk.Frame):
         self.tree = ttk.Treeview(treeframe, show="tree")
         self.tree.pack(side="left", fill="both", expand=1)
 
-        yscroll = ttk.Scrollbar(treeframe, command=self.tree.yview)
+        yscroll = Scrollbar(treeframe, command=self.tree.yview)
         yscroll.pack(side="right", fill="y")
         self.tree.config(yscrollcommand=yscroll.set)
         self.tree.bind("<Double-1>", self.on_double_click)

@@ -60,7 +60,7 @@ class Document:
     """Helper class, for the editor."""
 
     def __init__(
-            self, frame=None, textbox=None, file_dir: str = "", istoolwin: bool = False
+        self, frame=None, textbox=None, file_dir: str = "", istoolwin: bool = False
     ) -> None:
         self.frame = frame
         self.file_dir = file_dir
@@ -102,7 +102,7 @@ class Editor:
             logger.debug("Code settings loaded")
             splash.set_progress(2)
             self.style = ttkthemes.ThemedStyle(self.master)
-            self.style.set_theme(self.theme)
+            self.style.theme_use(self.settings_class.get_settings("theme"))
             logger.debug("Theme loaded")
             splash.set_progress(3)
             self.bg = self.style.lookup("TLabel", "background")
@@ -222,12 +222,7 @@ class Editor:
         first_tab.create_image(20, 20, anchor="nw", image=self.icon)
         bold = font.Font(family="tkDefaultFont", size=35, weight="bold")
         first_tab.create_text(
-            80,
-            20,
-            anchor="nw",
-            text="Welcome!",
-            font=bold,
-            fill=self.fg
+            80, 20, anchor="nw", text="Welcome!", font=bold, fill=self.fg
         )
         label1 = Link(
             first_tab,
@@ -297,7 +292,9 @@ class Editor:
         textbox.bind(("<Button-2>" if OSX else "<Button-3>"), self.right_click)
         textbox.bind(f"<{MAIN_KEY}-b>", self.codefuncs.run)
         textbox.bind(f"<{MAIN_KEY}-f>", self.codefuncs.search)
-        textbox.bind(f"<{MAIN_KEY}-n>", lambda _: self.filetree.new_file(*self.decide_new_file))
+        textbox.bind(
+            f"<{MAIN_KEY}-n>", lambda _: self.filetree.new_file(*self.decide_new_file)
+        )
         textbox.bind(f"<{MAIN_KEY}-N>", lambda _: Navigate(self.get_text))
         textbox.bind(f"<{MAIN_KEY}-r>", self.reload)
         textbox.bind(f"<{MAIN_KEY}-S>", lambda _: self.save_as())
@@ -338,9 +335,12 @@ class Editor:
         finally:
             return "break"
 
-    def key(self, _=None) -> None:
+    def key(self, event: tk.Event = None) -> None:
         """Event when a key is pressed."""
         try:
+            if event:
+                if not event.char:
+                    return
             currtext = self.get_text
             recolorize_line(currtext)
             currtext.edit_separator()
@@ -563,8 +563,11 @@ class Editor:
                         continue
                     cursor_pos = tab.textbox.index("insert")
                     file_list[tab.file_dir] = cursor_pos
-                file_list[self.tabs[self.nb.get_tab].file_dir] = self.tabs[self.nb.get_tab].textbox.index(
-                    "insert")  # Open the current file
+                file_list[self.tabs[self.nb.get_tab].file_dir] = self.tabs[
+                    self.nb.get_tab
+                ].textbox.index(
+                    "insert"
+                )  # Open the current file
             json.dump(file_list, f)
         with open("EditorStatus/window_status.json", "w") as f:
             status = {}

@@ -1,10 +1,10 @@
 from re import L
 from typing import *
-from src.Utils.photoimage import IconImage
 
 from src.constants import OSX
-from src.modules import json, tk, ttk, ttkthemes
+from src.modules import json, tk, ttk
 from src.Utils.images import get_image
+from src.Utils.photoimage import IconImage
 
 
 # Need these because importing settings is a circular import
@@ -15,8 +15,7 @@ def get_theme():
 
 
 def get_bg():
-    style = ttkthemes.ThemedStyle()
-    style.set_theme(get_theme())
+    style = ttk.Style()
     return style.lookup("TLabel", "background")
 
 
@@ -27,7 +26,7 @@ class WinFrame(tk.Toplevel):
         title: Text,
         disable: bool = True,
         closable: bool = True,
-        icon: IconImage = None
+        icon: IconImage = None,
     ):
         super().__init__(master)
 
@@ -66,7 +65,9 @@ class WinFrame(tk.Toplevel):
 
     def create_titlebar(self):
         self.titleframe = ttk.Frame(self)
-        self.titlebar = ttk.Label(self.titleframe, text=self.title_text, compound="left")
+        self.titlebar = ttk.Label(
+            self.titleframe, text=self.title_text, compound="left"
+        )
         self.titlebar.image = self.icon
         self.titlebar["image"] = self.icon
         self.titlebar.pack(side="left", fill="both", expand=1)

@@ -1,6 +1,6 @@
-from src.modules import Image, ImageTk, ttk, font
-from src.Utils.color_utils import lighten_color, darken_color, hex2dec, is_dark_color
-
+from src.modules import Image, ImageTk, font, ttk
+from src.Utils.color_utils import (darken_color, hex2dec, is_dark_color,
+                                   lighten_color)
 
 ICON_REPLACE_COLOR = (148, 148, 148, 255)
 
@@ -20,7 +20,7 @@ class IconImage(ImageTk.PhotoImage):
         self.resize_image()
         self.replace_colors()
 
-        super().__init__(self.image)
+        super().__init__(image=self.image)
 
     @property
     def bg(self):

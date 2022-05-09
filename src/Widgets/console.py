@@ -1,6 +1,7 @@
 """Python console for the editor."""
 from src.modules import code, hashlib, io, queue, sys, threading, tk, ttk
 from src.SettingsParser.general_settings import GeneralSettings
+from src.Widgets.scrollbar import TextScrollbar
 
 
 # from olisolomos's gist
@@ -39,9 +40,11 @@ class Console(ttk.Frame):
             font=self.font,
             insertwidth=3,
         )
-        vbar = ttk.Scrollbar(self, command=self.text.yview)
+        vbar = TextScrollbar(self, command=self.text.yview, widget=self.text)
         vbar.pack(side="right", fill="y", anchor="ne")
-        xbar = ttk.Scrollbar(self, command=self.text.xview, orient="horizontal")
+        xbar = TextScrollbar(
+            self, command=self.text.xview, orient="horizontal", widget=self.text
+        )
         xbar.pack(side="bottom", fill="x", anchor="sw")
         self.text.pack(fill="both", expand=True, side="left", anchor="nw")
         self.text.config(yscrollcommand=vbar.set)

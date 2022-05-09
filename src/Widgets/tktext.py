@@ -4,10 +4,11 @@ from typing import *
 
 from src.constants import MAIN_KEY, logger
 from src.highlighter import create_tags, recolorize, recolorize_line
-from src.modules import EditorErr, font, lexers, styles, tk, ttk, ttkthemes
+from src.modules import EditorErr, font, lexers, styles, tk, ttk
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.color_utils import darken_color, is_dark_color, lighten_color
 from src.Utils.images import get_image
+from src.Widgets.scrollbar import TextScrollbar
 
 
 class TextLineNumbers(tk.Canvas):
@@ -169,9 +170,11 @@ class EnhancedTextFrame(ttk.Frame):
         self.linenumbers.attach(self.text)
 
         self.linenumbers.pack(side="left", fill="y")
-        xscroll = ttk.Scrollbar(self, command=self.text.xview, orient="horizontal")
+        xscroll = TextScrollbar(
+            self, command=self.text.xview, orient="horizontal", widget=self.text
+        )
         xscroll.pack(side="bottom", fill="x", anchor="nw")
-        yscroll = ttk.Scrollbar(self, command=self.text.yview)
+        yscroll = TextScrollbar(self, command=self.text.yview, widget=self.text)
         self.text["yscrollcommand"] = yscroll.set
         yscroll.pack(side="right", fill="y")
         self.text.pack(side="right", fill="both", expand=True)
@@ -201,8 +204,7 @@ class TextOpts:
         self.settings_class = GeneralSettings()
         self.tabwidth = self.settings_class.get_settings("tab")
         self.theme = self.settings_class.get_settings("theme")
-        self.style = ttkthemes.ThemedStyle()
-        self.style.set_theme(self.theme)
+        self.style = ttk.Style()
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
 
@@ -333,7 +335,7 @@ class TextOpts:
         # Quit quickly, before a char is being inserted.
         return "break"
 
-    def key(self, _=None) -> None:
+    def key(self, event: tk.Event = None) -> None:
         """Event when a key is pressed."""
         if self.bindkey:
             currtext = self.text

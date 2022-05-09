@@ -2,9 +2,9 @@ import sys
 from typing import *
 
 from src.modules import json, styles, tk, ttk
+from src.Utils.images import get_image
 from src.Widgets.tktext import EnhancedTextFrame
 from src.Widgets.winframe import WinFrame
-from src.Utils.images import get_image
 
 
 # Need these to prevent circular imports
@@ -51,7 +51,6 @@ class ErrorReportDialog(WinFrame):
         text.pack(fill="both")
 
         self.protocol("WM_DELETE_WINDOW", lambda: sys.exit(1))
-        self.mainloop()
 
 
 class LogViewDialog(WinFrame):
@@ -67,7 +66,6 @@ class LogViewDialog(WinFrame):
         self.log_text = ReadonlyText(self)
         self.log_text.pack(fill="both", expand=1)
         self.log_text.after(10, self.update_log)
-        self.mainloop()
 
     def update_log(self) -> None:
         with open("pyplus.log") as f:

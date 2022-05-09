@@ -1,14 +1,19 @@
 from typing import *
 
 from src.modules import tk, ttk
+from src.Utils.images import get_image
 from src.Widgets.tkentry import Entry
 from src.Widgets.treeview import FileTree
 from src.Widgets.winframe import WinFrame
-from src.Utils.images import get_image
 
 
 class FileOpenDialog(FileTree):
-    def __init__(self, master: Union[Literal["."], tk.Misc] = ".", opencommand: callable = None, action: str = "Open"):
+    def __init__(
+        self,
+        master: Union[Literal["."], tk.Misc] = ".",
+        opencommand: callable = None,
+        action: str = "Open",
+    ):
         self._style = ttk.Style()
         self.win = WinFrame(master, action, icon=get_image("open"))
         self.buttonframe = ttk.Frame(self.win)
@@ -69,7 +74,5 @@ class DirectoryOpenDialog(FileOpenDialog):
             self.opencommand(path)
             self.master.destroy()
             return
-        self.opencommand(
-            self.get_path(self.tree.focus(), append_name=True)
-        )
+        self.opencommand(self.get_path(self.tree.focus(), append_name=True))
         self.master.destroy()

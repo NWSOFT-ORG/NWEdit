@@ -5,6 +5,7 @@ from src.modules import font, json, os, send2trash, shutil, tk, ttk
 from src.SettingsParser.extension_settings import FileTreeIconSettings
 from src.SettingsParser.interval_settings import IntervalSettings
 from src.Utils.color_utils import is_dark_color
+from src.Widgets.scrollbar import Scrollbar
 
 
 class FileTree(ttk.Frame):
@@ -19,8 +20,8 @@ class FileTree(ttk.Frame):
         self.bg = self._style.lookup("TLabel", "background")
         super().__init__(master)
         self.tree = ttk.Treeview(self, show="tree")
-        self.yscroll = ttk.Scrollbar(self, command=self.tree.yview)
-        self.xscroll = ttk.Scrollbar(self, command=self.tree.xview, orient="horizontal")
+        self.yscroll = Scrollbar(self, command=self.tree.yview)
+        self.xscroll = Scrollbar(self, command=self.tree.xview, orient="horizontal")
         self.yscroll.pack(side="right", fill="y")
         self.xscroll.pack(side="bottom", fill="x")
         self.tree["yscrollcommand"] = self.yscroll.set
@@ -138,7 +139,7 @@ class FileTree(ttk.Frame):
         self.process_directory(item, path=self.path)
 
     def process_directory(
-            self, parent: str, showdironly: bool = False, path: str = ""
+        self, parent: str, showdironly: bool = False, path: str = ""
     ) -> None:
         if os.path.isfile(path):
             return
@@ -258,10 +259,10 @@ class FileTree(ttk.Frame):
 
     def write_status(self, fp):
         state = {
-            "path"              : self.orig_path,
-            "expandedNodes"     : self.expanded,
+            "path": self.orig_path,
+            "expandedNodes": self.expanded,
             "yScrollbarLocation": self.yscroll.get(),
-            "xScrollbarLocation": self.xscroll.get()
+            "xScrollbarLocation": self.xscroll.get(),
         }
 
         with fp as f:

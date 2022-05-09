@@ -1,13 +1,15 @@
 from typing import *
 
 from src.modules import lexers, tk, ttk
+from src.Utils.images import get_image
 from src.Widgets.tktext import EnhancedTextFrame, TextOpts
 from src.Widgets.winframe import WinFrame
-from src.Utils.images import get_image
 
 
 class CodeInputDialog(WinFrame):
-    def __init__(self, parent: Union[tk.Misc, tk.Tk, tk.Toplevel], title: Text, onsave: Callable) -> None:
+    def __init__(
+        self, parent: Union[tk.Misc, tk.Tk, tk.Toplevel], title: Text, onsave: Callable
+    ) -> None:
         super().__init__(parent, title, closable=False, icon=get_image("question"))
 
         self.save = self.add_destroy_action(onsave)

@@ -1,8 +1,9 @@
 from typing import *
+
 from pygments.lexer import Lexer
-from src.Utils.photoimage import PhotoImage
 
 from src.modules import json, lexers, tk
+from src.Utils.photoimage import PhotoImage
 
 
 class ExtensionSettings:

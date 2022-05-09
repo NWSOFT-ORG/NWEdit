@@ -13,6 +13,7 @@ if __name__ == "__main__":
             info = bundle.localizedInfoDictionary() or bundle.infoDictionary()
             if info:
                 info["CFBundleName"] = "PyPlus"  # Change name on the titlebar
+                info["CFBundleDisplayName"] = "PyPlus"  # Change name on the Dock
     root = tk.Tk()
 
     editor.Editor(master=root)  # Starts the Editor

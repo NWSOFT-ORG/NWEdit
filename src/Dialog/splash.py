@@ -1,5 +1,5 @@
-from src.Utils.images import get_image
 from src.modules import EditorErr, tk
+from src.Utils.images import get_image
 
 
 class ProgressBar(tk.Canvas):

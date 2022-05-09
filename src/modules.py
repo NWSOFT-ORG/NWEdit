@@ -30,8 +30,8 @@ import json5 as json
 import pygments
 import send2trash
 import ttkthemes
-from pygments import lexers, styles
 from PIL import Image, ImageTk
+from pygments import lexers, styles
 
 if sys.platform == "darwin":
     import PyTouchBar

@@ -1,6 +1,6 @@
 from src.modules import json, ttk
-from src.Widgets.winframe import WinFrame
 from src.Utils.images import get_image
+from src.Widgets.winframe import WinFrame
 
 
 class PluginView(WinFrame):

@@ -35,7 +35,7 @@ class GeneralSettings:
                     )
 
         with zipfile.ZipFile(
-                os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
+            os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
         ) as zipobj:
             zipdir("Config/", zipobj)
         ErrorInfoDialog(title="Done", text="Settings backed up.")

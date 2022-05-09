@@ -17,7 +17,7 @@ def download_file(url: Text, localfile: PathLike = "") -> str:
 
 class YesNoDialog(WinFrame):
     def __init__(
-            self, parent: tk.Misc = None, title: str = "", text: str = None
+        self, parent: tk.Misc = None, title: str = "", text: str = None
     ) -> None:
         self.text = text
         super().__init__(parent, title, icon=get_image("question"))
@@ -49,7 +49,12 @@ class YesNoDialog(WinFrame):
 
 
 class StringInputDialog(WinFrame):
-    def __init__(self, parent: Union[Literal["."], tk.Misc] = ".", title: Text = "", text: Text = "") -> None:
+    def __init__(
+        self,
+        parent: Union[Literal["."], tk.Misc] = ".",
+        title: Text = "",
+        text: Text = "",
+    ) -> None:
         super().__init__(parent, title, icon=get_image("question"))
         self.result = ""
         ttk.Label(self, text=text).pack(fill="x")
@@ -79,7 +84,10 @@ class StringInputDialog(WinFrame):
 
 class ErrorInfoDialog(WinFrame):
     def __init__(
-            self, parent: Union[tk.Misc, Literal["."]] = None, text: Text = None, title: Text = "Error"
+        self,
+        parent: Union[tk.Misc, Literal["."]] = None,
+        text: Text = None,
+        title: Text = "Error",
     ) -> None:
         self.text = text
         super().__init__(parent, title, icon=get_image("question"))
@@ -100,7 +108,9 @@ class AboutDialog:
         self.master = master
 
         ver = WinFrame(self.master, "About PyPlus", icon=get_image("info"))
-        ttk.Label(ver, image=get_image("pyplus-35px", img_type="image")).pack(fill="both")
+        ttk.Label(ver, image=get_image("pyplus-35px", img_type="image")).pack(
+            fill="both"
+        )
         ttk.Label(ver, text=f"Version {VERSION}", font="tkDefaultFont 30 bold").pack(
             fill="both"
         )
@@ -115,7 +125,6 @@ class AboutDialog:
             )
         else:
             ttk.Label(ver, text="No updates available").pack(fill="both")
-        ver.mainloop()
 
     def check_updates(self, popup: bool = True) -> List:
         if "DEV" in VERSION:
@@ -133,7 +142,9 @@ class AboutDialog:
         if not popup:
             os.remove("ver.json")
             return [version != VERSION, newest["url"]]
-        updatewin = WinFrame(self.master, "Updates", closable=False, icon=get_image("info"))
+        updatewin = WinFrame(
+            self.master, "Updates", closable=False, icon=get_image("info")
+        )
         if version != VERSION:
             ttk.Label(
                 updatewin, text="Update available!", font="tkDefaultFont 30"
@@ -149,4 +160,3 @@ class AboutDialog:
                 updatewin, text="No updates available", font="tkDefaultFont 30"
             ).pack(fill="both")
         os.remove("ver.json")
-        updatewin.mainloop()

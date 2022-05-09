@@ -42,11 +42,11 @@ class FileInfoDialog(WinFrame):
             size += " Bytes"
         elif int(size) / 1024 >= 1 <= 2:
             size = f"{int(size) // 1024} Kilobytes"
-        elif int(size) / 1024 ** 2 >= 1 <= 2:
+        elif int(size) / 1024**2 >= 1 <= 2:
             size = f"{int(size) // 1024 ** 2} Megabytes"
-        elif int(size) / 1024 ** 3 >= 1 <= 2:
+        elif int(size) / 1024**3 >= 1 <= 2:
             size = f"{int(size) // 1024 ** 3} Gigabytes"
-        elif int(size) / 1024 ** 4 >= 1 <= 2:
+        elif int(size) / 1024**4 >= 1 <= 2:
             size = f"{int(size) // 1024 ** 4} Terabytes"
         # It can go on and on, but the newest PCs won't have more than a PB storage
         #      /-------------/|

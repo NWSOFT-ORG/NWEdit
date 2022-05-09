@@ -4,6 +4,7 @@ from src.Dialog.commondialog import StringInputDialog, YesNoDialog
 from src.modules import json, os, tk, ttk
 from src.SettingsParser.extension_settings import RunCommand
 from src.Utils.functions import is_valid_name, shell_command
+from src.Widgets.scrollbar import Scrollbar
 from src.Widgets.tktext import EnhancedTextFrame, TextOpts
 
 TESTS_FILE = ".PyPlus/Tests/tests.json"
@@ -18,7 +19,7 @@ class TestDialog(ttk.Frame):
         parent.add(self, text="Unit testing")
         self.path = path
         self.tests_listbox = ttk.Treeview(self, show="tree")
-        yscroll = ttk.Scrollbar(self, command=self.tests_listbox.yview)
+        yscroll = Scrollbar(self, command=self.tests_listbox.yview)
         yscroll.pack(side="right", fill="y")
         self.tests_listbox.config(yscrollcommand=yscroll.set)
         self.refresh_tests()
@@ -126,7 +127,6 @@ class TestDialog(ttk.Frame):
             settingswin.destroy()
 
         ttk.Button(settingswin, text="OK", command=save_and_close).pack(fill="both")
-        settingswin.mainloop()
 
     def new(self):
         dialog = StringInputDialog(self, "New", "Name")
@@ -136,7 +136,9 @@ class TestDialog(ttk.Frame):
         name = "test_" + name
         if not is_valid_name(name):
             return
-        win = CodeInputDialog(self, name, lambda: self.modify_test(name, win.text.get("1.0", "end")))
+        win = CodeInputDialog(
+            self, name, lambda: self.modify_test(name, win.text.get("1.0", "end"))
+        )
         self.refresh_tests()
 
     def delete(self):
@@ -152,9 +154,12 @@ class TestDialog(ttk.Frame):
         name = self.tests_listbox.item(self.tests_listbox.focus(), "text")
         if not name:
             return
-        win = CodeInputDialog(self, f"Editing {name}", lambda: self.modify_test(name, win.text.get("1.0", "end")))
+        win = CodeInputDialog(
+            self,
+            f"Editing {name}",
+            lambda: self.modify_test(name, win.text.get("1.0", "end")),
+        )
         win.text.insert("end", self.method_list[name])
-        win.mainloop()
 
         self.refresh_tests()
 

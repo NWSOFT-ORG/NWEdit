@@ -23,7 +23,9 @@ class Entry(ttk.Frame):
         self.entry.bind("<FocusIn>", self.entry_on_focus)
         self.entry.bind("<FocusOut>", self.entry_on_focus_out)
 
-        self.border = tk.Canvas(self, height=2, takefocus=False, bg=fg, highlightthickness=0)
+        self.border = tk.Canvas(
+            self, height=2, takefocus=False, bg=fg, highlightthickness=0
+        )
         self.border.pack(fill="x", expand=True, side="bottom")
 
     @property

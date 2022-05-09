@@ -16,15 +16,22 @@ class GroupLabel(ttk.Label):
 
 
 class Group:
-    buttons = {}
-    big_buttons = {}
+    buttons: Dict[Text, Dict[Text, Union[tk.Image, None, Callable]]] = {}
+    big_buttons: Dict[Text, Dict[Text, Union[tk.Image, None, Callable]]] = {}
 
-    def add_small_button(self, text: str, image: Union[tk.Image, None] = None, command: callable = None):
+    def add_small_button(
+        self, text: str, image: Union[tk.Image, None] = None, command: Callable = None
+    ):
         if text in self.buttons.keys():
             raise ValueError("Button already exsists")
         self.buttons[text] = {"image": image, "command": command}
 
-    def add_big_button(self, text: str = "", image: Union[tk.Image, None] = None, command: callable = None):
+    def add_big_button(
+        self,
+        text: str = "",
+        image: Union[tk.Image, None] = None,
+        command: Callable = None,
+    ):
         if text in self.big_buttons.keys():
             raise ValueError("Button already exsists")
         self.big_buttons[text] = {"image": image, "command": command}
@@ -40,7 +47,7 @@ class Ribbon(ttk.Notebook):
     def __init__(self, parent: tk.Misc):
         super().__init__(parent, style="Ribbon.TNotebook")
         self.__init_custom_style()
-        self.tabs: dict[str, Page, None] = {}
+        self.tabs: Dict[str, Page] = {}
         self.pack(side="top", fill="x")
 
     def add_page(self, name):
@@ -54,11 +61,8 @@ class Ribbon(ttk.Notebook):
         parent = self.tabs[tab].frame
 
         group_label = GroupLabel(parent, text=name)
-        frame = ttk.LabelFrame(parent,
-                               labelwidget=group_label,
-                               labelanchor="s"
-                               )
-        frame.pack(side='left', padx=5, pady=5)
+        frame = ttk.LabelFrame(parent, labelwidget=group_label, labelanchor="s")
+        frame.pack(side="left", padx=5, pady=5)
 
         buttons = group.buttons
         for row, item in enumerate(buttons.keys()):
@@ -66,21 +70,25 @@ class Ribbon(ttk.Notebook):
                 frame,
                 text=item,
                 image=buttons[item]["image"],
-                command=buttons[item]["command"]
+                command=buttons[item]["command"],
             ).grid(column=0, row=row)
 
         big_buttons = group.big_buttons
         for column, item in enumerate(big_buttons.keys()):
-            button = ttk.Button(frame, text=item,
-                                image=big_buttons[item]["image"],
-                                command=big_buttons[item]["command"]
-                                )
+            button = ttk.Button(
+                frame,
+                text=item,
+                image=big_buttons[item]["image"],
+                command=big_buttons[item]["command"],
+            )
             button.grid_propagate(False)
             button.grid(column=1 + column, row=0, rowspan=3, sticky="nsew")
 
     def __init_custom_style(self):
         self.tab_style = ttk.Style(self)
-        self.tab_style.theme_use("alt")  # The Aqua theme for OSX is not working great for the ribbon design
+        self.tab_style.theme_use(
+            "alt"
+        )  # The Aqua theme for OSX is not working great for the ribbon design
         self.tab_style.configure("Ribbon.TNotebook", tabposition="nw")
 
 

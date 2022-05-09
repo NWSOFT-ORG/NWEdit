@@ -1,6 +1,6 @@
 """Closable ttk.Notebook"""
 from src.constants import logger
-from src.modules import tk, ttk, ttkthemes
+from src.modules import tk, ttk
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.images import get_image
 from src.Widgets.statusbar import bind_events
@@ -18,9 +18,8 @@ class ClosableNotebook(ttk.Notebook):
     __initialized = False
 
     def __init__(self, master, cmd):
-        self.style = ttkthemes.ThemedStyle()
+        self.style = ttk.Style()
         self.settings = GeneralSettings()
-        self.style.set_theme(self.settings.get_settings("theme"))
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
         if not self.__initialized:
@@ -117,7 +116,9 @@ class ClosableNotebook(ttk.Notebook):
         self.style = style = ttk.Style()
 
         try:
-            style.element_create("close", "image", get_image("close"), border=10, sticky="")
+            style.element_create(
+                "close", "image", get_image("close"), border=10, sticky=""
+            )
         except tk.TclError:
             pass
         style.layout(
@@ -137,13 +138,13 @@ class ClosableNotebook(ttk.Notebook):
                 (
                     "ClosableNotebook.tab",
                     {
-                        "sticky"  : "nswe",
+                        "sticky": "nswe",
                         "children": [
                             (
                                 "ClosableNotebook.padding",
                                 {
-                                    "side"    : "top",
-                                    "sticky"  : "nswe",
+                                    "side": "top",
+                                    "sticky": "nswe",
                                     "children": [
                                         (
                                             "ClosableNotebook.label",

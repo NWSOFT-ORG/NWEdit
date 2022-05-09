@@ -8,7 +8,9 @@ from src.Widgets.tkentry import Entry
 from src.Widgets.tktext import EnhancedText
 
 
-def finditer_withlineno(pattern, string, flags: Union[re.RegexFlag, int] = 0) -> Iterable[Tuple[int]]:
+def finditer_withlineno(
+    pattern, string, flags: Union[re.RegexFlag, int] = 0
+) -> Iterable[Tuple[int]]:
     """
     A version of re.finditer that returns '(match, line_number)' pairs.
     """
@@ -58,7 +60,13 @@ def find_all(sub: Text, string: Text, case: bool = True) -> Iterable[Tuple[int]]
         start = end
 
 
-def re_search(pat: Text, text: Text, nocase: bool = False, full_word: bool = False, regex: bool = False) -> List:
+def re_search(
+    pat: Text,
+    text: Text,
+    nocase: bool = False,
+    full_word: bool = False,
+    regex: bool = False,
+) -> List:
     if nocase and full_word:
         res = [
             (x[0], x[1])

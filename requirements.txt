@@ -2,7 +2,7 @@ altgraph==0.17.2
 art==5.5
 json5==0.9.6
 macholib==1.16; sys_platform == "darwin"
-Pillow==9.1.0
+Pillow==9.1.1
 proxy-tools==0.1.0
 Pygments==2.11.2
 pyinstaller==5.0

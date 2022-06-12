@@ -1,8 +1,7 @@
 from src.modules import Image, ImageTk, font, ttk
-from src.Utils.color_utils import (darken_color, hex2dec, is_dark_color,
-                                   lighten_color)
+from src.Utils.color_utils import darken_color, hex2dec, is_dark_color, lighten_color
 
-ICON_REPLACE_COLOR = (148, 148, 148, 255)
+ICON_REPLACE_COLOR = (193, 193, 193, 255)
 
 
 class PhotoImage(ImageTk.PhotoImage):
@@ -43,4 +42,4 @@ class IconImage(ImageTk.PhotoImage):
 
     def resize_image(self):
         font_height = font.Font().metrics("linespace")
-        self.image = self.image.resize([font_height, font_height])
+        self.image = self.image.resize([font_height, font_height], Image.ANTIALIAS)

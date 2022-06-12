@@ -31,7 +31,6 @@ class FileTree(ttk.Frame):
         self.root_node = None
 
         self.icon_settings = FileTreeIconSettings()
-        self.icon_settings.set_theme(is_dark_color(self.bg))
         self.icons = []
         self.temp_path = []  # IMPORTANT! Reset after use
 

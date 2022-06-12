@@ -2,8 +2,8 @@ from typing import *
 
 from pygments.lexer import Lexer
 
-from src.modules import json, lexers, tk
-from src.Utils.photoimage import PhotoImage
+from src.modules import json, lexers
+from src.Utils.photoimage import IconImage
 
 
 class ExtensionSettings:
@@ -62,16 +62,13 @@ class FileTreeIconSettings:
     def __init__(self) -> None:
         self.path = "Config/file-icons.json"
         self.dark = False
-        self.folder_icon = PhotoImage(file="Images/file-icons/folder.png")
+        self.folder_icon = IconImage(file="Images/file-icons/folder.png")
 
-    def set_theme(self, dark: bool) -> None:
-        self.dark = dark
-
-    def get_icon(self, extension: str) -> tk.PhotoImage:
+    def get_icon(self, extension: str) -> IconImage:
         with open(self.path) as f:
             settings = json.load(f)
         try:
             icon_name = settings[extension]
         except KeyError:
             icon_name = "other"
-        return tk.PhotoImage(file=f"Images/file-icons/{icon_name}.png")
+        return IconImage(file=f"Images/file-icons/{icon_name}.png")

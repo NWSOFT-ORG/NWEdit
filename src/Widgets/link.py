@@ -3,11 +3,12 @@ from typing import *
 from src.constants import OSX
 from src.modules import tk, ttk
 from src.Utils.color_utils import is_dark_color
+from src.Utils.photoimage import PhotoImage
 
 
 class Link(ttk.Label):
     def __init__(
-        self, parent: tk.Misc, text: Text, image: Union[tk.PhotoImage, None] = None
+        self, parent: tk.Misc, text: Text, image: Union[PhotoImage, None] = None
     ):
         style = ttk.Style(parent)
         bg = style.lookup("TLabel", "background")

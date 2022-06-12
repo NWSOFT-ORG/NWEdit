@@ -20,22 +20,35 @@ from typing import *
 from src.codefunctions import CodeFunctions
 from src.constants import APPDIR, MAIN_KEY, OSX, logger
 from src.Dialog.autocomplete import CompleteDialog
-from src.Dialog.commondialog import (ErrorInfoDialog, StringInputDialog,
-                                     YesNoDialog)
+from src.Dialog.commondialog import ErrorInfoDialog, StringInputDialog, YesNoDialog
 from src.Dialog.debugdialog import ErrorReportDialog
-from src.Dialog.filedialog import (DirectoryOpenDialog, FileOpenDialog,
-                                   FileSaveAsDialog)
+from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog, FileSaveAsDialog
 from src.Dialog.goto import Navigate
 from src.Dialog.splash import SplashWindow
 from src.Git.gitview import GitView
 from src.highlighter import recolorize_line
 from src.Menu.create_menu import create_menu
-from src.modules import (Path, font, json, logging, os, subprocess, sys, tk,
-                         traceback, ttk, ttkthemes)
-from src.SettingsParser.extension_settings import (CommentMarker,
-                                                   FileTreeIconSettings,
-                                                   FormatCommand, Linter,
-                                                   PygmentsLexer, RunCommand)
+from src.modules import (
+    Path,
+    font,
+    json,
+    logging,
+    os,
+    subprocess,
+    sys,
+    tk,
+    traceback,
+    ttk,
+    ttkthemes,
+)
+from src.SettingsParser.extension_settings import (
+    CommentMarker,
+    FileTreeIconSettings,
+    FormatCommand,
+    Linter,
+    PygmentsLexer,
+    RunCommand,
+)
 from src.SettingsParser.general_settings import GeneralSettings
 from src.SettingsParser.plugin_settings import Plugins
 from src.Utils.color_utils import is_dark_color, lighten_color
@@ -109,7 +122,7 @@ class Editor:
             self.fg = self.style.lookup("TLabel", "foreground")
 
             self.icon = get_image("pyplus")
-            self.master.iconphoto(True, self.icon)
+            self.master.iconphoto(True, get_image("pyplus-35px", "image"))
             splash.set_progress(4)
 
             self.tabs = {}
@@ -136,17 +149,17 @@ class Editor:
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
                 open_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/open.png", action=lambda _: self.open_file()
+                    image="Images/open.svg", action=lambda _: self.open_file()
                 )
                 save_as_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/save-as.png", action=lambda _: self.save_as()
+                    image="Images/save-as.svg", action=lambda _: self.save_as()
                 )
                 close_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/close.png", action=lambda _: self.close_tab
+                    image="Images/close.svg", action=lambda _: self.close_tab
                 )
                 space = PyTouchBar.TouchBarItems.Space.Flexible()
                 run_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/run.png", action=lambda _: self.codefuncs.run
+                    image="Images/run.svg", action=lambda _: self.codefuncs.run
                 )
                 PyTouchBar.set_touchbar(
                     [open_button, save_as_button, close_button, space, run_button]
@@ -219,7 +232,9 @@ class Editor:
         first_tab = tk.Canvas(frame, background=self.bg, highlightthickness=0)
         frame.add_widget(first_tab)
 
-        first_tab.create_image(20, 20, anchor="nw", image=self.icon)
+        first_tab.create_image(
+            20, 20, anchor="nw", image=get_image("pyplus-35px", "image")
+        )
         bold = font.Font(family="tkDefaultFont", size=35, weight="bold")
         first_tab.create_text(
             80, 20, anchor="nw", text="Welcome!", font=bold, fill=self.fg

@@ -26,7 +26,7 @@ class FileOpenDialog(FileTree):
         self.buttonframe.pack(side="bottom", anchor="nw")
         self.entryframe = ttk.Frame(self.win)
         self.pathentry = Entry(self.entryframe)
-        self.pathentry.pack(side="left")
+        self.pathentry.pack(side="left", fill="x", expand=True)
         self.set_path_btn = ttk.Button(
             self.entryframe, command=self.goto_path, text="Go", takefocus=False
         )

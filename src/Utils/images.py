@@ -19,7 +19,9 @@ def init_images() -> None:
             images[name] = (IconImage(file=out), PhotoImage(file=out))
 
 
-def get_image(image: Text, img_type: Literal["image", "icon"] = "icon") -> Union[PhotoImage, IconImage]:
+def get_image(image: Text, img_type: Literal["image", "icon"] = "icon") -> Union[None, PhotoImage, IconImage]:
+    if not image:
+        return None
     if img_type == "image":
         return images[image][1]
     return images[image][0]

@@ -1,3 +1,4 @@
+import urllib.error
 from os import PathLike
 from typing import *
 
@@ -103,7 +104,7 @@ class ErrorInfoDialog(WinFrame):
 
 
 class AboutDialog:
-    def __init__(self, master: tk.Misc) -> None:
+    def __init__(self, master: tk.Tk) -> None:
         """Shows the version and related info of the editor."""
         self.master = master
 
@@ -114,7 +115,9 @@ class AboutDialog:
         ttk.Label(ver, text=f"Version {VERSION}", font="tkDefaultFont 30 bold").pack(
             fill="both"
         )
-        if self.check_updates(popup=False)[0]:
+        if self.check_updates(popup=False)[0] is None:
+            ttk.Label(ver, text="Unable to check updates").pack(fill="both")
+        elif self.check_updates(popup=False)[0]:
             update = ttk.Label(
                 ver, text="Updates available", foreground="blue", cursor="hand2"
             )
@@ -132,10 +135,13 @@ class AboutDialog:
                 text="Updates aren't supported by develop builds,\n\
             since you're always on the latest version!",
             )  # If you're on the developer build, you don't need updates!
-            return [True, "about://blank"]
-        download_file(
-            url="https://raw.githubusercontent.com/ZCG-coder/NWSOFT/master/PyPlusWeb/ver.json"
-        )
+            return [True, "about:blank"]
+        try:
+            download_file(
+                url="https://raw.githubusercontent.com/ZCG-coder/NWSOFT/master/PyPlusWeb/ver.json"
+            )
+        except urllib.error.URLError:
+            return [None, "about:blank"]
         with open("ver.json") as f:
             newest = json.load(f)
         version = newest["version"]

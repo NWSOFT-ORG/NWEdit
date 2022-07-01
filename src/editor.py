@@ -18,7 +18,7 @@ Also, it's cross-compatible!
 from typing import *
 
 from src.codefunctions import CodeFunctions
-from src.constants import APPDIR, MAIN_KEY, OSX, logger
+from src.constants import APPDIR, logger, MAIN_KEY, OSX
 from src.Dialog.autocomplete import CompleteDialog
 from src.Dialog.commondialog import ErrorInfoDialog, StringInputDialog, YesNoDialog
 from src.Dialog.debugdialog import ErrorReportDialog
@@ -27,20 +27,7 @@ from src.Dialog.goto import Navigate
 from src.Dialog.splash import SplashWindow
 from src.Git.gitview import GitView
 from src.highlighter import recolorize_line
-from src.Menu.create_menu import create_menu
-from src.modules import (
-    Path,
-    font,
-    json,
-    logging,
-    os,
-    subprocess,
-    sys,
-    tk,
-    traceback,
-    ttk,
-    ttkthemes,
-)
+from src.modules import (font, json, logging, os, Path, subprocess, sys, tk, traceback, ttk, ttkthemes)
 from src.SettingsParser.extension_settings import (
     CommentMarker,
     FileTreeIconSettings,
@@ -50,8 +37,8 @@ from src.SettingsParser.extension_settings import (
     RunCommand,
 )
 from src.SettingsParser.general_settings import GeneralSettings
+from src.SettingsParser.menu import Menu
 from src.SettingsParser.plugin_settings import Plugins
-from src.Utils.color_utils import is_dark_color, lighten_color
 from src.Utils.functions import is_binary_string
 from src.Utils.images import get_image, init_images
 from src.Widgets.customenotebook import ClosableNotebook
@@ -122,12 +109,12 @@ class Editor:
             self.fg = self.style.lookup("TLabel", "foreground")
 
             self.icon = get_image("pyplus")
+            # noinspection PyTypeChecker
             self.master.iconphoto(True, get_image("pyplus-35px", "image"))
             splash.set_progress(4)
 
             self.tabs = {}
 
-            self.menubar = tk.Menu(self.master)
             self.panedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.panedwin.pack(fill="both", expand=1)
             self.mainframe = ttk.Frame(self.master)
@@ -170,8 +157,9 @@ class Editor:
             logger.debug("Plugins loaded")
             splash.set_progress(8)
 
-            create_menu(self)
-            self.right_click_menu = self.opts.create_menu[1]
+            self.menu = Menu(self).menu
+            self.master["menu"] = self.menu
+            self.right_click_menu = self.opts.right_click_menu
             logger.debug("All menus loaded.")
             splash.set_progress(9)
 
@@ -353,9 +341,8 @@ class Editor:
     def key(self, event: tk.Event = None) -> None:
         """Event when a key is pressed."""
         try:
-            if event:
-                if not event.char:
-                    return
+            if hasattr(event, "char") and not event.char:
+                return
             currtext = self.get_text
             recolorize_line(currtext)
             currtext.edit_separator()
@@ -418,7 +405,7 @@ class Editor:
         self.update_statusbar()
         return window.textbox
 
-    def open_dir(self, directory: str = ""):
+    def open_dir(self, directory: os.PathLike = ""):
         if not directory:
             DirectoryOpenDialog(self.master, self.open_dir)
             return
@@ -456,10 +443,11 @@ class Editor:
             textbox = self.create_text_widget(new_tab)
             with open(file) as f:
                 # Puts the contents of the file into the text widget.
-                textbox.insert("end", f.read().replace("\t", " " * self.tabwidth))
-                # Inserts file content, replacing tabs with four spaces
+                textbox.insert("end", f.read())
+
+            new_tab.icon = self.icon_settings_class.get_icon(extens)
             self.tabs[new_tab] = Document(new_tab, textbox, file)
-            self.nb.add(new_tab, text=os.path.basename(file))
+            self.nb.add(new_tab, text=os.path.basename(file), image=new_tab.icon, compound="left")
             self.nb.select(new_tab)
 
             textbox.focus_set()

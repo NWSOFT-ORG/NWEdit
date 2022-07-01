@@ -31,48 +31,6 @@ class CodeFunctions:
         text = self.tabs[self.nb.get_tab].textbox
         CodeListDialog(self.bottomframe, text)
 
-    @property
-    def create_menu(self) -> tk.Menu:
-        codemenu = tk.Menu(self.master)
-        codemenu.add_command(
-            label="Run", command=self.run, image=get_image("run"), compound="left"
-        )
-        codemenu.add_command(
-            label="Lint",
-            command=self.lint_source,
-            image=get_image("lint"),
-            compound="left",
-        )
-        codemenu.add_command(
-            label="Auto-format",
-            command=self.autopep,
-            image=get_image("format"),
-            compound="left",
-        )
-        codemenu.add_command(
-            label="Open System Shell",
-            command=self.system_shell,
-            image=get_image("term"),
-            compound="left",
-        )
-        codemenu.add_command(
-            label="Python Shell",
-            command=self.python_shell,
-            image=get_image("py-term"),
-            compound="left",
-        )
-        codemenu.add_command(
-            label="Find and replace",
-            command=self.search,
-            image=get_image("search"),
-            compound="left",
-        )
-        codemenu.add_command(
-            label="Code Structure",
-            command=self.code_struct,
-        )
-        return codemenu
-
     def search(self, _=None) -> None:
         bottomframe = self.bottomframe
         Search(bottomframe, self.tabs[self.nb.get_tab].textbox)

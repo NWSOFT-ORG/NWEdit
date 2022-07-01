@@ -2,12 +2,11 @@
 
 from typing import *
 
-from src.constants import MAIN_KEY, logger
+from src.constants import logger, MAIN_KEY
 from src.highlighter import create_tags, recolorize, recolorize_line
 from src.modules import EditorErr, font, lexers, styles, tk, ttk
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.color_utils import darken_color, is_dark_color, lighten_color
-from src.Utils.images import get_image
 from src.Widgets.scrollbar import TextScrollbar
 
 
@@ -213,92 +212,7 @@ class TextOpts:
         self.bind_events()
 
     @property
-    def create_menu(self):
-        menu = tk.Menu(self.master)
-        menu.add_command(
-            label="Undo", command=self.undo, image=get_image("undo"), compound="left"
-        )
-        menu.add_command(
-            label="Redo", command=self.redo, image=get_image("redo"), compound="left"
-        )
-        menu.add_command(
-            label="Cut", command=self.cut, image=get_image("cut"), compound="left"
-        )
-        menu.add_command(
-            label="Copy", command=self.copy, image=get_image("copy"), compound="left"
-        )
-        menu.add_command(
-            label="Paste", command=self.paste, image=get_image("paste"), compound="left"
-        )
-        menu.add_command(
-            label="Duplicate Line or Selected", command=self.duplicate_line
-        )
-        indent_cascade = tk.Menu(menu)
-        indent_cascade.add_command(
-            label="Indent",
-            command=lambda: self.indent("indent"),
-            image=get_image("indent"),
-            compound="left",
-        )
-        indent_cascade.add_command(
-            label="Unident",
-            command=lambda: self.indent("unindent"),
-            image=get_image("unindent"),
-            compound="left",
-        )
-        menu.add_cascade(label="Indent...", menu=indent_cascade)
-        menu.add_command(
-            label="Comment/Uncomment Line or Selected", command=self.comment_lines
-        )
-        menu.add_command(label="Join lines", command=self.join_lines)
-        case_cascade = tk.Menu(menu)
-        case_cascade.add_command(label="Swap case", command=self.swap_case)
-        case_cascade.add_command(
-            label="Upper case",
-            command=self.upper_case,
-            image=get_image("upper"),
-            compound="left",
-        )
-        case_cascade.add_command(
-            label="Lower case",
-            command=self.lower_case,
-            image=get_image("lower"),
-            compound="left",
-        )
-        menu.add_cascade(label="Case...", menu=case_cascade)
-        select_cascade = tk.Menu(menu)
-        select_cascade.add_command(
-            label="Select All",
-            command=self.select_all,
-            image=get_image("sel-all"),
-            compound="left",
-        )
-        select_cascade.add_command(label="Select Line", command=self.sel_line)
-        select_cascade.add_command(label="Select Word", command=self.sel_word)
-        select_cascade.add_command(label="Select Prev Word", command=self.sel_word_left)
-        select_cascade.add_command(
-            label="Select Next Word", command=self.sel_word_right
-        )
-        menu.add_cascade(label="Select...", menu=select_cascade)
-        delete_cascade = tk.Menu(menu)
-        delete_cascade.add_command(
-            label="Delete Selected",
-            image=get_image("delete"),
-            command=self.delete,
-            compound="left",
-        )
-        delete_cascade.add_command(label="Delete Word", command=self.del_word)
-        delete_cascade.add_command(label="Delete Prev Word", command=self.del_word_left)
-        delete_cascade.add_command(
-            label="Delete Next Word", command=self.del_word_right
-        )
-        menu.add_command(label="-1 char", command=self.nav_1cb)
-        menu.add_command(label="+1 char", command=self.nav_1cf)
-        menu.add_command(label="Word end", command=self.nav_wordend)
-        menu.add_command(label="Word start", command=self.nav_wordstart)
-        menu.add_command(label="Move line up", command=self.mv_line_up)
-        menu.add_command(label="Move line down", command=self.mv_line_dn)
-
+    def right_click_menu(self):
         right_click_menu = tk.Menu(self.master)
         right_click_menu.add_command(label="Undo", command=self.undo)
         right_click_menu.add_command(label="Redo", command=self.redo)
@@ -308,7 +222,7 @@ class TextOpts:
         right_click_menu.add_command(label="Delete", command=self.delete)
         right_click_menu.add_command(label="Select All", command=self.select_all)
         logger.debug("Right-click menu created")
-        return [menu, right_click_menu]
+        return right_click_menu
 
     def bind_events(self):
         text = self.text
@@ -331,6 +245,7 @@ class TextOpts:
     def tab(self, _=None):
         # Convert tabs to spaces
         self.text.insert("insert", " " * self.tabwidth)
+        recolorize(self.text)
         self.key()
         # Quit quickly, before a char is being inserted.
         return "break"
@@ -344,7 +259,7 @@ class TextOpts:
             currtext.see("insert")
             logger.exception("Error when handling keyboard event:")
         else:
-            self.keyaction()
+            self.keyaction(event)
 
     def duplicate_line(self) -> None:
         currtext = self.text
@@ -355,6 +270,7 @@ class TextOpts:
         else:
             text = currtext.get("insert linestart", "insert lineend")
             currtext.insert("insert", "\n" + text)
+        recolorize(currtext)
         self.key()
 
     def indent(self, action="indent") -> None:
@@ -374,8 +290,7 @@ class TextOpts:
             currtext.delete(sel_start, sel_end)
             currtext.insert(sel_start, "\n".join(indented))
             currtext.tag_remove("sel", "1.0", "end")
-            currtext.tag_add("sel", sel_start, f"{sel_end} +4c")
-            self.key()
+            currtext.tag_add("sel", sel_start, f"{sel_end} +{self.tabwidth}c")
         elif action == "unindent":
             selected_text = currtext.get(sel_start, sel_end)
             unindented = []
@@ -388,9 +303,10 @@ class TextOpts:
             currtext.insert(sel_start, "\n".join(unindented))
             currtext.tag_remove("sel", "1.0", "end")
             currtext.tag_add("sel", sel_start, sel_end)
-            self.key()
         else:
             raise EditorErr("Action undefined.")
+        recolorize(currtext)
+        self.key()
 
     def comment_lines(self, _=None):
         """Comments the selection or line"""
@@ -440,6 +356,7 @@ class TextOpts:
                     )
                 else:
                     currtext.insert("insert", f"{comment_start}{line}{comment_end}\n")
+            recolorize(currtext)
             self.key()
         except (KeyError, AttributeError):
             return
@@ -556,6 +473,7 @@ class TextOpts:
     def undo(self, _=None) -> None:
         try:
             self.text.edit_undo()
+            recolorize(self.text)
             self.key()
         except Exception:
             return
@@ -563,6 +481,7 @@ class TextOpts:
     def redo(self, _=None) -> None:
         try:
             self.text.edit_redo()
+            recolorize(self.text)
             self.key()
         except Exception:
             return
@@ -594,6 +513,7 @@ class TextOpts:
                 self.text.insert(
                     "insert", clipboard.replace_all("\t", " " * self.tabwidth)
                 )
+            recolorize(self.text)
             self.key()
         except Exception:
             pass
@@ -666,6 +586,7 @@ class TextOpts:
         sel = "".join(sel)
         currtext.delete("sel.first", "sel.last")
         currtext.insert("insert", sel)
+        recolorize(currtext)
         self.key()
 
     def mv_line_up(self) -> None:
@@ -674,6 +595,8 @@ class TextOpts:
         currtext.delete("insert -1l lineend", "insert lineend")
         currtext.mark_set("insert", "insert -1l")
         currtext.insert("insert", text)
+        recolorize(currtext)
+        self.key()
 
     def mv_line_dn(self) -> None:
         currtext = self.text
@@ -681,6 +604,8 @@ class TextOpts:
         currtext.delete("insert -1l lineend", "insert lineend")
         currtext.mark_set("insert", "insert +1l")
         currtext.insert("insert", text)
+        recolorize(currtext)
+        self.key()
 
     def swap_case(self):
         currtext = self.text
@@ -690,6 +615,7 @@ class TextOpts:
         currtext.delete("sel.first", "sel.last")
         text = text.swapcase()
         currtext.insert("insert", text)
+        recolorize(currtext)
         self.key()
 
     def upper_case(self):
@@ -700,6 +626,7 @@ class TextOpts:
         currtext.delete("sel.first", "sel.last")
         text = text.upper()
         currtext.insert("insert", text)
+        recolorize(currtext)
         self.key()
 
     def lower_case(self):
@@ -710,4 +637,5 @@ class TextOpts:
         currtext.delete("sel.first", "sel.last")
         text = text.lower()
         currtext.insert("insert", text)
+        recolorize(currtext)
         self.key()

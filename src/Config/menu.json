@@ -1,0 +1,309 @@
+/*
+Creates the menu for PyPlus
+Config is in the format:
+"[cascade_name]": {}   <- A cascade OR
+"item_name": [image, mnemonic, function, plugin_path]   <- An item in a cascade
+The plugin_path should be a Python import string, with the object name.
+For example: "path.to.class -> Object"
+If it is a built-in, or a package installed with PyPlus, you can use direct import statements
+For example: "package"
+*/
+
+{
+    "[PyPlus]": {
+        "About PyPlus": [
+            "info",
+            null,
+            "AboutDialog(pyplus.master)",
+            "src.Dialog.commondialog -> AboutDialog"
+        ]
+    },
+    "[File]": {
+        "New": [
+            "new",
+            "n",
+            "pyplus.filetree.new_file()",
+            null
+        ],
+        "[Open...]": {
+            "Open File": [
+                "open",
+                "o",
+                "pyplus.open_file()",
+                null
+            ],
+            "Open File in Hex": [
+                "open",
+                null,
+                "pyplus.open_hex()",
+                null
+            ],
+            "Open Folder": [
+                "open",
+                "shift-o",
+                "pyplus.open_dir()",
+                null
+            ],
+            "Clone From Git...": [
+                "clone",
+                null,
+                "pyplus.git(\"clone\")",
+                null
+            ]
+        },
+        "Save Copy to": [
+            "save-as",
+            "shift-s",
+            "pyplus.save_as()",
+            null
+        ],
+        "Close Tab": [
+            "close",
+            "w",
+            "pyplus.close_tab()",
+            null
+        ],
+        "Reload All": [
+            "reload",
+            null,
+            "pyplus.reload()",
+            null
+        ]
+    },
+    "[Edit]": {
+        "Undo": [
+            "undo",
+            "z",
+            "pyplus.opts.undo()",
+            null
+        ],
+        "Redo": [
+            "redo",
+            "shift-z",
+            "pyplus.opts.redo()",
+            null
+        ],
+        "Cut": [
+            "cut",
+            "x",
+            "pyplus.opts.cut()",
+            null
+        ],
+        "Copy": [
+            "copy",
+            "c",
+            "pyplus.opts.copy()",
+            null
+        ],
+        "Paste": [
+            "paste",
+            "v",
+            "pyplus.opts.paste()",
+            null
+        ],
+        "Duplicate Line or Selected": [
+            null,
+            "d",
+            "pyplus.opts.duplicate_line()",
+            null
+        ],
+        "[Indent...]": {
+            "Indent": [
+                "indent",
+                "i",
+                "pyplus.opts.indent(\"indent\")",
+                null
+            ],
+            "Unindent": [
+                "unindent",
+                "u",
+                "pyplus.opts.indent(\"unindent\")",
+                null
+            ]
+        },
+        "Join Lines": [
+            null,
+            null,
+            "pyplus.opts.join_lines()",
+            null
+        ],
+        "[Case...]": {
+            "Swap Case": [
+                null,
+                null,
+                "pyplus.opts.swap_case()",
+                null
+            ],
+            "Upper Case": [
+                "upper",
+                null,
+                "pyplus.opts.upper_case()",
+                null
+            ],
+            "Lower Case": [
+                "lower",
+                null,
+                "pyplus.opts.lower_case()",
+                null
+            ]
+        },
+        "[Select...]": {
+            "Select All": [
+                "sel-all",
+                "a",
+                "pyplus.opts.select_all()",
+                null
+            ],
+            "Select Line": [
+                null,
+                null,
+                "pyplus.opts.sel_line()",
+                null
+            ],
+            "Select Word": [
+                null,
+                null,
+                "pyplus.opts.sel_word()",
+                null
+            ],
+            "Select Previous Word": [
+                null,
+                null,
+                "pyplus.opts.sel_word_left()",
+                null
+            ],
+            "Select Next Word": [
+                null,
+                null,
+                "pyplus.opts.sel_word_right()",
+                null
+            ]
+        },
+        "[Delete...]": {
+            "Delete Selected": [
+                "delete",
+                null,
+                "pyplus.opts.delete()",
+                null
+            ],
+            "Delete Word": [
+                "delete",
+                null,
+                "pyplus.opts.delete()",
+                null
+            ],
+            "Delete Previous Word": [
+                "delete",
+                null,
+                "pyplus.opts.delete()",
+                null
+            ],
+            "Delete Next Word": [
+                "delete",
+                null,
+                "pyplus.opts.delete()",
+                null
+            ]
+        },
+        "[Move line...]": {
+            "Up": [
+                null,
+                null,
+                "pyplus.opts.mv_line_up()",
+                null
+            ],
+            "Down": [
+                null,
+                null,
+                "pyplus.opts.mv_line_dn()",
+                null
+            ]
+        }
+    },
+    "[Code]": {
+        "Run": [
+            "run",
+            null,
+            "pyplus.codefuncs.run()",
+            null
+        ],
+        "Lint": [
+            "lint",
+            null,
+            "pyplus.codefuncs.lint_source()",
+            null
+        ],
+        "Auto-Format": [
+            "format",
+            null,
+            "pyplus.codefuncs.autopep()",
+            null
+        ],
+        "Open System Shell": [
+            "term",
+            null,
+            "pyplus.codefuncs.system_shell()",
+            null
+        ],
+        "Open Python Shell": [
+            "py-term",
+            null,
+            "pyplus.codefuncs.python_shell()",
+            null
+        ]
+    },
+    "[View]": {
+        "Unit tests": [
+            null,
+            null,
+            "TestDialog(pyplus.bottom_tabs, pyplus.filetree.path) if pyplus.tabs else None",
+            "src.Dialog.testdialog -> TestDialog"
+        ],
+        "Code structure": [
+            null,
+            null,
+            "CodeListDialog(pyplus.bottom_tabs, pyplus.get_text) if pyplus.tabs else None",
+            "src.Dialog.codelistdialog -> CodeListDialog"
+        ],
+        "Insert Ascii Art": [
+            null,
+            null,
+            "StyleWindow(pyplus.master, pyplus.get_text, pyplus.key) if pyplus.tabs else None",
+            "src.Dialog.textstyle -> StyleWindow"
+        ],
+        "Search in Directory": [
+            null,
+            null,
+            "SearchInDir(pyplus.bottom_tabs, pyplus.filetree.path, pyplus.open_file)",
+            "src.Dialog.searchindir -> SearchInDir"
+        ]
+    },
+    "[Navigate]": {
+        "Go to...": [
+            null,
+            null,
+            "Navigate(pyplus.get_text) if pyplus.tabs else None",
+            "src.Dialog.goto -> Navigate"
+        ],
+        "Find and Replace": [
+            "search",
+            "f",
+            "pyplus.codefuncs.search()",
+            null
+        ]
+    },
+    "[Git]": {
+        "Commit": [
+            null,
+            "shift-k",
+            "pyplus.git(\"commit\")",
+            null
+        ],
+        "Init": [
+            null,
+            null,
+            "subprocess.Popen('git init && git add . && git commit -am \"Added files\"',hell=True,cwd=pyplus.filetree.path,)",
+            "subprocess"
+        ]
+    }
+}

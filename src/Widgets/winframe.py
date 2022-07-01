@@ -2,9 +2,9 @@ from typing import *
 
 from src.constants import OSX
 from src.modules import json, tk, ttk, font
+from src.Utils.color_utils import lighten_color
 from src.Utils.images import get_image
 from src.Utils.photoimage import IconImage
-
 
 RADIUS = 27 if OSX else 0
 
@@ -72,17 +72,19 @@ class WinFrame(tk.Toplevel):
         super().title(title)  # Need a decent message to show on the taskbar
         self.update_idletasks()
         self.titlebar = tk.Canvas(self,
-                                  bg="systemTransparent",
                                   bd=0,
                                   highlightthickness=0,
                                   height=font_height() * 1.5,
                                   width=self.winfo_width())
         self.status_bar = tk.Canvas(self,
-                                    bg="systemTransparent",
                                     bd=0,
                                     highlightthickness=0,
                                     height=font_height() * 1.5,
-                                    width=self.winfo_width())
+                                    width=self.winfo_width(),
+                                    takefocus=True)
+        if OSX:
+            self.titlebar["bg"] = self.status_bar["bg"] = "systemTransparent"
+            # The transparent color exists in OSX only
         self.titlebar.pack(fill="x", side="top")
         self.master = master
         self.bg = get_bg()
@@ -110,14 +112,29 @@ class WinFrame(tk.Toplevel):
         self.create_titlebar()
 
     def create_statusbar(self):
-        self.status_bar.delete("all")
+        self.status_bar.focus_set()
+        self.status_bar.delete("status")
 
         self.status_bar.pack(side="bottom", fill="x")
         self.status_bar.update_idletasks()
 
         round_rect(self.status_bar, 0, -self.status_bar.winfo_height(),
                    self.status_bar.winfo_width(), self.status_bar.winfo_height(), RADIUS,
-                   fill=get_bg(), outline=get_fg())
+                   fill=get_bg(), tags="status")
+        if OSX:
+            size = self.status_bar.create_arc(self.status_bar.winfo_width() - self.status_bar.winfo_height(), 0,
+                                              self.status_bar.winfo_width(),
+                                              self.status_bar.winfo_height(), fill=lighten_color(get_bg(), 40),
+                                              outline="",
+                                              start=-90, tags="size")
+        else:
+            size = self.status_bar.create_rectangle(self.status_bar.winfo_width() - self.status_bar.winfo_height(), 0,
+                                                    self.status_bar.winfo_width(),
+                                                    self.status_bar.winfo_height(),
+                                                    fill=lighten_color(get_bg(), 40),
+                                                    outline="",
+                                                    tags="size")
+        self.status_bar.tag_bind(size, "<B1-Motion>", self.resize)
 
     def on_exit(self, _):
         # Release Grab to prevent issues
@@ -133,8 +150,7 @@ class WinFrame(tk.Toplevel):
                    self.titlebar.winfo_width(),
                    self.titlebar.winfo_height() * 2,
                    RADIUS,
-                   fill=get_bg(),
-                   outline=get_fg())
+                   fill=get_bg())
         self.titlebar.create_text(21, int((self.titlebar.winfo_height() - font_height()) / 2), text=self.title_text,
                                   fill=get_fg(), anchor="nw")
         self.close_button()
@@ -171,10 +187,9 @@ class WinFrame(tk.Toplevel):
         window_y = self.winfo_rooty()
         if (cursor_y > window_y) and (cursor_x > window_x):
             self.geometry(f"{cursor_x - window_x}x{cursor_y - window_y}")
-
-        # Recreate title
-        self.create_titlebar()
-        self.create_statusbar()
+            # Recreate title
+            self.create_titlebar()
+            self.create_statusbar()
         return
 
     def close_button(self):

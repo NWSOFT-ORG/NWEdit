@@ -15,6 +15,7 @@ if __name__ == "__main__":
                 info["CFBundleName"] = "PyPlus"  # Change name on the titlebar
                 info["CFBundleDisplayName"] = "PyPlus"  # Change name on the Dock
     root = tk.Tk()
+    root.option_add('*tearOff', "false")
 
     editor.Editor(master=root)  # Starts the Editor
     root.mainloop()

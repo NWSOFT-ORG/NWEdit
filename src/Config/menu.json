@@ -15,7 +15,8 @@ For example: "package"
             "info",
             null,
             "AboutDialog(pyplus.master)",
-            "src.Dialog.commondialog -> AboutDialog"
+            "src.Dialog.commondialog -> AboutDialog",
+            false
         ]
     },
     "[File]": {
@@ -23,51 +24,59 @@ For example: "package"
             "new",
             "n",
             "pyplus.filetree.new_file()",
-            null
+            null,
+            false
         ],
         "[Open...]": {
             "Open File": [
                 "open",
                 "o",
                 "pyplus.open_file()",
-                null
+                null,
+                false
             ],
             "Open File in Hex": [
                 "open",
                 null,
                 "pyplus.open_hex()",
-                null
+                null,
+                false
             ],
             "Open Folder": [
                 "open",
                 "shift-o",
                 "pyplus.open_dir()",
-                null
+                null,
+                false
             ],
             "Clone From Git...": [
                 "clone",
                 null,
                 "pyplus.git(\"clone\")",
-                null
+                null,
+                false
             ]
         },
         "Save Copy to": [
             "save-as",
             "shift-s",
             "pyplus.save_as()",
-            null
+            null,
+            false
         ],
         "Close Tab": [
             "close",
             "w",
             "pyplus.close_tab()",
-            null
+            null,
+            false
         ],
         "Reload All": [
             "reload",
             null,
             "pyplus.reload()",
-            null
+            null,
+            false
         ]
     },
     "[Edit]": {
@@ -75,76 +84,88 @@ For example: "package"
             "undo",
             "z",
             "pyplus.opts.undo()",
-            null
+            null,
+            true
         ],
         "Redo": [
             "redo",
             "shift-z",
             "pyplus.opts.redo()",
-            null
+            null,
+            true
         ],
         "Cut": [
             "cut",
             "x",
             "pyplus.opts.cut()",
-            null
+            null,
+            true
         ],
         "Copy": [
             "copy",
             "c",
             "pyplus.opts.copy()",
-            null
+            null,
+            true
         ],
         "Paste": [
             "paste",
             "v",
             "pyplus.opts.paste()",
-            null
+            null,
+            true
         ],
         "Duplicate Line or Selected": [
             null,
             "d",
             "pyplus.opts.duplicate_line()",
-            null
+            null,
+            true
         ],
         "[Indent...]": {
             "Indent": [
                 "indent",
                 "i",
                 "pyplus.opts.indent(\"indent\")",
-                null
+                null,
+                true
             ],
             "Unindent": [
                 "unindent",
                 "u",
                 "pyplus.opts.indent(\"unindent\")",
-                null
+                null,
+                true
             ]
         },
         "Join Lines": [
             null,
             null,
             "pyplus.opts.join_lines()",
-            null
+            null,
+            true
         ],
         "[Case...]": {
             "Swap Case": [
                 null,
                 null,
                 "pyplus.opts.swap_case()",
-                null
+                null,
+                true
             ],
             "Upper Case": [
                 "upper",
                 null,
                 "pyplus.opts.upper_case()",
-                null
+                null,
+                true
             ],
             "Lower Case": [
                 "lower",
                 null,
                 "pyplus.opts.lower_case()",
-                null
+                null,
+                true
             ]
         },
         "[Select...]": {
@@ -152,31 +173,36 @@ For example: "package"
                 "sel-all",
                 "a",
                 "pyplus.opts.select_all()",
-                null
+                null,
+                true
             ],
             "Select Line": [
                 null,
                 null,
                 "pyplus.opts.sel_line()",
-                null
+                null,
+                true
             ],
             "Select Word": [
                 null,
                 null,
                 "pyplus.opts.sel_word()",
-                null
+                null,
+                true
             ],
             "Select Previous Word": [
                 null,
                 null,
                 "pyplus.opts.sel_word_left()",
-                null
+                null,
+                true
             ],
             "Select Next Word": [
                 null,
                 null,
                 "pyplus.opts.sel_word_right()",
-                null
+                null,
+                true
             ]
         },
         "[Delete...]": {
@@ -184,25 +210,29 @@ For example: "package"
                 "delete",
                 null,
                 "pyplus.opts.delete()",
-                null
+                null,
+                true
             ],
             "Delete Word": [
                 "delete",
                 null,
                 "pyplus.opts.delete()",
-                null
+                null,
+                true
             ],
             "Delete Previous Word": [
                 "delete",
                 null,
                 "pyplus.opts.delete()",
-                null
+                null,
+                true
             ],
             "Delete Next Word": [
                 "delete",
                 null,
                 "pyplus.opts.delete()",
-                null
+                null,
+                true
             ]
         },
         "[Move line...]": {
@@ -210,13 +240,15 @@ For example: "package"
                 null,
                 null,
                 "pyplus.opts.mv_line_up()",
-                null
+                null,
+                true
             ],
             "Down": [
                 null,
                 null,
                 "pyplus.opts.mv_line_dn()",
-                null
+                null,
+                true
             ]
         }
     },
@@ -225,57 +257,61 @@ For example: "package"
             "run",
             null,
             "pyplus.codefuncs.run()",
-            null
+            null,
+            true
         ],
         "Lint": [
             "lint",
             null,
             "pyplus.codefuncs.lint_source()",
-            null
+            null,
+            true
         ],
         "Auto-Format": [
             "format",
             null,
             "pyplus.codefuncs.autopep()",
-            null
-        ],
-        "Open System Shell": [
-            "term",
             null,
-            "pyplus.codefuncs.system_shell()",
-            null
+            true
         ],
-        "Open Python Shell": [
-            "py-term",
-            null,
-            "pyplus.codefuncs.python_shell()",
-            null
-        ]
+        "[Open Shell...]": {
+            "Open System Shell": [
+                "term",
+                null,
+                "pyplus.codefuncs.system_shell()",
+                null,
+                false
+            ],
+            "Open Python Shell": [
+                "py-term",
+                null,
+                "pyplus.codefuncs.python_shell()",
+                null,
+                false
+            ]
+        }
     },
     "[View]": {
         "Unit tests": [
             null,
             null,
             "TestDialog(pyplus.bottom_tabs, pyplus.filetree.path) if pyplus.tabs else None",
-            "src.Dialog.testdialog -> TestDialog"
+            "src.Dialog.testdialog -> TestDialog",
+            false
         ],
         "Code structure": [
             null,
             null,
             "CodeListDialog(pyplus.bottom_tabs, pyplus.get_text) if pyplus.tabs else None",
-            "src.Dialog.codelistdialog -> CodeListDialog"
+            "src.Dialog.codelistdialog -> CodeListDialog",
+            true
         ],
         "Insert Ascii Art": [
             null,
             null,
             "StyleWindow(pyplus.master, pyplus.get_text, pyplus.key) if pyplus.tabs else None",
-            "src.Dialog.textstyle -> StyleWindow"
-        ],
-        "Search in Directory": [
-            null,
-            null,
-            "SearchInDir(pyplus.bottom_tabs, pyplus.filetree.path, pyplus.open_file)",
-            "src.Dialog.searchindir -> SearchInDir"
+            "src.Dialog.textstyle -> StyleWindow",
+            true
         ]
     },
     "[Navigate]": {
@@ -283,13 +319,22 @@ For example: "package"
             null,
             null,
             "Navigate(pyplus.get_text) if pyplus.tabs else None",
-            "src.Dialog.goto -> Navigate"
+            "src.Dialog.goto -> Navigate",
+            true
         ],
         "Find and Replace": [
             "search",
             "f",
             "pyplus.codefuncs.search()",
-            null
+            null,
+            true
+        ],
+        "Search in Directory": [
+            null,
+            null,
+            "SearchInDir(pyplus.bottom_tabs, pyplus.filetree.path, pyplus.open_file)",
+            "src.Dialog.searchindir -> SearchInDir",
+            false
         ]
     },
     "[Git]": {
@@ -297,13 +342,15 @@ For example: "package"
             null,
             "shift-k",
             "pyplus.git(\"commit\")",
-            null
+            null,
+            false
         ],
         "Init": [
             null,
             null,
             "subprocess.Popen('git init && git add . && git commit -am \"Added files\"',hell=True,cwd=pyplus.filetree.path,)",
-            "subprocess"
+            "subprocess",
+            false
         ]
     }
 }

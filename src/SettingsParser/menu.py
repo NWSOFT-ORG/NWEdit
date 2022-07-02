@@ -1,4 +1,4 @@
-from src.constants import MAIN_KEY
+from src.constants import MAIN_KEY, logger
 from src.modules import json, tk
 from typing import *
 
@@ -9,8 +9,10 @@ class Menu:
     def __init__(self, obj):
         """A menu creater from configuration"""
         self.pyplus = obj
+        self.master = obj.master
         self.menu = tk.Menu()
         self.functions = []
+        self.disable_menus = {}
         with open("Config/menu.json") as f:
             self.config: Dict[Text, Union[List, Dict]] = json.load(f)
 
@@ -20,15 +22,29 @@ class Menu:
         """Recursively loop through the configuration"""
         for key in config.keys():
             if not (key.startswith("[") and key.endswith("]")):
-                cnf = [menu, key, *config[key]]
+                cnf = [menu, key, *config[key][:-1]]
+                logger.debug(f"Creating item {key!r}")
+                logger.debug(f"Disable on no editors: {config[key][-1]}")
+                if config[key][-1]:
+                    if menu not in self.disable_menus.keys():
+                        self.disable_menus[menu] = []
+                    self.disable_menus[menu].append(key)
                 self.create_item(*cnf)
             else:
                 cnf = {}
                 if key == "[PyPlus]":
                     cnf["name"] = "apple"
+                    logger.debug("Creating apple menu")
                 cascade = tk.Menu(menu, **cnf)
                 self.create_menu(cascade, config[key])
                 menu.add_cascade(menu=cascade, label=key[1:-1])
+        logger.debug(f"Menus disabled when no editors: {self.disable_menus!r}")
+
+    def disable(self, tabs):
+        logger.debug(f"{bool(tabs)=!r}. Therefore, {'enable' if tabs else 'disable'} menu items")
+        for key in self.disable_menus.keys():
+            for value in self.disable_menus[key]:
+                key.entryconfig(value, state="disabled" if not tabs else "normal")
 
     @staticmethod
     def do_import(name):
@@ -38,6 +54,7 @@ class Menu:
             statement = f"from {imports[0]} import {imports[1]}"
         else:
             statement = f"import {imports[0]}"
+        logger.debug(f"Imported a module: {statement}")
         return statement
 
     def create_item(self, menu, text, image, mnemonic, function, imports):
@@ -54,7 +71,9 @@ class Menu:
         }
         if not mnemonic:
             cnf.pop("accelerator")  # Will cause error with an empty accelerator
+            logger.debug("No Accelerator")
         elif mnemonic.startswith("`"):
             cnf["accelerator"] = mnemonic[1:]
+            logger.debug("Bare Accelerator")
 
         menu.add_command(**cnf)

@@ -68,6 +68,29 @@ class Document:
         self.istoolwin = istoolwin
 
 
+class Tabs(dict):
+    def __init__(self, master: tk.Tk):
+        super().__init__()
+        self.trigger = lambda _: None
+        self.master = master
+
+    def set_triggger(self, trigger: Callable):
+        self.trigger = trigger
+        self.trigger(self)
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        self.trigger(self)
+
+    def __delitem__(self, v) -> None:
+        super().__delitem__(v)
+        self.trigger(self)
+
+    def pop(self, name: str) -> None:
+        super().pop(name)
+        self.trigger(self)
+
+
 class Editor:
     """The editor class."""
 
@@ -113,7 +136,7 @@ class Editor:
             self.master.iconphoto(True, get_image("pyplus-35px", "image"))
             splash.set_progress(4)
 
-            self.tabs = {}
+            self.tabs = Tabs(self.master)
 
             self.panedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.panedwin.pack(fill="both", expand=1)
@@ -157,7 +180,9 @@ class Editor:
             logger.debug("Plugins loaded")
             splash.set_progress(8)
 
-            self.menu = Menu(self).menu
+            self.menu_obj = Menu(self)
+            self.menu = self.menu_obj.menu
+            self.tabs.set_triggger(self.menu_obj.disable)
             self.master["menu"] = self.menu
             self.right_click_menu = self.opts.right_click_menu
             logger.debug("All menus loaded.")

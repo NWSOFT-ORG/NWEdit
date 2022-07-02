@@ -158,6 +158,7 @@ logging.basicConfig(
     filename="pyplus.log",
     filemode="w",
     level=logging.DEBUG,
+    datefmt="%d/%m %H:%M",
     format="%(asctime)s %(levelname)s %(funcName)s %(message)s",
 )
 

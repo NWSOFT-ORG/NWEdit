@@ -1,5 +1,4 @@
 import ast
-from typing import Text
 
 from src.modules import tk, traceback, ttk
 
@@ -55,7 +54,7 @@ class CodeListDialog(ttk.Frame):
         for var in defined_vars:
             self.show_var("", var)
 
-    def show_info(self, parent, _obj, _type="") -> Text:
+    def show_info(self, parent, _obj, _type="") -> str:
         return self.tree.insert(
             parent,
             "end",

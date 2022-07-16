@@ -1,4 +1,5 @@
 from src.modules import EditorErr, tk
+from src.types import Tk_Win
 from src.Utils.images import get_image
 
 
@@ -29,7 +30,7 @@ class ProgressBar(tk.Canvas):
 
 
 class SplashWindow(tk.Toplevel):
-    def __init__(self, master: tk.Tk) -> None:
+    def __init__(self, master: Tk_Win) -> None:
         """The splash window, which welcomes user to use PyPlus"""
         super().__init__(master, cursor="watch")
         self.title("")

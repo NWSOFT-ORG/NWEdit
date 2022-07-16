@@ -8,7 +8,7 @@ from src.Utils.photoimage import PhotoImage
 
 class Link(ttk.Label):
     def __init__(
-        self, parent: tk.Misc, text: Text, image: Union[PhotoImage, None] = None
+        self, parent: tk.Misc, text: str, image: Union[PhotoImage, None] = None, command: Callable = lambda: None
     ):
         style = ttk.Style(parent)
         bg = style.lookup("TLabel", "background")
@@ -21,6 +21,7 @@ class Link(ttk.Label):
             image=image,
             compound="left",
         )
+        self.bind("<1>", command, add=True)
 
     @property
     def cursor(self):

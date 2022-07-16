@@ -1,11 +1,10 @@
-from src.constants import APPDIR, LINT_BATCH, RUN_BATCH, WINDOWS, logger
+from src.constants import APPDIR, LINT_BATCH, logger, RUN_BATCH, WINDOWS
 from src.Dialog.codelistdialog import CodeListDialog
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.search import Search
 from src.highlighter import create_tags, recolorize
-from src.modules import Path, lexers, os, subprocess, tk, ttk
+from src.modules import lexers, os, Path, subprocess, tk, ttk
 from src.Utils.functions import open_shell, shell_command
-from src.Utils.images import get_image
 from src.Widgets.console import Console
 from src.Widgets.customenotebook import ClosableNotebook
 

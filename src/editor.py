@@ -1,18 +1,8 @@
 # coding: utf-8
 """
-
-+ =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
-| editor.py -- the editor's main file                 |
-| The editor                                          |
-| It's extremely small! (around 80 kB)                |
-| You can visit my site for more details!             |
-| +----------------------------------------------+    |
-| | https://ZCG-coder.github.io/NWSOFT/PyPlusWeb |    |
-| +----------------------------------------------+    |
-| You can also contribute it on github!               |
-| Note: Some parts are adapted from stack overflow.   |
-+ =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= +
-Also, it's cross-compatible!
+The editor object
+The editor is a combination of widgets
+TODO: Make it plugin-based
 """
 
 from typing import *
@@ -22,12 +12,11 @@ from src.constants import APPDIR, logger, MAIN_KEY, OSX
 from src.Dialog.autocomplete import CompleteDialog
 from src.Dialog.commondialog import ErrorInfoDialog, StringInputDialog, YesNoDialog
 from src.Dialog.debugdialog import ErrorReportDialog
-from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog, FileSaveAsDialog
+from src.Dialog.filedialog import FileOpenDialog, FileSaveAsDialog
 from src.Dialog.goto import Navigate
-from src.Dialog.splash import SplashWindow
 from src.Git.gitview import GitView
 from src.highlighter import recolorize_line
-from src.modules import (font, json, logging, os, Path, subprocess, sys, tk, traceback, ttk, ttkthemes)
+from src.modules import (json, logging, os, Path, subprocess, sys, tk, traceback, ttk)
 from src.SettingsParser.extension_settings import (
     CommentMarker,
     FileTreeIconSettings,
@@ -39,16 +28,16 @@ from src.SettingsParser.extension_settings import (
 from src.SettingsParser.general_settings import GeneralSettings
 from src.SettingsParser.menu import Menu
 from src.SettingsParser.plugin_settings import Plugins
+from src.SettingsParser.project_settings import RecentProjects
+from src.types import Tk_Win
 from src.Utils.functions import is_binary_string
 from src.Utils.images import get_image, init_images
 from src.Widgets.customenotebook import ClosableNotebook
 from src.Widgets.hexview import HexView
-from src.Widgets.link import Link
 from src.Widgets.panel import CustomTabs
 from src.Widgets.statusbar import Statusbar
 from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
 from src.Widgets.treeview import FileTree
-from src.Widgets.winframe import WinFrame
 
 if OSX:
     from src.modules import PyTouchBar
@@ -69,7 +58,7 @@ class Document:
 
 
 class Tabs(dict):
-    def __init__(self, master: tk.Tk):
+    def __init__(self, master: Tk_Win):
         super().__init__()
         self.trigger = lambda _: None
         self.master = master
@@ -95,16 +84,12 @@ class Editor:
     """The editor class."""
 
     # noinspection PyBroadException
-    def __init__(self, master: tk.Tk) -> None:
+    def __init__(self, master: Tk_Win, project_name: str) -> None:
         """The editor object, the entire thing that goes in the
         window."""
-        init_images()
-        empty_menu = tk.Menu(master)
-        master.config(menu=empty_menu)
-        # Create an empty menu to prevent mess-ups
-        splash = SplashWindow(master)
-        splash.set_section(10)
         self.master = master
+        self.project = project_name
+        init_images()
 
         try:
             self.settings_class = GeneralSettings(self.master)
@@ -115,28 +100,17 @@ class Editor:
             self.comment_settings_class = CommentMarker()
             self.plugins_settings_class = Plugins(master)
             self.icon_settings_class = FileTreeIconSettings()
+            self.projects = RecentProjects()
+            logger.debug("Settings classes loaded")
 
-            logger.debug("Settings classes initialised")
-            splash.set_progress(1)
-
-            self.opts = TextOpts(self.master, keyaction=self.key)
             self.theme = self.settings_class.get_settings("theme")
             self.tabwidth = self.settings_class.get_settings("tab")
             logger.debug("Code settings loaded")
-            splash.set_progress(2)
-            self.style = ttkthemes.ThemedStyle(self.master)
-            self.style.theme_use(self.settings_class.get_settings("theme"))
-            logger.debug("Theme loaded")
-            splash.set_progress(3)
-            self.bg = self.style.lookup("TLabel", "background")
-            self.fg = self.style.lookup("TLabel", "foreground")
 
-            self.icon = get_image("pyplus")
             # noinspection PyTypeChecker
             self.master.iconphoto(True, get_image("pyplus-35px", "image"))
-            splash.set_progress(4)
 
-            self.tabs = Tabs(self.master)
+            self.tabs = Tabs(self.master)  # Modified dict
 
             self.panedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.panedwin.pack(fill="both", expand=1)
@@ -144,13 +118,11 @@ class Editor:
             self.mainframe.pack(fill="both", expand=1)
             self.panedwin.add(self.mainframe)
             logger.debug("UI initialised")
-            splash.set_progress(5)
 
             self.left_panel()
             self.bottom_panel()
             self.statusbar = Statusbar()
             logger.debug("Layout created")
-            splash.set_progress(6)
 
             self.codefuncs = CodeFunctions(
                 self.master, self.tabs, self.nb, self.bottom_tabs
@@ -175,23 +147,19 @@ class Editor:
                     [open_button, save_as_button, close_button, space, run_button]
                 )
                 logger.debug(f"{OSX = }, therefore enable TouchBar support")
-            splash.set_progress(7)
+
             self.plugins_settings_class.load_plugins()
             logger.debug("Plugins loaded")
-            splash.set_progress(8)
 
             self.menu_obj = Menu(self)
             self.menu = self.menu_obj.menu
             self.tabs.set_triggger(self.menu_obj.disable)
             self.master["menu"] = self.menu
-            self.right_click_menu = self.opts.right_click_menu
             logger.debug("All menus loaded.")
-            splash.set_progress(9)
 
             self.create_bindings()
-            self.reopen_files()
+            self.load_status()
             self.update_title()
-            splash.set_progress(10)
         except Exception:
             logger.exception("Error when initializing:")
             ErrorReportDialog(
@@ -201,7 +169,7 @@ class Editor:
 
     def left_panel(self):
         self.left_tabs = CustomTabs(self.panedwin)
-        self.filetree = FileTree(self.left_tabs, self.open_file)
+        self.filetree = FileTree(self.left_tabs, self.open_file, self.projects.get_path_to(self.project))
         self.panedwin.insert(0, self.left_tabs)
         self.left_tabs.add(self.filetree, text="Files")
 
@@ -209,21 +177,12 @@ class Editor:
         self.bottom_panedwin = ttk.Panedwindow(self.mainframe)
 
         self.nb = ClosableNotebook(self.bottom_panedwin, self.close_tab)
-        self.nb.event_add("<<Click>>", "<1>")
-        self.nb.bind("<<Click>>", self.click_tab)
-
         self.nb.enable_traversal()
 
         self.bottom_panedwin.pack(side="bottom", fill="both", expand=1)
         self.bottom_panedwin.add(self.nb, weight=4)
         self.bottom_tabs = CustomTabs(self.bottom_panedwin)
         self.bottom_panedwin.add(self.bottom_tabs, weight=1)
-
-    def click_tab(self, _=None):
-        try:
-            self.opts.set_text(self.get_text)
-        except AttributeError:
-            pass
 
     def create_bindings(self):
         # Keyboard bindings
@@ -238,67 +197,6 @@ class Editor:
         )  # When the window is closed, or quit from Mac, do exit action
         self.master.createcommand("::tk::mac::Quit", self.exit)
         logger.debug("Bindings created")
-
-    def start_screen(self) -> None:
-        frame = WinFrame(self.master, "Start", closable=False, icon=self.icon)
-
-        first_tab = tk.Canvas(frame, background=self.bg, highlightthickness=0)
-        frame.add_widget(first_tab)
-
-        first_tab.create_image(
-            20, 20, anchor="nw", image=get_image("pyplus-35px", "image")
-        )
-        bold = font.Font(family="tkDefaultFont", size=35, weight="bold")
-        first_tab.create_text(
-            80, 20, anchor="nw", text="Welcome!", font=bold, fill=self.fg
-        )
-        label1 = Link(
-            first_tab,
-            text="Open file",
-            image=get_image("open"),
-        )
-        label2 = Link(
-            first_tab,
-            text="New...",
-            image=get_image("new"),
-        )
-        label3 = Link(
-            first_tab,
-            text="Clone",
-            image=get_image("clone"),
-        )
-        label4 = Link(
-            first_tab,
-            text="Close",
-            image=get_image("close"),
-        )
-
-        links = [label1, label2, label3, label4]
-
-        label1.bind("<Button>", lambda _: self.open_file())
-        label2.bind("<Button>", lambda _: self.filetree.new_file(*self.decide_new_file))
-        label4.bind("<Button>", lambda _: frame.destroy())
-        label3.bind("<Button>", lambda _: self.git("clone"))
-
-        for y_index, item in enumerate(links):
-            first_tab.create_window(
-                80, 100 + (y_index - 1) * 25, window=item, anchor="nw"
-            )
-            item.bind("<Button>", lambda _: frame.destroy(), add=True)
-
-        logger.debug("Start screen created")
-
-    @property
-    def decide_new_file(self) -> tuple:
-        """Decide where the element should go to"""
-        selected = self.filetree.tree.focus()
-        if not selected:
-            selected = self.filetree.root_node
-            isdir = True
-        else:
-            path = self.filetree.get_path(selected, True)
-            isdir = os.path.isdir(path)
-        return selected, isdir
 
     def create_text_widget(self, frame: ttk.Frame) -> EnhancedText:
         """Creates a text widget in a frame."""
@@ -315,14 +213,10 @@ class Editor:
 
         textbox = textframe.text  # text widget
         textbox.panedwin = panedwin
-        textbox.complete = CompleteDialog(textframe, textbox, self.opts)
+        textbox.complete = CompleteDialog(textframe, textbox, self.key)
         textbox.frame = frame  # The text will be packed into the frame.
-        textbox.bind(("<Button-2>" if OSX else "<Button-3>"), self.right_click)
         textbox.bind(f"<{MAIN_KEY}-b>", self.codefuncs.run)
         textbox.bind(f"<{MAIN_KEY}-f>", self.codefuncs.search)
-        textbox.bind(
-            f"<{MAIN_KEY}-n>", lambda _: self.filetree.new_file(*self.decide_new_file)
-        )
         textbox.bind(f"<{MAIN_KEY}-N>", lambda _: Navigate(self.get_text))
         textbox.bind(f"<{MAIN_KEY}-r>", self.reload)
         textbox.bind(f"<{MAIN_KEY}-S>", lambda _: self.save_as())
@@ -333,15 +227,16 @@ class Editor:
     def update_title(self, _=None) -> str:
         try:
             path = self.tabs[self.nb.get_tab].file_dir
+            path = os.path.basename(path)
             if self.tabs[self.nb.get_tab].istoolwin:
                 self.master.title("PyPlus")
                 logger.debug("update_title: Finished early")
                 return "break"
             if OSX:
                 self.master.attributes("-titlepath", path)
-            self.master.title(f"PyPlus — {path}")
+            self.master.title(f"PyPlus [{self.project}] — {path}")
         except KeyError:
-            self.master.title("PyPlus")
+            self.master.title(f"PyPlus [{self.project}]")
             self.master.attributes("-titlepath", "")
         finally:
             return "break"
@@ -394,22 +289,20 @@ class Editor:
             self.master.bell()
             logger.exception("Error when handling mouse event:")
 
-    def reopen_files(self):
-        with open("EditorStatus/open_files.json") as f:
-            files_list = json.load(f)
-            if not files_list:
-                self.start_screen()
-                return
-            for file, cur_pos in files_list.items():
-                self.open_file(file, askhex=False)
-                textbox = self.tabs[self.nb.get_tab].textbox
-                textbox.mark_set("insert", cur_pos)
-                textbox.see("insert")
+    def load_status(self):
         with open("EditorStatus/window_status.json") as f:
             geometry = json.load(f)
             geometry = geometry["windowGeometry"]
             geometry = f"{geometry[0]}x{geometry[1]}"
             self.master.geometry(geometry)
+        tree_stat = self.projects.get_treeview_stat(self.project)
+        self.filetree.load_status(tree_stat)
+
+        for file, index in self.projects.get_open_files(self.project).items():
+            self.open_file(file)
+            self.get_text.mark_set("insert", index)
+            self.get_text.see("insert")
+        self.get_text.focus_set()
         self.update_title()
         self.update_statusbar()
 
@@ -429,13 +322,6 @@ class Editor:
         self.update_title()
         self.update_statusbar()
         return window.textbox
-
-    def open_dir(self, directory: os.PathLike = ""):
-        if not directory:
-            DirectoryOpenDialog(self.master, self.open_dir)
-            return
-
-        self.filetree.set_path(directory)
 
     def open_file(self, file: str = "", askhex: bool = True):
         """Opens a file
@@ -486,7 +372,9 @@ class Editor:
             textbox.event_generate("<<Key>>")
             textbox.focus_set()
             textbox.edit_reset()
-            self.opts.set_text(textbox)
+
+            TextOpts(self.master, keyaction=self.key).set_text(textbox)
+
             self.mouse()
             logging.info("File opened")
             return textbox
@@ -527,15 +415,11 @@ class Editor:
                 return
             if os.access(self.tabs[curr_tab].file_dir, os.W_OK):
                 with open(self.tabs[curr_tab].file_dir, "w") as file:
-                    file.write(self.tabs[curr_tab].textbox.get(1.0, "end").strip())
+                    file.write(self.tabs[curr_tab].textbox.get(1.0, "end"))
             else:
                 ErrorInfoDialog(self.master, "File read only")
         except KeyError:
             pass
-
-    def right_click(self, event) -> None:
-        if self.tabs:
-            self.right_click_menu.tk_popup(event.x_root, event.y_root)
 
     def close_tab(self, event=None) -> None:
         try:
@@ -557,8 +441,6 @@ class Editor:
             self.nb.forget(selected_tab)
             self.tabs.pop(selected_tab)
 
-            if len(self.tabs) == 0:
-                self.start_screen()
             self.mouse()
         except KeyError:
             pass
@@ -580,23 +462,22 @@ class Editor:
         self.nb.select(curr)
 
     def exit(self) -> None:
-        with open("EditorStatus/treeview_stat.json", "w") as f:
-            self.filetree.write_status(f)
-        with open("EditorStatus/open_files.json", "w") as f:
-            file_list = {}
+        tree_stat = self.filetree.generate_status()
+        self.projects.set_tree_status(self.project, tree_stat)
 
-            if self.tabs:
-                for tab in self.tabs.values():
-                    if tab.istoolwin:
-                        continue
-                    cursor_pos = tab.textbox.index("insert")
-                    file_list[tab.file_dir] = cursor_pos
-                file_list[self.tabs[self.nb.get_tab].file_dir] = self.tabs[
-                    self.nb.get_tab
-                ].textbox.index(
-                    "insert"
-                )  # Open the current file
-            json.dump(file_list, f)
+        file_list = {}
+
+        if self.tabs:
+            for tab in self.tabs.values():
+                if tab.istoolwin:
+                    continue
+                cursor_pos = tab.textbox.index("insert")
+                file_list[tab.file_dir] = cursor_pos
+            file_list[self.tabs[self.nb.get_tab].file_dir] = self.get_text.index(
+                "insert"
+            )  # Open the current file
+        self.projects.set_open_files(self.project, file_list)
+
         with open("EditorStatus/window_status.json", "w") as f:
             status = {}
             self.master.update()
@@ -617,7 +498,7 @@ class Editor:
         try:
             return self.tabs[self.nb.get_tab].textbox
         except KeyError:
-            pass
+            return
 
     def git(self, action=None) -> None:
         currdir = self.filetree.path

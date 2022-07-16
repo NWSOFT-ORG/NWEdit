@@ -1,6 +1,7 @@
 from typing import *
 
 from src.modules import lexers, tk, ttk
+from src.types import Tk_Widget
 from src.Utils.images import get_image
 from src.Widgets.tktext import EnhancedTextFrame, TextOpts
 from src.Widgets.winframe import WinFrame
@@ -8,7 +9,7 @@ from src.Widgets.winframe import WinFrame
 
 class CodeInputDialog(WinFrame):
     def __init__(
-        self, parent: Union[tk.Misc, tk.Tk, tk.Toplevel], title: Text, onsave: Callable
+        self, parent: Tk_Widget, title: str, onsave: Callable
     ) -> None:
         super().__init__(parent, title, closable=False, icon=get_image("question"))
 
@@ -31,10 +32,10 @@ class CodeInputDialog(WinFrame):
         cancelbtn.pack(side="left")
         button_frame.pack(fill="x")
 
-    def insert(self, pos: Text, text: Text) -> None:
+    def insert(self, pos: Literal[float], text: str) -> None:
         self.text.insert(pos, text)
 
-    def get(self, pos1: Text, pos2: Text) -> str:
+    def get(self, pos1: Literal[float], pos2: Literal[float]) -> str:
         return self.text.get(pos1, pos2)
 
     def add_destroy_action(self, function: Callable) -> callable:

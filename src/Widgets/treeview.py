@@ -1,10 +1,9 @@
-from src.constants import OSX, logger
+from src.constants import logger, OSX
 from src.Dialog.commondialog import StringInputDialog
 from src.Dialog.fileinfodialog import FileInfoDialog
-from src.modules import font, json, os, send2trash, shutil, tk, ttk
+from src.modules import font, os, send2trash, shutil, tk, ttk
 from src.SettingsParser.extension_settings import FileTreeIconSettings
 from src.SettingsParser.interval_settings import IntervalSettings
-from src.Utils.color_utils import is_dark_color
 from src.Widgets.scrollbar import Scrollbar
 
 
@@ -13,7 +12,7 @@ class FileTree(ttk.Frame):
     Treeview to select files
     """
 
-    def __init__(self, master=None, opencommand=None):
+    def __init__(self, master=None, opencommand=None, path: os.PathLike = os.path.expanduser("~")):
         self.expanded = []
         self.temp_path = []
         self._style = ttk.Style()
@@ -60,8 +59,7 @@ class FileTree(ttk.Frame):
         self.tree.bind("<<TreeviewOpen>>", lambda _: self.open_dir())
         self.tree.bind("<<TreeviewClose>>", lambda _: self.close_dir())
 
-        with open("EditorStatus/treeview_stat.json") as f:
-            self.load_status(f)
+        self.set_path(path)
 
     def remove(self, item: str) -> None:
         path = self.get_path(item, True)
@@ -223,7 +221,7 @@ class FileTree(ttk.Frame):
         menu.add_command(label="Rename file", command=lambda: self.rename(item))
         menu.add_command(label="Move to Trash", command=lambda: self.remove(item))
         menu.add_separator()
-        menu.add_command(label="Refresh", command=self.advanced_refresh)
+        menu.add_command(label="Refresh", command=lambda _: self.refresh_tree(False))
 
         menu.tk_popup(event.x_root, event.y_root)
 
@@ -241,41 +239,33 @@ class FileTree(ttk.Frame):
     def set_path(self, new_path: os.PathLike):
         self.tree.delete(*self.tree.get_children())
         abspath = os.path.abspath(new_path)
-        self.path = abspath
 
+        self.path = abspath
         self.orig_path = abspath
+
         self.root_node = self.tree.insert(
             "", "end", text=abspath, open=True, tags=("root",)
         )
         self.process_directory(self.root_node, path=abspath)
 
-    def advanced_refresh(self):
-        path = self.orig_path
-        with open("EditorStatus/treeview_stat.json", "w") as f:
-            self.write_status(f)
-        with open("EditorStatus/treeview_stat.json") as f:
-            self.load_status(f)
-
-    def write_status(self, fp):
-        state = {
-            "path": self.orig_path,
-            "expandedNodes": self.expanded,
+    def generate_status(self):
+        status = {
+            "expandedNodes"     : self.expanded,
             "yScrollbarLocation": self.yscroll.get(),
             "xScrollbarLocation": self.xscroll.get(),
         }
 
-        with fp as f:
-            json.dump(state, f)
+        return status
 
-    def load_status(self, fp):
-        with fp as f:
-            status = json.load(f)
-        self.path = self.orig_path = status["path"]
+    def load_status(self, status):
         self.refresh_tree(True)
 
         for item in status["expandedNodes"]:
-            self.tree.item(item, open=True)
-            self.open_dir(item)
+            try:
+                self.tree.item(item, open=True)
+                self.open_dir(item)
+            except tk.TclError:
+                pass
 
         self.expanded = status["expandedNodes"]
 

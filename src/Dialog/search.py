@@ -1,5 +1,4 @@
 import re
-from tokenize import Number
 from typing import *
 
 from src.modules import tk, ttk
@@ -61,8 +60,8 @@ def find_all(sub: Text, string: Text, case: bool = True) -> Iterable[Tuple[int]]
 
 
 def re_search(
-    pat: Text,
-    text: Text,
+    pat: str,
+    text: str,
     nocase: bool = False,
     full_word: bool = False,
     regex: bool = False,
@@ -100,7 +99,6 @@ class Search:
         self.master = master
         self.text = text
         self._style = ttk.Style()
-        bg = self._style.lookup("TLabel", "background")
 
         if self.text.search or self.text.navigate:
             return

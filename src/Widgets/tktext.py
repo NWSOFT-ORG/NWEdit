@@ -2,12 +2,17 @@
 
 from typing import *
 
-from src.constants import logger, MAIN_KEY
+from src.constants import logger, MAIN_KEY, OSX
 from src.highlighter import create_tags, recolorize, recolorize_line
 from src.modules import EditorErr, font, lexers, styles, tk, ttk
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.color_utils import darken_color, is_dark_color, lighten_color
 from src.Widgets.scrollbar import TextScrollbar
+
+
+def font_height(font_name, size) -> int:
+    f = font.Font(font=font_name, size=size)
+    return f.metrics("linespace")
 
 
 class TextLineNumbers(tk.Canvas):
@@ -90,8 +95,10 @@ class EnhancedText(tk.Text):
     If you hit a key, or the text widget's content has changed,
     it generats an event, to redraw the line numbers."""
 
-    def __init__(self, *args: Union[None, list], **kwargs: Union[None, dict]) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+        self.settings = GeneralSettings(self.master)
+        self.config(blockcursor=self.settings.block_cur)
         self.frame = self.master
         self.search = False
         self.navigate = False
@@ -101,6 +108,11 @@ class EnhancedText(tk.Text):
         self._orig = self._w + "_orig"
         self.tk.call("rename", self._w, self._orig)
         self.tk.createcommand(self._w, self._proxy)
+
+    def set_spacing(self, _):
+        self.update_idletasks()
+        space = int(font_height(self.settings.font, self.settings.size) * (self.settings.line_height - 1)) / 2
+        self.config(spacing1=space, spacing3=space)
 
     def set_lexer(self, lexer):
         self.lexer = lexer
@@ -115,12 +127,12 @@ class EnhancedText(tk.Text):
             # generate an event if something was added or deleted,
             # or the cursor position changed
             if (
-                args[0] in ("insert", "replace", "delete")
-                or args[0:3] == ("mark", "set", "insert")
-                or args[0:2] == ("xview", "moveto")
-                or args[0:2] == ("xview", "scroll")
-                or args[0:2] == ("yview", "moveto")
-                or args[0:2] == ("yview", "scroll")
+                    args[0] in ("insert", "replace", "delete")
+                    or args[0:3] == ("mark", "set", "insert")
+                    or args[0:2] == ("xview", "moveto")
+                    or args[0:2] == ("xview", "scroll")
+                    or args[0:2] == ("yview", "moveto")
+                    or args[0:2] == ("yview", "scroll")
             ):
                 self.event_generate("<<Change>>", when="tail")
 
@@ -163,6 +175,7 @@ class EnhancedTextFrame(ttk.Frame):
             autoseparators=1,
             undo=True,
         )
+        self.bind("<Configure>", self.text.set_spacing)
         self.linenumbers = TextLineNumbers(
             self, width=30, bg=bgcolor, bd=0, highlightthickness=0
         )
@@ -187,6 +200,10 @@ class EnhancedTextFrame(ttk.Frame):
         currline = self.text.index("insert")
         self.linenumbers.advancedredraw(first=self.first_line, line=currline)
 
+        self.text.tag_remove("current_line", "1.0", "end")
+        self.text.tag_add("current_line", "insert linestart", "insert lineend +1c")
+        self.text.tag_config("current_line", background=lighten_color(self.text.cget("background"), 20))
+
     def _on_resize(self, _=None) -> None:
         self.linenumbers.redraw(first=self.first_line)
 
@@ -210,10 +227,11 @@ class TextOpts:
     def set_text(self, text):
         self.text = text
         self.bind_events()
+        return self
 
     @property
     def right_click_menu(self):
-        right_click_menu = tk.Menu(self.master)
+        right_click_menu = tk.Menu(self.text)
         right_click_menu.add_command(label="Undo", command=self.undo)
         right_click_menu.add_command(label="Redo", command=self.redo)
         right_click_menu.add_command(label="Cut", command=self.cut)
@@ -239,6 +257,10 @@ class TextOpts:
         text.bind(f"<{MAIN_KEY}-Z>", self.redo)
         text.bind(f"<{MAIN_KEY}-z>", self.undo)
         text.bind(f"{MAIN_KEY}-d", self.duplicate_line)
+        text.bind(
+            ("<Button-2>" if OSX else "<Button-3>"),
+            lambda e: self.right_click_menu.post(e.x_root, e.y_root)
+        )
         create_tags(text)
         recolorize(text)
 
@@ -296,7 +318,7 @@ class TextOpts:
             unindented = []
             for line in selected_text.splitlines():
                 if line.startswith(" " * self.tabwidth):
-                    unindented.append(line[4:])
+                    unindented.append(line[self.tabwidth:])
                 else:
                     return
             currtext.delete(sel_start, sel_end)
@@ -329,7 +351,7 @@ class TextOpts:
                 if block:
                     if text.startswith(comment_start):
                         currtext.insert(
-                            "insert", text[len(comment_start) : -len(comment_end)]
+                            "insert", text[len(comment_start): -len(comment_end)]
                         )
                         self.key()
                         return
@@ -371,10 +393,10 @@ class TextOpts:
             currtext.delete(f"insert -{self.tabwidth - 1}c", "insert")
         self.key()
 
-    def close_brackets(self, event: tk.EventType = None) -> str:
+    def close_brackets(self, event: Union[tk.Event, None] = None) -> str:
         currtext = self.text
         if event.char in [")", "]", "}", "'", '"'] and currtext.get(
-            "insert -1c", "insert"
+                "insert -1c", "insert"
         ) in [")", "]", "}", "'", '"']:
             currtext.mark_set("insert", "insert +1c")
             self.key()
@@ -462,7 +484,7 @@ class TextOpts:
         if linetext.endswith("\\"):
             indentation += " " * self.tabwidth
         if "return" in linetext or "break" in linetext:
-            indentation = indentation[self.tabwidth :]
+            indentation = indentation[self.tabwidth:]
         if linetext.endswith("(") or linetext.endswith(", ") or linetext.endswith(","):
             indentation += " " * self.tabwidth
 

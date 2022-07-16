@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-from src import editor
 from src.constants import OSX
+from src.Dialog.startdialog import StartDialog
 from src.modules import tk
 
 if __name__ == "__main__":
@@ -17,5 +17,5 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.option_add('*tearOff', "false")
 
-    editor.Editor(master=root)  # Starts the Editor
+    StartDialog(master=root)  # Starts the Editor
     root.mainloop()

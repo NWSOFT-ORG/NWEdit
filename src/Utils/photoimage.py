@@ -1,4 +1,4 @@
-from src.modules import Image, ImageTk, font, ttk
+from src.modules import font, Image, ImageTk, ttk
 from src.Utils.color_utils import darken_color, hex2dec, is_dark_color, lighten_color
 
 ICON_REPLACE_COLOR = (193, 193, 193, 255)
@@ -8,6 +8,11 @@ class PhotoImage(ImageTk.PhotoImage):
     def __init__(self, file) -> None:
         self.image = Image.open(file)
         self.image.convert("RGBA")
+
+        w = self.image.width
+        h = self.image.height
+        self.image = self.image.resize((w // 5, h // 5), 1)
+
         super().__init__(self.image)
 
 
@@ -16,8 +21,11 @@ class IconImage(ImageTk.PhotoImage):
         self.image = Image.open(file)
         self.image.convert("RGBA")
 
+        w = self.image.width
+        h = self.image.height
+        self.image = self.image.resize((w // 5, h // 5), 1)
+
         self.resize_image()
-        self.replace_colors()
 
         super().__init__(image=self.image)
 
@@ -32,14 +40,6 @@ class IconImage(ImageTk.PhotoImage):
         bg = hex2dec(bg)
         return bg
 
-    def replace_colors(self):
-        pixdata = self.image.load()
-
-        for y in range(self.image.size[1]):
-            for x in range(self.image.size[0]):
-                if pixdata[x, y] == ICON_REPLACE_COLOR:
-                    self.image.putpixel((x, y), (self.bg, self.bg, self.bg, 255))
-
     def resize_image(self):
         font_height = font.Font().metrics("linespace")
-        self.image = self.image.resize([font_height, font_height], Image.ANTIALIAS)
+        self.image = self.image.resize((font_height, font_height), Image.ANTIALIAS)

@@ -1,9 +1,10 @@
+import io
 from typing import *
 
+import cairosvg
 from pygments.lexer import Lexer
 
-from src.modules import json, lexers
-from src.Utils.photoimage import IconImage
+from src.modules import Image, ImageTk, json, lexers
 
 
 class ExtensionSettings:
@@ -62,13 +63,24 @@ class FileTreeIconSettings:
     def __init__(self) -> None:
         self.path = "Config/file-icons.json"
         self.dark = False
-        self.folder_icon = IconImage(file="Images/file-icons/folder.png")
 
-    def get_icon(self, extension: str) -> IconImage:
+    @property
+    def folder_icon(self) -> ImageTk.PhotoImage:
+        out = io.BytesIO()
+        cairosvg.svg2png(url=f"Images/file-icons/folder.svg", write_to=out, unsafe=True, scale=5)
+        img = Image.open(out)
+        img = img.resize((img.width // 5, img.height // 5), 1)
+        return ImageTk.PhotoImage(img)
+
+    def get_icon(self, extension: str) -> ImageTk.PhotoImage:
         with open(self.path) as f:
             settings = json.load(f)
         try:
             icon_name = settings[extension]
         except KeyError:
             icon_name = "other"
-        return IconImage(file=f"Images/file-icons/{icon_name}.png")
+        out = io.BytesIO()
+        cairosvg.svg2png(url=f"Images/file-icons/{icon_name}.svg", write_to=out, unsafe=True, scale=5)
+        img = Image.open(out)
+        img = img.resize((img.width // 5, img.height // 5), 1)
+        return ImageTk.PhotoImage(img)

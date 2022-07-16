@@ -1,5 +1,5 @@
 from src.modules import tk, ttk
-from src.Utils.color_utils import darken_color, lighten_color
+from src.Utils.color_utils import lighten_color
 
 
 class Entry(ttk.Frame):

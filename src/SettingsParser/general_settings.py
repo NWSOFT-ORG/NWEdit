@@ -1,25 +1,28 @@
 from json import JSONDecodeError
-from typing import *
 
 from src.constants import APPDIR
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog
-from src.modules import EditorErr, Path, json, os, sys, tk, zipfile
+from src.modules import EditorErr, json, os, Path, sys, tk, zipfile
+from src.types import Tk_Widget
 
 
 class GeneralSettings:
     """A class to read data to/from general-settings.json"""
 
-    def __init__(self, master: Union[tk.Tk, tk.Toplevel, tk.Misc, str] = "."):
+    def __init__(self, master: Tk_Widget = "."):
         self.master = master
         try:
             with open("Config/general-settings.json") as f:
                 self.settings = json.load(f)
-            self.theme = self.settings["theme"]
-            self.highlight_theme = self.settings["pygments"]
-            self.tabwidth = self.settings["tabwidth"]
+            self.theme = self.settings["ttk_theme"]
+            self.highlight_theme = self.settings["pygments_theme"]
+            self.tabwidth = self.settings["tab_width"]
             self.font = self.settings["font"]
-            self.size = self.settings["fontSize"]
+            self.size = self.settings["font_size"]
+            self.line_height = self.settings["line_height"]
+            self.block_cur = self.settings["block_cursor"]
+
         except JSONDecodeError:
             ErrorInfoDialog(self.master, text="Setings are corrupted.")
             sys.exit(1)

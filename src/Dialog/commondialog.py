@@ -2,14 +2,15 @@ import urllib.error
 from os import PathLike
 from typing import *
 
-from src.constants import VERSION, logger
+from src.constants import logger, VERSION
 from src.modules import json, os, request, tk, ttk, webbrowser
+from src.types import Tk_Widget, Tk_Win
 from src.Utils.images import get_image
 from src.Widgets.tkentry import Entry
 from src.Widgets.winframe import WinFrame
 
 
-def download_file(url: Text, localfile: PathLike = "") -> str:
+def download_file(url: str, localfile: PathLike = "") -> str:
     """Downloads a file from remote path"""
     localfile = url.split("/")[-1] if not localfile else localfile
     request.urlretrieve(url, localfile)
@@ -52,9 +53,9 @@ class YesNoDialog(WinFrame):
 class StringInputDialog(WinFrame):
     def __init__(
         self,
-        parent: Union[Literal["."], tk.Misc] = ".",
-        title: Text = "",
-        text: Text = "",
+        parent: Tk_Widget = ".",
+        title: str = "",
+        text: str = "",
     ) -> None:
         super().__init__(parent, title, icon=get_image("question"))
         self.result = ""
@@ -86,9 +87,9 @@ class StringInputDialog(WinFrame):
 class ErrorInfoDialog(WinFrame):
     def __init__(
         self,
-        parent: Union[tk.Misc, Literal["."]] = None,
-        text: Text = None,
-        title: Text = "Error",
+        parent: Tk_Widget = None,
+        text: str = None,
+        title: str = "Error",
     ) -> None:
         self.text = text
         super().__init__(parent, title, icon=get_image("question"))
@@ -104,7 +105,7 @@ class ErrorInfoDialog(WinFrame):
 
 
 class AboutDialog:
-    def __init__(self, master: tk.Tk) -> None:
+    def __init__(self, master: Tk_Win) -> None:
         """Shows the version and related info of the editor."""
         self.master = master
 

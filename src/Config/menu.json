@@ -83,88 +83,88 @@ For example: "package"
         "Undo": [
             "undo",
             "z",
-            "pyplus.opts.undo()",
-            null,
+            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).undo()",
+            "src.Widgets.tktext -> TextOpts",
             true
         ],
         "Redo": [
             "redo",
             "shift-z",
-            "pyplus.opts.redo()",
-            null,
+            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).redo()",
+            "src.Widgets.tktext -> TextOpts",
             true
         ],
         "Cut": [
             "cut",
             "x",
-            "pyplus.opts.cut()",
-            null,
+            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).cut()",
+            "src.Widgets.tktext -> TextOpts",
             true
         ],
         "Copy": [
             "copy",
             "c",
-            "pyplus.opts.copy()",
-            null,
+            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).copy()",
+            "src.Widgets.tktext -> TextOpts",
             true
         ],
         "Paste": [
             "paste",
             "v",
-            "pyplus.opts.paste()",
-            null,
+            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).paste()",
+            "src.Widgets.tktext -> TextOpts",
             true
         ],
         "Duplicate Line or Selected": [
             null,
             "d",
-            "pyplus.opts.duplicate_line()",
-            null,
+            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).duplicate_line()",
+            "src.Widgets.tktext -> TextOpts",
             true
         ],
         "[Indent...]": {
             "Indent": [
                 "indent",
                 "i",
-                "pyplus.opts.indent(\"indent\")",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).indent(\"indent\")",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ],
             "Unindent": [
                 "unindent",
                 "u",
-                "pyplus.opts.indent(\"unindent\")",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).indent(\"unindent\")",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ]
         },
         "Join Lines": [
             null,
             null,
-            "pyplus.opts.join_lines()",
-            null,
+            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).join_lines()",
+            "src.Widgets.tktext -> TextOpts",
             true
         ],
         "[Case...]": {
             "Swap Case": [
                 null,
                 null,
-                "pyplus.opts.swap_case()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).swap_case()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ],
             "Upper Case": [
                 "upper",
                 null,
-                "pyplus.opts.upper_case()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).upper_case()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ],
             "Lower Case": [
                 "lower",
                 null,
-                "pyplus.opts.lower_case()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).lower_case()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ]
         },
@@ -172,36 +172,36 @@ For example: "package"
             "Select All": [
                 "sel-all",
                 "a",
-                "pyplus.opts.select_all()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).select_all()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ],
             "Select Line": [
                 null,
                 null,
-                "pyplus.opts.sel_line()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).sel_line()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ],
             "Select Word": [
                 null,
                 null,
-                "pyplus.opts.sel_word()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).sel_word()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ],
             "Select Previous Word": [
                 null,
                 null,
-                "pyplus.opts.sel_word_left()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).sel_word_left()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ],
             "Select Next Word": [
                 null,
                 null,
-                "pyplus.opts.sel_word_right()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).sel_word_right()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ]
         },
@@ -209,29 +209,29 @@ For example: "package"
             "Delete Selected": [
                 "delete",
                 null,
-                "pyplus.opts.delete()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).delete()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ],
             "Delete Word": [
                 "delete",
                 null,
-                "pyplus.opts.delete()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).delete()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ],
             "Delete Previous Word": [
                 "delete",
                 null,
-                "pyplus.opts.delete()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).delete()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ],
             "Delete Next Word": [
                 "delete",
                 null,
-                "pyplus.opts.delete()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).delete()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ]
         },
@@ -239,15 +239,15 @@ For example: "package"
             "Up": [
                 null,
                 null,
-                "pyplus.opts.mv_line_up()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).mv_line_up()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ],
             "Down": [
                 null,
                 null,
-                "pyplus.opts.mv_line_dn()",
-                null,
+                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).mv_line_dn()",
+                "src.Widgets.tktext -> TextOpts",
                 true
             ]
         }
@@ -295,21 +295,21 @@ For example: "package"
         "Unit tests": [
             null,
             null,
-            "TestDialog(pyplus.bottom_tabs, pyplus.filetree.path) if pyplus.tabs else None",
+            "TestDialog(pyplus.bottom_tabs, pyplus.filetree.path)",
             "src.Dialog.testdialog -> TestDialog",
             false
         ],
         "Code structure": [
             null,
             null,
-            "CodeListDialog(pyplus.bottom_tabs, pyplus.get_text) if pyplus.tabs else None",
+            "CodeListDialog(pyplus.bottom_tabs, pyplus.get_text)",
             "src.Dialog.codelistdialog -> CodeListDialog",
             true
         ],
         "Insert Ascii Art": [
             null,
             null,
-            "StyleWindow(pyplus.master, pyplus.get_text, pyplus.key) if pyplus.tabs else None",
+            "StyleWindow(pyplus.master, pyplus.get_text, pyplus.key)",
             "src.Dialog.textstyle -> StyleWindow",
             true
         ]
@@ -318,7 +318,7 @@ For example: "package"
         "Go to...": [
             null,
             null,
-            "Navigate(pyplus.get_text) if pyplus.tabs else None",
+            "Navigate(pyplus.get_text)",
             "src.Dialog.goto -> Navigate",
             true
         ],

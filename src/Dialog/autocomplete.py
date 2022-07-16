@@ -1,9 +1,10 @@
 import string
 from typing import *
+from typing import Tuple
 
 from src.modules import tk, ttk
+from src.types import Tk_Widget
 from src.Widgets.scrollbar import Scrollbar
-from src.Widgets.tktext import TextOpts
 
 punc = [x for x in string.punctuation.replace("_", "")]
 whites = [x for x in string.whitespace]
@@ -20,7 +21,7 @@ def sort(words):
     return words
 
 
-def sep_words(str_to_sep: Text) -> list:
+def sep_words(str_to_sep: str) -> list:
     result = str_to_sep
     for char in (*punc, *whites):
         result = result.replace(char, " ")
@@ -33,9 +34,10 @@ def sep_words(str_to_sep: Text) -> list:
 
 
 class CompleteDialog(ttk.Frame):
-    def __init__(self, master: tk.Misc, text: tk.Text, opts: TextOpts):
+    def __init__(self, master: Tk_Widget, text: tk.Text, key: Callable):
         super().__init__(master, relief="groove")
-        self.opts = opts
+        self.key = key
+
         self.completions = ttk.Treeview(self, show="tree")
         self.completions.pack(side="left", fill="both", expand=1)
         self.completions.bind("<1>", self.complete)
@@ -54,7 +56,7 @@ class CompleteDialog(ttk.Frame):
         completion = self.completions.item(item, "text")
         text.delete(*self.index_word)
         text.insert("insert", completion)
-        self.opts.key()
+        self.key()
 
     def insert_completions(self):
         text = self.text
@@ -74,7 +76,7 @@ class CompleteDialog(ttk.Frame):
                 self.completions.insert("", "end", text=match)
 
     @property
-    def get_word(self) -> Union[Text, None]:
+    def get_word(self) -> Union[str, None]:
         text = self.text
         try:
             return text.get(*self.index_word)
@@ -82,7 +84,7 @@ class CompleteDialog(ttk.Frame):
             return None
 
     @property
-    def index_word(self) -> Union[Text, None]:
+    def index_word(self) -> Tuple[str, str] | None:
         text = self.text
         try:
             content = text.get("1.0", "insert")

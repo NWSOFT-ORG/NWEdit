@@ -1,7 +1,7 @@
-from src.constants import MAIN_KEY, logger
-from src.modules import json, tk
 from typing import *
 
+from src.constants import logger, MAIN_KEY
+from src.modules import json, tk
 from src.Utils.images import get_image
 
 
@@ -14,7 +14,7 @@ class Menu:
         self.functions = []
         self.disable_menus = {}
         with open("Config/menu.json") as f:
-            self.config: Dict[Text, Union[List, Dict]] = json.load(f)
+            self.config: Dict[str, Union[List, Dict]] = json.load(f)
 
         self.create_menu(self.menu, self.config)
 

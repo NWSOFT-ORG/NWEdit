@@ -1,7 +1,6 @@
-from typing import *
-
 from src.constants import OSX
-from src.modules import json, tk, ttk, font
+from src.modules import font, json, tk, ttk
+from src.types import Tk_Win
 from src.Utils.color_utils import lighten_color
 from src.Utils.images import get_image
 from src.Utils.photoimage import IconImage
@@ -58,12 +57,12 @@ def round_rect(canvas, x1, y1, x2, y2, radius=25, **kwargs):
 
 class WinFrame(tk.Toplevel):
     def __init__(
-            self,
-            master: Union[tk.Tk, tk.Toplevel, Literal["."]],
-            title: Text,
-            disable: bool = True,
-            closable: bool = True,
-            icon: IconImage = None,
+        self,
+        master: Tk_Win,
+        title: str,
+        disable: bool = True,
+        closable: bool = True,
+        icon: IconImage = None,
     ):
         super().__init__(master)
         self.overrideredirect(True)
@@ -71,17 +70,21 @@ class WinFrame(tk.Toplevel):
         self.title_text = title
         super().title(title)  # Need a decent message to show on the taskbar
         self.update_idletasks()
-        self.titlebar = tk.Canvas(self,
-                                  bd=0,
-                                  highlightthickness=0,
-                                  height=font_height() * 1.5,
-                                  width=self.winfo_width())
-        self.status_bar = tk.Canvas(self,
-                                    bd=0,
-                                    highlightthickness=0,
-                                    height=font_height() * 1.5,
-                                    width=self.winfo_width(),
-                                    takefocus=True)
+        self.titlebar = tk.Canvas(
+            self,
+            bd=0,
+            highlightthickness=0,
+            height=font_height() * 1.5,
+            width=self.winfo_width()
+        )
+        self.status_bar = tk.Canvas(
+            self,
+            bd=0,
+            highlightthickness=0,
+            height=font_height() * 1.5,
+            width=self.winfo_width(),
+            takefocus=True
+        )
         if OSX:
             self.titlebar["bg"] = self.status_bar["bg"] = "systemTransparent"
             # The transparent color exists in OSX only
@@ -105,6 +108,8 @@ class WinFrame(tk.Toplevel):
         self.bind("<Destroy>", self.on_exit)
         self.bind("<Configure>", self.create_bar)
 
+        self.resizable = self.wm_resizable
+        self._resizable = True
         self.create_bar()
 
     def create_bar(self, _=None):
@@ -118,23 +123,30 @@ class WinFrame(tk.Toplevel):
         self.status_bar.pack(side="bottom", fill="x")
         self.status_bar.update_idletasks()
 
-        round_rect(self.status_bar, 0, -self.status_bar.winfo_height(),
-                   self.status_bar.winfo_width(), self.status_bar.winfo_height(), RADIUS,
-                   fill=get_bg(), tags="status")
-        if OSX:
-            size = self.status_bar.create_arc(self.status_bar.winfo_width() - self.status_bar.winfo_height(), 0,
-                                              self.status_bar.winfo_width(),
-                                              self.status_bar.winfo_height(), fill=lighten_color(get_bg(), 40),
-                                              outline="",
-                                              start=-90, tags="size")
-        else:
-            size = self.status_bar.create_rectangle(self.status_bar.winfo_width() - self.status_bar.winfo_height(), 0,
-                                                    self.status_bar.winfo_width(),
-                                                    self.status_bar.winfo_height(),
-                                                    fill=lighten_color(get_bg(), 40),
-                                                    outline="",
-                                                    tags="size")
-        self.status_bar.tag_bind(size, "<B1-Motion>", self.resize)
+        round_rect(
+            self.status_bar, 0, -self.status_bar.winfo_height(),
+            self.status_bar.winfo_width(), self.status_bar.winfo_height(), RADIUS,
+            fill=get_bg(), tags="status"
+        )
+        if self._resizable:
+            if OSX:
+                size = self.status_bar.create_arc(
+                    self.status_bar.winfo_width() - self.status_bar.winfo_height(), 0,
+                    self.status_bar.winfo_width(),
+                    self.status_bar.winfo_height(), fill=lighten_color(get_bg(), 40),
+                    outline="",
+                    start=-90, tags="size"
+                    )
+            else:
+                size = self.status_bar.create_rectangle(
+                    self.status_bar.winfo_width() - self.status_bar.winfo_height(), 0,
+                    self.status_bar.winfo_width(),
+                    self.status_bar.winfo_height(),
+                    fill=lighten_color(get_bg(), 40),
+                    outline="",
+                    tags="size"
+                    )
+            self.status_bar.tag_bind(size, "<B1-Motion>", self.resize)
 
     def on_exit(self, _):
         # Release Grab to prevent issues
@@ -144,15 +156,19 @@ class WinFrame(tk.Toplevel):
         self.titlebar.delete('all')
         self.update_idletasks()
         self.titlebar.update_idletasks()
-        round_rect(self.titlebar,
-                   0,
-                   0,
-                   self.titlebar.winfo_width(),
-                   self.titlebar.winfo_height() * 2,
-                   RADIUS,
-                   fill=get_bg())
-        self.titlebar.create_text(21, int((self.titlebar.winfo_height() - font_height()) / 2), text=self.title_text,
-                                  fill=get_fg(), anchor="nw")
+        round_rect(
+            self.titlebar,
+            0,
+            0,
+            self.titlebar.winfo_width(),
+            self.titlebar.winfo_height() * 2,
+            RADIUS,
+            fill=get_bg()
+            )
+        self.titlebar.create_text(
+            21, int((self.titlebar.winfo_height() - font_height()) / 2), text=self.title_text,
+            fill=get_fg(), anchor="nw"
+        )
         self.close_button()
 
     def add_widget(self, child_frame: tk.Widget):
@@ -166,6 +182,10 @@ class WinFrame(tk.Toplevel):
         self.titlebar.bind("<ButtonPress-1>", self.start_move)
         self.titlebar.bind("<ButtonRelease-1>", self.stop_move)
         self.titlebar.bind("<B1-Motion>", self.do_move)
+
+    def wm_resizable(self, width: bool = ..., height: bool = ...):
+        self._resizable = bool(width or height)
+        super().resizable(width, height)
 
     def start_move(self, event):
         self.x = event.x

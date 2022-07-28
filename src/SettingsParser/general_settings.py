@@ -1,9 +1,16 @@
+import os
+import sys
+import tkinter as tk
+import zipfile
 from json import JSONDecodeError
+from pathlib import Path
+from tkinter import font
+
+import json5 as json
 
 from src.constants import APPDIR
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.filedialog import DirectoryOpenDialog, FileOpenDialog
-from src.modules import EditorErr, json, os, Path, sys, tk, zipfile
 from src.types import Tk_Widget
 
 
@@ -15,17 +22,18 @@ class GeneralSettings:
         try:
             with open("Config/general-settings.json") as f:
                 self.settings = json.load(f)
-            self.theme = self.settings["ttk_theme"]
-            self.highlight_theme = self.settings["pygments_theme"]
-            self.tabwidth = self.settings["tab_width"]
-            self.font = self.settings["font"]
-            self.size = self.settings["font_size"]
-            self.line_height = self.settings["line_height"]
-            self.block_cur = self.settings["block_cursor"]
 
         except JSONDecodeError:
             ErrorInfoDialog(self.master, text="Setings are corrupted.")
             sys.exit(1)
+
+    def get_font(self):
+        code_font = font.Font(
+            family=self.get_settings("font"),
+            size=self.get_settings("font_size")
+        )
+        for option, value in self.get_settings("font_options").items():
+            code_font[option] = value
 
     @staticmethod
     def zip_settings(backupdir):
@@ -38,12 +46,12 @@ class GeneralSettings:
                     )
 
         with zipfile.ZipFile(
-            os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
+                os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
         ) as zipobj:
             zipdir("Config/", zipobj)
         ErrorInfoDialog(title="Done", text="Settings backed up.")
 
-    def zipsettings(self):
+    def __zipsettings(self):
         DirectoryOpenDialog(self.master, self.zip_settings)
 
     @staticmethod
@@ -58,19 +66,11 @@ class GeneralSettings:
         except (zipfile.BadZipFile, zipfile.BadZipfile, zipfile.LargeZipFile):
             pass
 
-    def unzipsettings(self):
+    def __unzipsettings(self):
         FileOpenDialog(self.master, self.unzip_settings)
 
     def get_settings(self, setting):
-        if setting == "font":
-            return f"{self.font} {self.size}"
-        if setting == "theme":
-            return self.theme
-        if setting == "tab":
-            return self.tabwidth
-        if setting == "pygments":
-            return self.highlight_theme
-        raise EditorErr("The setting is not defined")
+        return self.settings[setting]
 
     def create_menu(self, open_file, master):
         menu = tk.Menu(master)
@@ -98,9 +98,9 @@ class GeneralSettings:
             label="Run Command Settings",
             command=lambda: open_file("Config/cmd-settings.json"),
         )
-        menu.add_command(label="Backup Settings to...", command=self.zipsettings)
+        menu.add_command(label="Backup Settings to...", command=self.__zipsettings)
         menu.add_command(
             label="Load Settings from...",
-            command=lambda _: self.unzipsettings(),
+            command=lambda _: self.__unzipsettings(),
         )
         return menu

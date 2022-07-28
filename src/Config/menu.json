@@ -20,7 +20,7 @@ For example: "package"
         ]
     },
     "[File]": {
-        "New": [
+        "New...": [
             "new",
             "n",
             "pyplus.filetree.new_file()",

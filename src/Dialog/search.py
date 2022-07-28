@@ -1,7 +1,8 @@
 import re
+import tkinter as tk
+from tkinter import ttk
 from typing import *
 
-from src.modules import tk, ttk
 from src.Utils.images import get_image
 from src.Widgets.tkentry import Entry
 from src.Widgets.tktext import EnhancedText

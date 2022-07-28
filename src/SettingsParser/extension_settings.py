@@ -2,9 +2,10 @@ import io
 from typing import *
 
 import cairosvg
+import json5 as json
+from PIL import Image, ImageTk
+from pygments import lexers
 from pygments.lexer import Lexer
-
-from src.modules import Image, ImageTk, json, lexers
 
 
 class ExtensionSettings:

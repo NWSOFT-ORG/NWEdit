@@ -1,5 +1,9 @@
+import tkinter as tk
+from tkinter import font, ttk
+
+import json5 as json
+
 from src.constants import OSX
-from src.modules import font, json, tk, ttk
 from src.types import Tk_Win
 from src.Utils.color_utils import lighten_color
 from src.Utils.images import get_image
@@ -95,21 +99,19 @@ class WinFrame(tk.Toplevel):
             self.close_button()
             self.bind("<Escape>", lambda _: self.destroy())
         self.window_bindings()
+        self.wait_visibility(self)  # Fix focus issues
 
         if disable:
-            self.wait_visibility(self)
             self.grab_set()  # Linux WMs might fail to grab the window
 
         self.lift()
-        self.attributes("-topmost", True)
         if OSX:
             # On OSX, all windows have rounded corners. Need to make window transparent before switching
             self.wm_attributes("-transparent", True)
         self.bind("<Destroy>", self.on_exit)
         self.bind("<Configure>", self.create_bar)
-
-        self.resizable = self.wm_resizable
         self._resizable = True
+
         self.create_bar()
 
     def create_bar(self, _=None):
@@ -117,11 +119,10 @@ class WinFrame(tk.Toplevel):
         self.create_titlebar()
 
     def create_statusbar(self):
-        self.status_bar.focus_set()
         self.status_bar.delete("status")
 
         self.status_bar.pack(side="bottom", fill="x")
-        self.status_bar.update_idletasks()
+        self.update_idletasks()
 
         round_rect(
             self.status_bar, 0, -self.status_bar.winfo_height(),
@@ -131,17 +132,17 @@ class WinFrame(tk.Toplevel):
         if self._resizable:
             if OSX:
                 size = self.status_bar.create_arc(
-                    self.status_bar.winfo_width() - self.status_bar.winfo_height(), 0,
-                    self.status_bar.winfo_width(),
-                    self.status_bar.winfo_height(), fill=lighten_color(get_bg(), 40),
+                    self.winfo_width() - self.status_bar.winfo_height(), 0,
+                    self.winfo_width(),
+                    self.winfo_height(), fill=lighten_color(get_bg(), 40),
                     outline="",
                     start=-90, tags="size"
                     )
             else:
                 size = self.status_bar.create_rectangle(
-                    self.status_bar.winfo_width() - self.status_bar.winfo_height(), 0,
-                    self.status_bar.winfo_width(),
-                    self.status_bar.winfo_height(),
+                    self.winfo_width() - self.status_bar.winfo_height(), 0,
+                    self.winfo_width(),
+                    self.winfo_height(),
                     fill=lighten_color(get_bg(), 40),
                     outline="",
                     tags="size"
@@ -160,7 +161,7 @@ class WinFrame(tk.Toplevel):
             self.titlebar,
             0,
             0,
-            self.titlebar.winfo_width(),
+            self.winfo_width(),
             self.titlebar.winfo_height() * 2,
             RADIUS,
             fill=get_bg()
@@ -186,6 +187,8 @@ class WinFrame(tk.Toplevel):
     def wm_resizable(self, width: bool = ..., height: bool = ...):
         self._resizable = bool(width or height)
         super().resizable(width, height)
+
+    resizable = wm_resizable
 
     def start_move(self, event):
         self.x = event.x

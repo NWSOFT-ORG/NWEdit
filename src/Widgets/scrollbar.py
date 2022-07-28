@@ -1,7 +1,7 @@
+import tkinter as tk
 from tkinter import ttk
 from typing import *
 
-from src.modules import tk
 from src.Utils.color_utils import darken_color, lighten_color
 
 

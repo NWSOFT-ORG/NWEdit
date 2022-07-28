@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from src.constants import OSX
 from src.Dialog.startdialog import StartDialog
-from src.modules import tk
+import tkinter as tk
 
 if __name__ == "__main__":
     if OSX:

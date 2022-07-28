@@ -1,5 +1,13 @@
 """Python console for the editor."""
-from src.modules import code, hashlib, io, queue, sys, threading, tk, ttk
+import code
+import hashlib
+import io
+import queue
+import sys
+import threading
+import tkinter as tk
+from tkinter import ttk
+
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Widgets.scrollbar import TextScrollbar
 
@@ -32,7 +40,7 @@ class Console(ttk.Frame):
         super().__init__(parent)
         settings_class = GeneralSettings()
         self.command_history = []
-        self.font = settings_class.get_settings("font")
+        self.font = settings_class.get_font()
         self.text = ConsoleText(
             self,
             wrap="none",

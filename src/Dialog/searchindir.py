@@ -1,5 +1,9 @@
+import os
+import threading
+import tkinter as tk
+from tkinter import ttk
+
 from src.Dialog.search import re_search
-from src.modules import os, threading, tk, ttk
 from src.Widgets.scrollbar import Scrollbar
 from src.Widgets.tkentry import Entry
 

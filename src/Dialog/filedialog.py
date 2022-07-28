@@ -1,6 +1,7 @@
+import tkinter as tk
+from tkinter import ttk
 from typing import *
 
-from src.modules import tk, ttk
 from src.Utils.images import get_image
 from src.Widgets.tkentry import Entry
 from src.Widgets.treeview import FileTree
@@ -33,6 +34,7 @@ class FileOpenDialog(FileTree):
         self.set_path_btn.pack(side="right")
         self.entryframe.pack(fill="x")
         super().__init__(master=self.win, opencommand=opencommand)
+        self.win.create_bar()  # Manually refresh
         self.temp_path = []
 
     def open(self):

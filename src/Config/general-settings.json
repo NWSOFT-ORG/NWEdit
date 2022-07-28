@@ -7,6 +7,12 @@ Please follow the instructions as comments.
     "font": "Menlo",
     // Size of font
     "font_size": 13,
+    "font_options": {
+        "weight": "normal",
+        "slant": "roman",
+        "underline": false,
+        "overstrike": false
+    },
     // Height of each line
     "line_height": 1.3,
     // Must be a valid TTK theme

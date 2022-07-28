@@ -1,6 +1,7 @@
 import ast
-
-from src.modules import tk, traceback, ttk
+import traceback
+import tkinter as tk
+from tkinter import ttk
 
 
 class CodeListDialog(ttk.Frame):

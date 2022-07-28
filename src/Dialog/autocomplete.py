@@ -1,8 +1,8 @@
 import string
 from typing import *
-from typing import Tuple
+import tkinter as tk
+from tkinter import ttk
 
-from src.modules import tk, ttk
 from src.types import Tk_Widget
 from src.Widgets.scrollbar import Scrollbar
 
@@ -17,7 +17,7 @@ def sort(words):
     for word in _words:
         _words[word] = words.count(word)
 
-    words.sort(key=lambda word: _words[word])
+    words.sort(key=lambda _word: _words[_word])
     return words
 
 
@@ -30,32 +30,37 @@ def sep_words(str_to_sep: str) -> list:
     result = sort(result)
     result = list(filter(None, result))
     result = list(dict.fromkeys(result))
+    result.reverse()
     return result
 
 
 class CompleteDialog(ttk.Frame):
     def __init__(self, master: Tk_Widget, text: tk.Text, key: Callable):
-        super().__init__(master, relief="groove")
+        super().__init__(master, relief="groove", takefocus=False)
         self.key = key
 
-        self.completions = ttk.Treeview(self, show="tree")
+        self.completions = ttk.Treeview(self, show="tree", takefocus=False)
         self.completions.pack(side="left", fill="both", expand=1)
-        self.completions.bind("<1>", self.complete)
+        self.completions.tag_configure("completion", font=text.cget("font"))
 
         yscroll = Scrollbar(self, command=self.completions.yview)
+        yscroll["takefocus"] = False
         yscroll.pack(side="right", fill="y", expand=1)
         self.completions["yscrollcommand"] = yscroll.set
         self.text = text
 
         text.bind("<Button-1>", lambda _: self.place_forget(), add=True)
-        text.bind("<Key>", lambda _: self.place_forget(), add=True)
 
-    def complete(self, event: tk.Event = None):
+        self.completions.bind("<1>", self.complete)
+
+    def complete(self, event: tk.Event):
         item = self.completions.identify("item", event.x, event.y)
         text = self.text
         completion = self.completions.item(item, "text")
         text.delete(*self.index_word)
         text.insert("insert", completion)
+        text.focus_set()
+        self.place_forget()
         self.key()
 
     def insert_completions(self):
@@ -66,6 +71,7 @@ class CompleteDialog(ttk.Frame):
             self.place_forget()
             return
 
+        all_matches.remove(self.get_word)  # Remove the current word
         dline = text.dlineinfo("insert")
         self.place_configure(x=dline[0] + dline[2], y=dline[1] + dline[3])
 
@@ -73,7 +79,7 @@ class CompleteDialog(ttk.Frame):
         self.completions.delete(*self.completions.get_children())
         for match in all_matches:
             if curr_word in match and curr_word != match:
-                self.completions.insert("", "end", text=match)
+                self.completions.insert("", "end", text=match, tags="completion")
 
     @property
     def get_word(self) -> Union[str, None]:

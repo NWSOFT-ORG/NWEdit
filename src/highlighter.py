@@ -1,4 +1,9 @@
-from src.modules import font, pygments, styles, tk
+import tkinter as tk
+from tkinter import font
+
+import pygments
+from pygments import styles
+
 from src.SettingsParser.general_settings import GeneralSettings
 
 
@@ -8,13 +13,13 @@ def create_tags(textbox: tk.Text) -> None:
     source code 'dressing'"""
     currtext = textbox
     settings = GeneralSettings(".")
-    bold_font = font.Font(currtext, settings.get_settings("font"))
+    bold_font = font.Font(currtext, settings.get_font())
     bold_font.configure(weight=font.BOLD)
-    italic_font = font.Font(currtext, settings.get_settings("font"))
+    italic_font = font.Font(currtext, settings.get_font())
     italic_font.configure(slant=font.ITALIC)
-    bold_italic_font = font.Font(currtext, settings.get_settings("font"))
+    bold_italic_font = font.Font(currtext, settings.get_font())
     bold_italic_font.configure(weight=font.BOLD, slant=font.ITALIC)
-    style = styles.get_style_by_name(settings.get_settings("pygments"))
+    style = styles.get_style_by_name(settings.get_settings("pygments_theme"))
 
     for ttype, ndef in style:
         tag_font = None

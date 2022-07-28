@@ -1,17 +1,25 @@
+import os
 from typing import *
+
+import json5 as json
 
 from src.constants import logger
 from src.Dialog.commondialog import ErrorInfoDialog
-from src.modules import json, os
 
 
 class RecentProjects:
-    def __init__(self):
+    def __init__(self, master):
+        self.master = master
         with open("EditorStatus/recent_projects.json") as f:
             self.config = json.load(f)
 
     def get_path_to(self, name: str):
         return self.config[name]["path"]
+
+    def get_name_for_path(self, path: str):
+        for key in self.config.keys():
+            if self.config[key]["path"] == path:
+                return key
 
     def set_open_files(self, name: str, files: Dict[str, str]):
         for file, index in files.items():
@@ -34,8 +42,9 @@ class RecentProjects:
             self.config[name][key] = value
         self.write_config()
 
-    def add_project(self, name: str, path: os.PathLike):
+    def add_project(self, name: str, path: str):
         self.config[name] = {
+            "openFiles"         : {},
             "path"              : path,
             "expandedNodes"     : [],
             "yScrollbarLocation": [0, 0],
@@ -53,7 +62,7 @@ class RecentProjects:
             self.config[name]["icon"] = icon
             self.write_config()
         else:
-            ErrorInfoDialog(".", "The file selected does not exist")
+            ErrorInfoDialog(self.master, "The file selected does not exist")
 
     def write_config(self):
         with open("EditorStatus/recent_projects.json", "w") as f:

@@ -1,5 +1,5 @@
 """Provides convenient color utilities"""
-from src.modules import tk
+import tkinter as tk
 
 DARK_COLOR = 128
 
@@ -19,7 +19,7 @@ def dec2hex(dec: int, color_code: bool = False) -> str:
 
 
 def is_dark_color(hex_code: str) -> bool:
-    hex_code = check_hex(hex_code)
+    hex_code = get_hex(hex_code)
     if (
         hex2dec(hex_code[0]) <= DARK_COLOR
         and hex2dec(hex_code[1]) <= DARK_COLOR
@@ -29,7 +29,7 @@ def is_dark_color(hex_code: str) -> bool:
     return False
 
 
-def check_hex(color):
+def get_hex(color):
     """Converts via winfo_rgb()"""
     checking_win = tk.Toplevel()
     rgb = checking_win.winfo_rgb(color)
@@ -40,7 +40,7 @@ def check_hex(color):
 
 
 def darken_color(hex_code: str, decrement: int) -> str:
-    hex_code = check_hex(hex_code)
+    hex_code = get_hex(hex_code)
     rgb = (
         hex2dec(hex_code[0]) - decrement,
         hex2dec(hex_code[1]) - decrement,
@@ -56,7 +56,7 @@ def darken_color(hex_code: str, decrement: int) -> str:
 
 
 def lighten_color(hex_code, increment) -> str:
-    hex_code = check_hex(hex_code)
+    hex_code = get_hex(hex_code)
     rgb = (
         hex2dec(hex_code[0]) + increment,
         hex2dec(hex_code[1]) + increment,

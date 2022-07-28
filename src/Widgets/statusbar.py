@@ -1,4 +1,4 @@
-from src.modules import ttk
+from tkinter import ttk
 
 
 def bind_events(label):

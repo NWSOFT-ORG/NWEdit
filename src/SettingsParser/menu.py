@@ -1,7 +1,9 @@
+import tkinter as tk
 from typing import *
 
+import json5 as json
+
 from src.constants import logger, MAIN_KEY
-from src.modules import json, tk
 from src.Utils.images import get_image
 
 
@@ -13,13 +15,18 @@ class Menu:
         self.menu = tk.Menu()
         self.functions = []
         self.disable_menus = {}
+        self.load_config()
+
+    def load_config(self):
+        """Reloads configuration"""
         with open("Config/menu.json") as f:
             self.config: Dict[str, Union[List, Dict]] = json.load(f)
-
         self.create_menu(self.menu, self.config)
 
     def create_menu(self, menu, config):
-        """Recursively loop through the configuration"""
+        """Recursively loop through the configuration
+        [x] = cascade, x = item
+        Will also create bindings"""
         for key in config.keys():
             if not (key.startswith("[") and key.endswith("]")):
                 cnf = [menu, key, *config[key][:-1]]
@@ -75,5 +82,6 @@ class Menu:
         elif mnemonic.startswith("`"):
             cnf["accelerator"] = mnemonic[1:]
             logger.debug("Bare Accelerator")
+        # self.master.bind(f'<{cnf["accelerator"]}>', self.functions[-1])
 
         menu.add_command(**cnf)

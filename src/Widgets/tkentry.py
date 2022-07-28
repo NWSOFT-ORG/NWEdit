@@ -1,4 +1,6 @@
-from src.modules import tk, ttk
+import tkinter as tk
+from tkinter import ttk
+
 from src.Utils.color_utils import lighten_color
 
 

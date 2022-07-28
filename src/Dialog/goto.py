@@ -1,4 +1,6 @@
-from src.modules import tk, ttk
+import tkinter as tk
+from tkinter import ttk
+
 from src.Widgets.tkentry import Entry
 from src.Widgets.tktext import EnhancedText
 

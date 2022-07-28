@@ -1,6 +1,8 @@
 """Closable ttk.Notebook"""
+import tkinter as tk
+from tkinter import ttk
+
 from src.constants import logger
-from src.modules import tk, ttk
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.images import get_image
 from src.Widgets.statusbar import bind_events

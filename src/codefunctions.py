@@ -1,9 +1,16 @@
+import os
+import subprocess
+import tkinter as tk
+from pathlib import Path
+from tkinter import ttk
+
+from pygments import lexers
+
 from src.constants import APPDIR, LINT_BATCH, logger, RUN_BATCH, WINDOWS
 from src.Dialog.codelistdialog import CodeListDialog
 from src.Dialog.commondialog import ErrorInfoDialog
 from src.Dialog.search import Search
 from src.highlighter import create_tags, recolorize
-from src.modules import lexers, os, Path, subprocess, tk, ttk
 from src.Utils.functions import open_shell, shell_command
 from src.Widgets.console import Console
 from src.Widgets.customenotebook import ClosableNotebook

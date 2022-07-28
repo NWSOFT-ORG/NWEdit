@@ -1,10 +1,14 @@
 """A modded version of tkinter.Text"""
 
+import tkinter as tk
+from tkinter import font, ttk
 from typing import *
+
+from pygments import lexers, styles
 
 from src.constants import logger, MAIN_KEY, OSX
 from src.highlighter import create_tags, recolorize, recolorize_line
-from src.modules import EditorErr, font, lexers, styles, tk, ttk
+from src.errors import EditorErr
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.color_utils import darken_color, is_dark_color, lighten_color
 from src.Widgets.scrollbar import TextScrollbar
@@ -98,20 +102,27 @@ class EnhancedText(tk.Text):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.settings = GeneralSettings(self.master)
-        self.config(blockcursor=self.settings.block_cur)
+        self.config(blockcursor=self.settings.get_settings("block_cursor"))
         self.frame = self.master
         self.search = False
         self.navigate = False
         self.lexer = lexers.get_lexer_by_name("text")
 
         # create a proxy for the underlying widget
+        self._rename_orig()
+
+    # noinspection PyUnresolvedReferences
+    def _rename_orig(self):
         self._orig = self._w + "_orig"
         self.tk.call("rename", self._w, self._orig)
         self.tk.createcommand(self._w, self._proxy)
 
     def set_spacing(self, _):
         self.update_idletasks()
-        space = int(font_height(self.settings.font, self.settings.size) * (self.settings.line_height - 1)) / 2
+        space = int(
+            font_height(self.settings.get_font(), self.settings.get_settings("font_size")) * (
+                        self.settings.get_settings("line_height") - 1)
+            ) / 2
         self.config(spacing1=space, spacing3=space)
 
     def set_lexer(self, lexer):
@@ -149,9 +160,9 @@ class EnhancedTextFrame(ttk.Frame):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         settings_class = GeneralSettings()
-        self.font = settings_class.get_settings("font")
+        self.font = settings_class.get_font()
         self.first_line = 1
-        style = styles.get_style_by_name(settings_class.get_settings("pygments"))
+        style = styles.get_style_by_name(settings_class.get_settings("pygments_theme"))
         bgcolor = style.background_color
         fgcolor = style.highlight_color
         if is_dark_color(bgcolor):
@@ -218,8 +229,7 @@ class TextOpts:
         self.master = master
 
         self.settings_class = GeneralSettings()
-        self.tabwidth = self.settings_class.get_settings("tab")
-        self.theme = self.settings_class.get_settings("theme")
+        self.tabwidth = self.settings_class.get_settings("tab_width")
         self.style = ttk.Style()
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
@@ -385,10 +395,10 @@ class TextOpts:
 
     def backspace(self, _=None) -> None:
         currtext = self.text
-        # Backchar
+        # Backspace a char
         if currtext.get("insert -1c", "insert +1c") in ["''", '""', "[]", "{}", "()"]:
             currtext.delete("insert", "insert +1c")
-        # Backtab
+        # Backspace a tab
         if currtext.get(f"insert -{self.tabwidth}c", "insert") == " " * self.tabwidth:
             currtext.delete(f"insert -{self.tabwidth - 1}c", "insert")
         self.key()
@@ -497,7 +507,7 @@ class TextOpts:
             self.text.edit_undo()
             recolorize(self.text)
             self.key()
-        except Exception:
+        except tk.TclError:
             return
 
     def redo(self, _=None) -> None:
@@ -505,7 +515,7 @@ class TextOpts:
             self.text.edit_redo()
             recolorize(self.text)
             self.key()
-        except Exception:
+        except tk.TclError:
             return
 
     def copy(self) -> None:
@@ -537,7 +547,7 @@ class TextOpts:
                 )
             recolorize(self.text)
             self.key()
-        except Exception:
+        except tk.TclError:
             pass
 
     def select_all(self) -> None:

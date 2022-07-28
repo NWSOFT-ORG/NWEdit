@@ -1,6 +1,8 @@
 from typing import *
+import tkinter as tk
+from tkinter import ttk
+from pygments import lexers
 
-from src.modules import lexers, tk, ttk
 from src.types import Tk_Widget
 from src.Utils.images import get_image
 from src.Widgets.tktext import EnhancedTextFrame, TextOpts

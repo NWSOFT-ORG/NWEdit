@@ -1,4 +1,10 @@
-from src.modules import art, io, sys, tk, ttk
+import io
+import sys
+import tkinter as tk
+from tkinter import ttk
+
+import art
+
 from src.Widgets.tkentry import Entry
 from src.Widgets.winframe import WinFrame
 

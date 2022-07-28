@@ -1,5 +1,6 @@
-from src.modules import tk  # You may import from PyPlus Libraries
-from src.Widgets.winframe import WinFrame
+import tkinter as tk
+
+from src.Widgets.winframe import WinFrame  # You may import from PyPlus Libraries
 
 
 class Sample(WinFrame):

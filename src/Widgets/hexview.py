@@ -1,7 +1,11 @@
 """A Hex Viewer to view non-text documents."""
 
+import codecs
+import os
+import tkinter as tk
+from tkinter import ttk
+
 from src.constants import BLOCK_HEIGHT, BLOCK_WIDTH, ENCODINGS
-from src.modules import codecs, os, tk, ttk
 from src.Widgets.tktext import EnhancedTextFrame
 
 

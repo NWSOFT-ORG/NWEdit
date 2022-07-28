@@ -1,4 +1,4 @@
-from src.modules import ttk
+from tkinter import ttk
 
 
 class GitView(ttk.Frame):

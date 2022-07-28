@@ -1,7 +1,14 @@
+import os
+import shutil
+import tkinter as tk
+from tkinter import font, ttk
+
+import send2trash
+
 from src.constants import logger, OSX
 from src.Dialog.commondialog import StringInputDialog
 from src.Dialog.fileinfodialog import FileInfoDialog
-from src.modules import font, os, send2trash, shutil, tk, ttk
+from src.Dialog.newitem import NewItemDialog
 from src.SettingsParser.extension_settings import FileTreeIconSettings
 from src.SettingsParser.interval_settings import IntervalSettings
 from src.Widgets.scrollbar import Scrollbar
@@ -58,8 +65,9 @@ class FileTree(ttk.Frame):
         self.tree.pack(fill="both", expand=1, anchor="nw")
         self.tree.bind("<<TreeviewOpen>>", lambda _: self.open_dir())
         self.tree.bind("<<TreeviewClose>>", lambda _: self.close_dir())
-
         self.set_path(path)
+        child_id = self.tree.get_children()[-1]
+        self.tree.selection_set(child_id)
 
     def remove(self, item: str) -> None:
         path = self.get_path(item, True)
@@ -90,28 +98,8 @@ class FileTree(ttk.Frame):
         path = self.get_path(item, True)
         FileInfoDialog(self.master, path)
 
-    def new_folder(self, item: str, isdir: bool) -> None:
-        win = StringInputDialog(self.master, "New Folder", "Name:")
-        if name := win.result:
-            item_path = self.get_path(item, isdir)
-            path = os.path.join(item_path, name)
-            os.mkdir(path)
-            self.path = path
-        self.refresh_tree()
-
-    def new_file(self, item: str, isdir: bool) -> None:
-        win = StringInputDialog(self.master, "New File", "Name:")
-        if name := win.result:
-            item_path = self.get_path(item, isdir)
-            path = os.path.join(item_path, name)
-            with open(path, "w") as f:
-                f.write("")
-        self.refresh_tree()
-
     def close_dir(self):
-        tree = self.tree
         item = self.tree.focus()
-
         self.expanded.remove(item)
 
     def open_dir(self, directory_item="") -> None:
@@ -179,6 +167,8 @@ class FileTree(ttk.Frame):
         tree = self.tree
         item = tree.identify("item", event.x, event.y)
         name = self.get_path(item, True)
+        if os.path.isdir(name):
+            return
         self.opencommand(name)
         if destroy:
             self.master.destroy()
@@ -207,14 +197,7 @@ class FileTree(ttk.Frame):
             item = self.tree.identify("item", event.x, event.y)
         self.tree.selection_set(item)
 
-        new_cascade = tk.Menu(menu)
-        new_cascade.add_command(
-            label="New File", command=lambda: self.new_file(item, isdir)
-        )
-        new_cascade.add_command(
-            label="New Directory", command=lambda: self.new_folder(item, isdir)
-        )
-        menu.add_cascade(menu=new_cascade, label="New...")
+        menu.add_command(label="New...", command=self.new_item)
         menu.add_separator()
         menu.add_command(label="Get Info", command=lambda: self.get_info(item))
         menu.add_separator()
@@ -273,3 +256,6 @@ class FileTree(ttk.Frame):
         x_scroll_location = status["xScrollbarLocation"]
         self.tree.yview_moveto(y_scroll_location[0])
         self.tree.xview_moveto(x_scroll_location[0])
+
+    def new_item(self):
+        NewItemDialog(self.master, self.opencommand)

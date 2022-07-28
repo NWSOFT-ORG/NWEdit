@@ -1,7 +1,11 @@
 import sys
+import tkinter as tk
+from tkinter import ttk
 from typing import *
 
-from src.modules import json, styles, tk, ttk
+import json5 as json
+from pygments import styles
+
 from src.types import Tk_Win
 from src.Utils.images import get_image
 from src.Widgets.tktext import EnhancedTextFrame

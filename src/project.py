@@ -1,10 +1,12 @@
+import tkinter as tk
+from tkinter import ttk
 from typing import *
 
-from PIL import ImageDraw, ImageFont
+import json5 as json
+from PIL import Image, ImageDraw, ImageFont, ImageTk
 
 from src.constants import OSX
 from src.Dialog.filedialog import FileOpenDialog
-from src.modules import Image, ImageTk, json, tk, ttk
 from src.SettingsParser.project_settings import RecentProjects
 from src.types import Tk_Widget
 from src.Widgets.scrollbar import Scrollbar
@@ -70,7 +72,7 @@ class ProjectList(ttk.Treeview):
         self.bind(f"<Double-1>", self.open)
         self.open_f = func
 
-        self.settings = RecentProjects()
+        self.settings = RecentProjects(self.master)
         self.images = []
         self.insert_projects()
 
@@ -106,7 +108,7 @@ class ProjectList(ttk.Treeview):
         self.insert_projects()
 
     def assign_icon(self, name):
-        FileOpenDialog(self.master, lambda file: self.settings.assign_icon(name, icon=file), action="Select a")
+        FileOpenDialog(self.master, lambda file: self.settings.assign_icon(name, icon=file), action="Select")
         self.insert_projects()
 
     def right_click(self, event: tk.Event):
@@ -116,9 +118,9 @@ class ProjectList(ttk.Treeview):
 
     def open(self, event):
         item = self.identify("item", event.x, event.y)
-        text = self.item(item, "values")[0]
-        if not text:
+        if not item:
             return
+        text = self.item(item, "values")[0]
 
         self.open_f(text)
 

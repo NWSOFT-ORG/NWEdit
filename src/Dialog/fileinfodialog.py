@@ -1,5 +1,10 @@
+import mimetypes
+import os
+import time
+import tkinter as tk
+from tkinter import ttk
+
 from src.constants import OSX, WINDOWS
-from src.modules import mimetypes, os, time, tk, ttk
 from src.Widgets.winframe import WinFrame
 
 

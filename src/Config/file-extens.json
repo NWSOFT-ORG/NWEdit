@@ -1,0 +1,26 @@
+{
+    "Python": [
+        "py","pyw"
+    ],
+    "C/C++": [
+        "c", "h", "cpp", "hpp"
+    ],
+    "HTML/PHP": [
+        "html", "xhtml", "php"
+    ],
+    "Markdown": [
+        "md", "markdown"
+    ],
+    "CSS": [
+        "css", "less", "sass", "scss"
+    ],
+    "JavaScript/JSON": [
+        "js", "javascript", "json"
+    ],
+    "ShellScript": [
+        "sh", "bash", "fish", "zsh"
+    ],
+    "Text": [
+        "txt"
+    ]
+}

@@ -1,16 +1,21 @@
+import os
+import tkinter as tk
 import urllib.error
-from os import PathLike
+import webbrowser
+from tkinter import ttk
 from typing import *
+from urllib import request
+
+import json5 as json
 
 from src.constants import logger, VERSION
-from src.modules import json, os, request, tk, ttk, webbrowser
 from src.types import Tk_Widget, Tk_Win
 from src.Utils.images import get_image
 from src.Widgets.tkentry import Entry
 from src.Widgets.winframe import WinFrame
 
 
-def download_file(url: str, localfile: PathLike = "") -> str:
+def download_file(url: str, localfile: os.PathLike = "") -> str:
     """Downloads a file from remote path"""
     localfile = url.split("/")[-1] if not localfile else localfile
     request.urlretrieve(url, localfile)
@@ -19,7 +24,7 @@ def download_file(url: str, localfile: PathLike = "") -> str:
 
 class YesNoDialog(WinFrame):
     def __init__(
-        self, parent: tk.Misc = None, title: str = "", text: str = None
+        self, parent: Tk_Win = None, title: str = "", text: str = None
     ) -> None:
         self.text = text
         super().__init__(parent, title, icon=get_image("question"))
@@ -109,7 +114,9 @@ class AboutDialog:
         """Shows the version and related info of the editor."""
         self.master = master
 
-        ver = WinFrame(self.master, "About PyPlus", icon=get_image("info"))
+        window = WinFrame(self.master, "About PyPlus", icon=get_image("info"))
+        ver = ttk.Frame(window)
+        window.add_widget(ver)
         ttk.Label(ver, image=get_image("pyplus-35px", img_type="image")).pack(
             fill="both"
         )
@@ -152,18 +159,20 @@ class AboutDialog:
         updatewin = WinFrame(
             self.master, "Updates", closable=False, icon=get_image("info")
         )
+        frame = ttk.Frame(updatewin)
+        updatewin.add_widget(frame)
         if version != VERSION:
             ttk.Label(
-                updatewin, text="Update available!", font="tkDefaultFont 30"
+                frame, text="Update available!", font="tkDefaultFont 30"
             ).pack(fill="both")
-            ttk.Label(updatewin, text=version).pack(fill="both")
-            ttk.Label(updatewin, text=newest["details"]).pack(fill="both")
+            ttk.Label(frame, text=version).pack(fill="both")
+            ttk.Label(frame, text=newest["details"]).pack(fill="both")
             url = newest["url"]
             ttk.Button(
-                updatewin, text="Get this update", command=lambda: webbrowser.open(url)
+                frame, text="Get this update", command=lambda: webbrowser.open(url)
             ).pack()
         else:
             ttk.Label(
-                updatewin, text="No updates available", font="tkDefaultFont 30"
+                frame, text="No updates available", font="tkDefaultFont 30"
             ).pack(fill="both")
         os.remove("ver.json")

@@ -1,9 +1,9 @@
 import io
+import os
 from typing import *
 
 import cairosvg
 
-from src.modules import os
 from src.Utils.photoimage import IconImage, PhotoImage
 
 images: Dict[str, Tuple[IconImage, PhotoImage]] = {}

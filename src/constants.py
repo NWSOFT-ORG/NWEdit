@@ -1,5 +1,9 @@
 """Constants for the editor."""
-from src.modules import logging, os, Path, sys, tk
+import logging
+import os
+import sys
+import tkinter as tk
+from pathlib import Path
 
 WINDOWS = bool(sys.platform.startswith("win"))
 OSX = bool(sys.platform.startswith("darwin"))

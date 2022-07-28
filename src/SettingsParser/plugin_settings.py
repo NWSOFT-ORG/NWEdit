@@ -1,5 +1,8 @@
+import tkinter as tk
+
+import json5 as json
+
 from src.constants import logger
-from src.modules import json, tk
 from src.Plugins.plugins_view import PluginView
 
 
@@ -9,6 +12,7 @@ class Plugins:
         self.tool_menu = tk.Menu(self.master)
         with open("Config/plugin-data.json") as f:
             self.settings = json.load(f)
+        self.create_tool_menu()
 
     def load_plugins(self) -> None:
         plugins = []
@@ -28,10 +32,7 @@ del Plugin""",
         for plugin in plugins:
             self.tool_menu.add_cascade(label=plugin["name"], menu=plugin["menu"])
 
-    @property
-    def create_tool_menu(self) -> tk.Menu:
-        self.tool_menu.add_separator()
+    def create_tool_menu(self):
         self.tool_menu.add_command(
             label="Manage Plugins...", command=lambda: PluginView(self.master)
         )
-        return self.tool_menu

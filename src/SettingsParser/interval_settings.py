@@ -1,4 +1,6 @@
-from src.modules import EditorErr, json
+import json5 as json
+
+from src.errors import EditorErr
 
 
 class IntervalSettings:

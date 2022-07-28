@@ -5,7 +5,17 @@ The editor is a combination of widgets
 TODO: Make it plugin-based
 """
 
+import logging
+import os
+import subprocess
+import sys
+import tkinter as tk
+import traceback
+from pathlib import Path
+from tkinter import ttk
 from typing import *
+
+import json5 as json
 
 from src.codefunctions import CodeFunctions
 from src.constants import APPDIR, logger, MAIN_KEY, OSX
@@ -16,7 +26,6 @@ from src.Dialog.filedialog import FileOpenDialog, FileSaveAsDialog
 from src.Dialog.goto import Navigate
 from src.Git.gitview import GitView
 from src.highlighter import recolorize_line
-from src.modules import (json, logging, os, Path, subprocess, sys, tk, traceback, ttk)
 from src.SettingsParser.extension_settings import (
     CommentMarker,
     FileTreeIconSettings,
@@ -40,7 +49,7 @@ from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
 from src.Widgets.treeview import FileTree
 
 if OSX:
-    from src.modules import PyTouchBar
+    import PyTouchBar
 
 os.chdir(APPDIR)
 
@@ -58,10 +67,9 @@ class Document:
 
 
 class Tabs(dict):
-    def __init__(self, master: Tk_Win):
+    def __init__(self):
         super().__init__()
         self.trigger = lambda _: None
-        self.master = master
 
     def set_triggger(self, trigger: Callable):
         self.trigger = trigger
@@ -100,17 +108,12 @@ class Editor:
             self.comment_settings_class = CommentMarker()
             self.plugins_settings_class = Plugins(master)
             self.icon_settings_class = FileTreeIconSettings()
-            self.projects = RecentProjects()
+            self.projects = RecentProjects(self.master)
             logger.debug("Settings classes loaded")
-
-            self.theme = self.settings_class.get_settings("theme")
-            self.tabwidth = self.settings_class.get_settings("tab")
-            logger.debug("Code settings loaded")
-
             # noinspection PyTypeChecker
             self.master.iconphoto(True, get_image("pyplus-35px", "image"))
 
-            self.tabs = Tabs(self.master)  # Modified dict
+            self.tabs = Tabs()  # Modified dict
 
             self.panedwin = ttk.Panedwindow(self.master, orient="horizontal")
             self.panedwin.pack(fill="both", expand=1)
@@ -219,7 +222,7 @@ class Editor:
         textbox.bind(f"<{MAIN_KEY}-f>", self.codefuncs.search)
         textbox.bind(f"<{MAIN_KEY}-N>", lambda _: Navigate(self.get_text))
         textbox.bind(f"<{MAIN_KEY}-r>", self.reload)
-        textbox.bind(f"<{MAIN_KEY}-S>", lambda _: self.save_as())
+        textbox.bind(f"<{MAIN_KEY}-shift-s>", lambda _: self.save_as())
         textbox.focus_set()
         logger.debug("Textbox created")
         return textbox
@@ -298,11 +301,13 @@ class Editor:
         tree_stat = self.projects.get_treeview_stat(self.project)
         self.filetree.load_status(tree_stat)
 
-        for file, index in self.projects.get_open_files(self.project).items():
-            self.open_file(file)
-            self.get_text.mark_set("insert", index)
-            self.get_text.see("insert")
-        self.get_text.focus_set()
+        files = self.projects.get_open_files(self.project)
+        if files:
+            for file, index in files.items():
+                self.open_file(file)
+                self.get_text.mark_set("insert", index)
+                self.get_text.see("insert")
+            self.get_text.focus_set()
         self.update_title()
         self.update_statusbar()
 
@@ -485,9 +490,8 @@ class Editor:
             height = self.master.winfo_height()
             status["windowGeometry"] = [width, height]
             json.dump(status, f)
-        logger.info("Window is destroyed")
-        self.master.quit()
-        sys.exit(0)
+
+        self.master.destroy()
 
     @staticmethod
     def restart() -> None:

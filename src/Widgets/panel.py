@@ -1,4 +1,5 @@
-from src.modules import tk
+import tkinter as tk
+
 from src.Widgets.customenotebook import ClosableNotebook
 
 
@@ -8,6 +9,7 @@ class CustomTabs(ClosableNotebook):
 
     def close_handle(self, event):
         # From editor.py
+        selected_tab = None
         if self.index("end"):
             # Close the current tab if close is selected from file menu, or
             # keyboard shortcut.

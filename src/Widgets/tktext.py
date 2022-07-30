@@ -262,11 +262,6 @@ class TextOpts:
         text.bind("<BackSpace>", self.backspace)
         text.bind("<Return>", self.autoindent)
         text.bind("<Tab>", self.tab)
-        text.bind(f"<{MAIN_KEY}-i>", lambda _=None: self.indent("indent"))
-        text.bind(f"<{MAIN_KEY}-u>", lambda _=None: self.indent("unindent"))
-        text.bind(f"<{MAIN_KEY}-Z>", self.redo)
-        text.bind(f"<{MAIN_KEY}-z>", self.undo)
-        text.bind(f"{MAIN_KEY}-d", self.duplicate_line)
         text.bind(
             ("<Button-2>" if OSX else "<Button-3>"),
             lambda e: self.right_click_menu.post(e.x_root, e.y_root)

@@ -1,10 +1,21 @@
 import tkinter as tk
 from typing import *
+import re
 
 import json5 as json
 
 from src.constants import logger, MAIN_KEY
 from src.Utils.images import get_image
+
+SHIFT_PATTERN = re.compile(r"shift-([a-zA-z])")
+
+
+def convert_shift_keysym(keysym):
+    res = re.search(SHIFT_PATTERN, keysym)
+    if res:
+        letter = res.group(1)
+        keysym = re.sub(SHIFT_PATTERN, letter.upper(), keysym)
+    return keysym
 
 
 class Menu:
@@ -68,20 +79,24 @@ class Menu:
         local_vars = {}
         if imports:
             exec(self.do_import(imports), local_vars)  # Imports things as plugins
-        exec(f"self.functions.append(lambda: {function})", {"pyplus": self.pyplus, "self": self} | local_vars)
+        exec(
+            f"self.functions.append(lambda _=None: {function} if pyplus.tabs else None)",
+            {"pyplus": self.pyplus, "self": self} | local_vars
+            )
         cnf = {
-            "label"      : text,
-            "image"      : get_image(image),
+            "label": text,
+            "image": get_image(image),
             "accelerator": f"{MAIN_KEY}-{mnemonic}",
-            "compound"   : "left",
-            "command"    : self.functions[-1]
+            "compound": "left",
+            "command": self.functions[-1]
         }
         if not mnemonic:
             cnf.pop("accelerator")  # Will cause error with an empty accelerator
             logger.debug("No Accelerator")
+        elif mnemonic:
+            self.master.bind(f'<{convert_shift_keysym(mnemonic)}>', self.functions[-1])
         elif mnemonic.startswith("`"):
             cnf["accelerator"] = mnemonic[1:]
             logger.debug("Bare Accelerator")
-        # self.master.bind(f'<{cnf["accelerator"]}>', self.functions[-1])
 
         menu.add_command(**cnf)

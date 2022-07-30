@@ -16,11 +16,11 @@ class Plugins:
 
     def load_plugins(self) -> None:
         plugins = []
-        for value in self.settings.values():
+        for module in self.settings.values():
             try:
                 exec(
                     f"""\
-from src.{value} import Plugin
+from src.{module} import Plugin
 p = Plugin(self.master)
 plugins.append(p.PLUGIN_DATA)
 del Plugin""",

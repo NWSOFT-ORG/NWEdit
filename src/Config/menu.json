@@ -23,7 +23,7 @@ For example: "package"
         "New...": [
             "new",
             "n",
-            "pyplus.filetree.new_file()",
+            "pyplus.filetree.new_item()",
             null,
             false
         ],
@@ -62,21 +62,21 @@ For example: "package"
             "shift-s",
             "pyplus.save_as()",
             null,
-            false
+            true
         ],
         "Close Tab": [
             "close",
             "w",
             "pyplus.close_tab()",
             null,
-            false
+            true
         ],
         "Reload All": [
             "reload",
             null,
             "pyplus.reload()",
             null,
-            false
+            true
         ]
     },
     "[Edit]": {
@@ -255,7 +255,7 @@ For example: "package"
     "[Code]": {
         "Run": [
             "run",
-            null,
+            "b",
             "pyplus.codefuncs.run()",
             null,
             true
@@ -284,7 +284,7 @@ For example: "package"
             ],
             "Open Python Shell": [
                 "py-term",
-                null,
+                "F2",
                 "pyplus.codefuncs.python_shell()",
                 null,
                 false
@@ -317,7 +317,7 @@ For example: "package"
     "[Navigate]": {
         "Go to...": [
             null,
-            null,
+            "shift-n",
             "Navigate(pyplus.get_text)",
             "src.Dialog.goto -> Navigate",
             true

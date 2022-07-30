@@ -188,9 +188,6 @@ class Editor:
         self.bottom_panedwin.add(self.bottom_tabs, weight=1)
 
     def create_bindings(self):
-        # Keyboard bindings
-        self.master.bind(f"<{MAIN_KEY}-w>", self.close_tab)
-        self.master.bind(f"<{MAIN_KEY}-o>", lambda _: self.open_file())
         # Mouse bindings
         self.master.bind("<<MouseEvent>>", self.mouse)
         self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
@@ -203,7 +200,6 @@ class Editor:
 
     def create_text_widget(self, frame: ttk.Frame) -> EnhancedText:
         """Creates a text widget in a frame."""
-
         panedwin = ttk.Panedwindow(frame)
         panedwin.pack(fill="both", expand=1)
 
@@ -218,11 +214,6 @@ class Editor:
         textbox.panedwin = panedwin
         textbox.complete = CompleteDialog(textframe, textbox, self.key)
         textbox.frame = frame  # The text will be packed into the frame.
-        textbox.bind(f"<{MAIN_KEY}-b>", self.codefuncs.run)
-        textbox.bind(f"<{MAIN_KEY}-f>", self.codefuncs.search)
-        textbox.bind(f"<{MAIN_KEY}-N>", lambda _: Navigate(self.get_text))
-        textbox.bind(f"<{MAIN_KEY}-r>", self.reload)
-        textbox.bind(f"<{MAIN_KEY}-shift-s>", lambda _: self.save_as())
         textbox.focus_set()
         logger.debug("Textbox created")
         return textbox

@@ -5,7 +5,7 @@ Configures the start window
 {
     "Open Project...": [
         "open",
-        "self.open_project()"
+        "self.open_project_dialog()"
     ],
     "New...": [
         "new",

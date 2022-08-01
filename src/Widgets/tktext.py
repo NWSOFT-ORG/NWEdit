@@ -538,7 +538,7 @@ class TextOpts:
             clipboard = self.text.clipboard_get()
             if clipboard:
                 self.text.insert(
-                    "insert", clipboard.replace_all("\t", " " * self.tabwidth)
+                    "insert", clipboard
                 )
             recolorize(self.text)
             self.key()

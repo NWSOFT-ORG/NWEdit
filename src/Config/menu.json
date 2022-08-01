@@ -3,6 +3,8 @@ Creates the menu for PyPlus
 Config is in the format:
 "[cascade_name]": {}   <- A cascade OR
 "item_name": [image, mnemonic, function, plugin_path]   <- An item in a cascade
+----
+The function should be a lambda call. You may use 'obj' to reference a class that uses the menu
 The plugin_path should be a Python import string, with the object name.
 For example: "path.to.class -> Object"
 If it is a built-in, or a package installed with PyPlus, you can use direct import statements
@@ -10,347 +12,446 @@ For example: "package"
 */
 
 {
-    "[PyPlus]": {
-        "About PyPlus": [
-            "info",
-            null,
-            "AboutDialog(pyplus.master)",
-            "src.Dialog.commondialog -> AboutDialog",
-            false
-        ]
+    /*
+    Main menubar (PyPlus, File, Edit...)
+    Used by src.Editor
+    */
+    "main": {
+        "[PyPlus]": {
+            "About PyPlus": [
+                "info",
+                null,
+                "AboutDialog(obj.master)",
+                "src.Dialog.commondialog -> AboutDialog",
+                false
+            ],
+            "[Preferences]": {
+                "General Settings": [
+                    "gear",
+                    ",",
+                    "obj.open_file(\"Config/general-settings.json\")",
+                    null,
+                    false
+                ],
+                "Run command settings": [
+                    "gear",
+                    null,
+                    "obj.open_file(\"Config/cmd-settings.json\")",
+                    null,
+                    false
+                ],
+                "Lexer settings": [
+                    "gear",
+                    null,
+                    "obj.open_file(\"Config/lexer-settings.json\")",
+                    null,
+                    false
+                ],
+                "Comment markers": [
+                    "gear",
+                    null,
+                    "obj.open_file(\"Config/comment-markers.json\")",
+                    null,
+                    false
+                ],
+                "File types for New File": [
+                    "gear",
+                    null,
+                    "obj.open_file(\"Config/file-extens.json\")",
+                    null,
+                    false
+                ],
+                "File icons": [
+                    "gear",
+                    null,
+                    "obj.open_file(\"Config/file-icons.json\")",
+                    null,
+                    false
+                ]
+            },
+            "---": null,
+            "Quit": [
+                "close",
+                "q",
+                "obj.exit()",
+                null,
+                false
+            ]
+        },
+        "[File]": {
+            "New...": [
+                "new",
+                "n",
+                "obj.filetree.new_item()",
+                null,
+                false
+            ],
+            "[Open...]": {
+                "Open File": [
+                    "open",
+                    "o",
+                    "obj.open_file()",
+                    null,
+                    false
+                ],
+                "Open File in Hex": [
+                    "open",
+                    null,
+                    "obj.open_hex()",
+                    null,
+                    false
+                ],
+                "Open Folder": [
+                    "open",
+                    "shift-o",
+                    "obj.open_dir()",
+                    null,
+                    false
+                ],
+                "Clone From Git...": [
+                    "clone",
+                    null,
+                    "obj.git(\"clone\")",
+                    null,
+                    false
+                ]
+            },
+            "Save Copy to": [
+                "save-as",
+                "shift-s",
+                "obj.save_as()",
+                null,
+                true
+            ],
+            "Close Tab": [
+                "close",
+                "w",
+                "obj.close_tab()",
+                null,
+                true
+            ],
+            "Reload All": [
+                "reload",
+                null,
+                "obj.reload()",
+                null,
+                true
+            ]
+        },
+        "[Edit]": {
+            "Undo": [
+                "undo",
+                "z",
+                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).undo()",
+                "src.Widgets.tktext -> TextOpts",
+                true
+            ],
+            "Redo": [
+                "redo",
+                "shift-z",
+                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).redo()",
+                "src.Widgets.tktext -> TextOpts",
+                true
+            ],
+            "Cut": [
+                "cut",
+                "x",
+                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).cut()",
+                "src.Widgets.tktext -> TextOpts",
+                true
+            ],
+            "Copy": [
+                "copy",
+                "c",
+                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).copy()",
+                "src.Widgets.tktext -> TextOpts",
+                true
+            ],
+            "Paste": [
+                "paste",
+                "v",
+                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).paste()",
+                "src.Widgets.tktext -> TextOpts",
+                true
+            ],
+            "Duplicate Line or Selected": [
+                null,
+                "d",
+                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).duplicate_line()",
+                "src.Widgets.tktext -> TextOpts",
+                true
+            ],
+            "[Indent...]": {
+                "Indent": [
+                    "indent",
+                    "i",
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).indent(\"indent\")",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ],
+                "Unindent": [
+                    "unindent",
+                    "u",
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).indent(\"unindent\")",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ]
+            },
+            "Join Lines": [
+                null,
+                null,
+                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).join_lines()",
+                "src.Widgets.tktext -> TextOpts",
+                true
+            ],
+            "[Case...]": {
+                "Swap Case": [
+                    null,
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).swap_case()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ],
+                "Upper Case": [
+                    "upper",
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).upper_case()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ],
+                "Lower Case": [
+                    "lower",
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).lower_case()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ]
+            },
+            "[Select...]": {
+                "Select All": [
+                    "sel-all",
+                    "a",
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).select_all()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ],
+                "Select Line": [
+                    null,
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_line()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ],
+                "Select Word": [
+                    null,
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_word()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ],
+                "Select Previous Word": [
+                    null,
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_word_left()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ],
+                "Select Next Word": [
+                    null,
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_word_right()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ]
+            },
+            "[Delete...]": {
+                "Delete Selected": [
+                    "delete",
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ],
+                "Delete Word": [
+                    "delete",
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ],
+                "Delete Previous Word": [
+                    "delete",
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ],
+                "Delete Next Word": [
+                    "delete",
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ]
+            },
+            "[Move line...]": {
+                "Up": [
+                    null,
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).mv_line_up()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ],
+                "Down": [
+                    null,
+                    null,
+                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).mv_line_dn()",
+                    "src.Widgets.tktext -> TextOpts",
+                    true
+                ]
+            }
+        },
+        "[Code]": {
+            "Run": [
+                "run",
+                "b",
+                "obj.codefuncs.run()",
+                null,
+                true
+            ],
+            "Lint": [
+                "lint",
+                null,
+                "obj.codefuncs.lint_source()",
+                null,
+                true
+            ],
+            "Auto-Format": [
+                "format",
+                null,
+                "obj.codefuncs.autopep()",
+                null,
+                true
+            ],
+            "[Open Shell...]": {
+                "Open System Shell": [
+                    "term",
+                    null,
+                    "obj.codefuncs.system_shell()",
+                    null,
+                    false
+                ],
+                "Open Python Shell": [
+                    "py-term",
+                    "F2",
+                    "obj.codefuncs.python_shell()",
+                    null,
+                    false
+                ]
+            }
+        },
+        "[View]": {
+            "Unit tests": [
+                null,
+                null,
+                "TestDialog(obj.bottom_tabs, obj.filetree.path)",
+                "src.Dialog.testdialog -> TestDialog",
+                false
+            ],
+            "Code structure": [
+                null,
+                null,
+                "CodeListDialog(obj.bottom_tabs, obj.get_text)",
+                "src.Dialog.codelistdialog -> CodeListDialog",
+                true
+            ],
+            "Insert Ascii Art": [
+                null,
+                null,
+                "StyleWindow(obj.master, obj.get_text, obj.key)",
+                "src.Dialog.textstyle -> StyleWindow",
+                true
+            ]
+        },
+        "[Navigate]": {
+            "Go to...": [
+                null,
+                "shift-n",
+                "Navigate(obj.get_text)",
+                "src.Dialog.goto -> Navigate",
+                true
+            ],
+            "Find and Replace": [
+                "search",
+                "f",
+                "obj.codefuncs.search()",
+                null,
+                true
+            ],
+            "Search in Directory": [
+                null,
+                null,
+                "SearchInDir(obj.bottom_tabs, obj.filetree.path, obj.open_file)",
+                "src.Dialog.searchindir -> SearchInDir",
+                false
+            ]
+        },
+        "[Tools]": {
+            "View Plugins": [
+                "gear",
+                null,
+                "PluginView(obj.master)",
+                "src.Plugins.plugins_view -> PluginView",
+                false
+            ]
+        },
+        "[Git]": {
+            "Commit": [
+                null,
+                "shift-k",
+                "obj.git(\"commit\")",
+                null,
+                false
+            ],
+            "Init": [
+                null,
+                null,
+                "subprocess.Popen('git init && git add . && git commit -am \"Added files\"',hell=True,cwd=obj.filetree.path,)",
+                "subprocess",
+                false
+            ]
+        }
     },
-    "[File]": {
-        "New...": [
-            "new",
-            "n",
-            "pyplus.filetree.new_item()",
-            null,
-            false
-        ],
-        "[Open...]": {
-            "Open File": [
-                "open",
-                "o",
-                "pyplus.open_file()",
+    /*
+    The menu shown on the start dialog (the modal to select projects to open)
+    Used by src.Dialog.startdialog
+    */
+    "start_dialog": {
+        "[PyPlus]": {
+            "About PyPlus": [
+                "info",
                 null,
+                "AboutDialog(obj.master)",
+                "src.Dialog.commondialog -> AboutDialog",
                 false
             ],
-            "Open File in Hex": [
-                "open",
-                null,
-                "pyplus.open_hex()",
-                null,
+            "---": null,
+            "Quit": [
+                "close",
+                "q",
+                "sys.exit(0)",
+                "sys",
                 false
-            ],
-            "Open Folder": [
+            ]
+        },
+        "[Project]": {
+            "Open Project": [
                 "open",
                 "shift-o",
-                "pyplus.open_dir()",
-                null,
-                false
-            ],
-            "Clone From Git...": [
-                "clone",
-                null,
-                "pyplus.git(\"clone\")",
-                null,
-                false
-            ]
-        },
-        "Save Copy to": [
-            "save-as",
-            "shift-s",
-            "pyplus.save_as()",
-            null,
-            true
-        ],
-        "Close Tab": [
-            "close",
-            "w",
-            "pyplus.close_tab()",
-            null,
-            true
-        ],
-        "Reload All": [
-            "reload",
-            null,
-            "pyplus.reload()",
-            null,
-            true
-        ]
-    },
-    "[Edit]": {
-        "Undo": [
-            "undo",
-            "z",
-            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).undo()",
-            "src.Widgets.tktext -> TextOpts",
-            true
-        ],
-        "Redo": [
-            "redo",
-            "shift-z",
-            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).redo()",
-            "src.Widgets.tktext -> TextOpts",
-            true
-        ],
-        "Cut": [
-            "cut",
-            "x",
-            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).cut()",
-            "src.Widgets.tktext -> TextOpts",
-            true
-        ],
-        "Copy": [
-            "copy",
-            "c",
-            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).copy()",
-            "src.Widgets.tktext -> TextOpts",
-            true
-        ],
-        "Paste": [
-            "paste",
-            "v",
-            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).paste()",
-            "src.Widgets.tktext -> TextOpts",
-            true
-        ],
-        "Duplicate Line or Selected": [
-            null,
-            "d",
-            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).duplicate_line()",
-            "src.Widgets.tktext -> TextOpts",
-            true
-        ],
-        "[Indent...]": {
-            "Indent": [
-                "indent",
-                "i",
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).indent(\"indent\")",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ],
-            "Unindent": [
-                "unindent",
-                "u",
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).indent(\"unindent\")",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ]
-        },
-        "Join Lines": [
-            null,
-            null,
-            "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).join_lines()",
-            "src.Widgets.tktext -> TextOpts",
-            true
-        ],
-        "[Case...]": {
-            "Swap Case": [
-                null,
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).swap_case()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ],
-            "Upper Case": [
-                "upper",
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).upper_case()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ],
-            "Lower Case": [
-                "lower",
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).lower_case()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ]
-        },
-        "[Select...]": {
-            "Select All": [
-                "sel-all",
-                "a",
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).select_all()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ],
-            "Select Line": [
-                null,
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).sel_line()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ],
-            "Select Word": [
-                null,
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).sel_word()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ],
-            "Select Previous Word": [
-                null,
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).sel_word_left()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ],
-            "Select Next Word": [
-                null,
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).sel_word_right()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ]
-        },
-        "[Delete...]": {
-            "Delete Selected": [
-                "delete",
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).delete()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ],
-            "Delete Word": [
-                "delete",
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).delete()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ],
-            "Delete Previous Word": [
-                "delete",
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).delete()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ],
-            "Delete Next Word": [
-                "delete",
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).delete()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ]
-        },
-        "[Move line...]": {
-            "Up": [
-                null,
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).mv_line_up()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ],
-            "Down": [
-                null,
-                null,
-                "TextOpts(pyplus.master, keyaction=pyplus.key).set_text(pyplus.get_text).mv_line_dn()",
-                "src.Widgets.tktext -> TextOpts",
-                true
-            ]
-        }
-    },
-    "[Code]": {
-        "Run": [
-            "run",
-            "b",
-            "pyplus.codefuncs.run()",
-            null,
-            true
-        ],
-        "Lint": [
-            "lint",
-            null,
-            "pyplus.codefuncs.lint_source()",
-            null,
-            true
-        ],
-        "Auto-Format": [
-            "format",
-            null,
-            "pyplus.codefuncs.autopep()",
-            null,
-            true
-        ],
-        "[Open Shell...]": {
-            "Open System Shell": [
-                "term",
-                null,
-                "pyplus.codefuncs.system_shell()",
-                null,
-                false
-            ],
-            "Open Python Shell": [
-                "py-term",
-                "F2",
-                "pyplus.codefuncs.python_shell()",
+                "obj.open_project_dialog()",
                 null,
                 false
             ]
         }
-    },
-    "[View]": {
-        "Unit tests": [
-            null,
-            null,
-            "TestDialog(pyplus.bottom_tabs, pyplus.filetree.path)",
-            "src.Dialog.testdialog -> TestDialog",
-            false
-        ],
-        "Code structure": [
-            null,
-            null,
-            "CodeListDialog(pyplus.bottom_tabs, pyplus.get_text)",
-            "src.Dialog.codelistdialog -> CodeListDialog",
-            true
-        ],
-        "Insert Ascii Art": [
-            null,
-            null,
-            "StyleWindow(pyplus.master, pyplus.get_text, pyplus.key)",
-            "src.Dialog.textstyle -> StyleWindow",
-            true
-        ]
-    },
-    "[Navigate]": {
-        "Go to...": [
-            null,
-            "shift-n",
-            "Navigate(pyplus.get_text)",
-            "src.Dialog.goto -> Navigate",
-            true
-        ],
-        "Find and Replace": [
-            "search",
-            "f",
-            "pyplus.codefuncs.search()",
-            null,
-            true
-        ],
-        "Search in Directory": [
-            null,
-            null,
-            "SearchInDir(pyplus.bottom_tabs, pyplus.filetree.path, pyplus.open_file)",
-            "src.Dialog.searchindir -> SearchInDir",
-            false
-        ]
-    },
-    "[Git]": {
-        "Commit": [
-            null,
-            "shift-k",
-            "pyplus.git(\"commit\")",
-            null,
-            false
-        ],
-        "Init": [
-            null,
-            null,
-            "subprocess.Popen('git init && git add . && git commit -am \"Added files\"',hell=True,cwd=pyplus.filetree.path,)",
-            "subprocess",
-            false
-        ]
     }
 }

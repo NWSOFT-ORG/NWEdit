@@ -71,7 +71,10 @@ class CompleteDialog(ttk.Frame):
             self.place_forget()
             return
 
-        all_matches.remove(self.get_word)  # Remove the current word
+        try:
+            all_matches.remove(self.get_word)  # Remove the current word
+        except ValueError:
+            pass
         dline = text.dlineinfo("insert")
         self.place_configure(x=dline[0] + dline[2], y=dline[1] + dline[3])
 

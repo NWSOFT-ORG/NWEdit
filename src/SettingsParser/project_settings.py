@@ -17,8 +17,8 @@ class RecentProjects:
         return self.config[name]["path"]
 
     def get_name_for_path(self, path: str):
-        for key in self.config.keys():
-            if self.config[key]["path"] == path:
+        for key, value in self.config.items():
+            if value["path"] == path:
                 return key
 
     def set_open_files(self, name: str, files: Dict[str, str]):

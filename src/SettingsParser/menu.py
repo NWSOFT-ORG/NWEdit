@@ -19,19 +19,22 @@ def convert_shift_keysym(keysym):
 
 
 class Menu:
-    def __init__(self, obj):
+    def __init__(self, obj, menu_type: str = "main", disable_tabs: bool = False):
         """A menu creater from configuration"""
-        self.pyplus = obj
+        self.menu_name = menu_type
+        self.disable_tabs = disable_tabs
+        self.obj = obj
         self.master = obj.master
         self.menu = tk.Menu()
         self.functions = []
         self.disable_menus = {}
+        with open("Config/menu.json") as f:
+            self.config: Dict[str, Union[List, Dict]] = json.load(f)[self.menu_name]  # Load main menu only
         self.load_config()
 
     def load_config(self):
         """Reloads configuration"""
-        with open("Config/menu.json") as f:
-            self.config: Dict[str, Union[List, Dict]] = json.load(f)
+        self.menu.delete(0, "end")
         self.create_menu(self.menu, self.config)
 
     def create_menu(self, menu, config):
@@ -39,7 +42,9 @@ class Menu:
         [x] = cascade, x = item
         Will also create bindings"""
         for key in config.keys():
-            if not (key.startswith("[") and key.endswith("]")):
+            if key == "---":
+                menu.add_separator()
+            elif not (key.startswith("[") and key.endswith("]")):
                 cnf = [menu, key, *config[key][:-1]]
                 logger.debug(f"Creating item {key!r}")
                 logger.debug(f"Disable on no editors: {config[key][-1]}")
@@ -80,21 +85,21 @@ class Menu:
         if imports:
             exec(self.do_import(imports), local_vars)  # Imports things as plugins
         exec(
-            f"self.functions.append(lambda _=None: {function} if pyplus.tabs else None)",
-            {"pyplus": self.pyplus, "self": self} | local_vars
-            )
+            f"self.functions.append(lambda _=None: {function} {'if obj.tabs else None' if self.disable_tabs else ''})",
+            {"obj": self.obj, "self": self} | local_vars
+        )
         cnf = {
-            "label": text,
-            "image": get_image(image),
+            "label"      : text,
+            "image"      : get_image(image),
             "accelerator": f"{MAIN_KEY}-{mnemonic}",
-            "compound": "left",
-            "command": self.functions[-1]
+            "compound"   : "left",
+            "command"    : self.functions[-1]
         }
         if not mnemonic:
             cnf.pop("accelerator")  # Will cause error with an empty accelerator
             logger.debug("No Accelerator")
         elif mnemonic:
-            self.master.bind(f'<{convert_shift_keysym(mnemonic)}>', self.functions[-1])
+            self.master.bind(f'<{MAIN_KEY}-{convert_shift_keysym(mnemonic)}>', self.functions[-1])
         elif mnemonic.startswith("`"):
             cnf["accelerator"] = mnemonic[1:]
             logger.debug("Bare Accelerator")

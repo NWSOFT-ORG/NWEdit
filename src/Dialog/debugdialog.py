@@ -28,10 +28,8 @@ def get_font() -> Text:
 class ReadonlyText(EnhancedTextFrame):
     def __init__(self, master: Union[Literal["."], tk.Misc]) -> None:
         super().__init__(master)
-        style = styles.get_style_by_name(get_pygments())
-        bgcolor = style.background_color
         fgcolor = "#f00"
-        self.text.configure(state="disabled", fg=fgcolor, bg=bgcolor, font=get_font())
+        self.text.configure(state="disabled", fg=fgcolor, font=get_font())
 
     def insert(self, pos: Text, text: Text) -> None:
         self.text.configure(state="normal")

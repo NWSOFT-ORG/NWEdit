@@ -6,26 +6,39 @@ from src.Widgets.winframe import WinFrame  # You may import from PyPlus Librarie
 class Sample(WinFrame):
     def __init__(self, master):
         super().__init__(master, "SAMPLE")
+        master.withdraw()
         self.hello()
+
+    def on_exit(self, _):
+        super().on_exit(_)
+        self.master.destroy()
 
     @staticmethod
     def hello():
         print("Hello")
 
 
-def main(master):
-    Sample(master)
+def main():
+    Sample(tk.Toplevel())
 
 
 class Plugin:  # Every Plugin main file should be a class called 'Plugin'
     """A sample plugin"""
 
-    def __init__(self, master):
-        self.menu = tk.Menu(master)
-        self.menu.add_command(label="Testing", command=lambda: main(master))
-        self.PLUGIN_DATA = {
-            "name": "Sample",
-            "menu": self.menu,
-            "onstart": lambda: None,
+    def __init__(self):
+        # Defined menu -> New menu
+        self.menu = {
+            "[Tools -> Testing]": {
+                "Sample": ["info",
+                           None,
+                           "main()",
+                           "src.Plugins.plugin_sample -> main",
+                           False]
+            }
         }
-        # Should be {"name": "...", "menu": tk.Menu, "onstart": callable, "cascade": bool}
+        self.PLUGIN_DATA = {
+            "name"   : "Sample",
+            "menu"   : self.menu,
+            "onstart": lambda: None,
+            "onsave" : lambda: None
+        }

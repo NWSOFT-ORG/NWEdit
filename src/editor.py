@@ -18,12 +18,11 @@ from typing import *
 import json5 as json
 
 from src.codefunctions import CodeFunctions
-from src.constants import APPDIR, logger, MAIN_KEY, OSX
+from src.constants import APPDIR, logger, OSX
 from src.Dialog.autocomplete import CompleteDialog
 from src.Dialog.commondialog import ErrorInfoDialog, StringInputDialog, YesNoDialog
 from src.Dialog.debugdialog import ErrorReportDialog
 from src.Dialog.filedialog import FileOpenDialog, FileSaveAsDialog
-from src.Dialog.goto import Navigate
 from src.Git.gitview import GitView
 from src.highlighter import recolorize_line
 from src.SettingsParser.extension_settings import (
@@ -106,7 +105,6 @@ class Editor:
             self.cmd_settings_class = RunCommand()
             self.format_settings_class = FormatCommand()
             self.comment_settings_class = CommentMarker()
-            self.plugins_settings_class = Plugins(master)
             self.icon_settings_class = FileTreeIconSettings()
             self.projects = RecentProjects(self.master)
             logger.debug("Settings classes loaded")
@@ -131,6 +129,12 @@ class Editor:
                 self.master, self.tabs, self.nb, self.bottom_tabs
             )
 
+            self.menu_obj = Menu(self)
+            self.menu = self.menu_obj.menu
+            self.tabs.set_triggger(self.menu_obj.disable)
+            self.master["menu"] = self.menu
+            logger.debug("All menus loaded.")
+
             if OSX:
                 PyTouchBar.prepare_tk_windows(self.master)
                 open_button = PyTouchBar.TouchBarItems.Button(
@@ -151,14 +155,9 @@ class Editor:
                 )
                 logger.debug(f"{OSX = }, therefore enable TouchBar support")
 
+            self.plugins_settings_class = Plugins(master, self.menu_obj)
             self.plugins_settings_class.load_plugins()
             logger.debug("Plugins loaded")
-
-            self.menu_obj = Menu(self)
-            self.menu = self.menu_obj.menu
-            self.tabs.set_triggger(self.menu_obj.disable)
-            self.master["menu"] = self.menu
-            logger.debug("All menus loaded.")
 
             self.create_bindings()
             self.load_status()

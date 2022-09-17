@@ -10,6 +10,7 @@ from tkinter import ttk
 
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Widgets.scrollbar import TextScrollbar
+from src.Widgets.tktext import apply_style, EnhancedText
 
 
 # from olisolomos's gist
@@ -146,13 +147,14 @@ class Console(ttk.Frame):
             threading.Thread(target=run_command).start()
 
 
-class ConsoleText(tk.Text):
+class ConsoleText(EnhancedText):
     """
     A Text widget that handles some application logic,
     e.g., having a line of input at the end with everything else being un-editable"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        apply_style(self)
 
         # make edits that occur during on_text_change not cause it to trigger again
         def on_modified(event):

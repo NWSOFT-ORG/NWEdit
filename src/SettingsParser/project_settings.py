@@ -10,6 +10,9 @@ from src.Dialog.commondialog import ErrorInfoDialog
 class RecentProjects:
     def __init__(self, master):
         self.master = master
+        self.reload_config()
+
+    def reload_config(self):
         with open("EditorStatus/recent_projects.json") as f:
             self.config = json.load(f)
 
@@ -68,3 +71,4 @@ class RecentProjects:
         with open("EditorStatus/recent_projects.json", "w") as f:
             json.dump(self.config, f)
         logger.debug("Updated project config")
+        self.reload_config()

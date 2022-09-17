@@ -13,6 +13,7 @@ import tkinter as tk
 import traceback
 from pathlib import Path
 from tkinter import ttk
+from types import UnionType
 from typing import *
 
 import json5 as json
@@ -70,7 +71,7 @@ class Tabs(dict):
         super().__init__()
         self.trigger = lambda _: None
 
-    def set_triggger(self, trigger: Callable):
+    def set_trigger(self, trigger: Callable):
         self.trigger = trigger
         self.trigger(self)
 
@@ -99,23 +100,23 @@ class Editor:
         init_images()
 
         try:
-            self.settings_class = GeneralSettings(self.master)
+            self.settings_class = GeneralSettings(master)
             self.file_settings_class = PygmentsLexer()
             self.linter_settings_class = Linter()
             self.cmd_settings_class = RunCommand()
             self.format_settings_class = FormatCommand()
             self.comment_settings_class = CommentMarker()
             self.icon_settings_class = FileTreeIconSettings()
-            self.projects = RecentProjects(self.master)
+            self.projects = RecentProjects(master)
             logger.debug("Settings classes loaded")
             # noinspection PyTypeChecker
-            self.master.iconphoto(True, get_image("pyplus-35px", "image"))
+            master.iconphoto(True, get_image("pyplus-35px", "image"))
 
             self.tabs = Tabs()  # Modified dict
 
-            self.panedwin = ttk.Panedwindow(self.master, orient="horizontal")
+            self.panedwin = ttk.Panedwindow(master, orient="horizontal")
             self.panedwin.pack(fill="both", expand=1)
-            self.mainframe = ttk.Frame(self.master)
+            self.mainframe = ttk.Frame(self.panedwin)
             self.mainframe.pack(fill="both", expand=1)
             self.panedwin.add(self.mainframe)
             logger.debug("UI initialised")
@@ -126,17 +127,18 @@ class Editor:
             logger.debug("Layout created")
 
             self.codefuncs = CodeFunctions(
-                self.master, self.tabs, self.nb, self.bottom_tabs
+                master, self.tabs, self.nb, self.bottom_tabs
             )
 
-            self.menu_obj = Menu(self)
-            self.menu = self.menu_obj.menu
-            self.tabs.set_triggger(self.menu_obj.disable)
-            self.master["menu"] = self.menu
+            self.menu_obj = Menu(self, "main")
+            self.tabs.set_trigger(self.menu_obj.disable)
+            self.menu_obj.load_config()
+
+            master["menu"] = self.menu_obj.menu
             logger.debug("All menus loaded.")
 
             if OSX:
-                PyTouchBar.prepare_tk_windows(self.master)
+                PyTouchBar.prepare_tk_windows(master)
                 open_button = PyTouchBar.TouchBarItems.Button(
                     image="Images/open.svg", action=lambda _: self.open_file()
                 )
@@ -165,7 +167,7 @@ class Editor:
         except Exception:
             logger.exception("Error when initializing:")
             ErrorReportDialog(
-                self.master, "Error when starting.", traceback.format_exc()
+                master, "Error when starting.", traceback.format_exc()
             )
             exit(1)
 
@@ -191,27 +193,17 @@ class Editor:
         self.master.bind("<<MouseEvent>>", self.mouse)
         self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
 
-        self.master.protocol(
-            "WM_DELETE_WINDOW", lambda: self.exit()
-        )  # When the window is closed, or quit from Mac, do exit action
         self.master.createcommand("::tk::mac::Quit", self.exit)
         logger.debug("Bindings created")
 
-    def create_text_widget(self, frame: ttk.Frame) -> EnhancedText:
+    def create_text_widget(self, frame: ClosableNotebook) -> EnhancedText:
         """Creates a text widget in a frame."""
-        panedwin = ttk.Panedwindow(frame)
-        panedwin.pack(fill="both", expand=1)
-
-        textframe = EnhancedTextFrame(panedwin)
+        textframe = EnhancedTextFrame(frame)
         # The one with line numbers, and a nice dark theme
         textframe.pack(fill="both", expand=1, side="right")
-        panedwin.add(textframe)
-        textframe.panedwin = panedwin
         textframe.set_first_line(1)
 
         textbox = textframe.text  # text widget
-        textbox.panedwin = panedwin
-        textbox.complete = CompleteDialog(textframe, textbox, self.key)
         textbox.frame = frame  # The text will be packed into the frame.
         textbox.focus_set()
         logger.debug("Textbox created")
@@ -220,14 +212,13 @@ class Editor:
     def update_title(self, _=None) -> str:
         try:
             path = self.tabs[self.nb.get_tab].file_dir
-            path = os.path.basename(path)
             if self.tabs[self.nb.get_tab].istoolwin:
                 self.master.title("PyPlus")
                 logger.debug("update_title: Finished early")
                 return "break"
             if OSX:
                 self.master.attributes("-titlepath", path)
-            self.master.title(f"PyPlus [{self.project}] — {path}")
+            self.master.title(f"PyPlus [{self.project}] — {os.path.basename(path)}")
         except KeyError:
             self.master.title(f"PyPlus [{self.project}]")
             self.master.attributes("-titlepath", "")
@@ -260,7 +251,14 @@ class Editor:
             recolorize_line(currtext)
             currtext.edit_separator()
             currtext.see("insert")
-            currtext.complete.insert_completions()
+
+            prev_completes = self.get_text.master.children
+            for widget in prev_completes.values():
+                if isinstance(widget, CompleteDialog):
+                    widget.destroy()
+                    break
+
+            CompleteDialog(currtext.master, currtext, self.key).insert_completions()
             # Auto-save
             self.save_file()
             self.update_statusbar()
@@ -295,9 +293,9 @@ class Editor:
         if files:
             for file, index in files.items():
                 self.open_file(file)
-                self.get_text.mark_set("insert", index)
-                self.get_text.see("insert")
-            self.get_text.focus_set()
+                self.get_text_editor.mark_set("insert", index)
+                self.get_text_editor.see("insert")
+            self.get_text_editor.focus_set()
         self.update_title()
         self.update_statusbar()
 
@@ -345,16 +343,17 @@ class Editor:
                 return self.get_text
 
             extens = file.split(".")[-1]
-            new_tab = ttk.Frame(self.nb)
-            textbox = self.create_text_widget(new_tab)
+            textbox = self.create_text_widget(self.nb)
+            textframe = textbox.master
             with open(file) as f:
                 # Puts the contents of the file into the text widget.
                 textbox.insert("end", f.read())
 
-            new_tab.icon = self.icon_settings_class.get_icon(extens)
-            self.tabs[new_tab] = Document(new_tab, textbox, file)
-            self.nb.add(new_tab, text=os.path.basename(file), image=new_tab.icon, compound="left")
-            self.nb.select(new_tab)
+            textframe.icon = self.icon_settings_class.get_icon(extens)
+            self.tabs[textframe] = Document(textframe, textbox, file)
+            # noinspection PyTypeChecker
+            self.nb.add(textframe, text=os.path.basename(file), image=textframe.icon, compound="left")
+            self.nb.select(textframe)
 
             textbox.focus_set()
             textbox.set_lexer(self.file_settings_class.get_settings(extens))
@@ -416,25 +415,42 @@ class Editor:
         except KeyError:
             pass
 
+    @staticmethod
+    def get_focus_widget(
+        base_widget: tk.Misc, cls: Union[object, type, UnionType, tk.Widget, tk.Misc, None]
+    ):
+        if isinstance(base_widget, cls):
+            return base_widget
+        while hasattr(base_widget, "master"):
+            base_widget = base_widget.master
+            if isinstance(base_widget, cls):
+                return base_widget
+        return None
+
     def close_tab(self, event=None) -> None:
         try:
             # noinspection PyGlobalUndefined
-            global selected_tab
-            if self.nb.index("end"):
-                # Close the current tab if close is selected from the file menu, or
-                # keyboard shortcut.
-                if event is None or event.type == str(2):
-                    selected_tab = self.nb.get_tab
-                # Otherwise, close the tab based on coordinates of center-click.
-                else:
-                    try:
-                        index = event.widget.index(f"@{event.x},{event.y}")
-                        selected_tab = self.nb.nametowidget(self.nb.tabs()[index])
-                    except tk.TclError:
-                        return
+            selected_tab = None
+            nb = self.mainframe.focus_get()
+            nb = self.get_focus_widget(nb, ClosableNotebook)
 
-            self.nb.forget(selected_tab)
-            self.tabs.pop(selected_tab)
+            if isinstance(nb, ClosableNotebook):
+                # noinspection DuplicatedCode
+                if nb.index("end"):
+                    # Close the current tab if close is selected from the file menu, or
+                    # keyboard shortcut.
+                    if event is None or event.type == str(2):
+                        selected_tab = nb.get_tab
+                    # Otherwise, close the tab based on coordinates of center-click.
+                    else:
+                        try:
+                            index = event.widget.index(f"@{event.x},{event.y}")
+                            selected_tab = nb.nametowidget(nb.tabs()[index])
+                        except tk.TclError:
+                            return
+
+                nb.forget(selected_tab)
+                self.tabs.pop(selected_tab)
 
             self.mouse()
         except KeyError:
@@ -489,6 +505,13 @@ class Editor:
 
     @property
     def get_text(self) -> Union[EnhancedText, None]:
+        text = self.mainframe.focus_get()
+        text = self.get_focus_widget(text, tk.Text)
+        # noinspection PyTypeChecker
+        return text
+
+    @property
+    def get_text_editor(self) -> Union[EnhancedText, None]:
         try:
             return self.tabs[self.nb.get_tab].textbox
         except KeyError:

@@ -25,7 +25,8 @@ class Menu:
         self.disable_tabs = disable_tabs
         self.obj = obj
         self.master = obj.master
-        self.menu = tk.Menu()
+        self.menu = tk.Menu(self.master)
+        self.apple = tk.Menu(self.menu, name="apple")
         self.functions = []
         self.disable_menus = {}
         with open("Config/menu.json") as f:
@@ -58,6 +59,7 @@ class Menu:
                 if key == "[PyPlus]":
                     cnf["name"] = "apple"
                     logger.debug("Creating apple menu")
+                    self.apple = tk.Menu(menu, **cnf)
                 cascade = tk.Menu(menu, **cnf)
                 self.create_menu(cascade, config[key])
                 menu.add_cascade(menu=cascade, label=key[1:-1])

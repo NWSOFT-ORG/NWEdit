@@ -9,7 +9,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.ipynb_checkpoints" />
       <excludeFolder url="file://$MODULE_DIR$/.pytest_cache" />
     </content>
-    <orderEntry type="jdk" jdkName="Poetry (PyPlus)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="PyPlus" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

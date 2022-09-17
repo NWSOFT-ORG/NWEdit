@@ -94,7 +94,7 @@ class ProjectList(ttk.Treeview):
     def right_click_menu(self, event: tk.Event) -> tk.Menu:
         menu = tk.Menu(self.master)
         item = self.identify("item", event.x, event.y)
-        name = self.item(item, "text")
+        name = self.item(item, "values")[0]
         menu.add_command(label="Open Project", command=lambda: self.open(event))
         menu.add_command(label="Remove from Projects", command=lambda: self.remove_project(name))
         menu.add_command(label="Assign Icon...", command=lambda: self.assign_icon(name))

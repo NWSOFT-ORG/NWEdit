@@ -12,7 +12,7 @@ def trigger(_):
 def test_tabs():
     global var
     tabs = Tabs()
-    tabs.set_triggger(trigger)
+    tabs.set_trigger(trigger)
 
     tabs["a"] = "a"  # Trigger a change
     tabs["a"] = "b"

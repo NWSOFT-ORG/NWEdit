@@ -27,6 +27,9 @@ class StartDialog:
     def __init__(self, master: Tk_Win) -> None:
         init_images()
         self.master = master
+        for item in master.winfo_children():
+            if not isinstance(item, WinFrame):
+                item.destroy()
         self.projects = RecentProjects(self.master)
 
         self.settings_class = GeneralSettings(self.master)
@@ -42,15 +45,18 @@ class StartDialog:
 
         self.frame.bind("<Destroy>", lambda _: sys.exit(0))
 
-        menu_obj = Menu(self, "start_dialog")
-        master.config(menu=menu_obj.menu)
-        menu_obj.load_config()
+        self.menu_obj = Menu(self, "start_dialog")
+        master.config(menu=self.menu_obj.menu)
+        self.menu_obj.load_config()
         self.functions = []
         self.create_links()
 
         self.project_view = ProjectView(self.frame, self.open_project)
         self.project_view.pack(side="bottom", fill="both", expand=True)
         self.frame.create_bar()
+
+        logger.info("Started PyPlus")
+        logger.debug("Loaded start dialog")
 
     def open_project(self, project):
         self.frame.withdraw()
@@ -59,6 +65,7 @@ class StartDialog:
 
         # If project closes, show the welcome dialog
         self.master.protocol("WM_DELETE_WINDOW", lambda: self.__init__(self.master))
+        logger.debug(f"Opened project: {project}")
 
     def open_project_dialog(self):
         DirectoryOpenDialog(

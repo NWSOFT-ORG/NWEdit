@@ -128,7 +128,11 @@ class FileTree(ttk.Frame):
     ) -> None:
         if os.path.isfile(path):
             return
-        items = sorted(os.listdir(path))
+        try:
+            items = sorted(os.listdir(path))
+        except FileNotFoundError:
+            logger.exception("Path not found")
+            items = []
         if not items:
             self.tree.insert(parent, "end", text="Empty", tags=("empty",))
         last_dir_index = 0
@@ -189,7 +193,7 @@ class FileTree(ttk.Frame):
         self.temp_path.remove("")
         if append_name:
             self.temp_path.append(self.tree.item(item, "text"))
-        return os.path.abspath("/".join(self.temp_path))
+        return os.path.abspath(os.path.join(*self.temp_path))
 
     def right_click(self, event: tk.Event, isdir: bool, item: str = "") -> None:
         menu = tk.Menu(self.master)

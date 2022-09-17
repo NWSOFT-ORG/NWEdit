@@ -6,9 +6,9 @@ from typing import *
 
 from pygments import lexers, styles
 
-from src.constants import logger, MAIN_KEY, OSX
-from src.highlighter import create_tags, recolorize, recolorize_line
+from src.constants import logger, OSX
 from src.errors import EditorErr
+from src.highlighter import create_tags, recolorize, recolorize_line
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.color_utils import darken_color, is_dark_color, lighten_color
 from src.Widgets.scrollbar import TextScrollbar
@@ -121,8 +121,8 @@ class EnhancedText(tk.Text):
         self.update_idletasks()
         space = int(
             font_height(self.settings.get_font(), self.settings.get_settings("font_size")) * (
-                        self.settings.get_settings("line_height") - 1)
-            ) / 2
+                    self.settings.get_settings("line_height") - 1)
+        ) / 2
         self.config(spacing1=space, spacing3=space)
 
     def set_lexer(self, lexer):
@@ -153,6 +153,34 @@ class EnhancedText(tk.Text):
             pass
 
 
+def apply_style(text: EnhancedText):
+    settings_class = GeneralSettings()
+    font_face = settings_class.get_font()
+    style = styles.get_style_by_name(settings_class.get_settings("pygments_theme"))
+    bgcolor = style.background_color
+    fgcolor = style.highlight_color
+    if is_dark_color(bgcolor):
+        bg = lighten_color(bgcolor, 30)
+        fg = lighten_color(fgcolor, 40)
+    else:
+        bg = darken_color(bgcolor, 30)
+        fg = darken_color(fgcolor, 40)
+    text.config(
+        bg=bgcolor,
+        fg=fgcolor,
+        selectforeground=bg,
+        selectbackground=fgcolor,
+        insertbackground=fg,
+        highlightthickness=0,
+        font=font_face,
+        wrap="none",
+        insertwidth=3,
+        maxundo=-1,
+        autoseparators=True,
+        undo=True,
+    )
+
+
 class EnhancedTextFrame(ttk.Frame):
     """An enhanced text frame to put the
     text widget with linenumbers in."""
@@ -164,28 +192,9 @@ class EnhancedTextFrame(ttk.Frame):
         self.first_line = 1
         style = styles.get_style_by_name(settings_class.get_settings("pygments_theme"))
         bgcolor = style.background_color
-        fgcolor = style.highlight_color
-        if is_dark_color(bgcolor):
-            bg = lighten_color(bgcolor, 30)
-            fg = lighten_color(fgcolor, 40)
-        else:
-            bg = darken_color(bgcolor, 30)
-            fg = darken_color(fgcolor, 40)
-        self.text = EnhancedText(
-            self,
-            bg=bgcolor,
-            fg=fgcolor,
-            selectforeground=bg,
-            selectbackground=fgcolor,
-            insertbackground=fg,
-            highlightthickness=0,
-            font=self.font,
-            wrap="none",
-            insertwidth=3,
-            maxundo=-1,
-            autoseparators=1,
-            undo=True,
-        )
+
+        self.text = EnhancedText(self)
+        apply_style(self.text)
         self.bind("<Configure>", self.text.set_spacing)
         self.linenumbers = TextLineNumbers(
             self, width=30, bg=bgcolor, bd=0, highlightthickness=0

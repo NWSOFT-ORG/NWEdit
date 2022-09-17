@@ -25,7 +25,7 @@ For example: "package"
                 "src.Dialog.commondialog -> AboutDialog",
                 false
             ],
-            "[Preferences]": {
+            "[Settings]": {
                 "General Settings": [
                     "gear",
                     ",",
@@ -78,6 +78,7 @@ For example: "package"
                 false
             ]
         },
+//        "[PyPlus]": {},
         "[File]": {
             "New...": [
                 "new",

@@ -5,7 +5,7 @@ from pygments import lexers
 
 from src.types import Tk_Widget
 from src.Utils.images import get_image
-from src.Widgets.tktext import EnhancedTextFrame, TextOpts
+from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
 from src.Widgets.winframe import WinFrame
 
 
@@ -19,7 +19,7 @@ class CodeInputDialog(WinFrame):
         self.textframe = EnhancedTextFrame(self)
         self.textframe.pack(fill="both", expand=1)
 
-        self.text: tk.Text = self.textframe.text
+        self.text: EnhancedText = self.textframe.text
         self.text.lexer = lexers.get_lexer_by_name("Python")
         TextOpts(self, bindkey=True).set_text(self.text)
         self.text.focus_set()

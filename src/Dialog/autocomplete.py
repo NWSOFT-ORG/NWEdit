@@ -49,8 +49,7 @@ class CompleteDialog(ttk.Frame):
         self.completions["yscrollcommand"] = yscroll.set
         self.text = text
 
-        text.bind("<Button-1>", lambda _: self.place_forget(), add=True)
-
+        text.bind("<1>", lambda _: self.destroy(), add=True)
         self.completions.bind("<1>", self.complete)
 
     def complete(self, event: tk.Event):

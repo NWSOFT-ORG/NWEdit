@@ -6,6 +6,7 @@ from tkinter import ttk
 import art
 
 from src.Widgets.tkentry import Entry
+from src.Widgets.tktext import EnhancedText, apply_style
 from src.Widgets.winframe import WinFrame
 
 
@@ -43,7 +44,8 @@ class StyleWindow(WinFrame):
         self.font.set(listfonts()[0])
         self.font.pack(fill="x")
 
-        self.preview = tk.Text(self, state="disabled", wrap="none")
+        self.preview = EnhancedText(self, state="disabled", wrap="none")
+        apply_style(self.preview)
         self.preview.pack(fill="both")
 
         ttk.Button(self, text="Insert >>", command=self.insert).pack(fill="x")

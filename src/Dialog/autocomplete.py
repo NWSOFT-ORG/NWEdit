@@ -92,7 +92,7 @@ class CompleteDialog(ttk.Frame):
             return None
 
     @property
-    def index_word(self) -> Tuple[str, str] | None:
+    def index_word(self) -> Union[Tuple[str, str], None]:
         text = self.text
         try:
             content = text.get("1.0", "insert")

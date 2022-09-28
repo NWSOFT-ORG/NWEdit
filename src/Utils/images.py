@@ -13,7 +13,7 @@ def init_images() -> None:
     for file_path in os.listdir("Images/"):
         file_path = os.path.join("Images", file_path)
         if os.path.isfile(file_path) and file_path.endswith(".svg"):
-            name = file_path.removeprefix("Images/").replace(".svg", "")
+            name = file_path.replace("Images/", "").replace(".svg", "")
             out = io.BytesIO()
             cairosvg.svg2png(url=file_path, write_to=out, unsafe=True, scale=5)
             # SVG created using Illustrator might trigger a false <ENTITY> problem

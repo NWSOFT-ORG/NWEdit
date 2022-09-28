@@ -1,28 +1,27 @@
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+
+[tool]
 [tool.poetry]
+authors = ["ZCG-Coder <z-c-ge@outlook.com>"]
+description = ""
 name = "pyplus"
 version = "0.1.0"
-description = ""
-authors = ["ZCG-Coder <z-c-ge@outlook.com>"]
-
 [tool.poetry.dependencies]
-python = "^3.10"
 CairoSVG = "^2.5.2"
+Pillow = "^9.2.0"
+PyTouchBar = "^0.2.0"
+Pygments = "^2.12.0"
+Send2Trash = "^1.8.0"
 art = "^5.7"
 json5 = "^0.9.8"
-Pillow = "^9.2.0"
-Pygments = "^2.12.0"
-PyTouchBar = "^0.2.0"
-rope = "^1.2.0"
-Send2Trash = "^1.8.0"
-ttkthemes = "^3.2.2"
+pyobjc-core = { version = "^8.5", markers="sys_platform == 'darwin'" }
+python = "^3.8"
 requests = "^2.28.1"
-pyobjc-core = "^8.5"
-pyobjc-framework-Cocoa = "^8.5"
+rope = "^1.2.0"
 tkterminal = "^0.1.0"
-
+ttkthemes = "^3.2.2"
+pymitter = "^0.4.0"
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"

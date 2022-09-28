@@ -28,7 +28,7 @@ For example: "package"
             "[Settings]": {
                 "General Settings": [
                     "gear",
-                    ",",
+                    "comma",
                     "obj.open_file(\"Config/general-settings.json\")",
                     null,
                     false

@@ -88,7 +88,7 @@ class Menu:
             exec(self.do_import(imports), local_vars)  # Imports things as plugins
         exec(
             f"self.functions.append(lambda _=None: {function} {'if obj.tabs else None' if self.disable_tabs else ''})",
-            {"obj": self.obj, "self": self} | local_vars
+            {"obj": self.obj, "self": self, **local_vars}
         )
         cnf = {
             "label"      : text,

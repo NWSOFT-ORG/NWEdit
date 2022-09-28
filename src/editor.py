@@ -13,7 +13,6 @@ import tkinter as tk
 import traceback
 from pathlib import Path
 from tkinter import ttk
-from types import UnionType
 from typing import *
 
 import json5 as json
@@ -416,9 +415,7 @@ class Editor:
             pass
 
     @staticmethod
-    def get_focus_widget(
-        base_widget: tk.Misc, cls: Union[object, type, UnionType, tk.Widget, tk.Misc, None]
-    ):
+    def get_focus_widget(base_widget: tk.Misc, cls):
         if isinstance(base_widget, cls):
             return base_widget
         while hasattr(base_widget, "master"):

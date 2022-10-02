@@ -3,8 +3,8 @@ from typing import *
 
 import json5 as json
 
+from src.Components.commondialog import ErrorInfoDialog
 from src.constants import logger
-from src.Dialog.commondialog import ErrorInfoDialog
 
 
 class RecentProjects:

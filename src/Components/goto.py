@@ -1,36 +1,38 @@
 import tkinter as tk
 from tkinter import ttk
 
-from src.Widgets.tkentry import Entry
-from src.Widgets.tktext import EnhancedText
+from src.Components.tkentry import Entry
+from src.Components.tktext import EnhancedText
+from src.Utils.images import get_image
 
 
 class Navigate:
     def __init__(self, text: EnhancedText):
         self.text = text
-        if self.text.navigate or self.text.search:
-            return
-        self.text.navigate = True
         self.goto_frame = ttk.Frame(self.text.frame)
         self._style = ttk.Style()
         self.goto_frame.pack(anchor="nw")
-        ttk.Label(self.goto_frame, text="Go to place: [Ln].[Col] ").pack(side="left")
-        self.place = Entry(self.goto_frame)
-        self.place.focus_set()
-        self.place.pack(side="left", anchor="nw")
-        ttk.Button(self.goto_frame, command=self._goto, text=">> Go to").pack(
+        ttk.Label(self.goto_frame, text="Go to place: [Ln].[Col]").pack(side="left")
+        self.location = Entry(self.goto_frame)
+        self.location.focus_set()
+        self.location.pack(side="left", anchor="nw")
+        ttk.Button(self.goto_frame, command=self._goto, text="OK").pack(
             side="left", anchor="nw"
         )
-        ttk.Button(self.goto_frame, text="x", command=self._exit, width=1).pack(
+        ttk.Button(self.goto_frame, image=get_image("close"), command=self._exit, width=1).pack(
             side="left", anchor="nw"
         )
         self.statuslabel = ttk.Label(self.goto_frame, foreground="red")
         self.statuslabel.pack(side="left", anchor="nw")
 
     def check(self) -> bool:
-        index = self.place.get().split(".")
+        index = self.location.get().split(".")
         lines = int(float(self.text.index("end")))
-        if (not len(index) == 2) or int(index[0]) > lines:
+
+        try:
+            if len(index) != 2 and int(index[0]) > lines:
+                raise ValueError
+        except ValueError:  # If not int given
             self.statuslabel.config(text=f'Error: invalid index: {".".join(index)}')
             return False
         return True
@@ -39,7 +41,12 @@ class Navigate:
         try:
             if self.check():
                 currtext = self.text
-                currtext.mark_set("insert", self.place.get())
+
+                index = self.location.get().split(".")
+                if len(index) == 1:
+                    currtext.mark_set("insert", f"{index[0]}.0")
+                else:
+                    currtext.mark_set("insert", f"{index[0]}.{index[1]}")
                 currtext.see("insert")
                 self._exit()
                 return

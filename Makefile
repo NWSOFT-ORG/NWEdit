@@ -1,5 +1,5 @@
-run: install-packages; python3 main.py
-install-packages: ; pip install -r requirements.txt
+run: install-packages; poetry run python3 main.py
+install-packages: ; poetry install 
 build-mac: install-packages; @printf "[Compiling via PyInstaller...]\n"
 							pyinstaller --noconfirm --onefile --windowed --icon "src/Images/pyplus.ico" \
 							--hidden-import "art" \

@@ -2,7 +2,8 @@ from tkinter import font, ttk
 
 from PIL import Image, ImageTk
 
-from src.Utils.color_utils import darken_color, hex2dec, is_dark_color, lighten_color
+from src.Utils.color_utils import (darken_color, hex2dec, is_dark_color,
+                                   lighten_color)
 
 ICON_REPLACE_COLOR = (193, 193, 193, 255)
 

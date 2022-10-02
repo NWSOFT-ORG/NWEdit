@@ -5,8 +5,8 @@ import os
 import tkinter as tk
 from tkinter import ttk
 
+from src.Components.tktext import EnhancedTextFrame
 from src.constants import BLOCK_HEIGHT, BLOCK_WIDTH, ENCODINGS
-from src.Widgets.tktext import EnhancedTextFrame
 
 
 class HexView:

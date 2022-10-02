@@ -4,10 +4,10 @@ from typing import *
 
 import json5 as json
 
+from src.Components.tkentry import Entry
+from src.Components.winframe import WinFrame
 from src.Utils.functions import is_illegal_filename
 from src.Utils.images import get_image
-from src.Widgets.tkentry import Entry
-from src.Widgets.winframe import WinFrame
 
 
 class NewItemDialog(WinFrame):

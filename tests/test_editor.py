@@ -1,6 +1,5 @@
 from src.editor import Tabs
 
-
 var = 0
 
 

@@ -2,10 +2,10 @@
 import tkinter as tk
 from tkinter import ttk
 
+from src.Components.statusbar import bind_events
 from src.constants import logger
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.images import get_image
-from src.Widgets.statusbar import bind_events
 
 
 class ClosableNotebook(ttk.Notebook):

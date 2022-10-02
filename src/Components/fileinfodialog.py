@@ -4,8 +4,8 @@ import time
 import tkinter as tk
 from tkinter import ttk
 
+from src.Components.winframe import WinFrame
 from src.constants import OSX, WINDOWS
-from src.Widgets.winframe import WinFrame
 
 
 class FileInfoDialog(WinFrame):

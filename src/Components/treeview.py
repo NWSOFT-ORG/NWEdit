@@ -5,13 +5,13 @@ from tkinter import font, ttk
 
 import send2trash
 
-from src.constants import logger, OSX
-from src.Dialog.commondialog import StringInputDialog
-from src.Dialog.fileinfodialog import FileInfoDialog
-from src.Dialog.newitem import NewItemDialog
+from src.Components.commondialog import StringInputDialog
+from src.Components.fileinfodialog import FileInfoDialog
+from src.Components.newitem import NewItemDialog
+from src.Components.scrollbar import Scrollbar
+from src.constants import OSX, logger
 from src.SettingsParser.extension_settings import FileTreeIconSettings
 from src.SettingsParser.interval_settings import IntervalSettings
-from src.Widgets.scrollbar import Scrollbar
 
 
 class FileTree(ttk.Frame):

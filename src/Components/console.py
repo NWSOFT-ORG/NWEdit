@@ -8,9 +8,10 @@ import threading
 import tkinter as tk
 from tkinter import ttk
 
+from src.Components.scrollbar import TextScrollbar
+from src.Components.tktext import EnhancedText
 from src.SettingsParser.general_settings import GeneralSettings
-from src.Widgets.scrollbar import TextScrollbar
-from src.Widgets.tktext import apply_style, EnhancedText
+from src.Utils.functions import apply_style
 
 
 # from olisolomos's gist
@@ -60,7 +61,7 @@ class Console(ttk.Frame):
         self.text.config(xscrollcommand=xbar.set)
         self.text.insert("insert", "Python " + sys.version + "\n")
 
-        self.shell = code.InteractiveConsole(_locals)
+        self.shell = code.InteractiveConsole()
 
         # make the enter key call the self.enter function
         self.text.bind("<Return>", self.enter)
@@ -74,7 +75,7 @@ class Console(ttk.Frame):
         sys.stdin = Pipe()
 
         self.read_from_pipe(sys.stdout, "stdout")
-        self.read_from_pipe(sys.stderr, "stderr", foreground="red")
+        self.read_from_pipe(sys.stderr, "stderr")
 
     def prompt(self):
         """Add a '>>> ' to the console"""

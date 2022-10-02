@@ -3,9 +3,9 @@ import tkinter as tk
 from tkinter import ttk
 from typing import *
 
+from src.Components.tkentry import Entry
+from src.Components.tktext import EnhancedText
 from src.Utils.images import get_image
-from src.Widgets.tkentry import Entry
-from src.Widgets.tktext import EnhancedText
 
 
 def finditer_withlineno(
@@ -114,11 +114,13 @@ class Search:
         self.case = tk.BooleanVar()
         self.regex = tk.BooleanVar()
         self.fullword = tk.BooleanVar()
+        self.search_content = tk.StringVar()
 
         ttk.Label(self.search_frame, text="Search for:").pack(
             side="left", anchor="nw", fill="y"
         )
         self.content = Entry(self.search_frame)
+        self.content.entry.config(textvariable=self.search_content)
         self.content.pack(side="left", fill="both")
 
         self.forward = ttk.Button(
@@ -156,10 +158,6 @@ class Search:
             command=self.replace_all,
         )
         self.replace_all_button.pack(side="left")
-        self.clear_button = ttk.Button(
-            self.replace_frame, text="Clear All", takefocus=False, command=self.clear
-        )
-        self.clear_button.pack(side="left")
 
         # Checkboxes
         self.case_yn = ttk.Checkbutton(
@@ -177,17 +175,8 @@ class Search:
         )
         self.fullw_yn.pack(side="left")
 
-        for variable in (self.case, self.regex, self.fullword):
+        for variable in (self.case, self.regex, self.fullword, self.search_content):
             variable.trace_add("write", self.find)
-
-        self.content.bind("<KeyRelease>", self.find)
-        ttk.Button(self.main_frame, image=get_image("close"), command=self._exit).pack(
-            side="right", anchor="se"
-        )
-        self.text.search = True
-
-        self.text.bind("<Escape>", self._exit)
-        self.main_frame.bind("<Escape>", self._exit)
 
         self.master.add(self.main_frame, text="Search")
 
@@ -265,11 +254,3 @@ class Search:
             text.see("insert")
         except tk.TclError:
             pass
-
-    def _exit(self, _=None) -> None:
-        self.text.unbind("<Escape>")
-        self.main_frame.unbind("<Escape>")
-        self.text.search = False
-        self.master.forget(self.master.index("current"))
-        self.clear()
-        self.text.focus_set()

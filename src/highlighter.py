@@ -22,7 +22,7 @@ def create_tags(textbox: tk.Text) -> None:
     style = styles.get_style_by_name(settings.get_settings("pygments_theme"))
 
     for ttype, ndef in style:
-        tag_font = None
+        tag_font = ''
 
         if ndef["bold"] and ndef["italic"]:
             tag_font = bold_italic_font
@@ -34,12 +34,12 @@ def create_tags(textbox: tk.Text) -> None:
         if ndef["color"]:
             foreground = f"#{ndef['color']}"
         else:
-            foreground = None
+            foreground = ''
 
         currtext.tag_configure(str(ttype), foreground=foreground, font=tag_font)
 
 
-def recolorize(textbox: tk.Text) -> None:
+def recolorize(textbox: tk.Text, lexer) -> None:
     """
     This method colors and styles the prepared tags"""
     currtext = textbox
@@ -62,14 +62,14 @@ def recolorize(textbox: tk.Text) -> None:
             break
 
     currtext.mark_set("range_start", start_index)
-    for token, content in pygments.lex(_code, currtext.lexer):
+    for token, content in pygments.lex(_code, lexer):
         currtext.mark_set("range_end", f"range_start + {len(content)}c")
         currtext.tag_add(str(token), "range_start", "range_end")
         currtext.mark_set("range_start", "range_end")
 
 
 # noinspection DuplicatedCode
-def recolorize_line(textbox: tk.Text) -> None:
+def recolorize_line(textbox: tk.Text, lexer) -> None:
     """
     This method colors and styles the prepared tags"""
     currtext = textbox
@@ -102,7 +102,7 @@ def recolorize_line(textbox: tk.Text) -> None:
     _code = currtext.get(start_index, end_index)
 
     currtext.mark_set("range_start", start_index)
-    for token, content in pygments.lex(_code, currtext.lexer):
+    for token, content in pygments.lex(_code, lexer):
         currtext.mark_set("range_end", f"range_start + {len(content)}c")
         currtext.tag_add(str(token), "range_start", "range_end")
         currtext.mark_set("range_start", "range_end")

@@ -1,15 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import *
+from typing import Callable, Literal
 
 import json5 as json
 from PIL import Image, ImageDraw, ImageFont, ImageTk
 
+from src.Components.filedialog import FileOpenDialog
+from src.Components.scrollbar import Scrollbar
 from src.constants import OSX
-from src.Dialog.filedialog import FileOpenDialog
 from src.SettingsParser.project_settings import RecentProjects
 from src.types import Tk_Widget
-from src.Widgets.scrollbar import Scrollbar
 
 COLORS = [(255, 127, 77, 255),  # Red
           (32, 59, 53, 255),  # Dark blue
@@ -81,6 +81,8 @@ class ProjectList(ttk.Treeview):
         self.delete(*self.get_children())
         with open("EditorStatus/recent_projects.json") as f:
             config = json.load(f)
+        if not isinstance(config, dict):
+            return
         for key in config.keys():
             if path := config[key]["icon"]:
                 self.images.append(tk.PhotoImage(file=path))

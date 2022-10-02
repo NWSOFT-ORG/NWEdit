@@ -1,7 +1,6 @@
-import os
 import pprint
 
-from src.Dialog.searchindir import list_all
+from src.Components.searchindir import list_all
 
 
 def test_list_all():

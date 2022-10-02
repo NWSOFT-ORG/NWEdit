@@ -9,43 +9,39 @@ import logging
 import os
 import subprocess
 import sys
+import threading
 import tkinter as tk
 import traceback
 from pathlib import Path
 from tkinter import ttk
-from typing import *
+from typing import Union, Callable
 
 import json5 as json
 
 from src.codefunctions import CodeFunctions
-from src.constants import APPDIR, logger, OSX
-from src.Dialog.autocomplete import CompleteDialog
-from src.Dialog.commondialog import ErrorInfoDialog, StringInputDialog, YesNoDialog
-from src.Dialog.debugdialog import ErrorReportDialog
-from src.Dialog.filedialog import FileOpenDialog, FileSaveAsDialog
+from src.Components.autocomplete import CompleteDialog
+from src.Components.commondialog import (ErrorInfoDialog, StringInputDialog,
+                                         YesNoDialog)
+from src.Components.customenotebook import ClosableNotebook
+from src.Components.debugdialog import ErrorReportDialog
+from src.Components.filedialog import FileOpenDialog, FileSaveAsDialog
+from src.Components.hexview import HexView
+from src.Components.panel import CustomTabs
+from src.Components.statusbar import Statusbar
+from src.Components.tktext import EnhancedText, EnhancedTextFrame, TextOpts
+from src.Components.treeview import FileTree
+from src.constants import APPDIR, OSX, events, logger
 from src.Git.gitview import GitView
 from src.highlighter import recolorize_line
-from src.SettingsParser.extension_settings import (
-    CommentMarker,
-    FileTreeIconSettings,
-    FormatCommand,
-    Linter,
-    PygmentsLexer,
-    RunCommand,
-)
-from src.SettingsParser.general_settings import GeneralSettings
+from src.SettingsParser.extension_settings import (CommentMarker,
+                                                   FileTreeIconSettings,
+                                                   FormatCommand, Linter,
+                                                   PygmentsLexer, RunCommand)
 from src.SettingsParser.menu import Menu
 from src.SettingsParser.plugin_settings import Plugins
 from src.SettingsParser.project_settings import RecentProjects
-from src.types import Tk_Win
 from src.Utils.functions import is_binary_string
 from src.Utils.images import get_image, init_images
-from src.Widgets.customenotebook import ClosableNotebook
-from src.Widgets.hexview import HexView
-from src.Widgets.panel import CustomTabs
-from src.Widgets.statusbar import Statusbar
-from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
-from src.Widgets.treeview import FileTree
 
 if OSX:
     import PyTouchBar
@@ -91,23 +87,16 @@ class Editor:
     """The editor class."""
 
     # noinspection PyBroadException
-    def __init__(self, master: Tk_Win, project_name: str) -> None:
+    def __init__(self, master: tk.Tk, project_name: str) -> None:
         """The editor object, the entire thing that goes in the
         window."""
-        self.master = master
+        self.master: tk.Tk = master
         self.project = project_name
         init_images()
 
         try:
-            self.settings_class = GeneralSettings(master)
-            self.file_settings_class = PygmentsLexer()
-            self.linter_settings_class = Linter()
-            self.cmd_settings_class = RunCommand()
-            self.format_settings_class = FormatCommand()
-            self.comment_settings_class = CommentMarker()
-            self.icon_settings_class = FileTreeIconSettings()
             self.projects = RecentProjects(master)
-            logger.debug("Settings classes loaded")
+            logger.debug("Project settings loaded")
             # noinspection PyTypeChecker
             master.iconphoto(True, get_image("pyplus-35px", "image"))
 
@@ -125,10 +114,6 @@ class Editor:
             self.statusbar = Statusbar()
             logger.debug("Layout created")
 
-            self.codefuncs = CodeFunctions(
-                master, self.tabs, self.nb, self.bottom_tabs
-            )
-
             self.menu_obj = Menu(self, "main")
             self.tabs.set_trigger(self.menu_obj.disable)
             self.menu_obj.load_config()
@@ -136,7 +121,7 @@ class Editor:
             master["menu"] = self.menu_obj.menu
             logger.debug("All menus loaded.")
 
-            if OSX:
+            if OSX:  # TouchBar support
                 PyTouchBar.prepare_tk_windows(master)
                 open_button = PyTouchBar.TouchBarItems.Button(
                     image="Images/open.svg", action=lambda _: self.open_file()
@@ -149,7 +134,8 @@ class Editor:
                 )
                 space = PyTouchBar.TouchBarItems.Space.Flexible()
                 run_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/run.svg", action=lambda _: self.codefuncs.run
+                    image="Images/run.svg",
+                    action=lambda _: CodeFunctions(self.master, self.get_text, self.bottom_tabs).run()
                 )
                 PyTouchBar.set_touchbar(
                     [open_button, save_as_button, close_button, space, run_button]
@@ -191,11 +177,15 @@ class Editor:
         # Mouse bindings
         self.master.bind("<<MouseEvent>>", self.mouse)
         self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
-
+        # EventClass bindings
+        events.on("editor.open_file", self.open_file)
+        events.on("reload", self.reload)
+        # Quit bindings
         self.master.createcommand("::tk::mac::Quit", self.exit)
         logger.debug("Bindings created")
 
-    def create_text_widget(self, frame: ClosableNotebook) -> EnhancedText:
+    @staticmethod
+    def create_text_widget(frame: ClosableNotebook) -> EnhancedText:
         """Creates a text widget in a frame."""
         textframe = EnhancedTextFrame(frame)
         # The one with line numbers, and a nice dark theme
@@ -226,10 +216,10 @@ class Editor:
 
     def update_statusbar(self, _=None) -> str:
         try:
-            if not self.tabs:
+            currtext = self.get_text
+            if not currtext:
                 self.statusbar.label3.config(text="")
                 return "break"
-            currtext = self.get_text
             index = currtext.index("insert")
             ln = index.split(".")[0]
             col = index.split(".")[1]
@@ -241,17 +231,19 @@ class Editor:
         finally:
             return "break"
 
-    def key(self, event: tk.Event = None) -> None:
+    def __key(self, event: tk.Event = None) -> None:
         """Event when a key is pressed."""
         try:
-            if hasattr(event, "char") and not event.char:
+            if hasattr(event, "char") and not event.char:  # No input, no action
                 return
             currtext = self.get_text
-            recolorize_line(currtext)
+            if not currtext:
+                return
+            recolorize_line(currtext, currtext.lexer)
             currtext.edit_separator()
             currtext.see("insert")
 
-            prev_completes = self.get_text.master.children
+            prev_completes = currtext.master.children
             for widget in prev_completes.values():
                 if isinstance(widget, CompleteDialog):
                     widget.destroy()
@@ -267,6 +259,14 @@ class Editor:
         except KeyError:
             self.master.bell()
             logger.exception("Error when handling keyboard event:")
+        except tk.TclError:
+            pass
+
+    def key(self, event: tk.Event = None) -> None:
+        """Run the key event in a separate thread"""
+        thread = threading.Thread(target=self.__key, args=(event,))
+        thread.daemon = True
+        thread.run()
 
     def mouse(self, _=None) -> None:
         """The action when the mouse is clicked"""
@@ -282,6 +282,8 @@ class Editor:
     def load_status(self):
         with open("EditorStatus/window_status.json") as f:
             geometry = json.load(f)
+            if geometry is None or not "windowGeometry" in geometry.keys():
+                return
             geometry = geometry["windowGeometry"]
             geometry = f"{geometry[0]}x{geometry[1]}"
             self.master.geometry(geometry)
@@ -292,9 +294,13 @@ class Editor:
         if files:
             for file, index in files.items():
                 self.open_file(file)
-                self.get_text_editor.mark_set("insert", index)
-                self.get_text_editor.see("insert")
-            self.get_text_editor.focus_set()
+                text = self.get_text_editor
+                if not text:
+                    break
+                text.mark_set("insert", index)
+                text.see("insert")
+        if text := self.get_text_editor:
+            text.focus_set()
         self.update_title()
         self.update_statusbar()
 
@@ -344,22 +350,23 @@ class Editor:
             extens = file.split(".")[-1]
             textbox = self.create_text_widget(self.nb)
             textframe = textbox.master
+
             with open(file) as f:
                 # Puts the contents of the file into the text widget.
                 textbox.insert("end", f.read())
 
-            textframe.icon = self.icon_settings_class.get_icon(extens)
-            self.tabs[textframe] = Document(textframe, textbox, file)
+            textframe.icon = FileTreeIconSettings().get_icon(extens)
+            textbox.controller = self.tabs[textframe] = Document(textframe, textbox, file)
             # noinspection PyTypeChecker
             self.nb.add(textframe, text=os.path.basename(file), image=textframe.icon, compound="left")
             self.nb.select(textframe)
 
             textbox.focus_set()
-            textbox.set_lexer(self.file_settings_class.get_settings(extens))
-            textbox.lint_cmd = self.linter_settings_class.get_settings(extens)
-            textbox.cmd = self.cmd_settings_class.get_settings(extens)
-            textbox.format_command = self.format_settings_class.get_settings(extens)
-            textbox.comment_marker = self.comment_settings_class.get_settings(extens)
+            textbox.set_lexer(PygmentsLexer().get_settings(extens))
+            textbox.lint_cmd = Linter().get_settings(extens)
+            textbox.cmd = RunCommand().get_settings(extens)
+            textbox.format_command = FormatCommand().get_settings(extens)
+            textbox.comment_marker = CommentMarker().get_settings(extens)
 
             textbox.see("insert")
             textbox.event_generate("<<Key>>")
@@ -409,8 +416,10 @@ class Editor:
             if os.access(self.tabs[curr_tab].file_dir, os.W_OK):
                 with open(self.tabs[curr_tab].file_dir, "w") as file:
                     file.write(self.tabs[curr_tab].textbox.get(1.0, "end"))
+                    logger.debug("Wrote file")
             else:
                 ErrorInfoDialog(self.master, "File read only")
+                logger.error("Cannnot save a read-only file")
         except KeyError:
             pass
 
@@ -422,11 +431,9 @@ class Editor:
             base_widget = base_widget.master
             if isinstance(base_widget, cls):
                 return base_widget
-        return None
 
     def close_tab(self, event=None) -> None:
         try:
-            # noinspection PyGlobalUndefined
             selected_tab = None
             nb = self.mainframe.focus_get()
             nb = self.get_focus_widget(nb, ClosableNotebook)
@@ -475,13 +482,13 @@ class Editor:
 
         file_list = {}
 
-        if self.tabs:
+        if self.get_text_editor:
             for tab in self.tabs.values():
                 if tab.istoolwin:
                     continue
                 cursor_pos = tab.textbox.index("insert")
                 file_list[tab.file_dir] = cursor_pos
-            file_list[self.tabs[self.nb.get_tab].file_dir] = self.get_text.index(
+            file_list[self.tabs[self.nb.get_tab].file_dir] = self.get_text_editor.index(
                 "insert"
             )  # Open the current file
         self.projects.set_open_files(self.project, file_list)

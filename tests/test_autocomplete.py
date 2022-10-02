@@ -1,7 +1,6 @@
 import pprint
 
-from src.Dialog.autocomplete import sep_words
-
+from src.Components.autocomplete import sep_words
 
 STRING = """\
 Here is some text, here is some other text.

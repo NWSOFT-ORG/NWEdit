@@ -1,6 +1,6 @@
 import ast
-import traceback
 import tkinter as tk
+import traceback
 from tkinter import ttk
 
 

@@ -1,6 +1,6 @@
-from typing import *
 import tkinter as tk
 from tkinter import ttk
+from typing import *
 
 from src.constants import OSX
 from src.Utils.color_utils import is_dark_color

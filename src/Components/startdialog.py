@@ -7,9 +7,12 @@ from typing import Callable
 import json5 as json
 import ttkthemes
 
+from src.Components.commondialog import ErrorInfoDialog, YesNoDialog
+from src.Components.filedialog import DirectoryOpenDialog
+from src.Components.link import Link
+from src.Components.tkentry import Entry
+from src.Components.winframe import WinFrame
 from src.constants import logger
-from src.Dialog.commondialog import ErrorInfoDialog, YesNoDialog
-from src.Dialog.filedialog import DirectoryOpenDialog
 from src.editor import Editor
 from src.project import ProjectView
 from src.SettingsParser.general_settings import GeneralSettings
@@ -18,9 +21,6 @@ from src.SettingsParser.project_settings import RecentProjects
 from src.types import Tk_Win
 from src.Utils.functions import is_illegal_filename
 from src.Utils.images import get_image, init_images
-from src.Widgets.link import Link
-from src.Widgets.tkentry import Entry
-from src.Widgets.winframe import WinFrame
 
 
 class StartDialog:

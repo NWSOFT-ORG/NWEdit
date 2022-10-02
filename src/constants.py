@@ -5,6 +5,8 @@ import sys
 import tkinter as tk
 from pathlib import Path
 
+from src.events import EventClass
+
 WINDOWS = bool(sys.platform.startswith("win"))
 OSX = bool(sys.platform.startswith("darwin"))
 APPDIR = str(Path(__file__).parent)
@@ -37,7 +39,7 @@ echo Program Finished With Exit Code %ERRORLEVEL%
 echo ----------------------------------------------------
 echo.
 del timertemp.txt
-.\CPP\x64\Debug\enter.exe
+pause
 """
 )  # The batch files for building.
 LINT_BATCH = (
@@ -168,3 +170,12 @@ logging.basicConfig(
 
 logger.info(f"Tkinter version: {tk.TkVersion}")
 logger.debug("All modules imported")
+
+events = EventClass(wildcard=True)
+
+DARK_COLOR = 128
+ILLEGAL_CHARS = ('\\', '/', ' ', '~') + ('?', '<', '>', '|', '*', ':')  # Windows illegal filenames
+ILLEGAL_NAMES = (
+    "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5",
+    "lpt6",
+    "lpt7", "lpt8", "lpt9", "con", "nul", "prn", '.', '..', '...', '')

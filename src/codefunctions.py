@@ -4,28 +4,26 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
+import pygments.lexers
 from pygments import lexers
 
-from src.constants import APPDIR, LINT_BATCH, logger, RUN_BATCH, WINDOWS
-from src.Dialog.codelistdialog import CodeListDialog
-from src.Dialog.commondialog import ErrorInfoDialog
-from src.Dialog.search import Search
+from src.Components.commondialog import ErrorInfoDialog
+from src.Components.console import Console
+from src.Components.tktext import EnhancedText
+from src.constants import (APPDIR, LINT_BATCH, RUN_BATCH, WINDOWS, events,
+                           logger)
 from src.highlighter import create_tags, recolorize
 from src.Utils.functions import open_shell, shell_command
-from src.Widgets.console import Console
-from src.Widgets.customenotebook import ClosableNotebook
 
 
 class CodeFunctions:
     def __init__(
         self,
         master: tk.Misc,
-        tabs: dict,
-        nb: ClosableNotebook,
+        text: EnhancedText,
         bottomframe: ttk.Notebook,
     ) -> None:
-        self.nb = nb
-        self.tabs = tabs
+        self.text = text
         self.master = master
         self.bottomframe = bottomframe
 
@@ -33,114 +31,117 @@ class CodeFunctions:
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
 
-    def code_struct(self) -> None:
-        text = self.tabs[self.nb.get_tab].textbox
-        CodeListDialog(self.bottomframe, text)
-
-    def search(self, _=None) -> None:
-        bottomframe = self.bottomframe
-        Search(bottomframe, self.tabs[self.nb.get_tab].textbox)
-
     def run(self, _=None) -> None:
         """Runs the file
         Steps:
         1) Writes run code into the batch file.
         2) Linux only: uses chmod to make the sh execuable
         3) Runs the run file"""
+
+        # noinspection PyBroadException
         try:
-            if WINDOWS:  # Windows
-                with open(APPDIR + "/run.bat", "w") as f:
-                    f.write(
-                        (
-                            RUN_BATCH.format(
-                                dir=APPDIR,
-                                file=self.tabs[self.nb.get_tab].file_dir,
-                                cmd=self.tabs[self.nb.get_tab].textbox.cmd,
+            if controller := self.text.controller:
+                if WINDOWS:  # Windows
+                    with open(APPDIR + "/run.bat", "w") as f:
+                        f.write(
+                            (
+                                RUN_BATCH.format(
+                                    dir=APPDIR,
+                                    file=controller.file_dir,
+                                    cmd=controller.textbox.cmd,
+                                )
                             )
                         )
-                    )
-                shell_command("run.bat && del run.bat && exit", cwd=APPDIR)
-            else:  # Others
-                with open(APPDIR + "/run.sh", "w") as f:
-                    f.write(
-                        (
-                            RUN_BATCH.format(
-                                dir=APPDIR,
-                                file=self.tabs[self.nb.get_tab].file_dir,
-                                cmd=self.tabs[self.nb.get_tab].textbox.cmd,
-                                script_dir=Path(
-                                    self.tabs[self.nb.get_tab].file_dir
-                                ).parent,
+                    shell_command("run.bat && del run.bat && exit", cwd=APPDIR)
+                else:  # Others
+                    with open(APPDIR + "/run.sh", "w") as f:
+                        f.write(
+                            (
+                                RUN_BATCH.format(
+                                    dir=APPDIR,
+                                    file=controller.file_dir,
+                                    cmd=controller.textbox.cmd,
+                                    script_dir=Path(
+                                        controller.file_dir
+                                    ).parent,
+                                )
                             )
                         )
-                    )
-                shell_command("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
-        except Exception as e:
+                    shell_command("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
+        except Exception:
+            logger.exception("Cannot run:")
             ErrorInfoDialog(self.master, "This language is not supported.")
 
-    @staticmethod
-    def system_shell() -> None:
-        open_shell()
+    def system_shell(self) -> None:
+        terminal = open_shell(self.bottomframe)
+        self.bottomframe.add(terminal, text="System Shell")
+        lexer = pygments.lexers.get_lexer_by_name("Bash")
+        create_tags(terminal)
+        recolorize(terminal, lexer)
+        terminal.bind(
+            "<KeyRelease>", lambda _=None: recolorize(terminal, lexer)
+        )
 
     def python_shell(self) -> None:
         curr_tab = self.bottomframe
         shell_frame = ttk.Frame(curr_tab)
-        main_window = Console(shell_frame, None, shell_frame.destroy)
-        main_window.text.lexer = lexers.get_lexer_by_name("pycon")
-        main_window.text.focus_set()
-        create_tags(main_window.text)
-        recolorize(main_window.text)
-        main_window.text.bind(
-            "<KeyRelease>", lambda _=None: recolorize(main_window.text)
+        console = Console(shell_frame, None, shell_frame.destroy)
+        lexer = lexers.get_lexer_by_name("pycon")
+        console.text.focus_set()
+        create_tags(console.text)
+        recolorize(console.text, lexer)
+        console.text.bind(
+            "<KeyRelease>", lambda _=None: recolorize(console.text, lexer)
         )
-        main_window.pack(fill="both", expand=1)
+        console.pack(fill="both", expand=1)
         shell_frame.pack(fill="both", expand=1)
         curr_tab.add(shell_frame, text="Python Shell")
 
     def lint_source(self) -> None:
-        if not self.tabs:
-            return
         try:
-            if self.tabs[self.nb.get_tab].textbox.lint_cmd:
-                currdir = self.tabs[self.nb.get_tab].file_dir
-                if WINDOWS:
-                    with open("lint.bat", "w") as f:
-                        f.write(
-                            LINT_BATCH.format(
-                                cmd=self.tabs[self.nb.get_tab].textbox.lint_cmd
+            if controller := self.text.controller:
+                if controller.textbox.lint_cmd:
+                    currdir = controller.file_dir
+                    if WINDOWS:
+                        with open("lint.bat", "w") as f:
+                            f.write(
+                                LINT_BATCH.format(
+                                    cmd=controller.textbox.lint_cmd
+                                )
                             )
-                        )
-                    subprocess.call(f'lint.bat "{currdir}"', shell=True)
-                    os.remove("lint.bat")
-                else:
-                    with open("lint.sh", "w") as f:
-                        f.write(
-                            LINT_BATCH.format(
-                                cmd=self.tabs[self.nb.get_tab].textbox.lint_cmd
+                        subprocess.call(f'lint.bat "{currdir}"', shell=True)
+                        os.remove("lint.bat")
+                    else:
+                        with open("lint.sh", "w") as f:
+                            f.write(
+                                LINT_BATCH.format(
+                                    cmd=controller.textbox.lint_cmd
+                                )
                             )
+                        subprocess.call(
+                            f'chmod 700 lint.sh && ./lint.sh "{currdir}"', shell=True
                         )
-                    subprocess.call(
-                        f'chmod 700 lint.sh && ./lint.sh "{currdir}"', shell=True
-                    )
-                    os.remove("lint.sh")
-                self.open_file("results.txt")
-                os.remove("results.txt")
+                        os.remove("lint.sh")
+                    events.emit("editor.open_file", file="results.txt", askhex=False)
+                    os.remove("results.txt")
         except Exception:
+            logger.exception("Cannot lint the file:")
             ErrorInfoDialog(self.master, "This language is not supported")
             return
 
     def autopep(self) -> None:
         """Auto Pretty-Format the document"""
         try:
-            currtext = self.tabs[self.nb.get_tab].textbox
-            currdir = self.tabs[self.nb.get_tab].file_dir
-            if currtext.format_command:
-                subprocess.Popen(
-                    f'{currtext.format_command} "{currdir}" > {os.devnull}', shell=True
-                )  # Throw the autopep8 results into the bit bin.(/dev/null)
-            else:
-                ErrorInfoDialog(self.master, "Language not supported.")
-                return
-            self.reload()
+            if controller := self.text.controller:
+                currtext = controller.textbox
+                currdir = controller.file_dir
+                if currtext.format_command:
+                    subprocess.Popen(
+                        f'{currtext.format_command} "{currdir}" > {os.devnull}', shell=True
+                    )  # Throw the autopep8 results into the bit bin.(/dev/null)
+                else:
+                    ErrorInfoDialog(self.master, "Language not supported.")
+                    return
+                events.emit("editor.reload")
         except Exception:
             logger.exception("Error when formatting:")

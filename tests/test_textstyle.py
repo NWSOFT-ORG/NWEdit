@@ -1,4 +1,4 @@
-from src.Dialog.textstyle import listfonts
+from src.Components.textstyle import listfonts
 
 
 def test_listfonts():

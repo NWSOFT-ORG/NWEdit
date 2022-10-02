@@ -1,10 +1,10 @@
+import re
 import tkinter as tk
 from typing import *
-import re
 
 import json5 as json
 
-from src.constants import logger, MAIN_KEY
+from src.constants import MAIN_KEY, logger
 from src.Utils.images import get_image
 
 SHIFT_PATTERN = re.compile(r"shift-([a-zA-z])")

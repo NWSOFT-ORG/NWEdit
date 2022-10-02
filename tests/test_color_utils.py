@@ -1,4 +1,5 @@
-from src.Utils.color_utils import darken_color, get_hex, hex2dec, dec2hex, is_dark_color, lighten_color
+from src.Utils.color_utils import (darken_color, dec2hex, get_hex, hex2dec,
+                                   is_dark_color, lighten_color)
 
 
 def test_hex2dec():

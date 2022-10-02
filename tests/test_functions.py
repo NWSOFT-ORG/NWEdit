@@ -2,7 +2,9 @@ import keyword
 import random
 import sys
 
-from src.Utils.functions import ILLEGAL_CHARS, ILLEGAL_NAMES, is_illegal_filename, is_valid_name, is_binary_string
+from src.constants import ILLEGAL_CHARS, ILLEGAL_NAMES
+from src.Utils.functions import (is_binary_string, is_illegal_filename,
+                                 is_valid_name)
 
 
 def generate_words_with_spaces():

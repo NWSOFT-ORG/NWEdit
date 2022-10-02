@@ -3,9 +3,9 @@ import threading
 import tkinter as tk
 from tkinter import ttk
 
-from src.Dialog.search import re_search
-from src.Widgets.scrollbar import Scrollbar
-from src.Widgets.tkentry import Entry
+from src.Components.scrollbar import Scrollbar
+from src.Components.search import re_search
+from src.Components.tkentry import Entry
 
 
 def list_all(directory: str) -> list:

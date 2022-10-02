@@ -4,13 +4,13 @@ from tkinter import ttk
 
 import json5 as json
 
+from src.Components.codeinputdialog import CodeInputDialog
+from src.Components.commondialog import StringInputDialog, YesNoDialog
+from src.Components.scrollbar import Scrollbar
+from src.Components.tktext import EnhancedTextFrame, TextOpts
 from src.constants import APPDIR
-from src.Dialog.codeinputdialog import CodeInputDialog
-from src.Dialog.commondialog import StringInputDialog, YesNoDialog
 from src.SettingsParser.extension_settings import RunCommand
 from src.Utils.functions import is_valid_name, shell_command
-from src.Widgets.scrollbar import Scrollbar
-from src.Widgets.tktext import EnhancedTextFrame, TextOpts
 
 TESTS_FILE = ".PyPlus/Tests/tests.json"
 SETTINGS_FILE = ".PyPlus/Tests/settings.json"

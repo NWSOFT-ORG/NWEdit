@@ -5,9 +5,10 @@ from tkinter import ttk
 
 import art
 
-from src.Widgets.tkentry import Entry
-from src.Widgets.tktext import EnhancedText, apply_style
-from src.Widgets.winframe import WinFrame
+from src.Components.tkentry import Entry
+from src.Components.tktext import EnhancedText
+from src.Components.winframe import WinFrame
+from src.Utils.functions import apply_style
 
 
 def listfonts():

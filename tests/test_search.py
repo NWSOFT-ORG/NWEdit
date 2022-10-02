@@ -1,4 +1,4 @@
-from src.Dialog.search import re_search
+from src.Components.search import re_search
 
 
 def test_case():

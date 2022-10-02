@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from src.Widgets.customenotebook import ClosableNotebook
+from src.Components.customenotebook import ClosableNotebook
 
 
 class CustomTabs(ClosableNotebook):

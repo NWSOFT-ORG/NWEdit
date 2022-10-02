@@ -1,12 +1,12 @@
-from typing import *
-import tkinter as tk
 from tkinter import ttk
+from typing import *
+
 from pygments import lexers
 
+from src.Components.tktext import EnhancedText, EnhancedTextFrame, TextOpts
+from src.Components.winframe import WinFrame
 from src.types import Tk_Widget
 from src.Utils.images import get_image
-from src.Widgets.tktext import EnhancedText, EnhancedTextFrame, TextOpts
-from src.Widgets.winframe import WinFrame
 
 
 class CodeInputDialog(WinFrame):

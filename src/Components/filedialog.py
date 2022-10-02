@@ -2,10 +2,10 @@ import tkinter as tk
 from tkinter import ttk
 from typing import *
 
+from src.Components.tkentry import Entry
+from src.Components.treeview import FileTree
+from src.Components.winframe import WinFrame
 from src.Utils.images import get_image
-from src.Widgets.tkentry import Entry
-from src.Widgets.treeview import FileTree
-from src.Widgets.winframe import WinFrame
 
 
 class FileOpenDialog(FileTree):

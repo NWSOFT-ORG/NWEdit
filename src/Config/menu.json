@@ -22,7 +22,7 @@ For example: "package"
                 "info",
                 null,
                 "AboutDialog(obj.master)",
-                "src.Dialog.commondialog -> AboutDialog",
+                "src.Components.commondialog -> AboutDialog",
                 false
             ],
             "[Settings]": {
@@ -67,7 +67,24 @@ For example: "package"
                     "obj.open_file(\"Config/file-icons.json\")",
                     null,
                     false
-                ]
+                ],
+                "---": null,
+                "[Backup Settings]": {
+                    "Save Settings...": [
+                        "save-as",
+                        null,
+                        "ZipSettings(obj.master).zipsettings()",
+                        "src.SettingsParser.zip_settings -> ZipSettings",
+                        false
+                    ],
+                    "Load Settings...": [
+                        "open",
+                        null,
+                        "ZipSettings(obj.master).unzipsettings()",
+                        "src.SettingsParser.zip_settings -> ZipSettings",
+                        false
+                    ]
+                }
             },
             "---": null,
             "Quit": [
@@ -144,42 +161,42 @@ For example: "package"
                 "undo",
                 "z",
                 "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).undo()",
-                "src.Widgets.tktext -> TextOpts",
+                "src.Components.tktext -> TextOpts",
                 true
             ],
             "Redo": [
                 "redo",
                 "shift-z",
                 "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).redo()",
-                "src.Widgets.tktext -> TextOpts",
+                "src.Components.tktext -> TextOpts",
                 true
             ],
             "Cut": [
                 "cut",
                 "x",
                 "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).cut()",
-                "src.Widgets.tktext -> TextOpts",
+                "src.Components.tktext -> TextOpts",
                 true
             ],
             "Copy": [
                 "copy",
                 "c",
                 "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).copy()",
-                "src.Widgets.tktext -> TextOpts",
+                "src.Components.tktext -> TextOpts",
                 true
             ],
             "Paste": [
                 "paste",
                 "v",
                 "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).paste()",
-                "src.Widgets.tktext -> TextOpts",
+                "src.Components.tktext -> TextOpts",
                 true
             ],
             "Duplicate Line or Selected": [
                 null,
                 "d",
                 "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).duplicate_line()",
-                "src.Widgets.tktext -> TextOpts",
+                "src.Components.tktext -> TextOpts",
                 true
             ],
             "[Indent...]": {
@@ -187,14 +204,14 @@ For example: "package"
                     "indent",
                     "i",
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).indent(\"indent\")",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ],
                 "Unindent": [
                     "unindent",
                     "u",
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).indent(\"unindent\")",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ]
             },
@@ -202,7 +219,7 @@ For example: "package"
                 null,
                 null,
                 "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).join_lines()",
-                "src.Widgets.tktext -> TextOpts",
+                "src.Components.tktext -> TextOpts",
                 true
             ],
             "[Case...]": {
@@ -210,21 +227,21 @@ For example: "package"
                     null,
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).swap_case()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ],
                 "Upper Case": [
                     "upper",
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).upper_case()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ],
                 "Lower Case": [
                     "lower",
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).lower_case()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ]
             },
@@ -233,35 +250,35 @@ For example: "package"
                     "sel-all",
                     "a",
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).select_all()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ],
                 "Select Line": [
                     null,
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_line()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ],
                 "Select Word": [
                     null,
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_word()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ],
                 "Select Previous Word": [
                     null,
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_word_left()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ],
                 "Select Next Word": [
                     null,
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_word_right()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ]
             },
@@ -270,28 +287,28 @@ For example: "package"
                     "delete",
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ],
                 "Delete Word": [
                     "delete",
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ],
                 "Delete Previous Word": [
                     "delete",
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ],
                 "Delete Next Word": [
                     "delete",
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ]
             },
@@ -300,14 +317,14 @@ For example: "package"
                     null,
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).mv_line_up()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ],
                 "Down": [
                     null,
                     null,
                     "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).mv_line_dn()",
-                    "src.Widgets.tktext -> TextOpts",
+                    "src.Components.tktext -> TextOpts",
                     true
                 ]
             }
@@ -316,37 +333,37 @@ For example: "package"
             "Run": [
                 "run",
                 "b",
-                "obj.codefuncs.run()",
-                null,
+                "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).run()",
+                "src.codefunctions -> CodeFunctions",
                 true
             ],
             "Lint": [
                 "lint",
                 null,
-                "obj.codefuncs.lint_source()",
-                null,
+                "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).lint_source()",
+                "src.codefunctions -> CodeFunctions",
                 true
             ],
             "Auto-Format": [
                 "format",
                 null,
-                "obj.codefuncs.autopep()",
-                null,
+                "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).autopep()",
+                "src.codefunctions -> CodeFunctions",
                 true
             ],
             "[Open Shell...]": {
                 "Open System Shell": [
                     "term",
                     null,
-                    "obj.codefuncs.system_shell()",
-                    null,
+                    "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).system_shell()",
+                    "src.codefunctions -> CodeFunctions",
                     false
                 ],
                 "Open Python Shell": [
                     "py-term",
                     "F2",
-                    "obj.codefuncs.python_shell()",
-                    null,
+                    "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).python_shell()",
+                    "src.codefunctions -> CodeFunctions",
                     false
                 ]
             }
@@ -356,21 +373,21 @@ For example: "package"
                 null,
                 null,
                 "TestDialog(obj.bottom_tabs, obj.filetree.path)",
-                "src.Dialog.testdialog -> TestDialog",
+                "src.Components.testdialog -> TestDialog",
                 false
             ],
             "Code structure": [
                 null,
                 null,
                 "CodeListDialog(obj.bottom_tabs, obj.get_text)",
-                "src.Dialog.codelistdialog -> CodeListDialog",
+                "src.Components.codelistdialog -> CodeListDialog",
                 true
             ],
             "Insert Ascii Art": [
                 null,
                 null,
                 "StyleWindow(obj.master, obj.get_text, obj.key)",
-                "src.Dialog.textstyle -> StyleWindow",
+                "src.Components.textstyle -> StyleWindow",
                 true
             ]
         },
@@ -379,21 +396,21 @@ For example: "package"
                 null,
                 "shift-n",
                 "Navigate(obj.get_text)",
-                "src.Dialog.goto -> Navigate",
+                "src.Components.goto -> Navigate",
                 true
             ],
             "Find and Replace": [
                 "search",
                 "f",
-                "obj.codefuncs.search()",
-                null,
+                "Search(obj.bottom_tabs, obj.get_text)",
+                "src.Components.search -> Search",
                 true
             ],
             "Search in Directory": [
                 null,
                 null,
                 "SearchInDir(obj.bottom_tabs, obj.filetree.path, obj.open_file)",
-                "src.Dialog.searchindir -> SearchInDir",
+                "src.Components.searchindir -> SearchInDir",
                 false
             ]
         },
@@ -425,7 +442,7 @@ For example: "package"
     },
     /*
     The menu shown on the start dialog (the modal to select projects to open)
-    Used by src.Dialog.startdialog
+    Used by src.Componentss.startdialog
     */
     "start_dialog": {
         "[PyPlus]": {
@@ -433,7 +450,7 @@ For example: "package"
                 "info",
                 null,
                 "AboutDialog(obj.master)",
-                "src.Dialog.commondialog -> AboutDialog",
+                "src.Components.commondialog -> AboutDialog",
                 false
             ],
             "---": null,

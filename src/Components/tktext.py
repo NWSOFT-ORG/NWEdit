@@ -6,12 +6,13 @@ from typing import *
 
 from pygments import lexers, styles
 
-from src.constants import logger, OSX
+from src.Components.scrollbar import TextScrollbar
+from src.constants import OSX, logger
 from src.errors import EditorErr
 from src.highlighter import create_tags, recolorize, recolorize_line
 from src.SettingsParser.general_settings import GeneralSettings
-from src.Utils.color_utils import darken_color, is_dark_color, lighten_color
-from src.Widgets.scrollbar import TextScrollbar
+from src.Utils.color_utils import darken_color, lighten_color
+from src.Utils.functions import apply_style
 
 
 def font_height(font_name, size) -> int:
@@ -104,6 +105,7 @@ class EnhancedText(tk.Text):
         self.settings = GeneralSettings(self.master)
         self.config(blockcursor=self.settings.get_settings("block_cursor"))
         self.frame = self.master
+        self.controller = None
         self.search = False
         self.navigate = False
         self.lexer = lexers.get_lexer_by_name("text")
@@ -151,34 +153,6 @@ class EnhancedText(tk.Text):
             return result
         except tk.TclError:
             pass
-
-
-def apply_style(text: EnhancedText):
-    settings_class = GeneralSettings()
-    font_face = settings_class.get_font()
-    style = styles.get_style_by_name(settings_class.get_settings("pygments_theme"))
-    bgcolor = style.background_color
-    fgcolor = style.highlight_color
-    if is_dark_color(bgcolor):
-        bg = lighten_color(bgcolor, 30)
-        fg = lighten_color(fgcolor, 40)
-    else:
-        bg = darken_color(bgcolor, 30)
-        fg = darken_color(fgcolor, 40)
-    text.config(
-        bg=bgcolor,
-        fg=fgcolor,
-        selectforeground=bg,
-        selectbackground=fgcolor,
-        insertbackground=fg,
-        highlightthickness=0,
-        font=font_face,
-        wrap="none",
-        insertwidth=3,
-        maxundo=-1,
-        autoseparators=True,
-        undo=True,
-    )
 
 
 class EnhancedTextFrame(ttk.Frame):
@@ -243,7 +217,7 @@ class TextOpts:
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
 
-    def set_text(self, text):
+    def set_text(self, text: EnhancedText):
         self.text = text
         self.bind_events()
         return self
@@ -263,12 +237,14 @@ class TextOpts:
 
     def bind_events(self):
         text = self.text
-        text.bind("<KeyRelease>", self.key)
+        text.bind("<<Key>>", self.key)
+        text.event_add("<<Key>>", "<KeyRelease>")
         for char in ['"', "'", "(", "[", "{"]:
             text.bind(char, self.autoinsert)
         for char in [")", "]", "}"]:
             text.bind(char, self.close_brackets)
-        text.bind("<BackSpace>", self.backspace)
+        text.bind("<<BackSpace>>", self.backspace)
+        text.event_add("<<BackSpace>>", "<BackSpace>")
         text.bind("<Return>", self.autoindent)
         text.bind("<Tab>", self.tab)
         text.bind(
@@ -276,12 +252,12 @@ class TextOpts:
             lambda e: self.right_click_menu.post(e.x_root, e.y_root)
         )
         create_tags(text)
-        recolorize(text)
+        recolorize(text, text.lexer)
 
     def tab(self, _=None):
         # Convert tabs to spaces
         self.text.insert("insert", " " * self.tabwidth)
-        recolorize(self.text)
+        recolorize(self.text, self.text.lexer)
         self.key()
         # Quit quickly, before a char is being inserted.
         return "break"
@@ -290,7 +266,7 @@ class TextOpts:
         """Event when a key is pressed."""
         if self.bindkey:
             currtext = self.text
-            recolorize_line(currtext)
+            recolorize_line(currtext, currtext.lexer)
             currtext.edit_separator()
             currtext.see("insert")
             logger.exception("Error when handling keyboard event:")
@@ -306,7 +282,7 @@ class TextOpts:
         else:
             text = currtext.get("insert linestart", "insert lineend")
             currtext.insert("insert", "\n" + text)
-        recolorize(currtext)
+        recolorize(currtext, currtext.lexer)
         self.key()
 
     def indent(self, action="indent") -> None:
@@ -341,7 +317,7 @@ class TextOpts:
             currtext.tag_add("sel", sel_start, sel_end)
         else:
             raise EditorErr("Action undefined.")
-        recolorize(currtext)
+        recolorize(currtext, currtext.lexer)
         self.key()
 
     def comment_lines(self, _=None):
@@ -392,20 +368,26 @@ class TextOpts:
                     )
                 else:
                     currtext.insert("insert", f"{comment_start}{line}{comment_end}\n")
-            recolorize(currtext)
+            recolorize(currtext, currtext.lexer)
             self.key()
         except (KeyError, AttributeError):
             return
 
-    def backspace(self, _=None) -> None:
+    def backspace(self, _=None) -> str:
         currtext = self.text
         # Backspace a char
-        if currtext.get("insert -1c", "insert +1c") in ["''", '""', "[]", "{}", "()"]:
+        if currtext.get("insert -1c", "insert +1c") in ["''", '""', "[]", "{}", "()", "<>"]:
             currtext.delete("insert", "insert +1c")
+            self.key()
+            return "break"
         # Backspace a tab
         if currtext.get(f"insert -{self.tabwidth}c", "insert") == " " * self.tabwidth:
             currtext.delete(f"insert -{self.tabwidth - 1}c", "insert")
+            self.key()
+            return "break"
+        currtext.delete("insert -1c", "insert")
         self.key()
+        return "break"
 
     def close_brackets(self, event: Union[tk.Event, None] = None) -> str:
         currtext = self.text
@@ -509,7 +491,7 @@ class TextOpts:
     def undo(self, _=None) -> None:
         try:
             self.text.edit_undo()
-            recolorize(self.text)
+            recolorize(self.text, self.text.lexer)
             self.key()
         except tk.TclError:
             return
@@ -517,7 +499,7 @@ class TextOpts:
     def redo(self, _=None) -> None:
         try:
             self.text.edit_redo()
-            recolorize(self.text)
+            recolorize(self.text, self.text.lexer)
             self.key()
         except tk.TclError:
             return
@@ -549,7 +531,7 @@ class TextOpts:
                 self.text.insert(
                     "insert", clipboard
                 )
-            recolorize(self.text)
+            recolorize(self.text, self.text.lexer)
             self.key()
         except tk.TclError:
             pass
@@ -622,7 +604,7 @@ class TextOpts:
         sel = "".join(sel)
         currtext.delete("sel.first", "sel.last")
         currtext.insert("insert", sel)
-        recolorize(currtext)
+        recolorize(currtext, currtext.lexer)
         self.key()
 
     def mv_line_up(self) -> None:
@@ -631,7 +613,7 @@ class TextOpts:
         currtext.delete("insert -1l lineend", "insert lineend")
         currtext.mark_set("insert", "insert -1l")
         currtext.insert("insert", text)
-        recolorize(currtext)
+        recolorize(currtext, currtext.lexer)
         self.key()
 
     def mv_line_dn(self) -> None:
@@ -640,7 +622,7 @@ class TextOpts:
         currtext.delete("insert -1l lineend", "insert lineend")
         currtext.mark_set("insert", "insert +1l")
         currtext.insert("insert", text)
-        recolorize(currtext)
+        recolorize(currtext, currtext.lexer)
         self.key()
 
     def swap_case(self):
@@ -651,7 +633,7 @@ class TextOpts:
         currtext.delete("sel.first", "sel.last")
         text = text.swapcase()
         currtext.insert("insert", text)
-        recolorize(currtext)
+        recolorize(currtext, currtext.lexer)
         self.key()
 
     def upper_case(self):
@@ -662,7 +644,7 @@ class TextOpts:
         currtext.delete("sel.first", "sel.last")
         text = text.upper()
         currtext.insert("insert", text)
-        recolorize(currtext)
+        recolorize(currtext, currtext.lexer)
         self.key()
 
     def lower_case(self):
@@ -673,5 +655,5 @@ class TextOpts:
         currtext.delete("sel.first", "sel.last")
         text = text.lower()
         currtext.insert("insert", text)
-        recolorize(currtext)
+        recolorize(currtext, currtext.lexer)
         self.key()

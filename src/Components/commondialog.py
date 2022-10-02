@@ -8,11 +8,11 @@ from urllib import request
 
 import json5 as json
 
-from src.constants import logger, VERSION
+from src.Components.tkentry import Entry
+from src.Components.winframe import WinFrame
+from src.constants import VERSION, logger
 from src.types import Tk_Widget, Tk_Win
 from src.Utils.images import get_image
-from src.Widgets.tkentry import Entry
-from src.Widgets.winframe import WinFrame
 
 
 def download_file(url: str, localfile: os.PathLike = "") -> str:
@@ -69,7 +69,7 @@ class StringInputDialog(WinFrame):
         self.entry.pack(fill="x", expand=1)
         box = ttk.Frame(self)
 
-        b1 = ttk.Button(box, text="Ok", command=self.apply)
+        b1 = ttk.Button(box, text="OK", command=self.apply)
         b1.pack(side="left")
         b2 = ttk.Button(box, text="Cancel", command=self.cancel)
         b2.pack(side="left")
@@ -100,7 +100,7 @@ class ErrorInfoDialog(WinFrame):
         super().__init__(parent, title, icon=get_image("question"))
         label1 = ttk.Label(self, text=self.text)
         label1.pack(side="top", fill="both", expand=1)
-        b1 = ttk.Button(self, text="Ok", width=10, command=self.apply)
+        b1 = ttk.Button(self, text="OK", width=10, command=self.apply)
         b1.pack(side="left")
         self.wait_window(self)
 

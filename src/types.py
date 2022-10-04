@@ -1,3 +1,5 @@
+"""Typings for editor"""
+
 import tkinter as tk
 from typing import Union
 

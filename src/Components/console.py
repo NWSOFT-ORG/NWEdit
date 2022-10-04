@@ -61,7 +61,7 @@ class Console(ttk.Frame):
         self.text.config(xscrollcommand=xbar.set)
         self.text.insert("insert", "Python " + sys.version + "\n")
 
-        self.shell = code.InteractiveConsole()
+        self.shell = code.InteractiveConsole(locals=_locals)
 
         # make the enter key call the self.enter function
         self.text.bind("<Return>", self.enter)

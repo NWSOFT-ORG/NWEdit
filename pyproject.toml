@@ -3,6 +3,7 @@ authors = ["ZCG-Coder <z-c-ge@outlook.com>"]
 description = "The editor that edits"
 name = "PyPlus"
 version = "7.0-dev"
+
 [tool.poetry.dependencies]
 python = "^3.10"
 CairoSVG = "^2.5.2"
@@ -30,3 +31,11 @@ build-backend = "poetry.core.masonry.api"
 [tool.pyright]
 reportPropertyTypeMismatch = false
 reportGeneralTypeIssues=false
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  ".", "src",
+]
+

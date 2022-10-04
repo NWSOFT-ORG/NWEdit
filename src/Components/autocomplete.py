@@ -1,7 +1,7 @@
 import string
 import tkinter as tk
 from tkinter import ttk
-from typing import *
+from typing import Callable, Union, Tuple
 
 from src.Components.scrollbar import Scrollbar
 from src.types import Tk_Widget
@@ -56,7 +56,11 @@ class CompleteDialog(ttk.Frame):
         item = self.completions.identify("item", event.x, event.y)
         text = self.text
         completion = self.completions.item(item, "text")
-        text.delete(*self.index_word)
+
+        word_index = self.index_word
+        if word_index is None:
+            return
+        text.delete(*word_index)
         text.insert("insert", completion)
         text.focus_set()
         self.place_forget()
@@ -75,6 +79,9 @@ class CompleteDialog(ttk.Frame):
         except ValueError:
             pass
         dline = text.dlineinfo("insert")
+        if dline is None:
+            self.place_forget()
+            return
         self.place_configure(x=dline[0] + dline[2], y=dline[1] + dline[3])
 
         curr_word = self.get_word
@@ -87,9 +94,12 @@ class CompleteDialog(ttk.Frame):
     def get_word(self) -> Union[str, None]:
         text = self.text
         try:
-            return text.get(*self.index_word)
+            word_index = self.index_word
+            if word_index is None:
+                return
+            return text.get(*word_index)
         except TypeError:
-            return None
+            return
 
     @property
     def index_word(self) -> Union[Tuple[str, str], None]:

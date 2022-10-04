@@ -1,7 +1,7 @@
 import re
 import tkinter as tk
 from tkinter import ttk
-from typing import *
+from typing import Iterable, List, Tuple, Union
 
 from src.Components.tkentry import Entry
 from src.Components.tktext import EnhancedText
@@ -39,7 +39,7 @@ def finditer_withlineno(
         )
 
 
-def find_all(sub: Text, string: Text, case: bool = True) -> Iterable[Tuple[int]]:
+def find_all(sub: str, string: str, case: bool = True) -> Iterable[Tuple[int]]:
     start = 0
     if not case:
         sub = sub.lower()

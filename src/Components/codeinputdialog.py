@@ -1,5 +1,5 @@
 from tkinter import ttk
-from typing import *
+from typing import Callable
 
 from pygments import lexers
 
@@ -34,10 +34,10 @@ class CodeInputDialog(WinFrame):
         cancelbtn.pack(side="left")
         button_frame.pack(fill="x")
 
-    def insert(self, pos: Literal[float], text: str) -> None:
+    def insert(self, pos: str, text: str) -> None:
         self.text.insert(pos, text)
 
-    def get(self, pos1: Literal[float], pos2: Literal[float]) -> str:
+    def get(self, pos1: str, pos2: str) -> str:
         return self.text.get(pos1, pos2)
 
     def add_destroy_action(self, function: Callable) -> callable:

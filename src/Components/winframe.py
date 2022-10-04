@@ -16,6 +16,8 @@ RADIUS = 27 if OSX else 0
 def get_theme():
     with open("Config/general-settings.json") as f:
         settings = json.load(f)
+        if not settings:
+            return ""  # Default theme
     return settings["theme"]
 
 
@@ -34,7 +36,6 @@ def font_height():
 
 
 def round_rect(canvas, x1, y1, x2, y2, radius=25, **kwargs):
-
     points = [x1 + radius, y1,
               x1 + radius, y1,
               x2 - radius, y1,
@@ -217,6 +218,8 @@ class WinFrame(tk.Toplevel):
 
     def close_button(self):
         image = get_image("close")
+        if not image:
+            return
         self.titlebar.image = image
 
         y = int((self.status_bar.winfo_height() - image.height()) / 2)

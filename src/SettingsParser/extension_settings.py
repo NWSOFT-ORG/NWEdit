@@ -1,5 +1,5 @@
 import io
-from typing import *
+from typing import Union
 
 import cairosvg
 import json5 as json
@@ -14,6 +14,8 @@ class ExtensionSettings:
     def __init__(self, path: str) -> None:
         with open(path) as f:
             all_settings = json.load(f)
+        if not all_settings:
+            all_settings = {}
         self.extens = []
         self.items = []
         for key, value in all_settings.items():
@@ -77,7 +79,10 @@ class FileTreeIconSettings:
         with open(self.path) as f:
             settings = json.load(f)
         try:
-            icon_name = settings[extension]
+            if settings:
+                icon_name = settings[extension]
+            else:
+                icon_name = "other"
         except KeyError:
             icon_name = "other"
         out = io.BytesIO()

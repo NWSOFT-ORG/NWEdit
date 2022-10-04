@@ -26,7 +26,6 @@ class ClosableNotebook(ttk.Notebook):
         self.fg = self.style.lookup("TLabel", "foreground")
         if not self.__initialized:
             self.__initialize_custom_style()
-            self.__inititialized = True
         super().__init__(master=master, style="ClosableNotebook", takefocus=False)
         self.cmd = cmd
 

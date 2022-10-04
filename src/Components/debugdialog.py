@@ -1,7 +1,7 @@
 import sys
 import tkinter as tk
 from tkinter import ttk
-from typing import *
+from typing import Union, Literal
 
 import json5 as json
 
@@ -12,15 +12,19 @@ from src.Utils.images import get_image
 
 
 # Need these to prevent circular imports
-def get_pygments() -> Text:
+def get_pygments() -> str:
     with open("Config/general-settings.json") as f:
         settings = json.load(f)
+        if settings is None:
+            return "default"  # Return the default theme
     return settings["pygments"]
 
 
-def get_font() -> Text:
+def get_font() -> str:
     with open("Config/general-settings.json") as f:
         settings = json.load(f)
+        if settings is None:
+            return "tkFixedFont"  # Return the default font
     return settings["font"]
 
 
@@ -30,19 +34,19 @@ class ReadonlyText(EnhancedTextFrame):
         fgcolor = "#f00"
         self.text.configure(state="disabled", fg=fgcolor, font=get_font())
 
-    def insert(self, pos: Text, text: Text) -> None:
+    def insert(self, pos: str, text: str) -> None:
         self.text.configure(state="normal")
         self.text.insert(pos, text)
         self.text.configure(state="disabled")
 
-    def delete(self, pos1: Text, pos2: Text) -> None:
+    def delete(self, pos1: str, pos2: str) -> None:
         self.text.configure(state="normal")
         self.text.delete(pos1, pos2)
         self.text.configure(state="disabled")
 
 
 class ErrorReportDialog(WinFrame):
-    def __init__(self, master: Tk_Win, error_name: Text, error_message: Text) -> None:
+    def __init__(self, master: Tk_Win, error_name: str, error_message: str) -> None:
         super().__init__(master, error_name, closable=False, icon=get_image("error"))
         master.withdraw()
         ttk.Label(self, text="Please consider reporting a bug on github.").pack(

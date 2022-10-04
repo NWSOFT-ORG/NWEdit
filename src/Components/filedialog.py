@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import *
+from typing import Union, Literal, Callable
 
 from src.Components.tkentry import Entry
 from src.Components.treeview import FileTree
@@ -12,7 +12,7 @@ class FileOpenDialog(FileTree):
     def __init__(
         self,
         master: Union[Literal["."], tk.Misc] = ".",
-        opencommand: callable = None,
+        opencommand: Callable = None,
         action: str = "Open",
     ):
         self._style = ttk.Style()
@@ -41,6 +41,9 @@ class FileOpenDialog(FileTree):
         item = self.tree.focus()
         item_text = self.tree.item(item, "text")
         self.get_parent(item)
+        if not self.opencommand:
+            self.win.destroy()
+            return
         self.opencommand(f"{self.temp_path[0]}/{item_text}")
         self.master.destroy()
 
@@ -52,12 +55,12 @@ class FileOpenDialog(FileTree):
         except FileNotFoundError:
             self.path = old_path
 
-    def on_double_click_treeview(self, event=None, **kwargs):
+    def on_double_click_treeview(self, event=None, **_):
         super().on_double_click_treeview(event, destroy=True)
 
 
 class FileSaveAsDialog(FileOpenDialog):
-    def __init__(self, master, savecommand: callable):
+    def __init__(self, master, savecommand: Callable):
         super().__init__(master, savecommand, "Save")
         self.win.titlebar["image"] = get_image("save-as")
 
@@ -67,7 +70,7 @@ class DirectoryOpenDialog(FileOpenDialog):
         self.opencommand = opencommand
         super().__init__(master, opencommand=opencommand)
 
-    def process_directory(self, parent, showdironly: bool = False, path: str = ""):
+    def process_directory(self, parent, _: bool = False, path: str = ""):
         super().process_directory(parent, False, path)
 
     def open(self):

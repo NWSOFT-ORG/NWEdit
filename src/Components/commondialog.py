@@ -3,7 +3,7 @@ import tkinter as tk
 import urllib.error
 import webbrowser
 from tkinter import ttk
-from typing import *
+from typing import List
 from urllib import request
 
 import json5 as json
@@ -132,7 +132,7 @@ class AboutDialog:
             update.pack(fill="both")
             update.bind(
                 "<Button-1>",
-                lambda e: webbrowser.open_new_tab(self.check_updates(popup=False)[1]),
+                lambda _: webbrowser.open_new_tab(self.check_updates(popup=False)[1]),
             )
         else:
             ttk.Label(ver, text="No updates available").pack(fill="both")
@@ -152,6 +152,8 @@ class AboutDialog:
             return [None, "about:blank"]
         with open("ver.json") as f:
             newest = json.load(f)
+            if newest is None:
+                return [None, "about:blank"]
         version = newest["version"]
         if not popup:
             os.remove("ver.json")

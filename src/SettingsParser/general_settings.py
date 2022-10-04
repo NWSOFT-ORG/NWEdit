@@ -26,8 +26,12 @@ class GeneralSettings:
             family=self.get_settings("font"),
             size=self.get_settings("font_size")
         )
-        for option, value in self.get_settings("font_options").items():
+        font_options = self.get_settings("font_options")
+        if not font_options:
+            return code_font
+        for option, value in font_options.items():
             code_font[option] = value
 
     def get_settings(self, setting):
-        return self.settings[setting]
+        if self.settings:
+            return self.settings[setting]

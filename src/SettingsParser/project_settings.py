@@ -17,23 +17,33 @@ class RecentProjects:
             self.config = json.load(f)
 
     def get_path_to(self, name: str):
+        if not self.config:
+            return
         return self.config[name]["path"]
 
     def get_name_for_path(self, path: str):
+        if not self.config:
+            return
         for key, value in self.config.items():
             if value["path"] == path:
                 return key
 
     def set_open_files(self, name: str, files: Dict[str, str]):
+        if not self.config:
+            return
         for file, index in files.items():
             self.config[name]["openFiles"][file] = index
         self.write_config()
 
     def get_open_files(self, name: str) -> Dict[str, str]:
+        if not self.config:
+            return
         files = self.config[name]["openFiles"]
         return files
 
     def get_treeview_stat(self, name: str) -> Dict[str, Union[List[str], str]]:
+        if not self.config:
+            return
         config = {}
         stats = ("expandedNodes", "yScrollbarLocation", "xScrollbarLocation")
         for item in stats:
@@ -41,11 +51,15 @@ class RecentProjects:
         return config
 
     def set_tree_status(self, name: str, status: Dict[str, str]):
+        if not self.config:
+            return
         for key, value in status.items():
             self.config[name][key] = value
         self.write_config()
 
     def add_project(self, name: str, path: str):
+        if not self.config:
+            return
         self.config[name] = {
             "openFiles"         : {},
             "path"              : path,
@@ -57,10 +71,14 @@ class RecentProjects:
         self.write_config()
 
     def remove_project(self, name: str):
+        if not self.config:
+            return
         self.config.pop(name)
         self.write_config()
 
     def assign_icon(self, name: str, icon: os.PathLike):
+        if not self.config:
+            return
         if os.path.isfile(icon):
             self.config[name]["icon"] = icon
             self.write_config()

@@ -21,13 +21,10 @@ printf "================================================\n"
 printf "================================================\n"
 echo Program Finished With Exit Code $?
 python3 {dir}/measure.py stop
-echo Press enter to continue...
-read -rs  # This will pause the script
 rm timertemp.txt
 """
     if not WINDOWS
     else """@echo off
-title Build Results
 cd "{script_dir}"
 {dir}/measure.py start
 echo.
@@ -39,7 +36,6 @@ echo Program Finished With Exit Code %ERRORLEVEL%
 echo ----------------------------------------------------
 echo.
 del timertemp.txt
-pause
 """
 )  # The batch files for building.
 LINT_BATCH = (

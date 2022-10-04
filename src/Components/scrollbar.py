@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import *
+from typing import Literal, Callable
 
 from src.Utils.color_utils import darken_color, lighten_color
 
@@ -13,7 +13,7 @@ class Scrollbar(tk.Canvas):
     def __init__(
         self,
         parent,
-        command: callable,
+        command: Callable,
         orient: Literal["vertical", "horizontal"] = "vertical",
         width=20,
     ):
@@ -74,6 +74,8 @@ class Scrollbar(tk.Canvas):
             y0 = 2
             x1 = min(int(width * hi), width)
             y1 = height
+        else:
+            raise ValueError("orient must be 'vertical' or 'horizontal'")
 
         self.coords("slider", x0, y0, x1, y1)
         self.x0 = x0

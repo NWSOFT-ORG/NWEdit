@@ -2,7 +2,7 @@
 
 import tkinter as tk
 from tkinter import font, ttk
-from typing import *
+from typing import Union
 
 from pygments import lexers, styles
 
@@ -32,6 +32,9 @@ class TextLineNumbers(tk.Canvas):
 
     def advancedredraw(self, line: str, first: int) -> None:
         """redraw line numbers"""
+        if not self.textwidget:
+            return
+
         self.delete("all")
 
         i = self.textwidget.index("@0,0")
@@ -73,6 +76,9 @@ class TextLineNumbers(tk.Canvas):
 
     def redraw(self, first: int) -> None:
         """redraw line numbers"""
+        if not self.textwidget:
+            return
+
         self.delete("all")
 
         i = self.textwidget.index("@0,0")
@@ -391,16 +397,17 @@ class TextOpts:
 
     def close_brackets(self, event: Union[tk.Event, None] = None) -> str:
         currtext = self.text
-        if event.char in [")", "]", "}", "'", '"'] and currtext.get(
+        if event:
+            if event.char in [")", "]", "}", "'", '"'] and currtext.get(
                 "insert -1c", "insert"
-        ) in [")", "]", "}", "'", '"']:
-            currtext.mark_set("insert", "insert +1c")
-            self.key()
-            return "break"
+            ) in [")", "]", "}", "'", '"']:
+                currtext.mark_set("insert", "insert +1c")
+                self.key()
+                return "break"
         currtext.delete("insert", "insert +1c")
         self.key()
 
-    def autoinsert(self, event=None) -> str:
+    def autoinsert(self, event: tk.Event = None) -> str:
         """Auto-inserts a symbol
         * ' -> ''
         * " -> ""

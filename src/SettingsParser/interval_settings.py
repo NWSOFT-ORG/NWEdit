@@ -10,6 +10,7 @@ class IntervalSettings:
 
     def get_settings(self, item):
         try:
-            return self.settings[item]
+            if self.settings:
+                return self.settings[item]
         except KeyError:
             raise EditorErr(f"Wrong request item: {item}")

@@ -48,12 +48,12 @@ class FileTree(ttk.Frame):
         self.tree.tag_bind(
             "file",
             "<Button-2>" if OSX else "<Button-3>",
-            lambda event: self.right_click(event, False),
+            lambda event: self.right_click(event),
         )
         self.tree.tag_bind(
             "subfolder",
             "<Button-2>" if OSX else "<Button-3>",
-            lambda event: self.right_click(event, True),
+            lambda event: self.right_click(event),
         )
         self.tree.update()
 
@@ -173,7 +173,8 @@ class FileTree(ttk.Frame):
         name = self.get_path(item, True)
         if os.path.isdir(name):
             return
-        self.opencommand(name)
+        if self.opencommand:
+            self.opencommand(name)
         if destroy:
             self.master.destroy()
 
@@ -195,7 +196,7 @@ class FileTree(ttk.Frame):
             self.temp_path.append(self.tree.item(item, "text"))
         return os.path.abspath(os.path.join(*self.temp_path))
 
-    def right_click(self, event: tk.Event, isdir: bool, item: str = "") -> None:
+    def right_click(self, event: tk.Event, item: str = "") -> None:
         menu = tk.Menu(self.master)
         if not item:
             item = self.tree.identify("item", event.x, event.y)

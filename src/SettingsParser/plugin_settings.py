@@ -28,6 +28,8 @@ class Plugins:
 
     def load_plugins(self) -> None:
         plugins = []
+        if not self.settings:
+            return
         for module in self.settings.values():
             try:
                 exec(

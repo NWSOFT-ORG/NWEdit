@@ -1,6 +1,6 @@
 run: install-packages; poetry run python3 main.py
 install-packages: ; poetry install 
-build-mac: install-packages; @printf "[Compiling via PyInstaller...]\n"
+build-mac: install-packages tests; @printf "[Compiling via PyInstaller...]\n"
 							pyinstaller --noconfirm --onefile --windowed --icon "src/Images/pyplus.ico" \
 							--hidden-import "art" \
 							--hidden-import "Foundation" \
@@ -31,3 +31,5 @@ build-linux-win: install-packages; @printf "[Compiling via PyInstaller...]\n"
 							 --clean > /dev/null
 							 rm -rf build main.spec
 							 @printf "\033[36m[Build complete] \033[0m"
+tests: install-packages;
+	poetry run pytest

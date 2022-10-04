@@ -1,7 +1,7 @@
 import os
 import sys
 from tkinter import font, ttk
-from typing import *
+from typing import Dict
 from typing import Callable
 
 import json5 as json

@@ -1,11 +1,12 @@
 import re
 import tkinter as tk
-from typing import *
+from typing import Union, Dict, List
 
 import json5 as json
 
 from src.constants import MAIN_KEY, logger
 from src.Utils.images import get_image
+from src.errors import EditorErr
 
 SHIFT_PATTERN = re.compile(r"shift-([a-zA-z])")
 
@@ -30,7 +31,10 @@ class Menu:
         self.functions = []
         self.disable_menus = {}
         with open("Config/menu.json") as f:
-            self.config: Dict[str, Union[List, Dict]] = json.load(f)[self.menu_name]  # Load main menu only
+            config = json.load(f)
+            if not config:
+                raise EditorErr("Menu configuration is empty")
+            self.config: Dict[str, Union[List, Dict]] = config[self.menu_name]  # Load main menu only
         self.load_config()
 
     def load_config(self):

@@ -282,7 +282,7 @@ class Editor:
     def load_status(self):
         with open("EditorStatus/window_status.json") as f:
             geometry = json.load(f)
-            if geometry is None or not "windowGeometry" in geometry.keys():
+            if geometry is None or "windowGeometry" not in geometry.keys():
                 return
             geometry = geometry["windowGeometry"]
             geometry = f"{geometry[0]}x{geometry[1]}"

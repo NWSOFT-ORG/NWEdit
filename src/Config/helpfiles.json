@@ -1,0 +1,9 @@
+{
+    "Home": "main.md",
+    "Getting Started": "setup.md",
+    "Features": "features.md",
+    "General Configuration": "general-conf.md",
+    "File Configuration": "filetype-conf.md",
+    "UI Configuration": "ui-conf.md",
+    "[default]": "main.md"
+}

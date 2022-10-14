@@ -95,7 +95,6 @@ For example: "package"
                 false
             ]
         },
-//        "[PyPlus]": {},
         "[File]": {
             "New...": [
                 "new",
@@ -438,11 +437,20 @@ For example: "package"
                 "subprocess",
                 false
             ]
+        },
+        "[Help]": {
+            "PyPlus Documentation": [
+                null,
+                null,
+                "HelpView(obj.master)",
+                "src.Components.helpview -> HelpView",
+                false
+            ]
         }
     },
     /*
     The menu shown on the start dialog (the modal to select projects to open)
-    Used by src.Componentss.startdialog
+    Used by src.Components.startdialog
     */
     "start_dialog": {
         "[PyPlus]": {
@@ -468,6 +476,15 @@ For example: "package"
                 "shift-o",
                 "obj.open_project_dialog()",
                 null,
+                false
+            ]
+        },
+        "[Help]": {
+            "PyPlus Documentation": [
+                null,
+                null,
+                "HelpView(obj.master)",
+                "src.Components.helpview -> HelpView",
                 false
             ]
         }

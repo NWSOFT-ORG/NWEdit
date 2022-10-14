@@ -20,20 +20,24 @@ from src.SettingsParser.general_settings import GeneralSettings
 class HighlightRenderer(HTMLRenderer):
     def block_code(self, code, info=None) -> str:
         if info:
+            if info == "jsonc":
+                info = "json"  # JSONC causes problems
             lexer = get_lexer_by_name(info, stripall=True)
             pygments_style = GeneralSettings().get_settings("pygments_theme")
             formatter = html.HtmlFormatter(noclasses=True, style=pygments_style)
             return highlight(code, lexer, formatter)
         bg = ttk.Style().lookup("TFrame", "background")
         fg = ttk.Style().lookup("TFrame", "foreground")
-        return f'<span style="font-family: \'TkFixedFont\'; color: {fg}; background-color: {lighten_color(bg, 15)}"><code>'\
+        return f'<pre style="font-family: \'TkFixedFont\'; color: {fg}; background-color: {lighten_color(bg, 15)}">\
+                <code>'\
                 + escape(code)\
-                + '</code></span>'
+                + '</code></pre>'
 
     def codespan(self, text) -> str:
         fg = ttk.Style().lookup("TFrame", "foreground")
         bg = ttk.Style().lookup("TFrame", "background")
-        return f'<pre style="font-family: \'TkFixedFont\'; color: {fg}; background-color: {lighten_color(bg, 15)}">' + escape(text) + '</pre>'
+        return f'<pre style="font-family: \'TkFixedFont\'; color: {fg}; background-color: {lighten_color(bg, 15)}">'\
+               + escape(text) + '</pre>'
 
     def text(self, text) -> str:
         fg = ttk.Style().lookup("TFrame", "foreground")
@@ -42,6 +46,7 @@ class HighlightRenderer(HTMLRenderer):
     def list_item(self, *text, **_) -> str:
         fg = ttk.Style().lookup("TFrame", "foreground")
         return f'<span style="color: {fg}"><li>' + text[0] + '</li></span>'
+
 
 class HelpView(WinFrame):
     def __init__(self, master: Tk_Win) -> None:
@@ -93,4 +98,3 @@ class HelpView(WinFrame):
             markdown = Markdown(renderer=HighlightRenderer(), plugins=[plugin_table])
             contents = markdown(f.read())
             self.apply_custom_style(contents)
-

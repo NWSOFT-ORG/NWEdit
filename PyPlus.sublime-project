@@ -1,0 +1,19 @@
+{
+	"folders":
+	[
+		{
+            "follow_symlinks": true,
+			"path": ".",
+		},
+	],
+	"settings": {
+        "python_interpreter": ".venv/bin/python3",
+        "test_command": ".venv/bin/pytest",
+    },
+	"build_systems": [
+		{
+			"name": "PyPlus: main",
+			"shell_cmd": "\".venv/bin/python3\" -u \"main.py\"",
+		},
+	]
+}

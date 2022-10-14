@@ -20,4 +20,3 @@ if __name__ == "__main__":
 
     StartDialog(master=root)  # Starts the Editor
     root.mainloop()
-

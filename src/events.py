@@ -28,8 +28,7 @@ class EventClass:
     def find_in_events(self, string: str) -> List[Callable]:
         matches: List[Callable] = []
         for key in self.events.keys():
-            if (self.wildcard == True and string in key) or string == key: 
+            if (self.wildcard is True and string in key) or string == key:
                 function = self.events[key]
                 matches.append(function)
         return matches
-

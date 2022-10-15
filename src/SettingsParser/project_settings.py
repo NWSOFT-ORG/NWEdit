@@ -31,6 +31,8 @@ class RecentProjects:
     def set_open_files(self, name: str, files: Dict[str, str]):
         if not self.config:
             return
+        if not files:
+            self.config[name]["openFiles"] = {}
         for file, index in files.items():
             self.config[name]["openFiles"][file] = index
         self.write_config()
@@ -53,6 +55,8 @@ class RecentProjects:
     def set_tree_status(self, name: str, status: Dict[str, str]):
         if not self.config:
             return
+        if not status:
+            self.config[name] = {}
         for key, value in status.items():
             self.config[name][key] = value
         self.write_config()

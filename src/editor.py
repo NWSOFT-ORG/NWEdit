@@ -87,10 +87,10 @@ class Editor:
     """The editor class."""
 
     # noinspection PyBroadException
-    def __init__(self, master: tk.Tk, project_name: str) -> None:
+    def __init__(self, master: tk.Toplevel, project_name: str) -> None:
         """The editor object, the entire thing that goes in the
         window."""
-        self.master: tk.Tk = master
+        self.master: tk.Toplevel = master
         self.project = project_name
         init_images()
 
@@ -180,8 +180,6 @@ class Editor:
         # EventClass bindings
         events.on("editor.open_file", self.open_file)
         events.on("reload", self.reload)
-        # Quit bindings
-        self.master.createcommand("::tk::mac::Quit", self.exit)
         logger.debug("Bindings created")
 
     @staticmethod
@@ -456,6 +454,8 @@ class Editor:
                 nb.forget(selected_tab)
                 self.tabs.pop(selected_tab)
 
+                print(self.tabs, flush=True)
+
             self.mouse()
         except KeyError:
             pass
@@ -476,13 +476,10 @@ class Editor:
             self.open_file(x)
         self.nb.select(curr)
 
-    def exit(self) -> None:
-        tree_stat = self.filetree.generate_status()
-        self.projects.set_tree_status(self.project, tree_stat)
-
+    def save_status(self):
         file_list = {}
 
-        if self.get_text_editor:
+        if self.tabs:
             for tab in self.tabs.values():
                 if tab.istoolwin:
                     continue
@@ -501,10 +498,19 @@ class Editor:
             status["windowGeometry"] = [width, height]
             json.dump(status, f)
 
-        self.master.destroy()
+        logger.debug("Saved status")
 
-    @staticmethod
-    def restart() -> None:
+    def exit(self) -> None:
+        tree_stat = self.filetree.generate_status()
+        self.projects.set_tree_status(self.project, tree_stat)
+
+        self.save_status()
+
+        logger.info("Close window")
+        self.master.withdraw()
+
+    def restart(self) -> None:
+        self.save_status()
         os.execv(sys.executable, [__file__] + sys.argv)
 
     @property

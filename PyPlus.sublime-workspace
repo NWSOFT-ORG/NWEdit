@@ -3,28 +3,57 @@
 	{
 		"selected_items":
 		[
+			[
+				"im",
+				"import"
+			],
+			[
+				"P",
+				"PIL"
+			],
+			[
+				"si",
+				"signal"
+			],
+			[
+				"dum",
+				"dump_traceback"
+			],
+			[
+				"on",
+				"on_exit"
+			],
+			[
+				"thr",
+				"thread"
+			],
+			[
+				"ma",
+				"main"
+			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "PyPlus.sublime-project",
+			"file": "src/EditorStatus/recent_projects.json",
 			"settings":
 			{
-				"buffer_size": 317,
+				"buffer_size": 2780,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/editor.py",
+			"settings":
+			{
+				"buffer_size": 19721,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			},
 			"undo_stack":
 			[
 			]
-		},
-		{
-			"file": "tests/test_color_utils.py",
-			"settings":
-			{
-				"buffer_size": 1232,
-				"line_ending": "Unix"
-			}
 		}
 	],
 	"build_system": "Packages/Makefile/Make.sublime-build",
@@ -103,16 +132,44 @@
 		"selected_items":
 		[
 			[
-				"term",
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"terv",
 				"Terminal View: Open Default Terminal"
 			],
 			[
 				"termi",
-				"Terminal View: Open Bash Terminal"
+				"Terminal View: Open Default Terminal"
 			],
 			[
-				"install",
+				"anac",
+				"Anaconda: Rename object under cursor"
+			],
+			[
+				"markdown",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"mark",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"pack",
 				"Package Control: Install Package"
+			],
+			[
+				":w",
+				":w - Save"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"term",
+				"Terminal View: Open Default Terminal"
 			],
 			[
 				"remove",
@@ -157,15 +214,36 @@
 	[
 		"/Users/andy/Documents/Projects/PyPlus",
 		"/Users/andy/Documents/Projects/PyPlus/src",
-		"/Users/andy/Documents/Projects/PyPlus/tests"
+		"/Users/andy/Documents/Projects/PyPlus/src/EditorStatus",
+		"/Users/andy/Documents/Projects/PyPlus/src/SettingsParser",
+		"/Users/andy/Documents/Projects/PyPlus/src/Utils"
 	],
 	"file_history":
 	[
-		"/Users/andy/Documents/Projects/PyPlus/pyproject.toml",
-		"/Users/andy/Documents/Projects/PyPlus/res.txt",
 		"/Users/andy/Documents/Projects/PyPlus/PyPlus.sublime-project",
-		"/Users/andy/Library/Application Support/Sublime Text/Packages/User/Anaconda.sublime-settings",
+		"/Users/andy/Documents/Projects/PyPlus/src/Components/helpview.py",
+		"/Users/andy/Documents/Projects/PyPlus/src/Components/startdialog.py",
 		"/Users/andy/Documents/Projects/PyPlus/main.py",
+		"/Users/andy/Documents/Projects/PyPlus/src/Utils/images.py",
+		"/Users/andy/Documents/Projects/PyPlus/src/Utils/photoimage.py",
+		"/Users/andy/Documents/Projects/PyPlus/src/SettingsParser/extension_settings.py",
+		"/Users/andy/Documents/Projects/PyPlus/pyproject.toml",
+		"/Users/andy/Documents/Projects/PyPlus/src/editor.py",
+		"/Users/andy/Documents/Projects/PyPlus/src/Config/start.json",
+		"/Users/andy/Documents/Projects/PyPlus/src/EditorStatus/recent_projects.json",
+		"/Users/andy/Downloads/ghostscript-10.0.0/.lgtm.yml",
+		"/Users/andy/Documents/Projects/PyPlus/src/pyplus.log",
+		"/Users/andy/Documents/Projects/PyPlus/src/Config/helpfiles.json",
+		"/Users/andy/Documents/Projects/PyPlus/docs/ui-conf.md",
+		"/Users/andy/Documents/Projects/PyPlus/docs/general-conf.md",
+		"/Users/andy/Documents/Projects/PyPlus/docs/filetype-conf.md",
+		"/Users/andy/Library/Application Support/Sublime Text/Packages/User/Anaconda.sublime-settings",
+		"/Users/andy/Documents/Projects/PyPlus/docs/main.md",
+		"/Users/andy/Documents/Projects/PyPlus/src/Config/menu.json",
+		"/Users/andy/Documents/Projects/PyPlus/src/SettingsParser/menu.py",
+		"/Users/andy/Documents/Projects/PyPlus/src/Components/autocomplete.py",
+		"/Users/andy/Documents/Projects/PyPlus/tests/test_color_utils.py",
+		"/Users/andy/Documents/Projects/PyPlus/res.txt",
 		"/Users/andy/Documents/Projects/PyPlus/PyPlus/pyproject.toml",
 		"/Users/andy/Documents/Projects/PyPlus/PyPlus/src/editor.py",
 		"/Users/andy/Documents/Projects/PyPlus/PyPlus/main.py",
@@ -175,13 +253,15 @@
 	],
 	"find":
 	{
-		"height": 39.0
+		"height": 27.0
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 101.0,
 		"where_history":
 		[
+			"/Users/andy/Documents/Projects/PyPlus/",
+			"/Users/andy/Documents/Projects/PyPlus/docs"
 		]
 	},
 	"find_state":
@@ -189,6 +269,16 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"svg",
+			"scg",
+			"reload",
+			"\",\n",
+			"\n            \"HelpView(obj.master)\", // Command\n            \"src.Components.helpview -> HelpView\", // Imports",
+			"\n            \"Class(obj.master)\", // Command\n            \"src.Components.class -> Class\", // Imports",
+			"Imports",
+			"\n            \"Class(obj.master)\", // Command\n            \"src.Components.class -> Class\", // Imports",
+			"```json",
+			"sation"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -196,6 +286,9 @@
 		"regex": false,
 		"replace_history":
 		[
+			"\n            \"HelpView(obj.master)\", // Command\n            \"src.Components.helpview -> HelpView\", // Imports",
+			"```jsonc",
+			"zation"
 		],
 		"reverse": false,
 		"scrollbar_highlights": true,
@@ -212,26 +305,24 @@
 			[
 				{
 					"buffer": 0,
-					"file": "PyPlus.sublime-project",
+					"file": "src/EditorStatus/recent_projects.json",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 317,
+						"buffer_size": 2780,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								317,
-								317
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JSON/JSON.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/JSON/JSON.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -243,20 +334,20 @@
 				},
 				{
 					"buffer": 1,
-					"file": "tests/test_color_utils.py",
+					"file": "src/editor.py",
 					"selected": true,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1232,
+						"buffer_size": 19721,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								713,
-								713
+								7017,
+								7017
 							]
 						],
 						"settings":
@@ -266,7 +357,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2927.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -282,7 +373,7 @@
 	},
 	"input":
 	{
-		"height": 39.0
+		"height": 40.0
 	},
 	"layout":
 	{
@@ -319,7 +410,7 @@
 	{
 		"height": 0.0
 	},
-	"pinned_build_system": "Packages/Makefile/Make.sublime-build",
+	"pinned_build_system": "PyPlus: main",
 	"project": "PyPlus.sublime-project",
 	"replace":
 	{

@@ -161,8 +161,10 @@ logging.basicConfig(
     filemode="w",
     level=logging.DEBUG,
     datefmt="%d/%m %H:%M",
-    format="%(asctime)s %(levelname)s %(funcName)s %(message)s",
+    format="%(asctime)s %(levelname)s %(name)s: %(funcName)s %(message)s",
 )
+
+logging.getLogger("PIL").setLevel(logging.CRITICAL)
 
 logger.info(f"Tkinter version: {tk.TkVersion}")
 logger.debug("All modules imported")

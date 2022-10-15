@@ -1,5 +1,6 @@
 import os
 import sys
+import tkinter as tk
 from tkinter import font, ttk
 from typing import Dict
 from typing import Callable
@@ -51,6 +52,8 @@ class StartDialog:
         self.functions = []
         self.create_links()
 
+        self.create_bindings()
+
         self.project_view = ProjectView(self.frame, self.open_project)
         self.project_view.pack(side="bottom", fill="both", expand=True)
         self.frame.create_bar()
@@ -59,12 +62,14 @@ class StartDialog:
         logger.debug("Loaded start dialog")
 
     def open_project(self, project):
+        def close(editor: Editor):
+            editor.exit()
+            self.__init__(self.master)
         self.frame.withdraw()
-        Editor(self.master, project)
         self.master.deiconify()
+        editor = Editor(self.master, project)
+        self.master.protocol("WM_DELETE_WINDOW", lambda: close(editor))
 
-        # If project closes, show the welcome dialog
-        self.master.protocol("WM_DELETE_WINDOW", lambda: self.__init__(self.master))
         logger.debug(f"Opened project: {project}")
 
     def open_project_dialog(self):
@@ -105,6 +110,10 @@ class StartDialog:
             item.pack(side="left", anchor="nw")
             item.bind("<Button>", lambda _: frame.destroy(), add=True)
         logger.debug("Start screen created")
+
+    def create_bindings(self):
+        # Quit bindings
+        self.master.createcommand("::tk::mac::Quit", lambda: sys.exit(0))
 
 
 class NewProjectDialog(WinFrame):

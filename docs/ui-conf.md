@@ -11,7 +11,7 @@ Example:
 ```jsonc
 {
     "main": {
-        "[Parent]": {
+        "[Parent]@A": {
             "Item": [
                 null, // Icon
                 null, // Accelerator
@@ -26,6 +26,29 @@ Example:
 ### Which menu?
 Currently, PyPlus supports two menus: the PyPlus application menu and the start screen menu.\
 The `main` word in the above example means this menu will be created for the PyPlus application.
+### Which platform?
+Platform markers are used to specify the platform to display the menu.\
+Supported markers are:
+- `W, !W` for Windows and all except Windows
+- `M, !A` for macOS and all except macOS
+- `L, !L` for Linux and all except Linux
+- `A` for all platforms
+E.g, display the Application menu on macOS only:
+```jsonc
+{
+    "main": {
+        "[PyPlus]@M": {
+            "Item": [
+                null, // Icon
+                null, // Accelerator
+                "Class(obj.master)", // Command
+                "src.Components.class -> Class", // Imports
+                false // Disable when no files open
+            ]
+        }
+    }
+}
+```
 ### Accelerator
 An accelerator is a marker to show the shortcut of a command, PyPlus also creates bindings with this option.\
 An accelerator accepted by PyPlus is either a bare accelerator (just a key), or a CTRL-key (Command-key on Macs) binding.
@@ -34,7 +57,7 @@ An accelerator accepted by PyPlus is either a bare accelerator (just a key), or 
 To specify a bare accelerator, start the accelerator with a `` ` ``
 ```jsonc
 {
-    "[Parent]": {
+    "[Parent]@A": {
         "Item": [
             null, // Icon
             "`a", // Accelerator: a
@@ -48,7 +71,7 @@ To specify a bare accelerator, start the accelerator with a `` ` ``
 #### CTRL-key accelerator
 ```jsonc
 {
-    "[Parent]": {
+    "[Parent]@A": {
         "Item": [
             null, // Icon
             "a", // Accelerator: CTRL/Command + a
@@ -64,7 +87,7 @@ Use this option to map a command to a specific menu item.\
 The `obj` can be used to reference the editor class.
 ```jsonc
 {
-    "[Parent]": {
+    "[Parent]@A": {
         "Item": [
             null, // Icon
             "a", // Accelerator: CTRL/Command + a

@@ -138,7 +138,7 @@ class WinFrame(tk.Toplevel):
                     self.winfo_height(), fill=lighten_color(get_bg(), 40),
                     outline="",
                     start=-90, tags="size"
-                    )
+                )
             else:
                 size = self.status_bar.create_rectangle(
                     self.winfo_width() - self.status_bar.winfo_height(), 0,
@@ -147,7 +147,7 @@ class WinFrame(tk.Toplevel):
                     fill=lighten_color(get_bg(), 40),
                     outline="",
                     tags="size"
-                    )
+                )
             self.status_bar.tag_bind(size, "<B1-Motion>", self.resize)
 
     def on_exit(self, _):
@@ -166,7 +166,7 @@ class WinFrame(tk.Toplevel):
             self.titlebar.winfo_height() * 2,
             RADIUS,
             fill=get_bg()
-            )
+        )
         self.titlebar.create_text(
             21, int((self.titlebar.winfo_height() - font_height()) / 2), text=self.title_text,
             fill=get_fg(), anchor="nw"

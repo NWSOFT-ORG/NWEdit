@@ -29,12 +29,14 @@ class Plugin:  # Every Plugin main file should be a class called 'Plugin'
     def __init__(self):
         # Defined menu -> New menu
         self.menu = {
-            "[Tools -> Testing]": {
-                "Sample": ["info",
-                           None,
-                           "main()",
-                           "src.Plugins.plugin_sample -> main",
-                           False]
+            "[Tools]@A -> [Testing]": {
+                "Sample": {
+                    "icon": "info",
+                    "mnemonic": None,
+                    "function": "main()",
+                    "imports": "src.Plugins.plugin_sample -> main",
+                    "disable": False
+                }
             }
         }
         self.PLUGIN_DATA = {

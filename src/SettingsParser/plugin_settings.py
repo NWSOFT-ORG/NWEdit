@@ -1,19 +1,22 @@
 import json5 as json
+import re
 
 from src.constants import logger
 from src.SettingsParser.menu import Menu
+from src.errors import EditorErr
+
+
+PLUGIN_MENU_PATTERN = re.compile(r"(\[(.+?)\](@(W|!W|M|!M|L|!L|A))?) -> (\[(.+?\])(@(W|!W|M|!M|L|!L|A))?)")
 
 
 def parse_name(name):
-    name = name.split(" -> ")
-    if len(name) < 1:
-        logger.error("Plugin menu incorrect")
-    for index, _ in enumerate(name):
-        if not index % 2:
-            name[index] += "]"
-        else:
-            name[index] = "[" + name[index]
-    return name
+    name_re = re.match(PLUGIN_MENU_PATTERN, name)
+    if not name_re:
+        raise EditorErr("Invalid plugin menu configuration")
+    orig_menu = name_re.group(1)
+    plugin_menu = name_re.group(5)
+
+    return [orig_menu, plugin_menu]
 
 
 class Plugins:

@@ -1,6 +1,7 @@
 import re
 import tkinter as tk
-from typing import Union, Dict, List
+import sys
+from typing import Union, Dict, List, Literal
 
 import json5 as json
 
@@ -9,6 +10,7 @@ from src.Utils.images import get_image
 from src.errors import EditorErr
 
 SHIFT_PATTERN = re.compile(r"shift-([a-zA-z])")
+PARENT_PATTERN = re.compile(r"\[(.+?)\](@(W|!W|M|!M|L|!L|A))?")
 
 
 def convert_shift_keysym(keysym):
@@ -17,6 +19,28 @@ def convert_shift_keysym(keysym):
         letter = res.group(1)
         keysym = re.sub(SHIFT_PATTERN, letter.upper(), keysym)
     return keysym
+
+
+def compare_platforms(platform: Literal["win32", "darwin", "linux"],
+                      marker: Literal["W", "!W", "M", "!M", "L", "!L", "A", ""]):
+    if not marker or marker == "A":
+        return True
+    PLATFORM_IS_WINDOWS = platform == "win32"
+    PLATFORM_IS_MACOS = platform == "darwin"
+    PLATFORM_IS_LINUX = platform == "linux"
+    PLATFORM_IS_NOT_WINDOWS = platform != "win32"
+    PLATFORM_IS_NOT_MACOS = platform != "darwin"
+    PLATFORM_IS_NOT_LINUX = platform != "linux"
+
+    MARKER_IS_WINDOWS = marker == "W"
+    MARKER_IS_MACOS = marker == "M"
+    MARKER_IS_LINUX = marker == "L"
+    MARKER_IS_NOT_WINDOWS = marker == "!W"
+    MARKER_IS_NOT_MACOS = marker == "!M"
+    MARKER_IS_NOT_LINUX = marker == "!L"
+    return (PLATFORM_IS_WINDOWS and MARKER_IS_WINDOWS) or (PLATFORM_IS_NOT_WINDOWS and MARKER_IS_NOT_WINDOWS) or \
+           (PLATFORM_IS_MACOS and MARKER_IS_MACOS) or (PLATFORM_IS_NOT_MACOS and MARKER_IS_NOT_MACOS) or \
+           (PLATFORM_IS_LINUX and MARKER_IS_LINUX) or (PLATFORM_IS_NOT_LINUX and MARKER_IS_NOT_LINUX)
 
 
 class Menu:
@@ -48,26 +72,39 @@ class Menu:
         Will also create bindings"""
         for key in config.keys():
             if key == "---":
+                # Separator
                 menu.add_separator()
-            elif not (key.startswith("[") and key.endswith("]")):
-                cnf = [menu, key, *config[key][:-1]]
+            elif not re.match(PARENT_PATTERN, key):
+                # Item
+                cnf = {"menu": menu, "text": key, **config[key]}
                 logger.debug(f"Creating item {key!r}")
-                logger.debug(f"Disable on no editors: {config[key][-1]}")
-                if config[key][-1]:
+                if cnf["disable"]:
                     if menu not in self.disable_menus.keys():
                         self.disable_menus[menu] = []
                     self.disable_menus[menu].append(key)
-                self.create_item(*cnf)
+                cnf.pop("disable")
+                self.create_item(**cnf)
             else:
+                # Parent
                 cnf = {}
-                if key == "[PyPlus]":
+                logger.debug(f"Creating parent {key!r}")
+                if key == "[PyPlus]@M":  # Create application menu on macOS only!
                     cnf["name"] = "apple"
                     logger.debug("Creating apple menu")
                     self.apple = tk.Menu(menu, **cnf)
-                cascade = tk.Menu(menu, **cnf)
-                self.create_menu(cascade, config[key])
-                menu.add_cascade(menu=cascade, label=key[1:-1])
-        logger.debug(f"Menus disabled when no editors: {self.disable_menus!r}")
+                platform_re = re.findall(PARENT_PATTERN, key)
+                if not platform_re:
+                    logger.error("Invalid menu syntax")
+                    sys.exit(1)
+
+                platform_re = platform_re[0]
+                platform = platform_re[2]
+                name = platform_re[0]
+
+                if compare_platforms(sys.platform, platform):
+                    cascade = tk.Menu(menu, **cnf)
+                    self.create_menu(cascade, config[key])
+                    menu.add_cascade(menu=cascade, label=name)
 
     def disable(self, tabs):
         logger.debug(f"{bool(tabs)=!r}. Therefore, {'enable' if tabs else 'disable'} menu items")
@@ -86,7 +123,7 @@ class Menu:
         logger.debug(f"Imported a module: {statement}")
         return statement
 
-    def create_item(self, menu, text, image, mnemonic, function, imports):
+    def create_item(self, menu, text, icon, mnemonic, function, imports):
         local_vars = {}
         if imports:
             exec(self.do_import(imports), local_vars)  # Imports things as plugins
@@ -96,7 +133,7 @@ class Menu:
         )
         cnf = {
             "label"      : text,
-            "image"      : get_image(image),
+            "image"      : get_image(icon),
             "accelerator": f"{MAIN_KEY}-{mnemonic}",
             "compound"   : "left",
             "command"    : self.functions[-1]

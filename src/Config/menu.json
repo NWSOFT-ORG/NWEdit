@@ -1,8 +1,8 @@
 /*
 Creates the menu for PyPlus
 Config is in the format:
-"[cascade_name]": {}   <- A cascade OR
-"item_name": [image, mnemonic, function, plugin_path]   <- An item in a cascade
+"[cascade_name]@A": {}   <- A cascade OR
+"item_name": {image, mnemonic, function, plugin_path]   <- An item in a cascade
 ----
 The function should be a lambda call. You may use 'obj' to reference a class that uses the menu
 The plugin_path should be a Python import string, with the object name.
@@ -17,435 +17,435 @@ For example: "package"
     Used by src.Editor
     */
     "main": {
-        "[PyPlus]": {
-            "About PyPlus": [
-                "info",
-                null,
-                "AboutDialog(obj.master)",
-                "src.Components.commondialog -> AboutDialog",
-                false
-            ],
-            "[Settings]": {
-                "General Settings": [
-                    "gear",
-                    "comma",
-                    "obj.open_file(\"Config/general-settings.json\")",
-                    null,
-                    false
-                ],
-                "Run command settings": [
-                    "gear",
-                    null,
-                    "obj.open_file(\"Config/cmd-settings.json\")",
-                    null,
-                    false
-                ],
-                "Lexer settings": [
-                    "gear",
-                    null,
-                    "obj.open_file(\"Config/lexer-settings.json\")",
-                    null,
-                    false
-                ],
-                "Comment markers": [
-                    "gear",
-                    null,
-                    "obj.open_file(\"Config/comment-markers.json\")",
-                    null,
-                    false
-                ],
-                "File types for New File": [
-                    "gear",
-                    null,
-                    "obj.open_file(\"Config/file-extens.json\")",
-                    null,
-                    false
-                ],
-                "File icons": [
-                    "gear",
-                    null,
-                    "obj.open_file(\"Config/file-icons.json\")",
-                    null,
-                    false
-                ],
+        "[PyPlus]@M": {
+            "About PyPlus": {
+                "icon": "info",
+                "mnemonic": null,
+                "function": "AboutDialog(obj.master)",
+                "imports": "src.Components.commondialog -> AboutDialog",
+                "disable": false
+            },
+            "[Settings]@A": {
+                "General Settings": {
+                    "icon": "gear",
+                    "mnemonic": "comma",
+                    "function": "obj.open_file(\"Config/general-settings.json\")",
+                    "imports": null,
+                    "disable": false
+                },
+                "Run command settings": {
+                    "icon": "gear",
+                    "mnemonic": null,
+                    "function": "obj.open_file(\"Config/cmd-settings.json\")",
+                    "imports": null,
+                    "disable": false
+                },
+                "Lexer settings": {
+                    "icon": "gear",
+                    "mnemonic": null,
+                    "function": "obj.open_file(\"Config/lexer-settings.json\")",
+                    "imports": null,
+                    "disable": false
+                },
+                "Comment markers": {
+                    "icon": "gear",
+                    "mnemonic": null,
+                    "function": "obj.open_file(\"Config/comment-markers.json\")",
+                    "imports": null,
+                    "disable": false
+                },
+                "File types for New File": {
+                    "icon": "gear",
+                    "mnemonic": null,
+                    "function": "obj.open_file(\"Config/file-extens.json\")",
+                    "imports": null,
+                    "disable": false
+                },
+                "File icons": {
+                    "icon": "gear",
+                    "mnemonic": null,
+                    "function": "obj.open_file(\"Config/file-icons.json\")",
+                    "imports": null,
+                    "disable": false
+                },
                 "---": null,
-                "[Backup Settings]": {
-                    "Save Settings...": [
-                        "save-as",
-                        null,
-                        "ZipSettings(obj.master).zipsettings()",
-                        "src.SettingsParser.zip_settings -> ZipSettings",
-                        false
-                    ],
-                    "Load Settings...": [
-                        "open",
-                        null,
-                        "ZipSettings(obj.master).unzipsettings()",
-                        "src.SettingsParser.zip_settings -> ZipSettings",
-                        false
-                    ]
+                "[Backup Settings]@A": {
+                    "Save Settings...": {
+                        "icon": "save-as",
+                        "mnemonic": null,
+                        "function": "ZipSettings(obj.master).zipsettings()",
+                        "imports": "src.SettingsParser.zip_settings -> ZipSettings",
+                        "disable": false
+                    },
+                    "Load Settings...": {
+                        "icon": "open",
+                        "mnemonic": null,
+                        "function": "ZipSettings(obj.master).unzipsettings()",
+                        "imports": "src.SettingsParser.zip_settings -> ZipSettings",
+                        "disable": false
+                    }
                 }
             },
             "---": null,
-            "Quit": [
-                "close",
-                "q",
-                "obj.exit()",
-                null,
-                false
-            ]
-        },
-        "[File]": {
-            "New...": [
-                "new",
-                "n",
-                "obj.filetree.new_item()",
-                null,
-                false
-            ],
-            "[Open...]": {
-                "Open File": [
-                    "open",
-                    "o",
-                    "obj.open_file()",
-                    null,
-                    false
-                ],
-                "Open File in Hex": [
-                    "open",
-                    null,
-                    "obj.open_hex()",
-                    null,
-                    false
-                ],
-                "Open Folder": [
-                    "open",
-                    "shift-o",
-                    "obj.open_dir()",
-                    null,
-                    false
-                ],
-                "Clone From Git...": [
-                    "clone",
-                    null,
-                    "obj.git(\"clone\")",
-                    null,
-                    false
-                ]
-            },
-            "Save Copy to": [
-                "save-as",
-                "shift-s",
-                "obj.save_as()",
-                null,
-                true
-            ],
-            "Close Tab": [
-                "close",
-                "w",
-                "obj.close_tab()",
-                null,
-                true
-            ],
-            "Reload All": [
-                "reload",
-                null,
-                "obj.reload()",
-                null,
-                true
-            ]
-        },
-        "[Edit]": {
-            "Undo": [
-                "undo",
-                "z",
-                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).undo()",
-                "src.Components.tktext -> TextOpts",
-                true
-            ],
-            "Redo": [
-                "redo",
-                "shift-z",
-                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).redo()",
-                "src.Components.tktext -> TextOpts",
-                true
-            ],
-            "Cut": [
-                "cut",
-                "x",
-                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).cut()",
-                "src.Components.tktext -> TextOpts",
-                true
-            ],
-            "Copy": [
-                "copy",
-                "c",
-                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).copy()",
-                "src.Components.tktext -> TextOpts",
-                true
-            ],
-            "Paste": [
-                "paste",
-                "v",
-                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).paste()",
-                "src.Components.tktext -> TextOpts",
-                true
-            ],
-            "Duplicate Line or Selected": [
-                null,
-                "d",
-                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).duplicate_line()",
-                "src.Components.tktext -> TextOpts",
-                true
-            ],
-            "[Indent...]": {
-                "Indent": [
-                    "indent",
-                    "i",
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).indent(\"indent\")",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ],
-                "Unindent": [
-                    "unindent",
-                    "u",
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).indent(\"unindent\")",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ]
-            },
-            "Join Lines": [
-                null,
-                null,
-                "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).join_lines()",
-                "src.Components.tktext -> TextOpts",
-                true
-            ],
-            "[Case...]": {
-                "Swap Case": [
-                    null,
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).swap_case()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ],
-                "Upper Case": [
-                    "upper",
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).upper_case()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ],
-                "Lower Case": [
-                    "lower",
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).lower_case()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ]
-            },
-            "[Select...]": {
-                "Select All": [
-                    "sel-all",
-                    "a",
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).select_all()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ],
-                "Select Line": [
-                    null,
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_line()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ],
-                "Select Word": [
-                    null,
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_word()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ],
-                "Select Previous Word": [
-                    null,
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_word_left()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ],
-                "Select Next Word": [
-                    null,
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_word_right()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ]
-            },
-            "[Delete...]": {
-                "Delete Selected": [
-                    "delete",
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ],
-                "Delete Word": [
-                    "delete",
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ],
-                "Delete Previous Word": [
-                    "delete",
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ],
-                "Delete Next Word": [
-                    "delete",
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ]
-            },
-            "[Move line...]": {
-                "Up": [
-                    null,
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).mv_line_up()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ],
-                "Down": [
-                    null,
-                    null,
-                    "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).mv_line_dn()",
-                    "src.Components.tktext -> TextOpts",
-                    true
-                ]
+            "Quit": {
+                "icon": "close",
+                "mnemonic": "q",
+                "function": "obj.exit()",
+                "imports": null,
+                "disable": false
             }
         },
-        "[Code]": {
-            "Run": [
-                "run",
-                "b",
-                "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).run()",
-                "src.codefunctions -> CodeFunctions",
-                true
-            ],
-            "Lint": [
-                "lint",
-                null,
-                "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).lint_source()",
-                "src.codefunctions -> CodeFunctions",
-                true
-            ],
-            "Auto-Format": [
-                "format",
-                null,
-                "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).autopep()",
-                "src.codefunctions -> CodeFunctions",
-                true
-            ],
-            "[Open Shell...]": {
-                "Open System Shell": [
-                    "term",
-                    null,
-                    "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).system_shell()",
-                    "src.codefunctions -> CodeFunctions",
-                    false
-                ],
-                "Open Python Shell": [
-                    "py-term",
-                    "F2",
-                    "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).python_shell()",
-                    "src.codefunctions -> CodeFunctions",
-                    false
-                ]
+        "[File]@A": {
+            "New...": {
+                "icon": "new",
+                "mnemonic": "n",
+                "function": "obj.filetree.new_item()",
+                "imports": null,
+                "disable": false
+            },
+            "[Open...]@A": {
+                "Open File": {
+                    "icon": "open",
+                    "mnemonic": "o",
+                    "function": "obj.open_file()",
+                    "imports": null,
+                    "disable": false
+                },
+                "Open File in Hex": {
+                    "icon": "open",
+                    "mnemonic": null,
+                    "function": "obj.open_hex()",
+                    "imports": null,
+                    "disable": false
+                },
+                "Open Folder": {
+                    "icon": "open",
+                    "mnemonic": "shift-o",
+                    "function": "obj.open_dir()",
+                    "imports": null,
+                    "disable": false
+                },
+                "Clone From Git...": {
+                    "icon": "clone",
+                    "mnemonic": null,
+                    "function": "obj.git(\"clone\")",
+                    "imports": null,
+                    "disable": false
+                }
+            },
+            "Save Copy to": {
+                "icon": "save-as",
+                "mnemonic": "shift-s",
+                "function": "obj.save_as()",
+                "imports": null,
+                "disable": true
+            },
+            "Close Tab": {
+                "icon": "close",
+                "mnemonic": "w",
+                "function": "obj.close_tab()",
+                "imports": null,
+                "disable": true
+            },
+            "Reload All": {
+                "icon": "reload",
+                "mnemonic": null,
+                "function": "obj.reload()",
+                "imports": null,
+                "disable": true
             }
         },
-        "[View]": {
-            "Unit tests": [
-                null,
-                null,
-                "TestDialog(obj.bottom_tabs, obj.filetree.path)",
-                "src.Components.testdialog -> TestDialog",
-                false
-            ],
-            "Code structure": [
-                null,
-                null,
-                "CodeListDialog(obj.bottom_tabs, obj.get_text)",
-                "src.Components.codelistdialog -> CodeListDialog",
-                true
-            ],
-            "Insert Ascii Art": [
-                null,
-                null,
-                "StyleWindow(obj.master, obj.get_text, obj.key)",
-                "src.Components.textstyle -> StyleWindow",
-                true
-            ]
+        "[Edit]@A": {
+            "Undo": {
+                "icon": "undo",
+                "mnemonic": "z",
+                "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).undo()",
+                "imports": "src.Components.tktext -> TextOpts",
+                "disable": true
+            },
+            "Redo": {
+                "icon": "redo",
+                "mnemonic": "shift-z",
+                "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).redo()",
+                "imports": "src.Components.tktext -> TextOpts",
+                "disable": true
+            },
+            "Cut": {
+                "icon": "cut",
+                "mnemonic": "x",
+                "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).cut()",
+                "imports": "src.Components.tktext -> TextOpts",
+                "disable": true
+            },
+            "Copy": {
+                "icon": "copy",
+                "mnemonic": "c",
+                "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).copy()",
+                "imports": "src.Components.tktext -> TextOpts",
+                "disable": true
+            },
+            "Paste": {
+                "icon": "paste",
+                "mnemonic": "v",
+                "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).paste()",
+                "imports": "src.Components.tktext -> TextOpts",
+                "disable": true
+            },
+            "Duplicate Line or Selected": {
+                "icon": null,
+                "mnemonic": "d",
+                "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).duplicate_line()",
+                "imports": "src.Components.tktext -> TextOpts",
+                "disable": true
+            },
+            "[Indent...]@A": {
+                "Indent": {
+                    "icon": "indent",
+                    "mnemonic": "i",
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).indent(\"indent\")",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                },
+                "Unindent": {
+                    "icon": "unindent",
+                    "mnemonic": "u",
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).indent(\"unindent\")",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                }
+            },
+            "Join Lines": {
+                "icon": null,
+                "mnemonic": null,
+                "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).join_lines()",
+                "imports": "src.Components.tktext -> TextOpts",
+                "disable": true
+            },
+            "[Case...]@A": {
+                "Swap Case": {
+                    "icon": null,
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).swap_case()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                },
+                "Upper Case": {
+                    "icon": "upper",
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).upper_case()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                },
+                "Lower Case": {
+                    "icon": "lower",
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).lower_case()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                }
+            },
+            "[Select...]@A": {
+                "Select All": {
+                    "icon": "sel-all",
+                    "mnemonic": "a",
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).select_all()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                },
+                "Select Line": {
+                    "icon": null,
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_line()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                },
+                "Select Word": {
+                    "icon": null,
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_word()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                },
+                "Select Previous Word": {
+                    "icon": null,
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_word_left()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                },
+                "Select Next Word": {
+                    "icon": null,
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).sel_word_right()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                }
+            },
+            "[Delete...]@A": {
+                "Delete Selected": {
+                    "icon": "delete",
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                },
+                "Delete Word": {
+                    "icon": "delete",
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                },
+                "Delete Previous Word": {
+                    "icon": "delete",
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                },
+                "Delete Next Word": {
+                    "icon": "delete",
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).delete()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                }
+            },
+            "[Move line...]@A": {
+                "Up": {
+                    "icon": null,
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).mv_line_up()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                },
+                "Down": {
+                    "icon": null,
+                    "mnemonic": null,
+                    "function": "TextOpts(obj.master, keyaction=obj.key).set_text(obj.get_text).mv_line_dn()",
+                    "imports": "src.Components.tktext -> TextOpts",
+                    "disable": true
+                }
+            }
         },
-        "[Navigate]": {
-            "Go to...": [
-                null,
-                "shift-n",
-                "Navigate(obj.get_text)",
-                "src.Components.goto -> Navigate",
-                true
-            ],
-            "Find and Replace": [
-                "search",
-                "f",
-                "Search(obj.bottom_tabs, obj.get_text)",
-                "src.Components.search -> Search",
-                true
-            ],
-            "Search in Directory": [
-                null,
-                null,
-                "SearchInDir(obj.bottom_tabs, obj.filetree.path, obj.open_file)",
-                "src.Components.searchindir -> SearchInDir",
-                false
-            ]
+        "[Code]@A": {
+            "Run": {
+                "icon": "run",
+                "mnemonic": "b",
+                "function": "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).run()",
+                "imports": "src.codefunctions -> CodeFunctions",
+                "disable": true
+            },
+            "Lint": {
+                "icon": "lint",
+                "mnemonic": null,
+                "function": "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).lint_source()",
+                "imports": "src.codefunctions -> CodeFunctions",
+                "disable": true
+            },
+            "Auto-Format": {
+                "icon": "format",
+                "mnemonic": null,
+                "function": "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).autopep()",
+                "imports": "src.codefunctions -> CodeFunctions",
+                "disable": true
+            },
+            "[Open Shell...]@A": {
+                "Open System Shell": {
+                    "icon": "term",
+                    "mnemonic": null,
+                    "function": "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).system_shell()",
+                    "imports": "src.codefunctions -> CodeFunctions",
+                    "disable": false
+                },
+                "Open Python Shell": {
+                    "icon": "py-term",
+                    "mnemonic": "F2",
+                    "function": "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).python_shell()",
+                    "imports": "src.codefunctions -> CodeFunctions",
+                    "disable": false
+                }
+            }
         },
-        "[Tools]": {
-            "View Plugins": [
-                "gear",
-                null,
-                "PluginView(obj.master)",
-                "src.Plugins.plugins_view -> PluginView",
-                false
-            ]
+        "[View]@A": {
+            "Unit tests": {
+                "icon": null,
+                "mnemonic": null,
+                "function": "TestDialog(obj.bottom_tabs, obj.filetree.path)",
+                "imports": "src.Components.testdialog -> TestDialog",
+                "disable": false
+            },
+            "Code structure": {
+                "icon": null,
+                "mnemonic": null,
+                "function": "CodeListDialog(obj.bottom_tabs, obj.get_text)",
+                "imports": "src.Components.codelistdialog -> CodeListDialog",
+                "disable": true
+            },
+            "Insert Ascii Art": {
+                "icon": null,
+                "mnemonic": null,
+                "function": "StyleWindow(obj.master, obj.get_text, obj.key)",
+                "imports": "src.Components.textstyle -> StyleWindow",
+                "disable": true
+            }
         },
-        "[Git]": {
-            "Commit": [
-                null,
-                "shift-k",
-                "obj.git(\"commit\")",
-                null,
-                false
-            ],
-            "Init": [
-                null,
-                null,
-                "subprocess.Popen('git init && git add . && git commit -am \"Added files\"',hell=True,cwd=obj.filetree.path,)",
-                "subprocess",
-                false
-            ]
+        "[Navigate]@A": {
+            "Go to...": {
+                "icon": null,
+                "mnemonic": "shift-n",
+                "function": "Navigate(obj.get_text)",
+                "imports": "src.Components.goto -> Navigate",
+                "disable": true
+            },
+            "Find and Replace": {
+                "icon": "search",
+                "mnemonic": "f",
+                "function": "Search(obj.bottom_tabs, obj.get_text)",
+                "imports": "src.Components.search -> Search",
+                "disable": true
+            },
+            "Search in Directory": {
+                "icon": null,
+                "mnemonic": null,
+                "function": "SearchInDir(obj.bottom_tabs, obj.filetree.path, obj.open_file)",
+                "imports": "src.Components.searchindir -> SearchInDir",
+                "disable": false
+            }
         },
-        "[Help]": {
-            "PyPlus Documentation": [
-                null,
-                null,
-                "HelpView(obj.master)",
-                "src.Components.helpview -> HelpView",
-                false
-            ]
+        "[Tools]@A": {
+            "View Plugins": {
+                "icon": "gear",
+                "mnemonic": null,
+                "function": "PluginView(obj.master)",
+                "imports": "src.Plugins.plugins_view -> PluginView",
+                "disable": false
+            }
+        },
+        "[Git]@A": {
+            "Commit": {
+                "icon": null,
+                "mnemonic": "shift-k",
+                "function": "obj.git(\"commit\")",
+                "imports": null,
+                "disable": false
+            },
+            "Init": {
+                "icon": null,
+                "mnemonic": null,
+                "function": "subprocess.Popen('git init && git add . && git commit -am \"Added files\"',hell=True,cwd=obj.filetree.path,)",
+                "imports": "subprocess",
+                "disable": false
+            }
+        },
+        "[Help]@A": {
+            "PyPlus Documentation": {
+                "icon": null,
+                "mnemonic": null,
+                "function": "HelpView(obj.master)",
+                "imports": "src.Components.helpview -> HelpView",
+                "disable": false
+            }
         }
     },
     /*
@@ -453,40 +453,40 @@ For example: "package"
     Used by src.Components.startdialog
     */
     "start_dialog": {
-        "[PyPlus]": {
-            "About PyPlus": [
-                "info",
-                null,
-                "AboutDialog(obj.master)",
-                "src.Components.commondialog -> AboutDialog",
-                false
-            ],
+        "[PyPlus]@M": {
+            "About PyPlus": {
+                "icon": "info",
+                "mnemonic": null,
+                "function": "AboutDialog(obj.master)",
+                "imports": "src.Components.commondialog -> AboutDialog",
+                "disable": false
+            },
             "---": null,
-            "Quit": [
-                "close",
-                "q",
-                "sys.exit(0)",
-                "sys",
-                false
-            ]
+            "Quit": {
+                "icon": "close",
+                "mnemonic": "q",
+                "function": "sys.exit(0)",
+                "imports": "sys",
+                "disable": false
+            }
         },
-        "[Project]": {
-            "Open Project": [
-                "open",
-                "shift-o",
-                "obj.open_project_dialog()",
-                null,
-                false
-            ]
+        "[Project]@A": {
+            "Open Project": {
+                "icon": "open",
+                "mnemonic": "shift-o",
+                "function": "obj.open_project_dialog()",
+                "imports": null,
+                "disable": false
+            }
         },
-        "[Help]": {
-            "PyPlus Documentation": [
-                null,
-                null,
-                "HelpView(obj.master)",
-                "src.Components.helpview -> HelpView",
-                false
-            ]
+        "[Help]@A": {
+            "PyPlus Documentation": {
+                "icon": null,
+                "mnemonic": null,
+                "function": "HelpView(obj.master)",
+                "imports": "src.Components.helpview -> HelpView",
+                "disable": false
+            }
         }
     }
 }

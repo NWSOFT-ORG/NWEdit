@@ -454,8 +454,6 @@ class Editor:
                 nb.forget(selected_tab)
                 self.tabs.pop(selected_tab)
 
-                print(self.tabs, flush=True)
-
             self.mouse()
         except KeyError:
             pass

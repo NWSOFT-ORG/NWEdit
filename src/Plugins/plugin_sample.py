@@ -31,11 +31,12 @@ class Plugin:  # Every Plugin main file should be a class called 'Plugin'
         self.menu = {
             "[Tools]@A -> [Testing]": {
                 "Sample": {
-                    "icon": "info",
+                    "icon"    : "info",
                     "mnemonic": None,
                     "function": "main()",
-                    "imports": "src.Plugins.plugin_sample -> main",
-                    "disable": False
+                    "imports" : "src.Plugins.plugin_sample -> main",
+                    "disable" : False,
+                    "platform": "A"
                 }
             }
         }

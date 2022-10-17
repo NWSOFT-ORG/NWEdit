@@ -1,10 +1,6 @@
-import sys
-from json import JSONDecodeError
 from tkinter import font
 
 import json5 as json
-
-from src.Components.commondialog import ErrorInfoDialog
 from src.types import Tk_Widget
 
 
@@ -13,13 +9,10 @@ class GeneralSettings:
 
     def __init__(self, master: Tk_Widget = "."):
         self.master = master
-        try:
-            with open("Config/general-settings.json") as f:
-                self.settings = json.load(f)
-
-        except JSONDecodeError:
-            ErrorInfoDialog(self.master, text="Setings are corrupted.")
-            sys.exit(1)
+        with open("Config/default/general-settings.json") as f:
+            self.settings = json.load(f)
+        with open("Config/general-settings.json") as f:
+            self.settings |= json.load(f)
 
     def get_font(self):
         code_font = font.Font(
@@ -31,6 +24,7 @@ class GeneralSettings:
             return code_font
         for option, value in font_options.items():
             code_font[option] = value
+        return code_font
 
     def get_settings(self, setting):
         if self.settings:

@@ -4,10 +4,10 @@ import json5 as json
 
 class HelpFiles():
     def __init__(self) -> None:
-        with open("Config/helpfiles.json") as f:
+        with open("Config/default/helpfiles.json") as f:
             self.helpfiles = json.load(f)
-            if self.helpfiles is None:
-                self.helpfiles = {}
+        with open("Config/helpfiles.json") as f:
+            self.helpfiles |= json.load(f)
 
     def get_name(self) -> List[str]:
         if self.helpfiles is None:

@@ -1,0 +1,22 @@
+/*
+Configures the start window
+*/
+
+{
+    "Open Project...": [
+        "open",
+        "self.open_project_dialog()"
+    ],
+    "New...": [
+        "new",
+        "self.new_project()"
+    ],
+    "Clone...": [
+        "clone",
+        "self.clone()"
+    ],
+    "Close": [
+        "close",
+        "frame.destroy()"
+    ]
+}

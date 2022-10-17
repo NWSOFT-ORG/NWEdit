@@ -12,15 +12,25 @@ class ExtensionSettings:
     """An inheratiable class"""
 
     def __init__(self, path: str) -> None:
-        with open(path) as f:
-            all_settings = json.load(f)
-        if not all_settings:
-            all_settings = {}
+        self.path = path
         self.extens = []
         self.items = []
+
+        self.load_config()
+
+    def load_config(self):
+        all_settings = self.load_default_config()
+        with open(f"Config/{self.path}") as f:
+            all_settings |= json.load(f)
+
         for key, value in all_settings.items():
             self.extens.append(key)
             self.items.append(value)
+
+    def load_default_config(self):
+        with open(f"Config/default/{self.path}") as f:
+            all_settings = json.load(f)
+        return all_settings
 
     def get_settings(self, extension) -> Union[str, None]:
         try:
@@ -33,7 +43,7 @@ class ExtensionSettings:
 
 class PygmentsLexer(ExtensionSettings):
     def __init__(self) -> None:
-        super().__init__("Config/lexer-settings.json")
+        super().__init__("lexer-settings.json")
 
     def get_settings(self, extension: str) -> Lexer:
         try:
@@ -44,28 +54,30 @@ class PygmentsLexer(ExtensionSettings):
 
 class Linter(ExtensionSettings):
     def __init__(self) -> None:
-        super().__init__("Config/linter-settings.json")
+        super().__init__("linter-settings.json")
 
 
 class FormatCommand(ExtensionSettings):
     def __init__(self) -> None:
-        super().__init__("Config/format-settings.json")
+        super().__init__("format-settings.json")
 
 
 class RunCommand(ExtensionSettings):
     def __init__(self) -> None:
-        super().__init__("Config/cmd-settings.json")
+        super().__init__("cmd-settings.json")
 
 
 class CommentMarker(ExtensionSettings):
     def __init__(self) -> None:
-        super().__init__("Config/comment-markers.json")
+        super().__init__("comment-markers.json")
 
 
 class FileTreeIconSettings:
     def __init__(self) -> None:
-        self.path = "Config/file-icons.json"
-        self.dark = False
+        self.path = "file-icons.json"
+        self.settings = {}
+
+        self.load_config()
 
     @property
     def folder_icon(self) -> ImageTk.PhotoImage:
@@ -75,12 +87,16 @@ class FileTreeIconSettings:
         img = img.resize((img.width // 5, img.height // 5), 1)
         return ImageTk.PhotoImage(img)
 
+    def load_config(self):
+        with open(f"Config/default/{self.path}") as f:
+            self.settings |= json.load(f)
+        with open(f"Config/{self.path}") as f:
+            self.settings |= json.load(f)
+
     def get_icon(self, extension: str) -> ImageTk.PhotoImage:
-        with open(self.path) as f:
-            settings = json.load(f)
         try:
-            if settings:
-                icon_name = settings[extension]
+            if self.settings:
+                icon_name = self.settings[extension]
             else:
                 icon_name = "other"
         except KeyError:

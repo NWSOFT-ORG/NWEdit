@@ -1,6 +1,5 @@
 import os
 import sys
-import tkinter as tk
 from tkinter import font, ttk
 from typing import Dict
 from typing import Callable

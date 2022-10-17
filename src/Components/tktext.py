@@ -49,12 +49,12 @@ class TextLineNumbers(tk.Canvas):
             light_fg = lighten_color(self.textwidget["fg"], 40)
             dark_fg = darken_color(self.textwidget["fg"], 5)
 
-            test_font = font.Font(family=self.textwidget["font"], weight="bold")
-            width = test_font.measure("0" * w) + 3
+            test_font = font.Font(font=self.textwidget["font"], weight="bold")
+            width = test_font.measure("0" * (w + 4))
             self.config(width=width)
 
             if int(linenum) == int(float(line)):
-                bold = font.Font(family=self.textwidget["font"], weight="bold")
+                bold = font.Font(font=self.textwidget["font"], weight="bold")
                 self.create_text(
                     2,
                     y,
@@ -83,7 +83,9 @@ class TextLineNumbers(tk.Canvas):
 
         i = self.textwidget.index("@0,0")
         w = len(self.textwidget.index("end-1c linestart"))
-        self.config(width=w * 10)
+        test_font = font.Font(family=self.textwidget["font"], weight="bold")
+        width = test_font.measure("0" * (w + 4))
+        self.config(width=width)
         while True:
             dline = self.textwidget.dlineinfo(i)
             if dline is None:
@@ -168,7 +170,6 @@ class EnhancedTextFrame(ttk.Frame):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         settings_class = GeneralSettings()
-        self.font = settings_class.get_font()
         self.first_line = 1
         style = styles.get_style_by_name(settings_class.get_settings("pygments_theme"))
         bgcolor = style.background_color

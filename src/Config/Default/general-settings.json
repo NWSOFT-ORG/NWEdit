@@ -1,0 +1,27 @@
+/* General settings
+Improper modifying might cause errors!
+Please follow the instructions as comments.
+*/
+{
+    // Must be a valid TK font
+    "font": "TkFixedFont",
+    // Size of font
+    "font_size": 10,
+    "font_options": {
+        "weight": "normal",
+        "slant": "roman",
+        "underline": false,
+        "overstrike": false
+    },
+    // Height of each line
+    "line_height": 1,
+    // Must be a valid TTK theme
+    "ttk_theme": "alt",
+    // Must be a valid Pygments theme
+    "pygments_theme": "default",
+    // Controls the tab width
+    "tab_width": 4,
+    // Shows the cursor as a block
+    "block_cursor": false
+}
+

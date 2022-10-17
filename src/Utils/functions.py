@@ -1,6 +1,7 @@
 """Useful functions"""
 
 import tkinter as tk
+from tkinter import font
 from keyword import iskeyword
 from typing import Union
 
@@ -64,6 +65,7 @@ def apply_style(text: tk.Text):
     style = styles.get_style_by_name(settings_class.get_settings("pygments_theme"))
     bgcolor = style.background_color
     fgcolor = style.highlight_color
+
     if is_dark_color(bgcolor):
         bg = lighten_color(bgcolor, 30)
         fg = lighten_color(fgcolor, 40)

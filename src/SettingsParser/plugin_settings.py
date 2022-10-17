@@ -25,9 +25,10 @@ class Plugins:
     def __init__(self, master, menu: Menu) -> None:
         self.master = master
         self.menu = menu
-        with open("Config/plugin-data.json") as f:
+        with open("Config/default/plugin-data.json") as f:
             self.settings = json.load(f)
-        # self.create_tool_menu()
+        with open("Config/plugin-data.json") as f:
+            self.settings |= json.load(f)
 
     def load_plugins(self) -> None:
         plugins = []

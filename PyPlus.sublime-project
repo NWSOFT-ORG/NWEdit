@@ -10,11 +10,14 @@
         "python_interpreter": ".venv/bin/python3",
         "test_command": ".venv/bin/pytest",
     },
-	"build_systems": [
-		{
-			"name": "PyPlus: main",
-			"shell_cmd": "\".venv/bin/python3\" \"main.py\"",
-			"working_dir": "$project_path"
-		},
-	]
+	"debugger_configurations" : [
+	    {
+	        "name" : "PyPlus",
+	        "request" : "launch",
+	        "type" : "python",
+	        "module": "main",
+	        "python": "$project_path/.venv/bin/python3",
+	        "cwd": "$project_path"
+	    }
+]
 }

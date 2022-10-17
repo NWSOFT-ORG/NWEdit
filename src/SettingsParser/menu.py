@@ -54,11 +54,12 @@ class Menu:
         self.apple = tk.Menu(self.menu, name="apple")
         self.functions = []
         self.disable_menus = {}
+        with open("Config/default/menu.json") as f:
+            config = json.load(f)
+            self.config: Dict[str, Union[List, Dict]] = config[self.menu_name]  # Load main menu only
         with open("Config/menu.json") as f:
             config = json.load(f)
-            if not config:
-                raise EditorErr("Menu configuration is empty")
-            self.config: Dict[str, Union[List, Dict]] = config[self.menu_name]  # Load main menu only
+            self.config |= config[self.menu_name]  # Load main menu only
         self.load_config()
 
     def load_config(self):
@@ -83,7 +84,9 @@ class Menu:
                         self.disable_menus[menu] = []
                     self.disable_menus[menu].append(key)
                 cnf.pop("disable")
-                self.create_item(**cnf)
+                if compare_platforms(sys.platform, cnf["platform"]):
+                    cnf.pop("platform")
+                    self.create_item(**cnf)
             else:
                 # Parent
                 cnf = {}

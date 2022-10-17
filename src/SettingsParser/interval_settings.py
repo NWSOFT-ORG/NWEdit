@@ -5,8 +5,10 @@ from src.errors import EditorErr
 
 class IntervalSettings:
     def __init__(self):
-        with open("Config/interval.json") as f:
+        with open("Config/default/interval.json") as f:
             self.settings = json.load(f)
+        with open("Config/interval.json") as f:
+            self.settings |= json.load(f)
 
     def get_settings(self, item):
         try:

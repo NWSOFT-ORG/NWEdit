@@ -1,0 +1,8 @@
+/* Low-level property file: MODIFY WITH CARE!
+Customise the application's waiting time.
+Time format: Milliseconds;
+Do not modify the keys!
+*/
+{
+    "TreeviewRefresh": 30
+}

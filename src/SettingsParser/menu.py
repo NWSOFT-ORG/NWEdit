@@ -7,7 +7,6 @@ import json5 as json
 
 from src.constants import MAIN_KEY, logger
 from src.Utils.images import get_image
-from src.errors import EditorErr
 
 SHIFT_PATTERN = re.compile(r"shift-([a-zA-z])")
 PARENT_PATTERN = re.compile(r"\[(.+?)\](@(W|!W|M|!M|L|!L|A))?")
@@ -91,7 +90,7 @@ class Menu:
                 # Parent
                 cnf = {}
                 logger.debug(f"Creating parent {key!r}")
-                if key == "[PyPlus]@M":  # Create application menu on macOS only!
+                if key == "[NWEdit]@M":  # Create application menu on macOS only!
                     cnf["name"] = "apple"
                     logger.debug("Creating apple menu")
                     self.apple = tk.Menu(menu, **cnf)
@@ -135,11 +134,11 @@ class Menu:
             {"obj": self.obj, "self": self, **local_vars}
         )
         cnf = {
-            "label"      : text,
-            "image"      : get_image(icon),
+            "label": text,
+            "image": get_image(icon),
             "accelerator": f"{MAIN_KEY}-{mnemonic}",
-            "compound"   : "left",
-            "command"    : self.functions[-1]
+            "compound": "left",
+            "command": self.functions[-1]
         }
         if not mnemonic:
             cnf.pop("accelerator")  # Will cause error with an empty accelerator

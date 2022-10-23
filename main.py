@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import tkinter as tk
+from tkinter import Tk
 
 from src.Components.startdialog import StartDialog
 from src.constants import OSX
@@ -13,9 +13,9 @@ if __name__ == "__main__":
         if bundle:
             info = bundle.localizedInfoDictionary() or bundle.infoDictionary()
             if info:
-                info["CFBundleName"] = "PyPlus"  # Change name on the titlebar
-                info["CFBundleDisplayName"] = "PyPlus"  # Change name on the Dock
-    root = tk.Tk()
+                info["CFBundleName"] = "NWEdit"  # Change name on the titlebar
+                info["CFBundleDisplayName"] = "NWEdit"  # Change name on the Dock
+    root = Tk()
     root.option_add('*tearOff', "false")
 
     StartDialog(master=root)  # Starts the Editor

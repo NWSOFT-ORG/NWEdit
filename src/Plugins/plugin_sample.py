@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from src.Components.winframe import \
-    WinFrame  # You may import from PyPlus Libraries
+    WinFrame  # You may import from NWEdit Libraries
 
 
 class Sample(WinFrame):

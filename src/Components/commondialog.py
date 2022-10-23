@@ -114,13 +114,18 @@ class AboutDialog:
         """Shows the version and related info of the editor."""
         self.master = master
 
-        window = WinFrame(self.master, "About PyPlus", icon=get_image("info"))
+        window = WinFrame(self.master, "About NWEdit", icon=get_image("info"))
         ver = ttk.Frame(window)
         window.add_widget(ver)
-        ttk.Label(ver, image=get_image("pyplus-35px", img_type="image")).pack(
-            fill="both"
-        )
-        ttk.Label(ver, text=f"Version {VERSION}", font="tkDefaultFont 30 bold").pack(
+        self.icon_35px = get_image("NWEdit", "custom", 35, 35)
+        version = ttk.Label(ver,
+                            text=f"Version {VERSION}",
+                            font="tkDefaultFont 35 bold",
+                            image=self.icon_35px,
+                            compound="left"
+                            )
+        version.img = self.icon_35px
+        version.pack(
             fill="both"
         )
         if self.check_updates(popup=False)[0] is None:
@@ -146,7 +151,7 @@ class AboutDialog:
             return [True, "about:blank"]
         try:
             download_file(
-                url="https://raw.githubusercontent.com/ZCG-coder/NWSOFT/master/PyPlusWeb/ver.json"
+                url="https://raw.githubusercontent.com/ZCG-coder/NWSOFT/master/NWEditWeb/ver.json"
             )
         except urllib.error.URLError:
             return [None, "about:blank"]

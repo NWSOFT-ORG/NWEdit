@@ -1,5 +1,6 @@
 from typing import List
 import json5 as json
+from src.constants import APPDIR
 
 
 class HelpFiles():
@@ -21,10 +22,10 @@ class HelpFiles():
             raise ValueError("No help files found")
         elif name == "[default]":
             raise Warning("Use the get_default() method instead")
-        return f"../docs/{self.helpfiles[name]}"
+        return f"{APPDIR}/../docs/{self.helpfiles[name]}"
 
     @property
     def get_default(self) -> str:
         if self.helpfiles is None:
             raise ValueError("No help files found")
-        return f"../docs/{self.helpfiles['[default]']}"
+        return f"{APPDIR}/../docs/{self.helpfiles['[default]']}"

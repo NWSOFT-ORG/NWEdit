@@ -61,7 +61,7 @@ class ErrorReportDialog(WinFrame):
 
 class LogViewDialog(WinFrame):
     def __init__(self, master: Tk_Win) -> None:
-        super().__init__(master, "PyPlus Log", icon=get_image("info"))
+        super().__init__(master, "NWEdit Log", icon=get_image("info"))
         self.title("Log view")
         frame = ttk.Frame(self)
         frame.pack(anchor="nw", fill="x")
@@ -74,7 +74,7 @@ class LogViewDialog(WinFrame):
         self.log_text.after(10, self.update_log)
 
     def update_log(self) -> None:
-        with open("pyplus.log") as f:
+        with open("NWEdit.log") as f:
             log = f.read()
         self.log_text.delete("1.0", "end")
         self.log_text.insert("end", log)

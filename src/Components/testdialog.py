@@ -12,8 +12,8 @@ from src.constants import APPDIR
 from src.SettingsParser.extension_settings import RunCommand
 from src.Utils.functions import is_valid_name, shell_command
 
-TESTS_FILE = ".PyPlus/Tests/tests.json"
-SETTINGS_FILE = ".PyPlus/Tests/settings.json"
+TESTS_FILE = ".NWEdit/Tests/tests.json"
+SETTINGS_FILE = ".NWEdit/Tests/settings.json"
 
 
 class TestDialog(ttk.Frame):
@@ -55,10 +55,10 @@ class TestDialog(ttk.Frame):
 
     def write_test(self):
         try:
-            if not os.path.isdir(os.path.join(self.path, ".PyPlus")):
-                os.mkdir(os.path.join(self.path, ".PyPlus"))
-            if not os.path.isdir(os.path.join(self.path, ".PyPlus", "Tests")):
-                os.mkdir(os.path.join(self.path, ".PyPlus", "Tests"))
+            if not os.path.isdir(os.path.join(self.path, ".NWEdit")):
+                os.mkdir(os.path.join(self.path, ".NWEdit"))
+            if not os.path.isdir(os.path.join(self.path, ".NWEdit", "Tests")):
+                os.mkdir(os.path.join(self.path, ".NWEdit", "Tests"))
         except OSError:
             pass
         try:

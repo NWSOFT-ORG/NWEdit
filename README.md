@@ -1,9 +1,9 @@
-# PyPlusSource
+# NWEditSource
 
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FZCG-coder%2FPyPlus&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Views&edge_flat=true)](javascript:void(0);)  
-The source code of the PyPlus editor.
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FZCG-coder%2FNWEdit&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Views&edge_flat=true)](javascript:void(0);)  
+The source code of the NWEdit editor.
 
-PyPlus is a multipurpose editor, written in Python. It's not pure Python though, because it has a few components written
+NWEdit is a multipurpose editor, written in Python. It's not pure Python though, because it has a few components written
 in either Node.js or C#
 
 # The code
@@ -11,7 +11,7 @@ in either Node.js or C#
 The code is a modified(*enhanced*) version of  
 [dh7qc/python-text-editor](https://www.github.com/dh7qc/python-text-editor), licensed after the GPL v3.0 license
 
-**The website is at [here](http://zcg-coder.github.io/NWSOFT/PyPlusWeb)**  
+**The website is at [here](http://zcg-coder.github.io/NWSOFT/NWEditWeb)**  
 **The website may be outdated, so please go to source release to download it.**  
 Some code is from pyro written by James Stalings, licensed after the GPL v3.0 License. Thanks him for the source
 

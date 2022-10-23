@@ -27,6 +27,9 @@ class StartDialog:
     def __init__(self, master: Tk_Win) -> None:
         init_images()
         self.master = master
+        # noinspection PyTypeChecker
+        master.iconphoto(True, get_image("NWEdit", "image"))
+
         for item in master.winfo_children():
             if not isinstance(item, WinFrame):
                 item.destroy()
@@ -38,7 +41,7 @@ class StartDialog:
         logger.debug("Theme loaded")
 
         self.master.withdraw()
-        self.icon = get_image("pyplus")
+        self.icon = get_image("NWEdit", "icon")
         self.frame = WinFrame(self.master, "Start", icon=self.icon, disable=False)
         self.frame.geometry("710x580")
         self.frame.resizable(False, False)
@@ -57,7 +60,7 @@ class StartDialog:
         self.project_view.pack(side="bottom", fill="both", expand=True)
         self.frame.create_bar()
 
-        logger.info("Started PyPlus")
+        logger.info("Started NWEdit")
         logger.debug("Loaded start dialog")
 
     def open_project(self, project):
@@ -65,8 +68,8 @@ class StartDialog:
             editor.exit()
             self.__init__(self.master)
         self.frame.withdraw()
-        self.master.deiconify()
         editor = Editor(self.master, project)
+        self.master.deiconify()
         self.master.protocol("WM_DELETE_WINDOW", lambda: close(editor))
 
         logger.debug(f"Opened project: {project}")
@@ -99,8 +102,9 @@ class StartDialog:
         self.first_tab = first_tab = ttk.Frame(frame)
         frame.add_widget(first_tab)
         bold = font.Font(family="tkDefaultFont", size=35, weight="bold")
+        self.icon_35px = get_image("NWEdit", "custom", 35, 35)
         ttk.Label(
-            first_tab, text="Welcome!", font=bold, image=get_image("pyplus-35px", "image"), compound="left"
+            first_tab, text="Welcome!", font=bold, image=self.icon_35px, compound="left"
         ).pack(anchor="nw")
         links = self.links
         for text in links.keys():

@@ -1,8 +1,7 @@
 *.pyc
 .DS_STORE
-.PyPlus/
+.NWEdit/
 bin/
 node_modules/
 .cache/
-src/pyplus.log
-.vscode/
+src/NWEdit.log

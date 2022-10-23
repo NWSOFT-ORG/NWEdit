@@ -16,7 +16,7 @@ class Statusbar(ttk.Frame):
         super().__init__(*args, **kwargs)
         style = ttk.Style(self)
         style.configure("TLabel", padding=[3, 1, 1, 3])
-        ttk.Label(self, text="PyPlus").pack(side="left")
+        ttk.Label(self, text="NWEdit").pack(side="left")
         ttk.Sizegrip(self).pack(side="right")
 
         self.label3 = ttk.Label(self)

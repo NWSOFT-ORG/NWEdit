@@ -1,5 +1,5 @@
-# Features of PyPlus
-PyPlus supports a lot of text editing features:
+# Features of NWEdit
+NWEdit supports a lot of text editing features:
 1. Basic insertion/deletion/navigation
 2. Sort/Join lines
 3. Indent/Unindent lines

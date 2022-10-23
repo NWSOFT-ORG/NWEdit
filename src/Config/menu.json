@@ -1,5 +1,5 @@
 /*
-Creates the menu for PyPlus
+Creates the menu for NWEdit
 Config is in the format:
 "[cascade_name]@A": {}   <- A cascade OR
 "item_name": {image, mnemonic, function, plugin_path}   <- An item in a cascade
@@ -7,18 +7,18 @@ Config is in the format:
 The function should be a lambda call. You may use 'obj' to reference a class that uses the menu
 The plugin_path should be a Python import string, with the object name.
 For example: "path.to.class -> Object"
-If it is a built-in, or a package installed with PyPlus, you can use direct import statements
+If it is a built-in, or a package installed with NWEdit, you can use direct import statements
 For example: "package"
 */
 
 {
     /*
-    Main menubar (PyPlus, File, Edit...)
+    Main menubar (NWEdit, File, Edit...)
     Used by src.Editor
     */
     "main": {
-        "[PyPlus]@M": {
-            "About PyPlus": {
+        "[NWEdit]@M": {
+            "About NWEdit": {
                 "icon": "info",
                 "mnemonic": null,
                 "function": "AboutDialog(obj.master)",
@@ -564,7 +564,7 @@ For example: "package"
             }
         },
         "[Help]@A": {
-            "About PyPlus": {
+            "About NWEdit": {
                 "icon": "info",
                 "mnemonic": null,
                 "function": "AboutDialog(obj.master)",
@@ -572,7 +572,7 @@ For example: "package"
                 "disable": false,
                 "platform": "!M"
             },
-            "PyPlus Documentation": {
+            "NWEdit Documentation": {
                 "icon": null,
                 "mnemonic": null,
                 "function": "HelpView(obj.master)",
@@ -587,8 +587,8 @@ For example: "package"
     Used by src.Components.startdialog
     */
     "start_dialog": {
-        "[PyPlus]@M": {
-            "About PyPlus": {
+        "[NWEdit]@M": {
+            "About NWEdit": {
                 "icon": "info",
                 "mnemonic": null,
                 "function": "AboutDialog(obj.master)",
@@ -617,7 +617,7 @@ For example: "package"
             }
         },
         "[Help]@A": {
-            "About PyPlus": {
+            "About NWEdit": {
                 "icon": "info",
                 "mnemonic": null,
                 "function": "AboutDialog(obj.master)",
@@ -625,7 +625,7 @@ For example: "package"
                 "disable": false,
                 "platform": "!M"
             },
-            "PyPlus Documentation": {
+            "NWEdit Documentation": {
                 "icon": null,
                 "mnemonic": null,
                 "function": "HelpView(obj.master)",

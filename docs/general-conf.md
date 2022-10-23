@@ -1,12 +1,12 @@
-# Customization of PyPlus
-PyPlus is designed to be customisable through [JSON](https://json.org/).\
+# Customization of NWEdit
+NWEdit is designed to be customisable through [JSON](https://json.org/).\
 The json files are located in the `Config/` directory in the source.\
-Because PyPlus loads these settings on start, you need to restart PyPlus (PyPlus > Restart) to see the changes.
+Because NWEdit loads these settings on start, you need to restart NWEdit (NWEdit > Restart) to see the changes.
 ## 1. General Settings
 ### 1.1 Themes and color schemes
-PyPlus supports theming through [ttkthemes](https://ttkthemes.readthedocs.io), and color schemes from [Pygments](https://pygments.org)\
+NWEdit supports theming through [ttkthemes](https://ttkthemes.readthedocs.io), and color schemes from [Pygments](https://pygments.org)\
 Explore themes [here](https://ttkthemes.readthedocs.io/en/latest/themes.html) and color schemes [here](https://pygments.org/styles/)\
-Configuration (Menu > PyPlus > Preferences > General Settings):
+Configuration (Menu > NWEdit > Preferences > General Settings):
 ```jsonc
 {
     "ttk_theme": "black", // Any ttk theme
@@ -14,9 +14,9 @@ Configuration (Menu > PyPlus > Preferences > General Settings):
 }
 ```
 ### 1.2 Fonts and options
-Tkinter, the framework which PyPlus written in, supports font customization.\
+Tkinter, the framework which NWEdit written in, supports font customization.\
 You can use any system-installed font, or 'TkFixedFont' for a built-in fixed-width font.\
-Configuration (Menu > PyPlus > Preferences > General Settings):
+Configuration (Menu > NWEdit > Preferences > General Settings):
 ```jsonc
 {
     // Font face

@@ -155,9 +155,9 @@ ENCODINGS = (
 textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7F})
 os.chdir(APPDIR)
 
-logger = logging.getLogger("PyPlus")
+logger = logging.getLogger("NWEdit")
 logging.basicConfig(
-    filename="pyplus.log",
+    filename="NWEdit.log",
     filemode="w",
     level=logging.DEBUG,
     datefmt="%d/%m %H:%M",

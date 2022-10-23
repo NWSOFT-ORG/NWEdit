@@ -1,10 +1,10 @@
 [tool.poetry]
 authors = ["ZCG-Coder <z-c-ge@outlook.com>"]
 description = "The editor that edits"
-name = "PyPlus"
+name = "NWEdit"
 version = "7.0-dev"
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.10,<3.12"
 CairoSVG = "^2.5.2"
 art = "^5.7"
 json5 = "^0.9.8"
@@ -22,7 +22,8 @@ markdown2 = "^2.4.5"
 tkhtmlview = "^0.1.1.post5"
 mistune = "^2.0.4"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
+pyinstaller = "^5.5"
 pytest = "^7.1.2"
 isort = "^5.10.1"
 

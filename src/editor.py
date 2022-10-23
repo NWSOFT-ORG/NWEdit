@@ -97,8 +97,6 @@ class Editor:
         try:
             self.projects = RecentProjects(master)
             logger.debug("Project settings loaded")
-            # noinspection PyTypeChecker
-            master.iconphoto(True, get_image("pyplus-35px", "image"))
 
             self.tabs = Tabs()  # Modified dict
 
@@ -200,14 +198,14 @@ class Editor:
         try:
             path = self.tabs[self.nb.get_tab].file_dir
             if self.tabs[self.nb.get_tab].istoolwin:
-                self.master.title("PyPlus")
+                self.master.title("NWEdit")
                 logger.debug("update_title: Finished early")
                 return "break"
             if OSX:
                 self.master.attributes("-titlepath", path)
-            self.master.title(f"PyPlus [{self.project}] — {os.path.basename(path)}")
+            self.master.title(f"NWEdit [{self.project}] — {os.path.basename(path)}")
         except KeyError:
-            self.master.title(f"PyPlus [{self.project}]")
+            self.master.title(f"NWEdit [{self.project}]")
             self.master.attributes("-titlepath", "")
         finally:
             return "break"
@@ -283,7 +281,6 @@ class Editor:
             if geometry is None or "windowGeometry" not in geometry.keys():
                 return
             geometry = geometry["windowGeometry"]
-            geometry = f"{geometry[0]}x{geometry[1]}"
             self.master.geometry(geometry)
         tree_stat = self.projects.get_treeview_stat(self.project)
         self.filetree.load_status(tree_stat)
@@ -414,6 +411,7 @@ class Editor:
             if os.access(self.tabs[curr_tab].file_dir, os.W_OK):
                 with open(self.tabs[curr_tab].file_dir, "w") as file:
                     file.write(self.tabs[curr_tab].textbox.get(1.0, "end"))
+                    file.truncate(file.tell() - 1)
                     logger.debug("Wrote file")
             else:
                 ErrorInfoDialog(self.master, "File read only")
@@ -491,9 +489,8 @@ class Editor:
         with open("EditorStatus/window_status.json", "w") as f:
             status = {}
             self.master.update()
-            width = self.master.winfo_width()
-            height = self.master.winfo_height()
-            status["windowGeometry"] = [width, height]
+            geometry = self.master.winfo_geometry()
+            status["windowGeometry"] = geometry
             json.dump(status, f)
 
         logger.debug("Saved status")

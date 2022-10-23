@@ -1,5 +1,5 @@
 # Setup
-PyPlus can be run on Windows, Mac and Linux. Currrently, the only method to install it is to build from source.
+NWEdit can be run on Windows, Mac and Linux. Currrently, the only method to install it is to build from source.
 ## Prerequisites
 1. [Git](https://git-scm.com)
 2. [Python](https://python.org)
@@ -7,7 +7,7 @@ PyPlus can be run on Windows, Mac and Linux. Currrently, the only method to inst
 ## Build instructions for Windows
 1. Get the prerequisites
 2. Clone the repository\
-`git clone https://github.com/ZCG-coder/PyPlus.git && cd PyPlus`
+`git clone https://github.com/ZCG-coder/NWEdit.git && cd NWEdit`
 3. (Optional) Run tests\
 `make tests`
 4. Build
@@ -18,7 +18,7 @@ PyPlus can be run on Windows, Mac and Linux. Currrently, the only method to inst
 2. Get Xcode command line tools if necessary\
 `xcode-select --install`
 2. Clone the repository\
-`git clone https://github.com/ZCG-coder/PyPlus.git && cd PyPlus`
+`git clone https://github.com/ZCG-coder/NWEdit.git && cd NWEdit`
 3. (Optional) Run tests\
 `make tests`
 4. Build
@@ -27,7 +27,7 @@ PyPlus can be run on Windows, Mac and Linux. Currrently, the only method to inst
 ## Build instructions for Linux
 1. Get the prerequisites
 2. Clone the repository\
-`git clone https://github.com/ZCG-coder/PyPlus.git && cd PyPlus`
+`git clone https://github.com/ZCG-coder/NWEdit.git && cd NWEdit`
 3. (Optional) Run tests\
 `make tests`
 4. Build

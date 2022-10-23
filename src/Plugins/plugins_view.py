@@ -25,7 +25,7 @@ class PluginView(WinFrame):
         node = self.plugins.insert(
             "",
             "end",
-            values=("Bundled", "Comes with PyPlus, you cannot uninstall."),
+            values=("Bundled", "Comes with NWEdit, you cannot uninstall."),
             open=True,
         )
         docs = []

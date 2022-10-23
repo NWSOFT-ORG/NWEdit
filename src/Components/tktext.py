@@ -7,7 +7,7 @@ from typing import Union
 from pygments import lexers, styles
 
 from src.Components.scrollbar import TextScrollbar
-from src.constants import OSX, logger
+from src.constants import OSX, logger, MAIN_KEY
 from src.errors import EditorErr
 from src.highlighter import create_tags, recolorize, recolorize_line
 from src.SettingsParser.general_settings import GeneralSettings
@@ -382,6 +382,9 @@ class TextOpts:
 
     def backspace(self, _=None) -> str:
         currtext = self.text
+        if currtext.tag_ranges("sel"):  # If text selected
+            currtext.delete("sel.first", "sel.last")
+            return "break"
         # Backspace a char
         if currtext.get("insert -1c", "insert +1c") in ["''", '""', "[]", "{}", "()", "<>"]:
             currtext.delete("insert", "insert +1c")
@@ -514,14 +517,14 @@ class TextOpts:
 
     def copy(self) -> None:
         try:
-            sel = self.text.get(tk.SEL_FIRST, tk.SEL_LAST)
+            sel = self.text.get("sel.first", "sel.last")
             self.text.clipboard_clear()
             self.text.clipboard_append(sel)
         except tk.TclError:
             pass
 
     def delete(self) -> None:
-        self.text.delete(tk.SEL_FIRST, tk.SEL_LAST)
+        self.text.delete("sel.first", "sel.last")
         self.key()
 
     def cut(self) -> None:
@@ -543,6 +546,8 @@ class TextOpts:
             self.key()
         except tk.TclError:
             pass
+        finally:
+            return "break"
 
     def select_all(self) -> None:
         try:

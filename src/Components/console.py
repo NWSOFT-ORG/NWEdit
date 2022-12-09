@@ -36,7 +36,7 @@ class Pipe:
 
 
 class Console(ttk.Frame):
-    """A tkinter widget which behaves like an interpreter"""
+    """A Tkinter widget which behaves like an interpreter"""
 
     def __init__(self, parent: tk.Misc, _locals=None, exit_callback=None):
         super().__init__(parent)

@@ -1,5 +1,7 @@
 from typing import List
-import json5 as json
+
+import json5rw as json
+
 from src.constants import APPDIR
 
 

@@ -2,14 +2,14 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Callable, Literal
 
-import json5 as json
+import json5rw as json
 from PIL import Image, ImageDraw, ImageFont, ImageTk
 
 from src.Components.filedialog import FileOpenDialog
 from src.Components.scrollbar import Scrollbar
 from src.constants import OSX
 from src.SettingsParser.project_settings import RecentProjects
-from src.types import Tk_Widget
+from src.tktypes import Tk_Widget
 
 COLORS = [(255, 127, 77, 255),  # Red
           (32, 59, 53, 255),  # Dark blue

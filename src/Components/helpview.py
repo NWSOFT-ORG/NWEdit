@@ -1,20 +1,20 @@
 import tkinter as tk
 from tkinter import ttk
 
-from mistune import HTMLRenderer, Markdown, escape
+from mistune import escape, HTMLRenderer, Markdown
 from mistune.plugins.table import plugin_table
 from pygments import highlight
 from pygments.formatters import html
 from pygments.lexers import get_lexer_by_name
 from tkhtmlview import HTMLText
 
-from src.Components.winframe import WinFrame
 from src.Components.scrollbar import Scrollbar
+from src.Components.winframe import WinFrame
+from src.SettingsParser.general_settings import GeneralSettings
+from src.SettingsParser.helpfiles import HelpFiles
+from src.tktypes import Tk_Win
 from src.Utils.color_utils import lighten_color
 from src.Utils.images import get_image
-from src.SettingsParser.helpfiles import HelpFiles
-from src.types import Tk_Win
-from src.SettingsParser.general_settings import GeneralSettings
 
 
 class HighlightRenderer(HTMLRenderer):
@@ -28,16 +28,18 @@ class HighlightRenderer(HTMLRenderer):
             return highlight(code, lexer, formatter)
         bg = ttk.Style().lookup("TFrame", "background")
         fg = ttk.Style().lookup("TFrame", "foreground")
-        return f'<pre style="font-family: \'TkFixedFont\'; color: {fg}; background-color: {lighten_color(bg, 15)}">\
-                <code>'\
-                + escape(code)\
-                + '</code></pre>'
+        return f'<pre style="font-family: \'TkFixedFont\',sans-serif; color: {fg}; background-color: ' \
+               f'{lighten_color(bg, 15)}">\
+                <code>' \
+            + escape(code) \
+            + '</code></pre>'
 
     def codespan(self, text) -> str:
         fg = ttk.Style().lookup("TFrame", "foreground")
         bg = ttk.Style().lookup("TFrame", "background")
-        return f'<pre style="font-family: \'TkFixedFont\'; color: {fg}; background-color: {lighten_color(bg, 15)}">'\
-               + escape(text) + '</pre>'
+        return f'<pre style="font-family: \'TkFixedFont\',sans-serif; color: {fg}; background-color: ' \
+               f'{lighten_color(bg, 15)}">' \
+            + escape(text) + '</pre>'
 
     def text(self, text) -> str:
         fg = ttk.Style().lookup("TFrame", "foreground")

@@ -31,6 +31,7 @@ class ClosableNotebook(ttk.Notebook):
 
         self._active = None
 
+        self.tab_frame = ttk.Frame(self)
         self.add_frame()
 
         self.bind("<1>", self.on_close_press, True)
@@ -38,7 +39,7 @@ class ClosableNotebook(ttk.Notebook):
         self.bind("<B1-Motion>", self.move_tab)
 
     def add_frame(self):
-        self.tab_frame = tab_frame = ttk.Frame(self)
+        tab_frame = self.tab_frame
         tab_frame.place(relx=1.0, x=0, y=1, anchor="ne")
 
         ttk.Separator(tab_frame, orient="vertical").pack(side="left", fill="y", padx=2)
@@ -110,7 +111,7 @@ class ClosableNotebook(ttk.Notebook):
             self._active = None
             logger.debug("Close tab end")
 
-        except Exception:
+        except tk.TclError:
             logger.exception("Error:")
 
     def __initialize_custom_style(self):
@@ -139,13 +140,13 @@ class ClosableNotebook(ttk.Notebook):
                 (
                     "ClosableNotebook.tab",
                     {
-                        "sticky": "nswe",
+                        "sticky"  : "nswe",
                         "children": [
                             (
                                 "ClosableNotebook.padding",
                                 {
-                                    "side": "top",
-                                    "sticky": "nswe",
+                                    "side"    : "top",
+                                    "sticky"  : "nswe",
                                     "children": [
                                         (
                                             "ClosableNotebook.label",

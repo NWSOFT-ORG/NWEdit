@@ -1,10 +1,10 @@
-import json5 as json
 import re
 
-from src.constants import logger
-from src.SettingsParser.menu import Menu
-from src.errors import EditorErr
+import json5rw as json
 
+from src.constants import logger
+from src.errors import EditorErr
+from src.SettingsParser.menu import Menu
 
 PLUGIN_MENU_PATTERN = re.compile(r"(\[(.+?)\](@(W|!W|M|!M|L|!L|A))?) -> (\[(.+?\])(@(W|!W|M|!M|L|!L|A))?)")
 

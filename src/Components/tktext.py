@@ -7,7 +7,7 @@ from typing import Union
 from pygments import lexers, styles
 
 from src.Components.scrollbar import TextScrollbar
-from src.constants import OSX, logger, MAIN_KEY
+from src.constants import logger, OSX
 from src.errors import EditorErr
 from src.highlighter import create_tags, recolorize, recolorize_line
 from src.SettingsParser.general_settings import GeneralSettings
@@ -21,7 +21,7 @@ def font_height(font_name, size) -> int:
 
 
 class TextLineNumbers(tk.Canvas):
-    """Line numbers class for tkinter text widgets. From stackoverflow."""
+    """Line numbers class for Tkinter text widgets. From stackoverflow."""
 
     def __init__(self, *args: any, **kwargs: any) -> None:
         super().__init__(*args, **kwargs)
@@ -403,7 +403,7 @@ class TextOpts:
         currtext = self.text
         if event:
             if event.char in [")", "]", "}", "'", '"'] and currtext.get(
-                "insert -1c", "insert"
+                    "insert -1c", "insert"
             ) in [")", "]", "}", "'", '"']:
                 currtext.mark_set("insert", "insert +1c")
                 self.key()

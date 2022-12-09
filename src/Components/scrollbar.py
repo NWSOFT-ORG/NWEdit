@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import Literal, Callable
+from typing import Callable, Literal
 
 from src.Utils.color_utils import darken_color, lighten_color
 
@@ -33,11 +33,15 @@ class Scrollbar(tk.Canvas):
         self.fill_color = darken_color(bg, 10)
 
         if orient == "vertical":
-            self.config(bg=self.fill_color, bd=0,
-                        highlightthickness=0, width=width)
+            self.config(
+                bg=self.fill_color, bd=0,
+                highlightthickness=0, width=width
+            )
         else:
-            self.config(bg=self.fill_color, bd=0,
-                        highlightthickness=0, height=width)
+            self.config(
+                bg=self.fill_color, bd=0,
+                highlightthickness=0, height=width
+            )
 
         # coordinates are irrelevant; they will be recomputed
         #   in the 'set' method

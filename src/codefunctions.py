@@ -10,8 +10,7 @@ from pygments import lexers
 from src.Components.commondialog import ErrorInfoDialog
 from src.Components.console import Console
 from src.Components.tktext import EnhancedText
-from src.constants import (APPDIR, LINT_BATCH, RUN_BATCH, WINDOWS, events,
-                           logger)
+from src.constants import (APPDIR, events, LINT_BATCH, logger, RUN_BATCH, WINDOWS)
 from src.highlighter import create_tags, recolorize
 from src.Utils.functions import open_shell, shell_command
 

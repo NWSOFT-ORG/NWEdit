@@ -1,4 +1,4 @@
-import json5 as json
+import json5rw as json
 
 from src.errors import EditorErr
 

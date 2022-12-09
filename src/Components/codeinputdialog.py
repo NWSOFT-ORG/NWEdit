@@ -5,7 +5,7 @@ from pygments import lexers
 
 from src.Components.tktext import EnhancedText, EnhancedTextFrame, TextOpts
 from src.Components.winframe import WinFrame
-from src.types import Tk_Widget
+from src.tktypes import Tk_Widget
 from src.Utils.images import get_image
 
 

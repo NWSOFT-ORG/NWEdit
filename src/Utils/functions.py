@@ -1,14 +1,13 @@
 """Useful functions"""
 
 import tkinter as tk
-from tkinter import font
 from keyword import iskeyword
 from typing import Union
 
 from pygments import styles
 from tkterminal import Terminal
 
-from src.constants import ILLEGAL_CHARS, ILLEGAL_NAMES, WINDOWS, textchars
+from src.constants import ILLEGAL_CHARS, ILLEGAL_NAMES, textchars, WINDOWS
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.color_utils import darken_color, is_dark_color, lighten_color
 

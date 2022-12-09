@@ -3,7 +3,12 @@ import os
 import tkinter as tk
 from typing import Dict, Literal, Tuple, Union
 
-import cairosvg
+from src.constants import WINDOWS
+
+if not WINDOWS:
+    import cairosvg
+else:
+    pass
 
 from src.Utils.photoimage import IconImage, PhotoImage
 from PIL import Image, ImageTk
@@ -12,7 +17,13 @@ images: Dict[str, Tuple[IconImage, PhotoImage]] = {}
 orig_images: Dict[str, Image.Image] = {}
 
 
+def _init_images_win():
+    pass
+
+
 def init_images() -> None:
+    if WINDOWS:
+        _init_images_win()
     for file_path in os.listdir("Images/"):
         file_path = os.path.join("Images", file_path)
         if os.path.isfile(file_path) and file_path.endswith(".svg"):
@@ -25,10 +36,12 @@ def init_images() -> None:
             orig_images[name] = out
 
 
-def get_image(image: str,
-              img_type: Literal["image", "icon", "custom"] = "icon",
-              width: int = None,
-              height: int = None) -> Union[None, PhotoImage, IconImage, tk.Image]:
+def get_image(
+    image: str,
+    img_type: Literal["image", "icon", "custom"] = "icon",
+    width: int = None,
+    height: int = None
+) -> Union[None, PhotoImage, IconImage, tk.Image]:
     if not image:
         return None
     if img_type == "image":

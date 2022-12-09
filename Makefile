@@ -6,7 +6,7 @@ build-mac: install-packages; @printf "[Compiling via PyInstaller...]\n"
 							--hidden-import "cairosvg" \
 							--hidden-import "Foundation" \
 							--hidden-import "json" \
-							--hidden-import "json5" --hidden-import "ttkthemes" \
+							--hidden-import "pyjson5" --hidden-import "ttkthemes" \
 							--hidden-import "mistune" \
 							--hidden-import "pygments" \
 							--hidden-import "PyTouchBar" \
@@ -29,7 +29,7 @@ build-linux: install-packages; @printf "[Compiling via PyInstaller...]\n"
 							   --hidden-import "art" \
 							   --hidden-import "cairosvg" \
 							   --hidden-import "json" \
-							   --hidden-import "json5" \
+							   --hidden-import "pyjson5" \
 							   --hidden-import "mistune" \
 							   --hidden-import "pygments" \
 							   --hidden-import "send2trash" \
@@ -52,7 +52,7 @@ build-windows: install-packages; @echo "[Compiling via PyInstaller...]"
 							   --hidden-import "art" \
 							   --hidden-import "cairosvg" \
 							   --hidden-import "json" \
-							   --hidden-import "json5" \
+							   --hidden-import "pyjson5" \
 							   --hidden-import "mistune" \
 							   --hidden-import "pygments" \
 							   --hidden-import "send2trash" \

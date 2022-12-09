@@ -1,4 +1,3 @@
-import os
 import tkinter as tk
 import urllib.error
 import webbrowser
@@ -6,20 +5,21 @@ from tkinter import ttk
 from typing import List
 from urllib import request
 
-import json5 as json
+import json5rw as json
 
+from Components.link import Link
 from src.Components.tkentry import Entry
 from src.Components.winframe import WinFrame
-from src.constants import VERSION, logger
-from src.types import Tk_Widget, Tk_Win
+from src.constants import logger, VERSION
+from src.tktypes import Tk_Widget, Tk_Win
 from src.Utils.images import get_image
 
 
-def download_file(url: str, localfile: os.PathLike = "") -> str:
+def download_file(url: str) -> str:
     """Downloads a file from remote path"""
-    localfile = url.split("/")[-1] if not localfile else localfile
-    request.urlretrieve(url, localfile)
-    return localfile
+    with request.urlopen(url) as f:
+        content = f.read().decode("utf-8")
+    return content
 
 
 class YesNoDialog(WinFrame):
@@ -118,12 +118,13 @@ class AboutDialog:
         ver = ttk.Frame(window)
         window.add_widget(ver)
         self.icon_35px = get_image("NWEdit", "custom", 35, 35)
-        version = ttk.Label(ver,
-                            text=f"Version {VERSION}",
-                            font="tkDefaultFont 35 bold",
-                            image=self.icon_35px,
-                            compound="left"
-                            )
+        version = ttk.Label(
+            ver,
+            text=f"Version {VERSION}",
+            font="tkDefaultFont 35 bold",
+            image=self.icon_35px,
+            compound="left"
+        )
         version.img = self.icon_35px
         version.pack(
             fill="both"
@@ -131,14 +132,11 @@ class AboutDialog:
         if self.check_updates(popup=False)[0] is None:
             ttk.Label(ver, text="Unable to check updates").pack(fill="both")
         elif self.check_updates(popup=False)[0]:
-            update = ttk.Label(
-                ver, text="Updates available", foreground="blue", cursor="hand2"
+            update = Link(
+                ver, text="Updates available",
+                command=lambda _: webbrowser.open_new_tab(self.check_updates(popup=False)[1])
             )
             update.pack(fill="both")
-            update.bind(
-                "<Button-1>",
-                lambda _: webbrowser.open_new_tab(self.check_updates(popup=False)[1]),
-            )
         else:
             ttk.Label(ver, text="No updates available").pack(fill="both")
 
@@ -150,31 +148,32 @@ class AboutDialog:
             )  # If you're on the developer build, you don't need updates!
             return [True, "about:blank"]
         try:
-            download_file(
-                url="https://raw.githubusercontent.com/ZCG-coder/NWSOFT/master/NWEditWeb/ver.json"
-            )
+            newest = download_file(url="https://pst.klgrth.io/paste/7fv2t/download")
+            newest = json.loads(newest)
         except urllib.error.URLError:
+            logger.exception("Unable to check updates")
             return [None, "about:blank"]
-        with open("ver.json") as f:
-            newest = json.load(f)
-            if newest is None:
-                return [None, "about:blank"]
+        if newest is None:
+            return [None, "about:blank"]
+
         version = newest["version"]
+        details = newest["details"]
+        update_available = version != VERSION
+        url = newest["url"]
+
         if not popup:
-            os.remove("ver.json")
-            return [version != VERSION, newest["url"]]
+            return [update_available, url]
         updatewin = WinFrame(
             self.master, "Updates", closable=False, icon=get_image("info")
         )
         frame = ttk.Frame(updatewin)
         updatewin.add_widget(frame)
-        if version != VERSION:
+        if update_available:
             ttk.Label(
                 frame, text="Update available!", font="tkDefaultFont 30"
             ).pack(fill="both")
             ttk.Label(frame, text=version).pack(fill="both")
-            ttk.Label(frame, text=newest["details"]).pack(fill="both")
-            url = newest["url"]
+            ttk.Label(frame, text=details).pack(fill="both")
             ttk.Button(
                 frame, text="Get this update", command=lambda: webbrowser.open(url)
             ).pack()
@@ -182,4 +181,3 @@ class AboutDialog:
             ttk.Label(
                 frame, text="No updates available", font="tkDefaultFont 30"
             ).pack(fill="both")
-        os.remove("ver.json")

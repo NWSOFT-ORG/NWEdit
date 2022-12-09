@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Dict, List
 
-import json5 as json
+import json5rw as json
 
 from src.Components.tkentry import Entry
 from src.Components.winframe import WinFrame

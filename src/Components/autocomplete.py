@@ -1,10 +1,10 @@
 import string
 import tkinter as tk
 from tkinter import ttk
-from typing import Callable, Union, Tuple
+from typing import Callable, Tuple, Union
 
 from src.Components.scrollbar import Scrollbar
-from src.types import Tk_Widget
+from src.tktypes import Tk_Widget
 
 punc = [x for x in string.punctuation.replace("_", "")]
 whites = [x for x in string.whitespace]

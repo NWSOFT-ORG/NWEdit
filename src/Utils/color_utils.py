@@ -21,9 +21,9 @@ def dec2hex(dec: int, color_code: bool = False) -> str:
 def is_dark_color(hex_code: str) -> bool:
     hex_code = get_hex(hex_code)
     if (
-        hex2dec(hex_code[0]) <= DARK_COLOR
-        and hex2dec(hex_code[1]) <= DARK_COLOR
-        and hex2dec(hex_code[2]) <= DARK_COLOR
+            hex2dec(hex_code[0]) <= DARK_COLOR
+            and hex2dec(hex_code[1]) <= DARK_COLOR
+            and hex2dec(hex_code[2]) <= DARK_COLOR
     ):
         return True
     return False

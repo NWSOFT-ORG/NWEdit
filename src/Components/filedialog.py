@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import Union, Literal, Callable
+from typing import Callable, Literal, Union
 
 from src.Components.tkentry import Entry
 from src.Components.treeview import FileTree
@@ -62,10 +62,9 @@ class FileOpenDialog(FileTree):
 class FileSaveAsDialog(FileOpenDialog):
     def __init__(self, master, savecommand: Callable):
         super().__init__(master, savecommand, "Save")
-        self.win.titlebar["image"] = get_image("save-as")
 
 
-class DirectoryOpenDialog(FileOpenDialog):
+class DirectoryOpenDialog(FileOpenDialog, FileTree):
     def __init__(self, master, opencommand):
         self.opencommand = opencommand
         super().__init__(master, opencommand=opencommand)

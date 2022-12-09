@@ -1,10 +1,9 @@
 import os
 import sys
 from tkinter import font, ttk
-from typing import Dict
-from typing import Callable
+from typing import Callable, Dict
 
-import json5 as json
+import json5rw as json
 import ttkthemes
 
 from src.Components.commondialog import ErrorInfoDialog, YesNoDialog
@@ -18,7 +17,7 @@ from src.project import ProjectView
 from src.SettingsParser.general_settings import GeneralSettings
 from src.SettingsParser.menu import Menu
 from src.SettingsParser.project_settings import RecentProjects
-from src.types import Tk_Win
+from src.tktypes import Tk_Win
 from src.Utils.functions import is_illegal_filename
 from src.Utils.images import get_image, init_images
 
@@ -67,6 +66,7 @@ class StartDialog:
         def close(editor: Editor):
             editor.exit()
             self.__init__(self.master)
+
         self.frame.withdraw()
         editor = Editor(self.master, project)
         self.master.deiconify()

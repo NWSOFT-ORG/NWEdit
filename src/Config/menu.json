@@ -2,16 +2,24 @@
 Creates the menu for NWEdit
 Config is in the format:
 "[cascade_name]@A": {}   <- A cascade OR
-"item_name": {image, mnemonic, function, plugin_path}   <- An item in a cascade
+"item_name": {icon, mnemonic, function, imports, disable, platform}   <- An item in a cascade
 ----
-The function should be a lambda call. You may use 'obj' to reference a class that uses the menu
-The plugin_path should be a Python import string, with the object name.
+The 'function' should be a lambda call. You may use 'obj' to reference a class that uses the menu
+The 'imports' should be a Python import string, with the object name.
 For example: "path.to.class -> Object"
 If it is a built-in, or a package installed with NWEdit, you can use direct import statements
 For example: "package"
+The 'platform' is a platform marker, and it should be W, !W, M, !M, L, !L
 */
 
 {
+    /**
+     * 'menu' refers to the menu that is currently being created
+     */
+    "@place_holders": {
+        "@---": "obj.add_separator()",
+        "@<->": "items.append(obj.TouchBarItems.Space.Flexible())"
+    },
     /*
     Main menubar (NWEdit, File, Edit...)
     Used by src.Editor
@@ -75,7 +83,7 @@ For example: "package"
                     "disable": false,
                     "platform": "M"
                 },
-                "---": null,
+                "@---": null,
                 "[Backup Settings]@A": {
                     "Save Settings...": {
                         "icon": "save-as",
@@ -95,7 +103,7 @@ For example: "package"
                     }
                 }
             },
-            "---": null,
+            "@---": null,
             "Quit": {
                 "icon": "close",
                 "mnemonic": "q",
@@ -474,7 +482,7 @@ For example: "package"
                 "disable": false,
                 "platform": "A"
             },
-            "---": null,
+            "@---": null,
             "[Settings]@!M": {
                 "General Settings": {
                     "icon": "gear",
@@ -524,7 +532,7 @@ For example: "package"
                     "disable": false,
                     "platform": "A"
                 },
-                "---": null,
+                "@---": null,
                 "[Backup Settings]@A": {
                     "Save Settings...": {
                         "icon": "save-as",
@@ -543,7 +551,7 @@ For example: "package"
                         "platform": "A"
                     }
                 }
-            },
+            }
         },
         "[Git]@A": {
             "Commit": {
@@ -596,7 +604,7 @@ For example: "package"
                 "disable": false,
                 "platform": "A"
             },
-            "---": null,
+            "@---": null,
             "Quit": {
                 "icon": "close",
                 "mnemonic": "q",
@@ -633,6 +641,26 @@ For example: "package"
                 "disable": false,
                 "platform": "A"
             }
+        }
+    },
+    // The TouchBar works on macOS only!
+    "touchbar": {
+        "open": {
+            "function": "obj.open_file()",
+            "imports": null,
+            "disable": false
+        },
+        "save-as": {
+            "function": "obj.save_as()",
+            "imports": null,
+            "disable": true
+        },
+        "@<->": null,
+        // Flexible space
+        "run": {
+            "function": "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).run()",
+            "imports": null,
+            "disable": false
         }
     }
 }

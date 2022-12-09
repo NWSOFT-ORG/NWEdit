@@ -1,7 +1,7 @@
 import os
 from typing import *
 
-import json5 as json
+import json5rw as json
 
 from src.Components.commondialog import ErrorInfoDialog
 from src.constants import logger
@@ -10,20 +10,21 @@ from src.constants import logger
 class RecentProjects:
     def __init__(self, master):
         self.master = master
+        self.config = {}
         self.reload_config()
 
     def reload_config(self):
         with open("EditorStatus/recent_projects.json") as f:
-            self.config = json.load(f)
+            self.config |= json.load(f)
 
-    def get_path_to(self, name: str):
+    def get_path_to(self, name: str) -> str:
         if not self.config:
-            return
+            return ""
         return self.config[name]["path"]
 
-    def get_name_for_path(self, path: str):
+    def get_name_for_path(self, path: str) -> str:
         if not self.config:
-            return
+            return ""
         for key, value in self.config.items():
             if value["path"] == path:
                 return key
@@ -39,13 +40,13 @@ class RecentProjects:
 
     def get_open_files(self, name: str) -> Dict[str, str]:
         if not self.config:
-            return
+            return {}
         files = self.config[name]["openFiles"]
         return files
 
     def get_treeview_stat(self, name: str) -> Dict[str, Union[List[str], str]]:
         if not self.config:
-            return
+            return {}
         config = {}
         stats = ("expandedNodes", "yScrollbarLocation", "xScrollbarLocation")
         for item in stats:
@@ -63,7 +64,7 @@ class RecentProjects:
 
     def add_project(self, name: str, path: str):
         if not self.config:
-            return
+            self.config = {}
         self.config[name] = {
             "openFiles"         : {},
             "path"              : path,

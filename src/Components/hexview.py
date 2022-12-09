@@ -95,7 +95,7 @@ class HexView:
             return
         with open(self.filename, "rb") as file:
             block = file.read()
-        rows = [block[i : i + BLOCK_WIDTH] for i in range(0, len(block), BLOCK_WIDTH)]
+        rows = [block[i: i + BLOCK_WIDTH] for i in range(0, len(block), BLOCK_WIDTH)]
         for row in rows:
             self.show_bytes(row)
             self.show_line(row)

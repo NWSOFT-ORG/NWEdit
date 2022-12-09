@@ -10,7 +10,7 @@ from src.events import EventClass
 WINDOWS = bool(sys.platform.startswith("win"))
 OSX = bool(sys.platform.startswith("darwin"))
 APPDIR = str(Path(__file__).parent)
-VERSION = "6.0"
+VERSION = "0.6-DEV"
 RUN_BATCH = (
     """#!/bin/bash
 set +v
@@ -48,8 +48,10 @@ exit
 {cmd} "%1" > results.txt
 exit"""
 )
-MAIN_KEY = "Command" if OSX else "Control"  # MacOS uses Cmd, but others uses Ctrl
-TK_VERSION = int(float(tk.TkVersion) * 10)  # Gets tkinter's version
+MODIFIER = "Command" if OSX else "Control"  # MacOS uses Cmd, but others uses Ctrl
+HAND_CURSOR = "pointinghand" if OSX else "hand2"
+
+TK_VERSION = int(float(tk.TkVersion) * 10)  # Gets Tkinter's version
 BLOCK_WIDTH = 16
 BLOCK_HEIGHT = 32
 ENCODINGS = (
@@ -172,7 +174,7 @@ logger.debug("All modules imported")
 events = EventClass(wildcard=True)
 
 DARK_COLOR = 128
-ILLEGAL_CHARS = ('\\', '/', ' ', '~') + ('?', '<', '>', '|', '*', ':')  # Windows illegal filenames
+ILLEGAL_CHARS = ('\\', '/', ' ', '~') + ('?', '<', '>', '|', '*', ':')  # UNIX and Windows illegal filenames
 ILLEGAL_NAMES = (
     "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5",
     "lpt6",

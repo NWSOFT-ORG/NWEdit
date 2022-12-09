@@ -1,7 +1,8 @@
 from tkinter import font
 
-import json5 as json
-from src.types import Tk_Widget
+import json5rw as json
+
+from src.tktypes import Tk_Widget
 
 
 class GeneralSettings:

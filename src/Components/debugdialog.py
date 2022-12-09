@@ -1,13 +1,13 @@
 import sys
 import tkinter as tk
 from tkinter import ttk
-from typing import Union, Literal
+from typing import Literal, Union
 
-import json5 as json
+import json5rw as json
 
 from src.Components.tktext import EnhancedTextFrame
 from src.Components.winframe import WinFrame
-from src.types import Tk_Win
+from src.tktypes import Tk_Win
 from src.Utils.images import get_image
 
 

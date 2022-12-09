@@ -69,7 +69,7 @@ class CodeListDialog(ttk.Frame):
                 parent, "end", text=f"{item.id} [{item.lineno}:{item.col_offset}]"
             )
 
-    def double_click(self, event: tk.Event=None) -> None:
+    def double_click(self, event: tk.Event = None) -> None:
         try:
             item = self.tree.identify("item", event.x, event.y)
             text = self.tree.item(item, "text")

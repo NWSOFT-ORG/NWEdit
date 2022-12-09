@@ -9,7 +9,7 @@ from src.Components.commondialog import StringInputDialog
 from src.Components.fileinfodialog import FileInfoDialog
 from src.Components.newitem import NewItemDialog
 from src.Components.scrollbar import Scrollbar
-from src.constants import OSX, logger
+from src.constants import logger, OSX
 from src.SettingsParser.extension_settings import FileTreeIconSettings
 from src.SettingsParser.interval_settings import IntervalSettings
 

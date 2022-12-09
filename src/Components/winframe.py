@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import font, ttk
 
-import json5 as json
+import json5rw as json
 
 from src.constants import OSX
-from src.types import Tk_Win
+from src.tktypes import Tk_Win
 from src.Utils.color_utils import lighten_color
 from src.Utils.images import get_image
 from src.Utils.photoimage import IconImage

@@ -3,5 +3,8 @@
 .NWEdit/
 bin/
 node_modules/
+.idea/
 .cache/
+.pytest_cache/
+.debris/
 src/NWEdit.log

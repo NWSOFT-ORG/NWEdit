@@ -1,19 +1,26 @@
-# NWEditSource
+# NWEdit
 
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FZCG-coder%2FNWEdit&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Views&edge_flat=true)](javascript:void(0);)  
-The source code of the NWEdit editor.
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FZCG-coder%2FNWEdit&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=Views&edge_flat=false)]()
+> The editor that edits.
 
-NWEdit is a multipurpose editor, written in Python. It's not pure Python though, because it has a few components written
-in either Node.js or C#
+## Introduction
 
-# The code
+NWEdit is a multipurpose editor written in Python.\
+We try to make an editor that satisfies your needs, but doesn't have all that excess clutter that bloats up the size\
+It's not pure Python though, because it has a few components written
+in Node.js. We're working on making it pure Python, so that it compiles cross-platform.
 
-The code is a modified(*enhanced*) version of  
-[dh7qc/python-text-editor](https://www.github.com/dh7qc/python-text-editor), licensed after the GPL v3.0 license
+**The website is [here](https://nwsoft.tk/public/PyPlus.html)**  
+**The website may be outdated, so please go to source release to download it.**
 
-**The website is at [here](http://zcg-coder.github.io/NWSOFT/NWEditWeb)**  
-**The website may be outdated, so please go to source release to download it.**  
-Some code is from pyro written by James Stalings, licensed after the GPL v3.0 License. Thanks him for the source
+## Build Instructions
+
+## Credits
+
+* The main code is a modified(*enhanced*) version of
+  [dh7qc/python-text-editor](https://www.github.com/dh7qc/python-text-editor), licensed under the GPL v3.0 license
+
+* The highlighting part is from pyro written by James Stalings, licensed under the GPL v3.0 License:
 
 ```
 simple elegant text editor built on Python/Tkinter
@@ -30,68 +37,12 @@ simple elegant text editor built on Python/Tkinter
       Inspired by acme, sam, vi and ohmwriter.
     A sincere thanks to these good people for making their source code available for myself and others
     to learn from. Cheers!
-    
-    
-        Pyro currently does a very minimalist job of text editing via tcl/tk ala tkinter. 
-        
-        What pyro does now:
-        
-           colorizes syntax for a variety of text types; to wit:
-    
-               Python
-               PlainText
-               Html/Javascript
-               Xml
-               Html/Php
-               Perl6
-               Ruby
-               Ini/Init
-               Apache 'Conf'
-               Bash Scripts
-               Diffs
-               C#
-               MySql
-           
-           writes out its buffer
-           converts tabs to 4 spaces
-           
-           It does this in an austere text editor framework which is essentially a glue layer
-           bringing together the tk text widget with the Pygment library for styling displayed
-           text. _Editor status line is in the window title.
-           
-           Pyro comes with one serious warning: it is a user-space editor. It makes no effort
-           to monitor state-change events on files and so should not be used in situations
-           where it is possible that more than one writer will have access to the file.
-           
-           
-        Pyro's current controls are as follows:
-        
-           Ctrl+q quits
-           Ctrl+w writes out the buffer
-           Selection, copy, cut and paste are all per xserver/window manager. Keyboard navigation via
-           arrow/control keys, per system READLINE.
-           
-        Pyro's current commands are:
-        
-           #(num) move view to line 'num' and highlight it, if possible.
-           *(text) find text in file.
-           /(delim)(text)(delim)(text) search and replace
-        
-        Pyro requires Tkinter and Pygment external libraries.
 ```
 
-Also, from thonny, licensed after the MIT License. And the Hex editor
+* The file tree is adapted from [this editor](https://github.com/morten1982/crossviper), with just minor adjustments
+  that adds cascade support. Licensed under the GPL v3.0 License
+* And thanks to people who wrote greate code on Gist and Stack Overflow:
 
-```
-Copyright © 2016-20 Qtrac Ltd. All rights reserved.
-This program or module is free software: you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version. It is provided for educational
-purposes and is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-```
-
-Thanks to overture for the phplint tool, and thanks to people who wrote greate code on Gist and stack overflow.
+    * olisolomos – Python Console in Tkinter
+    * Bryan Oakley, who made the custom Tkinter tabs that has close buttons, and answered the question about the cut
+      bug

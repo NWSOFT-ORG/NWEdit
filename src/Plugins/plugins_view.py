@@ -1,6 +1,6 @@
 from tkinter import ttk
 
-import json5 as json
+import json5rw as json
 
 from src.Components.winframe import WinFrame
 from src.Utils.images import get_image

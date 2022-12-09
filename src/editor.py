@@ -7,21 +7,17 @@ TODO: Make it plugin-based
 
 import logging
 import os
-import subprocess
 import sys
 import threading
 import tkinter as tk
 import traceback
-from pathlib import Path
 from tkinter import ttk
-from typing import Union, Callable
+from typing import Callable, Union
 
-import json5 as json
+import json5rw as json
 
-from src.codefunctions import CodeFunctions
 from src.Components.autocomplete import CompleteDialog
-from src.Components.commondialog import (ErrorInfoDialog, StringInputDialog,
-                                         YesNoDialog)
+from src.Components.commondialog import ErrorInfoDialog, YesNoDialog
 from src.Components.customenotebook import ClosableNotebook
 from src.Components.debugdialog import ErrorReportDialog
 from src.Components.filedialog import FileOpenDialog, FileSaveAsDialog
@@ -30,21 +26,18 @@ from src.Components.panel import CustomTabs
 from src.Components.statusbar import Statusbar
 from src.Components.tktext import EnhancedText, EnhancedTextFrame, TextOpts
 from src.Components.treeview import FileTree
-from src.constants import APPDIR, OSX, events, logger
-from src.Git.gitview import GitView
+from src.constants import APPDIR, events, logger, OSX
 from src.highlighter import recolorize_line
-from src.SettingsParser.extension_settings import (CommentMarker,
-                                                   FileTreeIconSettings,
-                                                   FormatCommand, Linter,
-                                                   PygmentsLexer, RunCommand)
-from src.SettingsParser.menu import Menu
+from src.SettingsParser.extension_settings import (
+    CommentMarker,
+    FileTreeIconSettings,
+    FormatCommand, Linter,
+    PygmentsLexer, RunCommand,
+)
+from src.SettingsParser.menu import Menu, TouchBar
 from src.SettingsParser.plugin_settings import Plugins
 from src.SettingsParser.project_settings import RecentProjects
 from src.Utils.functions import is_binary_string
-from src.Utils.images import get_image, init_images
-
-if OSX:
-    import PyTouchBar
 
 os.chdir(APPDIR)
 
@@ -92,7 +85,6 @@ class Editor:
         window."""
         self.master: tk.Toplevel = master
         self.project = project_name
-        init_images()
 
         try:
             self.projects = RecentProjects(master)
@@ -120,24 +112,8 @@ class Editor:
             logger.debug("All menus loaded.")
 
             if OSX:  # TouchBar support
-                PyTouchBar.prepare_tk_windows(master)
-                open_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/open.svg", action=lambda _: self.open_file()
-                )
-                save_as_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/save-as.svg", action=lambda _: self.save_as()
-                )
-                close_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/close.svg", action=lambda _: self.close_tab
-                )
-                space = PyTouchBar.TouchBarItems.Space.Flexible()
-                run_button = PyTouchBar.TouchBarItems.Button(
-                    image="Images/run.svg",
-                    action=lambda _: CodeFunctions(self.master, self.get_text, self.bottom_tabs).run()
-                )
-                PyTouchBar.set_touchbar(
-                    [open_button, save_as_button, close_button, space, run_button]
-                )
+                touchbar = TouchBar(self, True)
+                touchbar.create_touchbar()
                 logger.debug(f"{OSX = }, therefore enable TouchBar support")
 
             self.plugins_settings_class = Plugins(master, self.menu_obj)
@@ -152,7 +128,7 @@ class Editor:
             ErrorReportDialog(
                 master, "Error when starting.", traceback.format_exc()
             )
-            exit(1)
+            sys.exit(1)
 
     def left_panel(self):
         self.left_tabs = CustomTabs(self.panedwin)
@@ -177,7 +153,7 @@ class Editor:
         self.master.event_add("<<MouseEvent>>", "<ButtonRelease>")
         # EventClass bindings
         events.on("editor.open_file", self.open_file)
-        events.on("reload", self.reload)
+        events.on("editor.reload", self.reload)
         logger.debug("Bindings created")
 
     @staticmethod
@@ -475,7 +451,7 @@ class Editor:
     def save_status(self):
         file_list = {}
 
-        if self.tabs:
+        if self.get_text_editor:
             for tab in self.tabs.values():
                 if tab.istoolwin:
                     continue
@@ -522,17 +498,5 @@ class Editor:
         except KeyError:
             return
 
-    def git(self, action=None) -> None:
-        currdir = self.filetree.path
-        if action == "clone":
-            dialog = StringInputDialog(self.master, "Clone", "Remote git url:")
-            url = dialog.result
-            if not url:
-                return
-            subprocess.Popen(f"git clone {url}", shell=True, cwd=currdir)
-            return
-        if not os.path.exists(path := os.path.join(currdir, ".git")):
-            ErrorInfoDialog(self.master, f"Not a git repository: {Path(path).parent}")
-            return
-        elif action == "commit":
-            GitView(self.bottom_tabs)
+    def git(self, _=None) -> None:
+        pass

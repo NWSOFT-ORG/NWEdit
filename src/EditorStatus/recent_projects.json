@@ -1,1 +1,16 @@
-{Reminders: {openFiles: {"/Users/andy/Documents/Projects/Reminders/file.hpp": "17.0"}, path: "/Users/andy/Documents/Projects/Reminders", expandedNodes: ["I01B"], yScrollbarLocation: [0, 947], xScrollbarLocation: [2, 20], icon: null}, NWEdit: {openFiles: {}, path: "/Users/andy/Documents/Projects/NWEdit", expandedNodes: ["I03D"], yScrollbarLocation: [0, 889], xScrollbarLocation: [2, 20], icon: null}}
+{
+    "Documents": {
+        "openFiles": {},
+        "path": "/Users/andy/Documents",
+        "expandedNodes": [],
+        "yScrollbarLocation": [
+            0,
+            915
+        ],
+        "xScrollbarLocation": [
+            2,
+            20
+        ],
+        "icon": null
+    }
+}

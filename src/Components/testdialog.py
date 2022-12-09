@@ -2,7 +2,7 @@ import os
 import tkinter as tk
 from tkinter import ttk
 
-import json5 as json
+import json5rw as json
 
 from src.Components.codeinputdialog import CodeInputDialog
 from src.Components.commondialog import StringInputDialog, YesNoDialog

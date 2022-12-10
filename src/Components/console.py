@@ -38,8 +38,8 @@ class Pipe:
 class Console(ttk.Frame):
     """A Tkinter widget which behaves like an interpreter"""
 
-    def __init__(self, parent: tk.Misc, _locals=None, exit_callback=None):
-        super().__init__(parent)
+    def __init__(self, master: tk.Misc, _locals=None, exit_callback=None):
+        super().__init__(master)
         settings_class = GeneralSettings()
         self.command_history = []
         self.font = settings_class.get_font()
@@ -52,9 +52,7 @@ class Console(ttk.Frame):
         )
         vbar = TextScrollbar(self, command=self.text.yview, widget=self.text)
         vbar.pack(side="right", fill="y", anchor="ne")
-        xbar = TextScrollbar(
-            self, command=self.text.xview, orient="horizontal", widget=self.text
-        )
+        xbar = TextScrollbar(self, command=self.text.xview, widget=self.text, orient="horizontal")
         xbar.pack(side="bottom", fill="x", anchor="sw")
         self.text.pack(fill="both", expand=True, side="left", anchor="nw")
         self.text.config(yscrollcommand=vbar.set)

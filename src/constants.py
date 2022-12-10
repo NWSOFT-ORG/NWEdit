@@ -168,9 +168,6 @@ logging.basicConfig(
 
 logging.getLogger("PIL").setLevel(logging.CRITICAL)
 
-logger.info(f"Tkinter version: {tk.TkVersion}")
-logger.debug("All modules imported")
-
 events = EventClass(wildcard=True)
 
 DARK_COLOR = 128

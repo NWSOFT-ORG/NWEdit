@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Callable, Union
 
-from constants import HAND_CURSOR
+from src.constants import HAND_CURSOR
 from src.Utils.color_utils import is_dark_color
 from src.Utils.photoimage import PhotoImage
 

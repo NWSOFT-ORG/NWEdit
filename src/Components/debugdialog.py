@@ -1,7 +1,7 @@
 import sys
 import tkinter as tk
 from tkinter import ttk
-from typing import Literal, Union
+from typing import Union
 
 import json5rw as json
 
@@ -9,6 +9,7 @@ from src.Components.tktext import EnhancedTextFrame
 from src.Components.winframe import WinFrame
 from src.tktypes import Tk_Win
 from src.Utils.images import get_image
+from src.window import get_window
 
 
 # Need these to prevent circular imports
@@ -29,7 +30,9 @@ def get_font() -> str:
 
 
 class ReadonlyText(EnhancedTextFrame):
-    def __init__(self, master: Union[Literal["."], tk.Misc]) -> None:
+    def __init__(self, master: Union[None, tk.Misc]) -> None:
+        if master is None:
+            master = get_window()
         super().__init__(master)
         fgcolor = "#f00"
         self.text.configure(state="disabled", fg=fgcolor, font=get_font())
@@ -47,6 +50,8 @@ class ReadonlyText(EnhancedTextFrame):
 
 class ErrorReportDialog(WinFrame):
     def __init__(self, master: Tk_Win, error_name: str, error_message: str) -> None:
+        if master is None:
+            master = get_window()
         super().__init__(master, error_name, closable=False, icon=get_image("error"))
         master.withdraw()
         ttk.Label(self, text="Please consider reporting a bug on github.").pack(
@@ -61,6 +66,8 @@ class ErrorReportDialog(WinFrame):
 
 class LogViewDialog(WinFrame):
     def __init__(self, master: Tk_Win) -> None:
+        if master is None:
+            master = get_window()
         super().__init__(master, "NWEdit Log", icon=get_image("info"))
         self.title("Log view")
         frame = ttk.Frame(self)
@@ -83,4 +90,4 @@ class LogViewDialog(WinFrame):
 
     def copy_log(self) -> None:
         self.log_text.clipboard_clear()
-        self.log_text.clipboard_append(self.log_text.get("1.0", "end"))
+        self.log_text.clipboard_append(self.log_text.text.get("1.0", "end"))

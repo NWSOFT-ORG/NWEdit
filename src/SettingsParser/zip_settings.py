@@ -25,7 +25,7 @@ class ZipSettings:
                 os.path.join(backupdir, "Config.zip"), "w", zipfile.ZIP_DEFLATED
         ) as zipobj:
             zipdir("Config/", zipobj)
-        ErrorInfoDialog(title="Done", text="Settings backed up.")
+        ErrorInfoDialog(text="Settings backed up.", title="Done")
 
     def zipsettings(self):
         DirectoryOpenDialog(self.master, self.__zip_settings)
@@ -35,10 +35,7 @@ class ZipSettings:
         try:
             with zipfile.ZipFile(backupdir) as zipobj:
                 zipobj.extractall(path=APPDIR)
-            ErrorInfoDialog(
-                title="Done",
-                text="Settings extracted. Please restart to apply changes.",
-            )
+            ErrorInfoDialog(text="Settings extracted. Please restart to apply changes.", title="Done")
         except (zipfile.BadZipFile, zipfile.BadZipfile, zipfile.LargeZipFile):
             pass
 

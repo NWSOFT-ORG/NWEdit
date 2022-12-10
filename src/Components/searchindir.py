@@ -22,12 +22,12 @@ def list_all(directory: str) -> list:
 
 
 class SearchInDir(ttk.Frame):
-    def __init__(self, parent: ttk.Notebook, path: str, opencommand: callable):
-        super().__init__(parent)
+    def __init__(self, master: ttk.Notebook, path: str, opencommand: callable):
+        super().__init__(master)
         self.pack(fill="both", expand=1)
-        parent.add(self, text="Search in Directory")
+        master.add(self, text="Search in Directory")
 
-        self.parent = parent
+        self.master = master
         self.path = path
         self.opencommand = opencommand
 

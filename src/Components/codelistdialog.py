@@ -5,8 +5,8 @@ from tkinter import ttk
 
 
 class CodeListDialog(ttk.Frame):
-    def __init__(self, parent: ttk.Notebook = None, text: tk.Text = None) -> None:
-        super().__init__(parent)
+    def __init__(self, master: ttk.Notebook = None, text: tk.Text = None) -> None:
+        super().__init__(master)
         self.text = text
 
         self.state_label = ttk.Label(self, text="")
@@ -17,7 +17,7 @@ class CodeListDialog(ttk.Frame):
 
         self.show_items()
         self.pack(fill="both", expand=1)
-        parent.add(self, text="Code structure")
+        master.add(self, text="Code structure")
 
     def show_items(self) -> None:
         # noinspection PyBroadException

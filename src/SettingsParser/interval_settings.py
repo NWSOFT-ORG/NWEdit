@@ -1,6 +1,6 @@
 import json5rw as json
 
-from src.errors import EditorErr
+from src.exceptions import ConfigurationRequestError
 
 
 class IntervalSettings:
@@ -15,4 +15,4 @@ class IntervalSettings:
             if self.settings:
                 return self.settings[item]
         except KeyError:
-            raise EditorErr(f"Wrong request item: {item}")
+            raise ConfigurationRequestError(item)

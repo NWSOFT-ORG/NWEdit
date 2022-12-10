@@ -3,7 +3,7 @@ import re
 import json5rw as json
 
 from src.constants import logger
-from src.errors import EditorErr
+from src.exceptions import ConfigurationForbiddenError
 from src.SettingsParser.menu import Menu
 
 PLUGIN_MENU_PATTERN = re.compile(r"(\[(.+?)\](@(W|!W|M|!M|L|!L|A))?) -> (\[(.+?\])(@(W|!W|M|!M|L|!L|A))?)")
@@ -12,7 +12,7 @@ PLUGIN_MENU_PATTERN = re.compile(r"(\[(.+?)\](@(W|!W|M|!M|L|!L|A))?) -> (\[(.+?\
 def parse_name(name):
     name_re = re.match(PLUGIN_MENU_PATTERN, name)
     if not name_re:
-        raise EditorErr("Invalid plugin menu configuration")
+        raise ConfigurationForbiddenError()
     orig_menu = name_re.group(1)
     plugin_menu = name_re.group(5)
 

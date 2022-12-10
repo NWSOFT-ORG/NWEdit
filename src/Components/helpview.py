@@ -65,8 +65,8 @@ class HelpView(WinFrame):
         self.html_frame = ttk.Frame(self.panedwin)
         self.html = HTMLText(self.html_frame)
 
-        yscroll = Scrollbar(self.html_frame, orient="vertical", command=self.html.yview)
-        xscroll = Scrollbar(self.html_frame, orient="horizontal", command=self.html.xview)
+        yscroll = Scrollbar(self.html_frame, command=self.html.yview, orient="vertical")
+        xscroll = Scrollbar(self.html_frame, command=self.html.xview, orient="horizontal")
 
         yscroll.pack(side="right", fill="y")
         xscroll.pack(side="bottom", fill="x")

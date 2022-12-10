@@ -1,20 +1,23 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import Callable, Literal, Union
+from typing import Callable, Union
 
 from src.Components.tkentry import Entry
 from src.Components.treeview import FileTree
 from src.Components.winframe import WinFrame
 from src.Utils.images import get_image
+from src.window import get_window
 
 
 class FileOpenDialog(FileTree):
     def __init__(
         self,
-        master: Union[Literal["."], tk.Misc] = ".",
+        master: Union[None, tk.Misc] = None,
         opencommand: Callable = None,
         action: str = "Open",
     ):
+        if master is None:
+            master = get_window()
         self._style = ttk.Style()
         self.win = WinFrame(master, action, icon=get_image("open"))
         self.buttonframe = ttk.Frame(self.win)

@@ -3,12 +3,15 @@ from tkinter import font
 import json5rw as json
 
 from src.tktypes import Tk_Widget
+from src.window import get_window
 
 
 class GeneralSettings:
     """A class to read data to/from general-settings.json"""
 
-    def __init__(self, master: Tk_Widget = "."):
+    def __init__(self, master: Tk_Widget = None):
+        if master is None:
+            master = get_window()
         self.master = master
         with open("Config/default/general-settings.json") as f:
             self.settings = json.load(f)

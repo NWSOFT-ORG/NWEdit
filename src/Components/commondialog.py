@@ -7,12 +7,13 @@ from urllib import request
 
 import json5rw as json
 
-from Components.link import Link
+from src.Components.link import Link
 from src.Components.tkentry import Entry
 from src.Components.winframe import WinFrame
 from src.constants import logger, VERSION
 from src.tktypes import Tk_Widget, Tk_Win
 from src.Utils.images import get_image
+from src.window import get_window
 
 
 def download_file(url: str) -> str:
@@ -24,16 +25,18 @@ def download_file(url: str) -> str:
 
 class YesNoDialog(WinFrame):
     def __init__(
-        self, parent: Tk_Win = None, title: str = "", text: str = None
+        self, master: Tk_Win = None, title: str = "", text: str = None
     ) -> None:
+        if master is None:
+            master = get_window()
         self.text = text
-        super().__init__(parent, title, icon=get_image("question"))
+        super().__init__(master, title, icon=get_image("question"))
         label1 = ttk.Label(self, text=self.text)
         label1.pack(fill="both")
 
         box = ttk.Frame(self)
 
-        b1 = ttk.Button(box, text="Yes", command=self.apply)
+        b1 = ttk.Button(box, text="Yes", command=self.apply, default="active")
         b1.pack(side="left")
         b2 = ttk.Button(box, text="No", command=self.cancel)
         b2.pack(side="left")
@@ -49,7 +52,7 @@ class YesNoDialog(WinFrame):
         logger.info("apply")
 
     def cancel(self, _=None) -> None:
-        """put focus back to the parent window"""
+        """put focus back to the master window"""
         self.result = 0
         self.destroy()
         logger.info("cancel")
@@ -58,18 +61,20 @@ class YesNoDialog(WinFrame):
 class StringInputDialog(WinFrame):
     def __init__(
         self,
-        parent: Tk_Widget = ".",
+        master: Tk_Widget = None,
         title: str = "",
         text: str = "",
     ) -> None:
-        super().__init__(parent, title, icon=get_image("question"))
+        if master is None:
+            master = get_window()
+        super().__init__(master, title, icon=get_image("question"))
         self.result = ""
         ttk.Label(self, text=text).pack(fill="x")
         self.entry = Entry(self)
         self.entry.pack(fill="x", expand=1)
         box = ttk.Frame(self)
 
-        b1 = ttk.Button(box, text="OK", command=self.apply)
+        b1 = ttk.Button(box, text="OK", command=self.apply, default="active")
         b1.pack(side="left")
         b2 = ttk.Button(box, text="Cancel", command=self.cancel)
         b2.pack(side="left")
@@ -92,15 +97,17 @@ class StringInputDialog(WinFrame):
 class ErrorInfoDialog(WinFrame):
     def __init__(
         self,
-        parent: Tk_Widget = None,
+        master: Tk_Widget = None,
         text: str = None,
         title: str = "Error",
     ) -> None:
+        if master is None:
+            master = get_window()
         self.text = text
-        super().__init__(parent, title, icon=get_image("question"))
+        super().__init__(master, title, icon=get_image("question"))
         label1 = ttk.Label(self, text=self.text)
         label1.pack(side="top", fill="both", expand=1)
-        b1 = ttk.Button(self, text="OK", width=10, command=self.apply)
+        b1 = ttk.Button(self, text="OK", width=10, command=self.apply, default="active")
         b1.pack(side="left")
         self.wait_window(self)
 
@@ -141,10 +148,10 @@ class AboutDialog:
             ttk.Label(ver, text="No updates available").pack(fill="both")
 
     def check_updates(self, popup: bool = True) -> List:
-        if "DEV" in VERSION:
+        if "DEV" in VERSION and popup:
             ErrorInfoDialog(
                 text="Updates aren't supported by develop builds,\n\
-            since you're always on the latest version!",
+            since you're always on the latest version!"
             )  # If you're on the developer build, you don't need updates!
             return [True, "about:blank"]
         try:

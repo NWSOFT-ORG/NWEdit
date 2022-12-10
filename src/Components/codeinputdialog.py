@@ -7,13 +7,16 @@ from src.Components.tktext import EnhancedText, EnhancedTextFrame, TextOpts
 from src.Components.winframe import WinFrame
 from src.tktypes import Tk_Widget
 from src.Utils.images import get_image
+from src.window import get_window
 
 
 class CodeInputDialog(WinFrame):
     def __init__(
-        self, parent: Tk_Widget, title: str, onsave: Callable
+        self, master: Tk_Widget, title: str, onsave: Callable
     ) -> None:
-        super().__init__(parent, title, closable=False, icon=get_image("question"))
+        if master is None:
+            master = get_window()
+        super().__init__(master, title, closable=False, icon=get_image("question"))
 
         self.save = self.add_destroy_action(onsave)
         self.textframe = EnhancedTextFrame(self)

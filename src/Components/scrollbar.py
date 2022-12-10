@@ -12,13 +12,13 @@ class Scrollbar(tk.Canvas):
 
     def __init__(
         self,
-        parent,
+        master,
         command: Callable,
         orient: Literal["vertical", "horizontal"] = "vertical",
         width=20,
     ):
         self.command = command
-        super().__init__(parent)
+        super().__init__(master)
 
         self.orient = orient
 
@@ -157,7 +157,7 @@ class Scrollbar(tk.Canvas):
             self.last_x = event.x
             #   do the scroll
             self.command("scroll", delta, "units")
-            # afix slider to mouse pointer
+            # fix slider to mouse pointer
             mouse_pos = event.x - self.first_x
             if self.new_start_x != 0:
                 mouse_pos = event.x - self.x_move_on_click
@@ -167,11 +167,11 @@ class Scrollbar(tk.Canvas):
 class TextScrollbar(Scrollbar):
     def __init__(
         self,
-        parent,
+        master,
         command: callable,
         widget: tk.Text,
         orient: Literal["vertical", "horizontal"] = "vertical",
     ):
-        super().__init__(parent, command, orient=orient)
+        super().__init__(master, command, orient=orient)
         self.config(bg=widget["bg"])
         self.itemconfig("slider", fill=widget["fg"])

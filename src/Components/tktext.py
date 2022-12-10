@@ -2,13 +2,12 @@
 
 import tkinter as tk
 from tkinter import font, ttk
-from typing import Union
+from typing import Literal, Union
 
 from pygments import lexers, styles
 
 from src.Components.scrollbar import TextScrollbar
 from src.constants import logger, OSX
-from src.errors import EditorErr
 from src.highlighter import create_tags, recolorize, recolorize_line
 from src.SettingsParser.general_settings import GeneralSettings
 from src.Utils.color_utils import darken_color, lighten_color
@@ -116,7 +115,9 @@ class EnhancedText(tk.Text):
         self.controller = None
         self.search = False
         self.navigate = False
+
         self.lexer = lexers.get_lexer_by_name("text")
+        self.comment_marker = None
 
         # create a proxy for the underlying widget
         self._rename_orig()
@@ -183,9 +184,7 @@ class EnhancedTextFrame(ttk.Frame):
         self.linenumbers.attach(self.text)
 
         self.linenumbers.pack(side="left", fill="y")
-        xscroll = TextScrollbar(
-            self, command=self.text.xview, orient="horizontal", widget=self.text
-        )
+        xscroll = TextScrollbar(self, command=self.text.xview, widget=self.text, orient="horizontal")
         xscroll.pack(side="bottom", fill="x", anchor="nw")
         yscroll = TextScrollbar(self, command=self.text.yview, widget=self.text)
         self.text["yscrollcommand"] = yscroll.set
@@ -214,6 +213,7 @@ class EnhancedTextFrame(ttk.Frame):
 
 class TextOpts:
     def __init__(self, master, bindkey: bool = False, keyaction: callable = None):
+        self.text = None
         self.keyaction = keyaction
         self.bindkey = bindkey
         self.master = master
@@ -292,7 +292,7 @@ class TextOpts:
         recolorize(currtext, currtext.lexer)
         self.key()
 
-    def indent(self, action="indent") -> None:
+    def indent(self, indent: bool = True) -> None:
         """Indent/unindent feature."""
         currtext = self.text
         if currtext.tag_ranges("sel"):
@@ -301,7 +301,7 @@ class TextOpts:
         else:
             sel_start = currtext.index("insert linestart")
             sel_end = currtext.index("insert lineend")
-        if action == "indent":
+        if indent:
             selected_text = currtext.get(sel_start, sel_end)
             indented = []
             for line in selected_text.splitlines():
@@ -310,7 +310,7 @@ class TextOpts:
             currtext.insert(sel_start, "\n".join(indented))
             currtext.tag_remove("sel", "1.0", "end")
             currtext.tag_add("sel", sel_start, f"{sel_end} +{self.tabwidth}c")
-        elif action == "unindent":
+        else:
             selected_text = currtext.get(sel_start, sel_end)
             unindented = []
             for line in selected_text.splitlines():
@@ -322,8 +322,6 @@ class TextOpts:
             currtext.insert(sel_start, "\n".join(unindented))
             currtext.tag_remove("sel", "1.0", "end")
             currtext.tag_add("sel", sel_start, sel_end)
-        else:
-            raise EditorErr("Action undefined.")
         recolorize(currtext, currtext.lexer)
         self.key()
 
@@ -535,7 +533,7 @@ class TextOpts:
         except tk.TclError:
             pass
 
-    def paste(self) -> None:
+    def paste(self) -> Union[None, Literal["break"]]:
         try:
             clipboard = self.text.clipboard_get()
             if clipboard:
@@ -544,8 +542,6 @@ class TextOpts:
                 )
             recolorize(self.text, self.text.lexer)
             self.key()
-        except tk.TclError:
-            pass
         finally:
             return "break"
 

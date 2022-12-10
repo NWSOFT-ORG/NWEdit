@@ -5,8 +5,8 @@ from src.Utils.color_utils import lighten_color
 
 
 class Entry(ttk.Frame):
-    def __init__(self, parent: tk.Misc):
-        super().__init__(parent)
+    def __init__(self, master: tk.Misc):
+        super().__init__(master)
         style = ttk.Style()
         self.bg = bg = style.lookup("TLabel", "background")
         self.fg = fg = style.lookup("TLabel", "foreground")

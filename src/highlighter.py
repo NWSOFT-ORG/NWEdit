@@ -12,7 +12,7 @@ def create_tags(textbox: tk.Text) -> None:
     The method creates the tags associated with each distinct style element of the
     source code 'dressing'"""
     currtext = textbox
-    settings = GeneralSettings(".")
+    settings = GeneralSettings()
     bold_font = font.Font(currtext, settings.get_font())
     bold_font.configure(weight=font.BOLD)
     italic_font = font.Font(currtext, settings.get_font())

@@ -7,6 +7,7 @@ from tkinter import ttk
 
 from src.Components.tktext import EnhancedTextFrame
 from src.constants import BLOCK_HEIGHT, BLOCK_WIDTH, ENCODINGS
+from src.tktypes import Tk_Widget
 
 
 class HexView:
@@ -21,22 +22,22 @@ class HexView:
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License for more details."""
 
-    def __init__(self, parent):
+    def __init__(self, master: Tk_Widget):
         """Initializes the class"""
-        self.parent = parent
+        self.master = master
         self.filename = None
         self.offset = tk.IntVar()
         self.offset.set(0)
         self.encoding = tk.StringVar()
         self.encoding.set(ENCODINGS[0])
 
-        buttonframe = ttk.Frame(self.parent)
-        self._style = ttk.Style(self.parent)
+        buttonframe = ttk.Frame(self.master)
+        self._style = ttk.Style(self.master)
         self.encoding_label = ttk.Label(buttonframe, text="Encoding")
         self.encoding_combobox = ttk.Combobox(
             buttonframe, values=ENCODINGS, textvariable=self.encoding, state="readonly"
         )
-        textframe = EnhancedTextFrame(self.parent)
+        textframe = EnhancedTextFrame(self.master)
         self.textbox = textframe.text
         self.textbox.config(
             height=BLOCK_HEIGHT,

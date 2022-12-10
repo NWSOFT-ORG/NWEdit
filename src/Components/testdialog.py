@@ -17,11 +17,11 @@ SETTINGS_FILE = ".NWEdit/Tests/settings.json"
 
 
 class TestDialog(ttk.Frame):
-    def __init__(self, parent: ttk.Notebook, path):
-        self.master = parent
-        super().__init__(parent)
+    def __init__(self, master: ttk.Notebook, path):
+        self.master = master
+        super().__init__(master)
         self.pack(fill="both", expand=1)
-        parent.add(self, text="Unit testing")
+        master.add(self, text="Unit testing")
         self.path = path
         self.tests_listbox = ttk.Treeview(self, show="tree")
         yscroll = Scrollbar(self, command=self.tests_listbox.yview)
@@ -141,9 +141,7 @@ class TestDialog(ttk.Frame):
         name = "test_" + name
         if not is_valid_name(name):
             return
-        win = CodeInputDialog(
-            self, name, lambda: self.modify_test(name, win.text.get("1.0", "end"))
-        )
+        win = CodeInputDialog(self, name, lambda: self.modify_test(name, win.text.get("1.0", "end")))
         self.refresh_tests()
 
     def delete(self):
@@ -159,11 +157,7 @@ class TestDialog(ttk.Frame):
         name = self.tests_listbox.item(self.tests_listbox.focus(), "text")
         if not name:
             return
-        win = CodeInputDialog(
-            self,
-            f"Editing {name}",
-            lambda: self.modify_test(name, win.text.get("1.0", "end")),
-        )
+        win = CodeInputDialog(self, f"Editing {name}", lambda: self.modify_test(name, win.text.get("1.0", "end")))
         win.text.insert("end", self.method_list[name])
 
         self.refresh_tests()

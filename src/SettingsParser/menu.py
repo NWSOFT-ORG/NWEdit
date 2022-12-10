@@ -7,6 +7,7 @@ import json5rw as json
 
 from src.constants import logger, MODIFIER, OSX
 from src.errors import EditorErr
+from src.exceptions import ConfigurationForbiddenError
 from src.Utils.images import get_image
 
 if OSX:
@@ -87,7 +88,7 @@ class Menu:
     def __init__(self, obj, menu_type: str = "main", disable_on_no_tabs: bool = False):
         """A menu creater from configuration"""
         if menu_type.startswith("@"):
-            raise EditorErr("Access to forbidden configuration")
+            raise ConfigurationForbiddenError()
         self.menu_name = menu_type
         self.disable_on_no_tabs = disable_on_no_tabs
         self.obj = obj

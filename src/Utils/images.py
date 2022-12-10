@@ -14,7 +14,7 @@ from src.Utils.photoimage import IconImage, PhotoImage
 from PIL import Image, ImageTk
 
 images: Dict[str, Tuple[IconImage, PhotoImage]] = {}
-orig_images: Dict[str, Image.Image] = {}
+orig_images: Dict[str, io.BytesIO] = {}
 
 
 def _init_images_win():

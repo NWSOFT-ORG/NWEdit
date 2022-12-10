@@ -1,11 +1,15 @@
 #!/usr/bin/python3
 import logging
-from tkinter import Tk
+import tkinter as tk
 
 from src.Components.startdialog import StartDialog
-from src.constants import OSX
+from src.constants import logger, OSX
+from src.window import create_window, main_loop
 
 if __name__ == "__main__":
+    logger.info(f"Tkinter version: {tk.TkVersion}")
+    logger.debug("All modules imported")
+
     if OSX:
         # noinspection PyUnresolvedReferences,PyPackageRequirements
         # This really should be renamed! PyCharm always complains about it!
@@ -17,11 +21,12 @@ if __name__ == "__main__":
             if info:
                 info["CFBundleName"] = "NWEdit"  # Change name on the titlebar
                 info["CFBundleDisplayName"] = "NWEdit"  # Change name on the Dock
-    root = Tk()
+
+    root = create_window()
     root.option_add('*tearOff', "false")
 
     StartDialog(master=root)  # Starts the Editor
-    root.mainloop()
+    main_loop()
 
     # Stop log
     logging.shutdown()

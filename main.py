@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-import logging
 import tkinter as tk
 
 from src.Components.startdialog import StartDialog
@@ -27,6 +26,3 @@ if __name__ == "__main__":
 
     StartDialog(master=root)  # Starts the Editor
     main_loop()
-
-    # Stop log
-    logging.shutdown()

@@ -1,8 +1,8 @@
 import io
 from typing import Union
 
-import cairosvg
 import json5rw as json
+import pyvips
 from PIL import Image, ImageTk
 from pygments import lexers
 from pygments.lexer import Lexer
@@ -82,7 +82,9 @@ class FileTreeIconSettings:
     @property
     def folder_icon(self) -> ImageTk.PhotoImage:
         out = io.BytesIO()
-        cairosvg.svg2png(url=f"Images/file-icons/folder.svg", write_to=out, unsafe=True, scale=5)
+        image = pyvips.Image.new_from_file("Images/file-icons/folder.svg", access="sequential", scale=5)
+        out.write(image.write_to_buffer(".png"))
+
         img = Image.open(out)
         img = img.resize((img.width // 5, img.height // 5), 1)
         return ImageTk.PhotoImage(img)
@@ -102,7 +104,10 @@ class FileTreeIconSettings:
         except KeyError:
             icon_name = "other"
         out = io.BytesIO()
-        cairosvg.svg2png(url=f"Images/file-icons/{icon_name}.svg", write_to=out, unsafe=True, scale=5)
+
+        image = pyvips.Image.new_from_file(f"Images/file-icons/{icon_name}.svg", access="sequential", scale=5)
+        out.write(image.write_to_buffer(".png"))
+
         img = Image.open(out)
         img = img.resize((img.width // 5, img.height // 5), 1)
         return ImageTk.PhotoImage(img)

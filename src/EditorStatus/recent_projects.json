@@ -1,6 +1,8 @@
 {
     "Documents": {
-        "openFiles": {},
+        "openFiles": {
+            "/Users/andy/Documents/COMMENT.txt": "1.19"
+        },
         "path": "/Users/andy/Documents",
         "expandedNodes": [],
         "yScrollbarLocation": [

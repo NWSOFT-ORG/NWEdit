@@ -22,6 +22,8 @@ Please follow the instructions as comments.
     // Controls the tab width
     "tab_width": 4,
     // Shows the cursor as a block
-    "block_cursor": true
+    "block_cursor": true,
+    // Maximum file size to be opened, in KB
+    "max_file_size": 1024
 }
 

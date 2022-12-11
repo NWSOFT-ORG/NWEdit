@@ -2,7 +2,6 @@
 """
 The editor object
 The editor is a combination of widgets
-TODO: Make it plugin-based
 """
 
 import logging
@@ -34,6 +33,7 @@ from src.SettingsParser.extension_settings import (
     FormatCommand, Linter,
     PygmentsLexer, RunCommand,
 )
+from src.SettingsParser.general_settings import GeneralSettings
 from src.SettingsParser.menu import Menu, TouchBar
 from src.SettingsParser.plugin_settings import Plugins
 from src.SettingsParser.project_settings import RecentProjects
@@ -286,13 +286,13 @@ class Editor:
         window = HexView(viewer)
         window.open(file)
         self.tabs[viewer] = Document(viewer, EnhancedText, file, istoolwin=True)
-        self.nb.add(viewer, text=f"Hex -- {os.path.basename(file)}")
+        self.nb.add(viewer, text=os.path.basename(file))
         self.nb.select(viewer)
         self.update_title()
         self.update_statusbar()
         return window.textbox
 
-    def open_file(self, file: str = "", askhex: bool = True):
+    def open_file(self, file: str = "", askhex: bool = True, asksize: bool = True) -> Union[EnhancedText, None]:
         """Opens a file
         If a file is not provided, a messagebox'll
         pop up to ask the user to select the path."""
@@ -302,6 +302,13 @@ class Editor:
 
         file = os.path.abspath(file)
         try:
+            # If the file is too large, ask the user if they want to open it
+            if asksize and os.path.getsize(file) > GeneralSettings().get_settings("max_file_size") * 1024:
+                dialog = YesNoDialog(
+                    self.master, "File is too large", "The file is too large to open. Do you want to open it anyway?"
+                )
+                if not dialog.result:
+                    return
             # If the file is already opened, focus the tab
             for tab in self.tabs.items():
                 if file == tab[1].file_dir:
@@ -310,14 +317,14 @@ class Editor:
             # If the file is in binary, ask the user to open in Hex editor
             if is_binary_string(open(file, "rb").read()):
                 if askhex:
-                    dialog = YesNoDialog(self.master, "Error", "View in Hex?")
-                    if dialog.result:
-                        self.open_hex(file)
+                    dialog = YesNoDialog(self.master, "Binary characters in file", "View in Hex?")
+                    self.open_hex(file) if dialog.result else None
                     logging.info("User pressed No.")
                     return self.get_text
                 self.open_hex(file)
                 return self.get_text
 
+            # If the file is not opened, open it
             extens = file.split(".")[-1]
             textbox = self.create_text_widget(self.nb)
             textframe = textbox.master
@@ -353,10 +360,10 @@ class Editor:
             name = type(e).__name__
             if name == "IsADirectoryError":
                 pass
-            elif name != "ValueError":
-                logger.exception("Error when opening file:")
+            elif name == "ValueError":
+                logger.exception("Warning! Value Error:")
             else:
-                logger.exception("Warning! Program has ValueError.")
+                logger.exception("Unknown error when opening file:")
 
     def save_as(self, file: str = None) -> None:
         """Save the document as a different name."""
@@ -471,7 +478,7 @@ class Editor:
 
         logger.debug("Saved status")
 
-    def exit(self) -> None:
+    def close(self) -> None:
         tree_stat = self.filetree.generate_status()
         self.projects.set_tree_status(self.project, tree_stat)
 
@@ -479,6 +486,15 @@ class Editor:
 
         logger.info("Close window")
         self.master.withdraw()
+
+    def exit(self) -> None:
+        tree_stat = self.filetree.generate_status()
+        self.projects.set_tree_status(self.project, tree_stat)
+
+        self.save_status()
+
+        logger.info("Close window")
+        self.master.destroy()
 
     def restart(self) -> None:
         self.save_status()
@@ -494,6 +510,8 @@ class Editor:
     @property
     def get_text_editor(self) -> Union[EnhancedText, None]:
         try:
+            if self.tabs[self.nb.get_tab].istoolwin:
+                return
             return self.tabs[self.nb.get_tab].textbox
         except KeyError:
             return

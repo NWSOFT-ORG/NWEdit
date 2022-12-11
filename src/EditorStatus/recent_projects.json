@@ -1,13 +1,32 @@
 {
     "Documents": {
-        "openFiles": {
-            "/Users/andy/Documents/COMMENT.txt": "1.19"
-        },
+        "openFiles": {},
         "path": "/Users/andy/Documents",
         "expandedNodes": [],
         "yScrollbarLocation": [
             0,
-            915
+            755
+        ],
+        "xScrollbarLocation": [
+            2,
+            20
+        ],
+        "icon": null
+    },
+    "json5rw": {
+        "openFiles": {
+            "/Users/andy/Documents/Projects/json5rw/__init__.py": "1.0",
+            "/Users/andy/Documents/Projects/json5rw/json5rw/decoder.py": "13.0",
+            "/Users/andy/Documents/Projects/json5rw/json5rw/default_processing.py": "21.0",
+            "/Users/andy/Documents/Projects/json5rw/json5rw/dumper.py": "28.11"
+        },
+        "path": "/Users/andy/Documents/Projects/json5rw",
+        "expandedNodes": [
+            "I027"
+        ],
+        "yScrollbarLocation": [
+            0,
+            755
         ],
         "xScrollbarLocation": [
             2,

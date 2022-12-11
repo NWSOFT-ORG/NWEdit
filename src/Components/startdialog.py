@@ -1,5 +1,6 @@
 import os
 import sys
+import threading
 from tkinter import font, ttk
 from typing import Callable, Dict
 
@@ -24,6 +25,7 @@ from src.Utils.images import get_image, init_images
 
 class StartDialog:
     def __init__(self, master: Tk_Win) -> None:
+        self.menu_obj = None
         init_images()
         self.master = master
         # noinspection PyTypeChecker
@@ -47,9 +49,8 @@ class StartDialog:
 
         self.frame.bind("<Destroy>", lambda _: sys.exit(0))
 
-        self.menu_obj = Menu(self, "start_dialog")
-        master.config(menu=self.menu_obj.menu)
-        self.menu_obj.load_config()
+        threading.Thread(target=lambda: self.create_menu(master)).start()
+
         self.functions = []
         self.create_links()
 
@@ -62,9 +63,14 @@ class StartDialog:
         logger.info("Started NWEdit")
         logger.debug("Loaded start dialog")
 
+    def create_menu(self, master):
+        self.menu_obj = Menu(self, "start_dialog")
+        master.config(menu=self.menu_obj.menu)
+        self.menu_obj.load_config()
+
     def open_project(self, project):
-        def close(editor: Editor):
-            editor.exit()
+        def close(_editor: Editor):
+            _editor.close()
             self.__init__(self.master)
 
         self.frame.withdraw()
@@ -169,7 +175,7 @@ class NewProjectDialog(WinFrame):
     def on_name_change(self, _):
         directory = self.directory.get()
         name = self.name.get()
-        if is_illegal_filename(name) is None:  # When the name is not recommended
+        if is_illegal_filename(name) is None:  # When the project name is not recommended
             self.status["text"] = "This name is legal, though not recommended. It is considered too long"
         if is_illegal_filename(name):  # When it is illegal, should return early
             self.status["text"] = "Invalid name"

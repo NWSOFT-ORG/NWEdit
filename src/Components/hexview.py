@@ -5,9 +5,10 @@ import os
 import tkinter as tk
 from tkinter import ttk
 
-from src.Components.tktext import EnhancedTextFrame
+from src.Components.scrollbar import TextScrollbar
 from src.constants import BLOCK_HEIGHT, BLOCK_WIDTH, ENCODINGS
 from src.tktypes import Tk_Widget
+from src.Utils.functions import apply_style
 
 
 class HexView:
@@ -37,13 +38,22 @@ class HexView:
         self.encoding_combobox = ttk.Combobox(
             buttonframe, values=ENCODINGS, textvariable=self.encoding, state="readonly"
         )
-        textframe = EnhancedTextFrame(self.master)
-        self.textbox = textframe.text
+        buttonframe.pack(fill="x")
+
+        self.textbox = tk.Text(self.master)
+        apply_style(self.textbox)
         self.textbox.config(
             height=BLOCK_HEIGHT,
             width=2 + (BLOCK_WIDTH * 4),
             state="disabled",
         )
+
+        xscroll = TextScrollbar(self.master, command=self.textbox.xview, widget=self.textbox, orient="horizontal")
+        xscroll.pack(side="bottom", fill="x", anchor="nw")
+        yscroll = TextScrollbar(self.master, command=self.textbox.yview, widget=self.textbox)
+        yscroll.pack(side="right", fill="y")
+        self.textbox["yscrollcommand"] = yscroll.set
+        self.textbox["xscrollcommand"] = xscroll.set
 
         self.textbox.tag_configure("ascii", foreground="green")
         self.textbox.tag_configure("error", foreground="red")
@@ -51,8 +61,10 @@ class HexView:
         self.textbox.tag_configure("graybg", background="lightgray")
         self.encoding_label.pack(side="left", anchor="nw")
         self.encoding_combobox.pack(side="left", anchor="nw")
-        textframe.pack(fill="both", expand=1)
+        self.textbox.pack(fill="both", expand=1)
         self.encoding.trace_variable("w", self.show_block)
+
+        self.textbox.bind("<B1-Motion>", "break")
 
     def show_bytes(self, row):
         self.textbox.config(state="normal")

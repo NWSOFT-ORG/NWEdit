@@ -182,16 +182,16 @@ class EnhancedTextFrame(ttk.Frame):
             self, width=30, bg=bgcolor, bd=0, highlightthickness=0
         )
         self.linenumbers.attach(self.text)
-
         self.linenumbers.pack(side="left", fill="y")
+
         xscroll = TextScrollbar(self, command=self.text.xview, widget=self.text, orient="horizontal")
         xscroll.pack(side="bottom", fill="x", anchor="nw")
         yscroll = TextScrollbar(self, command=self.text.yview, widget=self.text)
-        self.text["yscrollcommand"] = yscroll.set
         yscroll.pack(side="right", fill="y")
-        self.text.pack(side="right", fill="both", expand=True)
-
+        self.text["yscrollcommand"] = yscroll.set
         self.text["xscrollcommand"] = xscroll.set
+
+        self.text.pack(side="right", fill="both", expand=True)
 
         self.text.bind("<<Change>>", self.on_change)
         self.text.bind("<Configure>", self._on_resize)
@@ -214,8 +214,14 @@ class EnhancedTextFrame(ttk.Frame):
 class TextOpts:
     def __init__(self, master, bindkey: bool = False, keyaction: callable = None):
         self.text = None
-        self.keyaction = keyaction
         self.bindkey = bindkey
+        self.cmd = ""
+        self.comment_marker = ""
+        self.controller = None
+        self.format_cmd = ""
+        self.icon = None
+        self.keyaction = keyaction
+        self.lint_cmd = ""
         self.master = master
 
         self.settings_class = GeneralSettings()
@@ -224,9 +230,10 @@ class TextOpts:
         self.bg = self.style.lookup("TLabel", "background")
         self.fg = self.style.lookup("TLabel", "foreground")
 
-    def set_text(self, text: EnhancedText):
+    def set_text(self, text: Union[EnhancedText, tk.Text]) -> None:
         self.text = text
-        self.bind_events()
+        if isinstance(text, EnhancedText):
+            self.bind_events()
         return self
 
     @property

@@ -72,16 +72,17 @@ def apply_style(text: tk.Text):
         bg = darken_color(bgcolor, 30)
         fg = darken_color(fgcolor, 40)
     text.config(
+        autoseparators=True,
         bg=bgcolor,
+        exportselection=True,
         fg=fgcolor,
-        selectforeground=bg,
-        selectbackground=fgcolor,
-        insertbackground=fg,
-        highlightthickness=0,
         font=font_face,
-        wrap="none",
+        highlightthickness=0,
+        insertbackground=fg,
         insertwidth=3,
         maxundo=-1,
-        autoseparators=True,
+        selectbackground=fgcolor,
+        selectforeground=bg,
         undo=True,
+        wrap="none",
     )

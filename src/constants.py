@@ -167,6 +167,7 @@ logging.basicConfig(
 )
 
 logging.getLogger("PIL").setLevel(logging.CRITICAL)
+logging.getLogger("pyvips").setLevel(logging.CRITICAL)
 
 events = EventClass(wildcard=True)
 

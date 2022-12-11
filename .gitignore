@@ -7,4 +7,5 @@ node_modules/
 .cache/
 .pytest_cache/
 .debris/
-src/NWEdit.log
+/src/NWEdit.log
+Icon\r

@@ -49,7 +49,7 @@ class StartDialog:
 
         self.frame.bind("<Destroy>", lambda _: sys.exit(0))
 
-        threading.Thread(target=lambda: self.create_menu(master)).start()
+        self.create_menu(master)
 
         self.functions = []
         self.create_links()

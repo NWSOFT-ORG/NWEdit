@@ -1,12 +1,21 @@
 run: install-packages; poetry run python3 main.py
 install-packages: ; poetry install 
+init-ubuntu: ; sudo apt-get update && \
+    sudo apt-get upgrade -y && \
+    sudo apt install software-properties-common -y && \
+    sudo add-apt-repository ppa:deadsnakes/ppa -y && \
+    sudo apt-get install -y python3.10-tk python3.10-distutils libvips && \
+    python3 -m pip install poetry && \
+    poetry env use /usr/bin/python3.10 && \
+    poetry install
 build-mac: install-packages; @printf "[Compiling via PyInstaller...]\n"
 							.venv/bin/pyinstaller --noconfirm --onedir --windowed --icon "src/Images/NWEdit-1024.icns" \
 							--hidden-import "art" \
-							--hidden-import "cairosvg" \
+							--hidden-import "pyvips" \
 							--hidden-import "Foundation" \
 							--hidden-import "json" \
-							--hidden-import "pyjson5" --hidden-import "ttkthemes" \
+							--hidden-import "json5rw"\
+							--hidden-import "ttkthemes" \
 							--hidden-import "mistune" \
 							--hidden-import "pygments" \
 							--hidden-import "PyTouchBar" \
@@ -27,9 +36,9 @@ build-mac: install-packages; @printf "[Compiling via PyInstaller...]\n"
 build-linux: install-packages; @printf "[Compiling via PyInstaller...]\n"
 							   poetry run pyinstaller --noconfirm --onefile --windowed --icon "src/Images/NWEdit.ico" \
 							   --hidden-import "art" \
-							   --hidden-import "cairosvg" \
+							   --hidden-import "pyvips" \
 							   --hidden-import "json" \
-							   --hidden-import "pyjson5" \
+							   --hidden-import "json5rw" \
 							   --hidden-import "mistune" \
 							   --hidden-import "pygments" \
 							   --hidden-import "send2trash" \
@@ -50,9 +59,9 @@ build-linux: install-packages; @printf "[Compiling via PyInstaller...]\n"
 build-windows: install-packages; @echo "[Compiling via PyInstaller...]"
 							   poetry run pyinstaller --noconfirm --onefile --windowed --icon "src/Images/NWEdit.ico" \
 							   --hidden-import "art" \
-							   --hidden-import "cairosvg" \
+							   --hidden-import "pyvips" \
 							   --hidden-import "json" \
-							   --hidden-import "pyjson5" \
+							   --hidden-import "json5rw" \
 							   --hidden-import "mistune" \
 							   --hidden-import "pygments" \
 							   --hidden-import "send2trash" \

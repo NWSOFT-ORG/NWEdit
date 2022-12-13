@@ -67,6 +67,7 @@ class WinFrame(tk.Toplevel):
         title: str,
         disable: bool = True,
         closable: bool = True,
+        resizable: bool = True,
         icon: IconImage = None,
     ):
         super().__init__(master)
@@ -111,7 +112,7 @@ class WinFrame(tk.Toplevel):
             self.wm_attributes("-transparent", True)
         self.bind("<Destroy>", self.on_exit)
         self.bind("<Configure>", self.create_bar)
-        self._resizable = True
+        self._resizable = resizable
 
         self.create_bar()
 
@@ -133,11 +134,14 @@ class WinFrame(tk.Toplevel):
         if self._resizable:
             if OSX:
                 size = self.status_bar.create_arc(
-                    self.winfo_width() - self.status_bar.winfo_height(), 0,
+                    self.winfo_width() - self.status_bar.winfo_height(),
+                    0,
                     self.winfo_width(),
-                    self.winfo_height(), fill=lighten_color(get_bg(), 40),
+                    self.winfo_height(),
+                    fill=lighten_color(get_bg(), 40),
                     outline="",
-                    start=-90, tags="size"
+                    start=-90,
+                    tags="size"
                 )
             else:
                 size = self.status_bar.create_rectangle(
@@ -148,7 +152,7 @@ class WinFrame(tk.Toplevel):
                     outline="",
                     tags="size"
                 )
-            self.status_bar.tag_bind(size, "<B1-Motion>", self.resize)
+            self.status_bar.tag_bind("size", "<B1-Motion>", self.resize)
 
     def on_exit(self, _):
         # Release Grab to prevent issues
@@ -167,8 +171,11 @@ class WinFrame(tk.Toplevel):
             RADIUS,
             fill=get_bg()
         )
+        self.titlebar.create_image(
+            20, int((self.titlebar.winfo_height() - 16) / 2), image=self.icon, anchor="nw"
+        )
         self.titlebar.create_text(
-            21, int((self.titlebar.winfo_height() - font_height()) / 2), text=self.title_text,
+            40, int((self.titlebar.winfo_height() - font_height()) / 2), text=self.title_text,
             fill=get_fg(), anchor="nw"
         )
         self.close_button()

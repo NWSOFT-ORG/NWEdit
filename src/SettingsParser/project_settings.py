@@ -13,7 +13,14 @@ class RecentProjects:
         self.config = {}
         self.reload_config()
 
+    def create_config(self):
+        with open("EditorStatus/recent_projects.json", "w") as f:
+            json.dump({}, f)
+        self.reload_config()
+
     def reload_config(self):
+        if not os.path.isfile("EditorStatus/recent_projects.json"):
+            self.create_config()
         with open("EditorStatus/recent_projects.json") as f:
             self.config |= json.load(f)
 

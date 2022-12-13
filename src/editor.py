@@ -252,6 +252,11 @@ class Editor:
             logger.exception("Error when handling mouse event:")
 
     def load_status(self):
+        if not os.path.isfile("EditorStatus/window_status.json"):
+            with open("EditorStatus/window_status.json", "w") as f:
+                json.dump(
+                    {"windowGeometry": "800x600+100+100"}, f
+                )
         with open("EditorStatus/window_status.json") as f:
             geometry = json.load(f)
             if geometry is None or "windowGeometry" not in geometry.keys():
@@ -388,7 +393,7 @@ class Editor:
         """Save an *existing* file"""
         try:
             curr_tab = self.nb.get_tab
-            if not os.path.exists(self.tabs[curr_tab].file_dir):
+            if not os.path.isfile(self.tabs[curr_tab].file_dir):
                 self.save_as()
                 return
             if os.access(self.tabs[curr_tab].file_dir, os.W_OK):

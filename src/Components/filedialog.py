@@ -56,7 +56,7 @@ class FileOpenDialog(FileTree):
         try:
             self.set_path(path)
         except FileNotFoundError:
-            self.path = old_path
+            self.set_path(old_path)
 
     def on_double_click_treeview(self, event=None, **_):
         super().on_double_click_treeview(event, destroy=True)
@@ -77,7 +77,7 @@ class DirectoryOpenDialog(FileOpenDialog, FileTree):
 
     def open(self):
         if not self.tree.focus():
-            path = self.root_node_path
+            path = self.get_path(self.root_node)
             self.opencommand(path)
             self.master.destroy()
             return

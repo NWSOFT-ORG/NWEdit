@@ -97,7 +97,7 @@ class HexView:
         self.textbox.config(state="disabled")
 
     def open(self, filename):
-        if filename and os.path.exists(filename):
+        if filename and os.path.isfile(filename):
             self.filename = filename
             self.show_block()
 

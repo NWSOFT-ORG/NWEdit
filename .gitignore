@@ -9,3 +9,4 @@ node_modules/
 .debris/
 /src/NWEdit.log
 Icon\r
+/src/EditorStatus/*.json

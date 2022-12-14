@@ -27,7 +27,7 @@ build-mac: install-packages; @printf "[Compiling via PyInstaller...]\n"
 							--add-data "src:src/" \
 							--add-data "docs:docs/" \
 							--name "NWEdit" \
-							--additional-hooks-dir=.
+							--additional-hooks-dir=. \
 							"./main.py" \
 						    --clean > /dev/null
 							rm -rf build NWEdit.spec
@@ -50,7 +50,7 @@ build-linux: install-packages; @printf "[Compiling via PyInstaller...]\n"
 						 	   --add-data "src:src/" \
 						 	   --hidden-import "tkterminal" \
 							   --name "NWEdit" \
-							   --additional-hooks-dir=.
+							   --additional-hooks-dir=. \
 					 	 	   "./main.py" \
 						 	   --clean > /dev/null
 							   rm -rf build NWEdit.spec
@@ -73,7 +73,7 @@ build-windows: install-packages; @echo "[Compiling via PyInstaller...]"
 							   --hidden-import "ttkthemes" \
 							   --add-data "src:src/" \
 							   --name "NWEdit" \
-							   --additional-hooks-dir=.
+							   --additional-hooks-dir=. \
 							   "./main.py" \
 							   --clean > NUL
 							   del NWEdit.spec

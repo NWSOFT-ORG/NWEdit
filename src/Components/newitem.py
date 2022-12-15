@@ -1,3 +1,4 @@
+import os.path
 import tkinter as tk
 from tkinter import ttk
 from typing import Dict, List
@@ -8,27 +9,36 @@ from src.Components.tkentry import Entry
 from src.Components.winframe import WinFrame
 from src.Utils.functions import is_illegal_filename
 from src.Utils.images import get_image
+from src.tktypes import Tk_Widget
 
 
 class NewItemDialog(WinFrame):
-    def __init__(self, master, opencommand):
+    def __init__(self, treeview, master: Tk_Widget, opencommand):
         super().__init__(master, "New Item", icon=get_image("new"))
-        with open("Config/file-extens.json") as f:
+        with open("Config/default/file-extens.json") as f:
             self.config: Dict[str, List[str]] = json.load(f)
-        self.treeview = ttk.Treeview(self, show="tree", selectmode="browse")
-        self.treeview.pack(side="left", fill="both")
-        self.treeview.bind("<<TreeviewSelect>>", self.select)
+        with open("Config/file-extens.json") as f:
+            self.config |= json.load(f)
+
+        frame = ttk.Frame(self)
+
+        self.extension_tree = ttk.Treeview(frame, show="tree", selectmode="browse")
+        self.extension_tree.pack(side="left", fill="both")
+        self.extension_tree.bind("<<TreeviewSelect>>", self.select)
         self.make_treeview()
+
+        self.filetree = treeview
+        self.opencommand = opencommand
 
         self.extens_var = tk.StringVar()
 
-        self.right_frame = ttk.Frame(self)
+        self.right_frame = ttk.Frame(frame)
         self.right_frame.pack(side="right", fill="both")
 
         ttk.Label(self.right_frame, text="Name: ").grid(row=0, column=0)
         self.name = Entry(self.right_frame)
         self.name.grid(row=0, column=1, sticky="ew")
-        self.name.entry.bind("<Key>", self.on_name_change)
+        self.name.entry.bind("<KeyRelease>", self.on_name_change)
         self.name_status = ttk.Label(self.right_frame, foreground="red")
         self.name_status.grid(row=0, column=2, sticky="e")
 
@@ -38,15 +48,30 @@ class NewItemDialog(WinFrame):
         self.extension_status = ttk.Label(self.right_frame, foreground="red")
         self.extension_status.grid(row=1, column=2)
 
-        self.create_btn = ttk.Button(self.right_frame, text="Create")
+        self.create_btn = ttk.Button(self.right_frame, text="Create",
+                                     command=lambda: self.create_file(
+                                         f"{self.name.get()}{'.' if self.extens.get() else ''}{self.extens.get()}"))
         self.create_btn.grid(row=2, column=2, sticky="e")
 
         self.extens_var.trace_add("write", self.on_extens_change)
 
+        self.add_widget(frame)
+        self.update_idletasks()
         self.resizable(False, False)
 
+    def create_file(self, file_name):
+        tree: ttk.Treeview = self.filetree.tree
+        directory = self.filetree.get_path(tree.focus(), append_name=True, expect_type="dir")
+        path = os.path.join(directory, file_name)
+        with open(path, "w") as f:
+            f.write("")
+        self.opencommand(path)
+
+        self.destroy()
+        self.filetree.refresh_tree()
+
     def on_extens_change(self, *_):
-        extens = self.extens_var.get()
+        extens = self.extens.get()
 
         if len(extens) > 5:  # When the extension is not recommended
             self.extension_status["text"] = "This extension is too long"
@@ -58,6 +83,7 @@ class NewItemDialog(WinFrame):
         self.create_btn["state"] = "normal"
         self.extension_status["text"] = ""
 
+    # noinspection DuplicatedCode
     def on_name_change(self, _):
         name = self.name.get()
 
@@ -72,12 +98,12 @@ class NewItemDialog(WinFrame):
         self.name_status["text"] = ""
 
     def select(self, _):
-        item = self.treeview.focus()
-        text = self.treeview.item(item, "text")
+        item = self.extension_tree.focus()
+        text = self.extension_tree.item(item, "text")
 
         vals = self.config[text]
         self.extens.config(values=vals)
 
     def make_treeview(self):
         for key in self.config.keys():
-            self.treeview.insert("", "end", text=key)
+            self.extension_tree.insert("", "end", text=key)

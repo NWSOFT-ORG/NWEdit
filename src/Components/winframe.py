@@ -3,11 +3,11 @@ from tkinter import font, ttk
 
 import json5rw as json
 
-from src.constants import OSX
-from src.tktypes import Tk_Win
 from src.Utils.color_utils import lighten_color
 from src.Utils.images import get_image
 from src.Utils.photoimage import IconImage
+from src.constants import OSX
+from src.tktypes import Tk_Win
 
 RADIUS = 27 if OSX else 0
 
@@ -61,14 +61,18 @@ def round_rect(canvas, x1, y1, x2, y2, radius=25, **kwargs):
 
 
 class WinFrame(tk.Toplevel):
+    child_frame = None
+    x = 0
+    y = 0
+
     def __init__(
-        self,
-        master: Tk_Win,
-        title: str,
-        disable: bool = True,
-        closable: bool = True,
-        resizable: bool = True,
-        icon: IconImage = None,
+            self,
+            master: Tk_Win,
+            title: str,
+            disable: bool = True,
+            closable: bool = True,
+            resizable: bool = True,
+            icon: IconImage = None,
     ):
         super().__init__(master)
         self.overrideredirect(True)
@@ -133,7 +137,7 @@ class WinFrame(tk.Toplevel):
         )
         if self._resizable:
             if OSX:
-                size = self.status_bar.create_arc(
+                self.status_bar.create_arc(
                     self.winfo_width() - self.status_bar.winfo_height(),
                     0,
                     self.winfo_width(),
@@ -144,7 +148,7 @@ class WinFrame(tk.Toplevel):
                     tags="size"
                 )
             else:
-                size = self.status_bar.create_rectangle(
+                self.status_bar.create_rectangle(
                     self.winfo_width() - self.status_bar.winfo_height(), 0,
                     self.winfo_width(),
                     self.winfo_height(),

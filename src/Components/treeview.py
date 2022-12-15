@@ -1,7 +1,9 @@
 import os
 import shutil
 import tkinter as tk
+from pathlib import Path
 from tkinter import font, ttk
+from typing import Union, Literal
 
 import send2trash
 
@@ -9,9 +11,9 @@ from src.Components.commondialog import StringInputDialog
 from src.Components.fileinfodialog import FileInfoDialog
 from src.Components.newitem import NewItemDialog
 from src.Components.scrollbar import Scrollbar
-from src.constants import logger, OSX
 from src.SettingsParser.extension_settings import FileTreeIconSettings
 from src.SettingsParser.interval_settings import IntervalSettings
+from src.constants import logger, OSX
 
 
 class FileTree(ttk.Frame):
@@ -124,7 +126,7 @@ class FileTree(ttk.Frame):
         self.process_directory(item, path=self.path)
 
     def process_directory(
-        self, parent: str, showdironly: bool = False, path: str = ""
+            self, parent: str, showdironly: bool = False, path: str = ""
     ) -> None:
         if os.path.isfile(path):
             return
@@ -187,14 +189,18 @@ class FileTree(ttk.Frame):
         if parent_text:
             self.get_parent(parent_iid)
 
-    def get_path(self, item: str, append_name: bool = False) -> str:
+    def get_path(self, item: str, append_name: bool = False, expect_type: Literal["file", "dir"] = "file") -> str:
         self.temp_path = []
         self.get_parent(item)
         self.temp_path.reverse()
         self.temp_path.remove("")
         if append_name:
             self.temp_path.append(self.tree.item(item, "text"))
-        return os.path.abspath(os.path.join(*self.temp_path))
+        abspath = os.path.abspath(os.path.join(*self.temp_path))
+        if os.path.isfile(abspath) and expect_type == "dir":
+            # If we're getting a file, but we're trying to get the directory, return its parent
+            abspath = Path(abspath).parent
+        return abspath
 
     def right_click(self, event: tk.Event, item: str = "") -> None:
         menu = tk.Menu(self.master)
@@ -209,7 +215,7 @@ class FileTree(ttk.Frame):
         menu.add_command(label="Rename file", command=lambda: self.rename(item))
         menu.add_command(label="Move to Trash", command=lambda: self.remove(item))
         menu.add_separator()
-        menu.add_command(label="Refresh", command=lambda _: self.refresh_tree(False))
+        menu.add_command(label="Refresh", command=lambda: self.refresh_tree(False))
 
         menu.tk_popup(event.x_root, event.y_root)
 
@@ -224,7 +230,7 @@ class FileTree(ttk.Frame):
         )
         self.process_directory(self.root_node, path=abspath)
 
-    def set_path(self, new_path: os.PathLike):
+    def set_path(self, new_path: Union[os.PathLike, str]):
         self.tree.delete(*self.tree.get_children())
         abspath = os.path.abspath(new_path)
 
@@ -238,7 +244,7 @@ class FileTree(ttk.Frame):
 
     def generate_status(self):
         status = {
-            "expandedNodes"     : self.expanded,
+            "expandedNodes": self.expanded,
             "yScrollbarLocation": self.yscroll.get(),
             "xScrollbarLocation": self.xscroll.get(),
         }
@@ -263,4 +269,4 @@ class FileTree(ttk.Frame):
         self.tree.xview_moveto(x_scroll_location[0])
 
     def new_item(self):
-        NewItemDialog(self.master, self.opencommand)
+        NewItemDialog(self, self.master, self.opencommand)

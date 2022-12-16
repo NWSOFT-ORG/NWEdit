@@ -1,6 +1,6 @@
 import os
 import sys
-import threading
+import tkinter as tk
 from tkinter import font, ttk
 from typing import Callable, Dict
 
@@ -12,7 +12,7 @@ from src.Components.filedialog import DirectoryOpenDialog
 from src.Components.link import Link
 from src.Components.tkentry import Entry
 from src.Components.winframe import WinFrame
-from src.constants import logger
+from src.constants import logger, OSX
 from src.editor import Editor
 from src.project import ProjectView
 from src.SettingsParser.general_settings import GeneralSettings
@@ -28,7 +28,6 @@ class StartDialog:
         self.menu_obj = None
         init_images()
         self.master = master
-        # noinspection PyTypeChecker
         master.iconphoto(True, get_image("NWEdit", "image"))
 
         for item in master.winfo_children():
@@ -43,9 +42,15 @@ class StartDialog:
 
         self.master.withdraw()
         self.icon = get_image("NWEdit", "icon")
-        self.frame = WinFrame(self.master, "Start", icon=self.icon, disable=False)
+        self.frame = tk.Toplevel(self.master)
+        self.frame.title("Start")
+        self.frame.iconphoto(False, get_image("NWEdit"))
         self.frame.geometry("710x580")
         self.frame.resizable(False, False)
+        if OSX:
+            self.frame.tk.call(
+                "tk::unsupported::MacWindowStyle", "style", self.frame._w, "moveableModal"
+            )
 
         self.frame.bind("<Destroy>", lambda _: sys.exit(0))
 
@@ -58,7 +63,6 @@ class StartDialog:
 
         self.project_view = ProjectView(self.frame, self.open_project)
         self.project_view.pack(side="bottom", fill="both", expand=True)
-        self.frame.create_bar()
 
         logger.info("Started NWEdit")
         logger.debug("Loaded start dialog")
@@ -106,7 +110,7 @@ class StartDialog:
         frame = self.frame
 
         self.first_tab = first_tab = ttk.Frame(frame)
-        frame.add_widget(first_tab)
+        first_tab.pack(fill="both", expand=True)
         bold = font.Font(family="tkDefaultFont", size=35, weight="bold")
         self.icon_35px = get_image("NWEdit", "custom", 35, 35)
         ttk.Label(
@@ -129,11 +133,14 @@ class NewProjectDialog(WinFrame):
     def __init__(self, master: Tk_Win, open_func: Callable):
         self.open_func = open_func
         self.master: Tk_Win = master
-        super().__init__(master, "New Project")
+        super().__init__(master, "New Project", icon=get_image("new"))
+        # super().__init__(master)
         self.directory_to_create = os.path.expanduser("~/")
         self.projects = RecentProjects(self.master)
 
         frame = ttk.Frame(self)
+        self.add_widget(frame)
+        # frame.pack(fill="both", expand=True)
         ttk.Label(frame, text="Name: ").grid(row=0, column=0, sticky="e")
         self.name = Entry(frame)
         self.name.grid(row=0, column=1)
@@ -148,9 +155,8 @@ class NewProjectDialog(WinFrame):
         self.create_btn = ttk.Button(frame, text="Create", command=self.create)
         self.create_btn.grid(row=3, column=1, sticky="e")
 
-        frame.pack(fill="both", expand=True)
-
         self.name.entry.bind("<KeyRelease>", self.on_name_change)
+        self.name.focus_set()
 
     def create(self):
         try:

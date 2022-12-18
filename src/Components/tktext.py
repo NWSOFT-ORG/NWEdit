@@ -1,5 +1,4 @@
 """A modded version of tkinter.Text"""
-
 import tkinter as tk
 from tkinter import font, ttk
 from typing import Literal, Union

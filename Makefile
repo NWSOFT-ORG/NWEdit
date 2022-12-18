@@ -9,7 +9,7 @@ init-ubuntu: ; sudo apt-get update && \
     poetry env use /usr/bin/python3.10 && \
     poetry install
 build-mac: install-packages; @printf "[Compiling via PyInstaller...]\n"
-							.venv/bin/pyinstaller --noconfirm --onedir --windowed --icon "src/Images/NWEdit-1024.icns" \
+							poetry run pyinstaller --noconfirm --onedir --windowed --icon "src/Images/NWEdit.icns" \
 							--hidden-import "art" \
 							--hidden-import "pyvips" \
 							--hidden-import "Foundation" \
@@ -48,6 +48,7 @@ build-linux: install-packages; @printf "[Compiling via PyInstaller...]\n"
 					 		   --hidden-import "tkinter.font" \
 					 		   --hidden-import "ttkthemes" \
 						 	   --add-data "src:src/" \
+							   --add-data "docs:docs/" \
 						 	   --hidden-import "tkterminal" \
 							   --name "NWEdit" \
 							   --additional-hooks-dir=. \
@@ -71,7 +72,8 @@ build-windows: install-packages; @echo "[Compiling via PyInstaller...]"
 							   --hidden-import "tkinter.ttk" \
 							   --hidden-import "tkterminal" \
 							   --hidden-import "ttkthemes" \
-							   --add-data "src:src/" \
+							   --add-data "src;src/" \
+							   --add-data "docs;docs/" \
 							   --name "NWEdit" \
 							   --additional-hooks-dir=. \
 							   "./main.py" \

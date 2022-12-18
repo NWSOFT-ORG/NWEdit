@@ -208,6 +208,8 @@ class Editor:
         try:
             if hasattr(event, "char") and not event.char:  # No input, no action
                 return
+            if hasattr(event, "keysym") and not event.keysym:  # No input, no action
+                return
             currtext = self.get_text
             if not currtext:
                 return

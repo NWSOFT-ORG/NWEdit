@@ -56,7 +56,7 @@ class MenuPlaceHolderSettings():
         self.obj = obj
         self.vars = vars_
 
-        with open("Config/default/menu.json") as f:
+        with open("Config/defaults/menu.json") as f:
             config = json.load(f)
             if not config:
                 return
@@ -100,7 +100,7 @@ class Menu:
 
         self.place_holder_settings = MenuPlaceHolderSettings(None)
 
-        with open("Config/default/menu.json") as f:
+        with open("Config/defaults/menu.json") as f:
             config = json.load(f)
             if not config:
                 return
@@ -233,7 +233,7 @@ class TouchBar():
         return statement
 
     def load_config(self):
-        with open("Config/default/menu.json") as f:
+        with open("Config/defaults/menu.json") as f:
             config = json.load(f)
             if not config:
                 return

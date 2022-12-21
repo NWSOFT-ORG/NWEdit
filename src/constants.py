@@ -11,33 +11,7 @@ WINDOWS = bool(sys.platform.startswith("win"))
 OSX = bool(sys.platform.startswith("darwin"))
 APPDIR = str(Path(__file__).parent)
 VERSION = "0.6-DEV"
-RUN_BATCH = (
-    """#!/bin/bash
-set +v
-cd "{script_dir}"
-python3 {dir}/measure.py start
-printf "================================================\n"
-{cmd} "{file}"
-printf "================================================\n"
-echo Program Finished With Exit Code $?
-python3 {dir}/measure.py stop
-rm timertemp.txt
-"""
-    if not WINDOWS
-    else """@echo off
-cd "{script_dir}"
-{dir}/measure.py start
-echo.
-echo.
-echo ----------------------------------------------------
-{cmd} "{file}"
-echo Program Finished With Exit Code %ERRORLEVEL%
-{dir}/measure.py stop
-echo ----------------------------------------------------
-echo.
-del timertemp.txt
-"""
-)  # The batch files for building.
+
 LINT_BATCH = (
     """#!/bin/bash
 {cmd} "$1" > results.txt

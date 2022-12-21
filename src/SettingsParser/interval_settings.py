@@ -5,7 +5,7 @@ from src.exceptions import ConfigurationRequestError
 
 class IntervalSettings:
     def __init__(self):
-        with open("Config/default/interval.json") as f:
+        with open("Config/defaults/interval.json") as f:
             self.settings = json.load(f)
         with open("Config/interval.json") as f:
             self.settings |= json.load(f)

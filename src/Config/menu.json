@@ -381,8 +381,8 @@ The 'platform' is a platform marker, and it should be W, !W, M, !M, L, !L
             "Run": {
                 "icon": "run",
                 "mnemonic": "b",
-                "function": "CodeFunctions(obj.master, obj.get_text, obj.bottom_tabs).run()",
-                "imports": "src.codefunctions -> CodeFunctions",
+                "function": "Runner(obj.project).run()",
+                "imports": "src.ProjectActions.runner -> Runner",
                 "disable": true,
                 "platform": "A"
             },

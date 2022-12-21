@@ -28,11 +28,14 @@ class InProjectConfig:
             item_config_dir = f"{config_dir}/{item}"
             if not os.path.isdir(item_config_dir):
                 os.mkdir(item_config_dir)
+            if not os.path.isfile(f"{item_config_dir}/settings.json"):
+                with open(f"{item_config_dir}/settings.json", "w") as f:
+                    json.dump({}, f)
 
-    def get_settings_file(self, item: Literal["Run", "Tests", "EditorStatus"]):
-        return f"{self.path}/{item}/settings.json"
+    def get_settings_file(self, item: Literal["Run", "Tests", "Lint", "EditorStatus"]):
+        return f"{self.path}/.NWEdit/{item}/settings.json"
 
-    def get_settings(self, parent: Literal["Run", "Tests", "EditorStatus"], child: str):
+    def get_settings(self, parent: Literal["Run", "Tests", "Lint", "EditorStatus"], child: str):
         file = self.get_settings_file(parent)
         with open(file) as f:
             settings = json.load(f)
@@ -43,8 +46,19 @@ class RunConfig:
     def __init__(self, project_name):
         self.config_class = InProjectConfig(project_name)
 
-        with open(self.config_class.get_settings_file("Run")) as f:
+        with open("Config/project-defaults/Run/settings.json") as f:
             self.settings = json.load(f)
+
+        with open(self.config_class.get_settings_file("Run")) as f:
+            try:
+                self.settings |= json.load(f)
+            except ValueError:
+                with open(f.name, "w") as fp:
+                    json.dump(self.settings, fp)  # Ensures that the config file is up-to-date
+
+    @property
+    def configurations(self):
+        return self.settings["run"].keys()
 
     def format_vars(self, string: str):
         variables: Dict[str, Any] = self.settings["variables"]

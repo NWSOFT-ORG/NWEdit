@@ -28,7 +28,7 @@ class ExtensionSettings:
             self.items.append(value)
 
     def load_default_config(self):
-        with open(f"Config/default/{self.path}") as f:
+        with open(f"Config/defaults/{self.path}") as f:
             all_settings = json.load(f)
         return all_settings
 
@@ -90,7 +90,7 @@ class FileTreeIconSettings:
         return ImageTk.PhotoImage(img)
 
     def load_config(self):
-        with open(f"Config/default/{self.path}") as f:
+        with open(f"Config/defaults/{self.path}") as f:
             self.settings |= json.load(f)
         with open(f"Config/{self.path}") as f:
             self.settings |= json.load(f)

@@ -1,0 +1,8 @@
+{
+    "commands": {
+        "pylint": "pylint --rcfile=pylintrc"
+    },
+    "file_types": {
+        "py": "[pylint]"
+    }
+}

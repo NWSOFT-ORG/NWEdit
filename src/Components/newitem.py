@@ -7,15 +7,15 @@ import json5rw as json
 
 from src.Components.tkentry import Entry
 from src.Components.winframe import WinFrame
+from src.tktypes import Tk_Widget
 from src.Utils.functions import is_illegal_filename
 from src.Utils.images import get_image
-from src.tktypes import Tk_Widget
 
 
 class NewItemDialog(WinFrame):
     def __init__(self, treeview, master: Tk_Widget, opencommand):
         super().__init__(master, "New Item", icon=get_image("new"))
-        with open("Config/default/file-extens.json") as f:
+        with open("Config/defaults/file-extens.json") as f:
             self.config: Dict[str, List[str]] = json.load(f)
         with open("Config/file-extens.json") as f:
             self.config |= json.load(f)

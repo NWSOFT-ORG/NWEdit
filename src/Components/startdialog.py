@@ -44,7 +44,7 @@ class StartDialog:
         self.icon = get_image("NWEdit", "icon")
         self.frame = tk.Toplevel(self.master)
         self.frame.title("Start")
-        self.frame.iconphoto(False, get_image("NWEdit"))
+        self.frame.iconphoto(False, get_image("NWEdit", img_type="image"))
         self.frame.geometry("710x580")
         self.frame.resizable(False, False)
         if OSX:

@@ -13,7 +13,7 @@ class GeneralSettings:
         if master is None:
             master = get_window()
         self.master = master
-        with open("Config/default/general-settings.json") as f:
+        with open("Config/defaults/general-settings.json") as f:
             self.settings = json.load(f)
         with open("Config/general-settings.json") as f:
             self.settings |= json.load(f)

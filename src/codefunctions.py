@@ -1,7 +1,6 @@
 import os
 import subprocess
 import tkinter as tk
-from pathlib import Path
 from tkinter import ttk
 
 import pygments.lexers
@@ -10,9 +9,9 @@ from pygments import lexers
 from src.Components.commondialog import ErrorInfoDialog
 from src.Components.console import Console
 from src.Components.tktext import EnhancedText
-from src.constants import (APPDIR, events, LINT_BATCH, logger, RUN_BATCH, WINDOWS)
+from src.constants import (events, LINT_BATCH, logger, WINDOWS)
 from src.highlighter import create_tags, recolorize
-from src.Utils.functions import open_shell, shell_command
+from src.Utils.functions import open_shell
 
 
 class CodeFunctions:
@@ -25,51 +24,6 @@ class CodeFunctions:
         self.text = text
         self.master = master
         self.bottomframe = bottomframe
-
-        self.style = ttk.Style(master)
-        self.bg = self.style.lookup("TLabel", "background")
-        self.fg = self.style.lookup("TLabel", "foreground")
-
-    def run(self, _=None) -> None:
-        """Runs the file
-        Steps:
-        1) Writes run code into the batch file.
-        2) Linux only: uses chmod to make the sh execuable
-        3) Runs the run file"""
-
-        # noinspection PyBroadException
-        try:
-            if controller := self.text.controller:
-                if WINDOWS:  # Windows
-                    with open(APPDIR + "/run.bat", "w") as f:
-                        f.write(
-                            (
-                                RUN_BATCH.format(
-                                    dir=APPDIR,
-                                    file=controller.file_dir,
-                                    cmd=controller.textbox.cmd,
-                                )
-                            )
-                        )
-                    shell_command("run.bat && del run.bat && exit", cwd=APPDIR)
-                else:  # Others
-                    with open(APPDIR + "/run.sh", "w") as f:
-                        f.write(
-                            (
-                                RUN_BATCH.format(
-                                    dir=APPDIR,
-                                    file=controller.file_dir,
-                                    cmd=controller.textbox.cmd,
-                                    script_dir=Path(
-                                        controller.file_dir
-                                    ).parent,
-                                )
-                            )
-                        )
-                    shell_command("chmod 700 run.sh && ./run.sh && rm run.sh", cwd=APPDIR)
-        except Exception:
-            logger.exception("Cannot run:")
-            ErrorInfoDialog(self.master, "This language is not supported.")
 
     def system_shell(self) -> None:
         terminal = open_shell(self.bottomframe)

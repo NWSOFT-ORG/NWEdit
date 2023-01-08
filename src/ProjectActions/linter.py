@@ -1,2 +1,5 @@
+InProjectConfig
+
+
 class Linter:
     pass

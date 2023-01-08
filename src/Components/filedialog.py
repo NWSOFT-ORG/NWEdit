@@ -37,7 +37,6 @@ class FileOpenDialog(FileTree):
         self.set_path_btn.pack(side="right")
         self.entryframe.pack(fill="x")
         super().__init__(master=self.win, opencommand=opencommand)
-        self.win.create_bar()  # Manually refresh
         self.temp_path = []
 
     def open(self):

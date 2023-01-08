@@ -49,7 +49,7 @@ class StartDialog:
         self.frame.resizable(False, False)
         if OSX:
             self.frame.tk.call(
-                "tk::unsupported::MacWindowStyle", "style", self.frame._w, "moveableModal"
+                "tk::unsupported::MacWindowStyle", "style", self.frame._w, "floating", "closeBox"
             )
 
         self.frame.bind("<Destroy>", lambda _: sys.exit(0))
@@ -194,4 +194,3 @@ class NewProjectDialog(WinFrame):
         directory = os.path.join(directory, name)
         self.directory_to_create = directory
         self.title_text = f"New Project - {directory}"
-        self.create_titlebar()

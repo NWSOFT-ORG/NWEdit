@@ -155,7 +155,7 @@ class AboutDialog:
             )  # If you're on the developer build, you don't need updates!
             return [True, "about:blank"]
         try:
-            newest = download_file(url="https://pst.klgrth.io/paste/7fv2t/download")
+            newest = download_file(url="https://data.nwsoft.tk/nwedit")
             newest = json.loads(newest)
         except urllib.error.URLError:
             logger.exception("Unable to check updates")

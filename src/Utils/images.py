@@ -1,11 +1,11 @@
 import io
-import os
 import tkinter as tk
 from typing import Dict, Literal, Tuple, Union
 
 import pyvips
 from PIL import Image, ImageTk
 
+from src.SettingsParser.configfiles import IMAGE_FILES
 from src.Utils.photoimage import IconImage, PhotoImage
 
 images: Dict[str, Tuple[IconImage, PhotoImage]] = {}
@@ -13,10 +13,10 @@ orig_images: Dict[str, io.BytesIO] = {}
 
 
 def init_images() -> None:
-    for file_path in os.listdir("Images/"):
-        file_path = os.path.join("Images", file_path)
-        if os.path.isfile(file_path) and file_path.endswith(".svg"):
-            name = file_path.replace("Images/", "").replace(".svg", "")
+    for file_path in IMAGE_FILES.iterdir():
+        file_path = IMAGE_FILES / file_path
+        if file_path.is_file() and file_path.suffix == ".svg":
+            name = file_path.stem
             out = io.BytesIO()
 
             image = pyvips.Image.new_from_file(file_path, access="sequential", scale=5)

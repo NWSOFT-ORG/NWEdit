@@ -1,6 +1,7 @@
 import os
 import subprocess
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
 
 import pygments.lexers
@@ -51,21 +52,24 @@ class CodeFunctions:
         curr_tab.add(shell_frame, text="Python Shell")
 
     def lint_source(self) -> None:
+        # noinspection PyBroadException
         try:
             if controller := self.text.controller:
                 if controller.textbox.lint_cmd:
                     currdir = controller.file_dir
                     if WINDOWS:
-                        with open("lint.bat", "w") as f:
+                        bat_path = Path(currdir, "lint.bat").resolve()
+                        with bat_path.open("w") as f:
                             f.write(
                                 LINT_BATCH.format(
                                     cmd=controller.textbox.lint_cmd
                                 )
                             )
                         subprocess.call(f'lint.bat "{currdir}"', shell=True)
-                        os.remove("lint.bat")
+                        bat_path.unlink()  # Remove the lint.bat file
                     else:
-                        with open("lint.sh", "w") as f:
+                        sh_path = Path(currdir, "lint.sh").resolve()
+                        with sh_path.open("w") as f:
                             f.write(
                                 LINT_BATCH.format(
                                     cmd=controller.textbox.lint_cmd
@@ -74,9 +78,9 @@ class CodeFunctions:
                         subprocess.call(
                             f'chmod 700 lint.sh && ./lint.sh "{currdir}"', shell=True
                         )
-                        os.remove("lint.sh")
+                        sh_path.unlink()  # Remove the lint.sh file
                     events.emit("editor.open_file", file="results.txt", askhex=False)
-                    os.remove("results.txt")
+                    Path(currdir, "results.txt").unlink()  # Remove the results.txt file
         except Exception:
             logger.exception("Cannot lint the file:")
             ErrorInfoDialog(self.master, "This language is not supported")

@@ -10,6 +10,7 @@ import sys
 import threading
 import tkinter as tk
 import traceback
+from pathlib import Path
 from tkinter import ttk
 from typing import Callable, Union
 
@@ -27,6 +28,7 @@ from src.Components.tktext import EnhancedText, EnhancedTextFrame, TextOpts
 from src.Components.treeview import FileTree
 from src.constants import APPDIR, events, logger, OSX
 from src.highlighter import recolorize_line
+from src.SettingsParser.configfiles import WINDOW_STATUS
 from src.SettingsParser.extension_settings import (
     CommentMarker,
     FileTreeIconSettings,
@@ -46,10 +48,10 @@ class Document:
     """Helper class, for the editor."""
 
     def __init__(
-        self, frame=None, textbox=None, file_dir: str = "", istoolwin: bool = False
+        self, frame=None, textbox=None, file_dir: Path = "", istoolwin: bool = False
     ) -> None:
         self.frame = frame
-        self.file_dir = file_dir
+        self.file_dir: Path = file_dir
         self.textbox = textbox
         self.istoolwin = istoolwin
 
@@ -132,7 +134,9 @@ class Editor:
 
     def left_panel(self):
         self.left_tabs = CustomTabs(self.panedwin)
-        self.filetree = FileTree(self.left_tabs, self.open_file, self.projects.get_path_to(self.project))
+        self.filetree = FileTree(
+            path=self.projects.get_path_to(self.project), master=self.left_tabs, opencommand=self.open_file
+        )
         self.panedwin.insert(0, self.left_tabs)
         self.left_tabs.add(self.filetree, text="Files")
 
@@ -172,14 +176,14 @@ class Editor:
 
     def update_title(self, _=None) -> str:
         try:
-            path = self.tabs[self.nb.get_tab].file_dir
+            path: Path = self.tabs[self.nb.get_tab].file_dir
             if self.tabs[self.nb.get_tab].istoolwin:
                 self.master.title("NWEdit")
                 logger.debug("update_title: Finished early")
                 return "break"
             if OSX:
                 self.master.attributes("-titlepath", path)
-            self.master.title(f"NWEdit [{self.project}] — {os.path.basename(path)}")
+            self.master.title(f"NWEdit [{self.project}] — {path.name}")
         except KeyError:
             self.master.title(f"NWEdit [{self.project}]")
             self.master.attributes("-titlepath", "")
@@ -254,12 +258,12 @@ class Editor:
             logger.exception("Error when handling mouse event:")
 
     def load_status(self):
-        if not os.path.isfile("EditorStatus/window_status.json"):
-            with open("EditorStatus/window_status.json", "w") as f:
+        if not WINDOW_STATUS.is_file():
+            with WINDOW_STATUS.open("w") as f:
                 json.dump(
                     {"windowGeometry": "800x600+100+100"}, f
                 )
-        with open("EditorStatus/window_status.json") as f:
+        with WINDOW_STATUS.open() as f:
             geometry = json.load(f)
             if geometry is None or "windowGeometry" not in geometry.keys():
                 return
@@ -271,7 +275,7 @@ class Editor:
         files = self.projects.get_open_files(self.project)
         if files:
             for file, index in files.items():
-                self.open_file(file)
+                self.open_file(Path(file))
                 text = self.get_text_editor
                 if not text:
                     break
@@ -282,35 +286,37 @@ class Editor:
         self.update_title()
         self.update_statusbar()
 
-    def open_hex(self, file="") -> Union[EnhancedText, None]:
+    def open_hex(self, file: Path = "") -> Union[EnhancedText, None]:
         if not file:
-            FileOpenDialog(self.master, self.open_hex)
+            FileOpenDialog(Path("~").expanduser(), self.master, self.open_hex)
             return
-        file = os.path.abspath(file)
+        file = file.resolve()
+
         logger.info("HexView: opened")
         viewer = ttk.Frame(self.master)
         viewer.focus_set()
         window = HexView(viewer)
         window.open(file)
+
         self.tabs[viewer] = Document(viewer, EnhancedText, file, istoolwin=True)
-        self.nb.add(viewer, text=os.path.basename(file))
+        self.nb.add(viewer, text=file.stem)
         self.nb.select(viewer)
         self.update_title()
         self.update_statusbar()
         return window.textbox
 
-    def open_file(self, file: str = "", askhex: bool = True, asksize: bool = True) -> Union[EnhancedText, None]:
+    def open_file(self, file: Path = "", askhex: bool = True, asksize: bool = True) -> Union[EnhancedText, None]:
         """Opens a file
         If a file is not provided, a messagebox'll
         pop up to ask the user to select the path."""
         if not file:
-            FileOpenDialog(self.master, self.open_file)
+            FileOpenDialog(Path("~").expanduser(), self.master, self.open_file)
             return
 
-        file = os.path.abspath(file)
+        file = file.resolve()
         try:
             # If the file is too large, ask the user if they want to open it
-            if asksize and os.path.getsize(file) > GeneralSettings().get_settings("max_file_size") * 1024:
+            if asksize and file.stat().st_size > GeneralSettings().get_settings("max_file_size") * 1024:
                 dialog = YesNoDialog(
                     self.master, "File is too large", "The file is too large to open. Do you want to open it anyway?"
                 )
@@ -322,7 +328,7 @@ class Editor:
                     self.nb.select(tab[1].frame)
                     return tab[1].textbox
             # If the file is in binary, ask the user to open in Hex editor
-            if is_binary_string(open(file, "rb").read()):
+            if is_binary_string(file.open("rb").read()):
                 if askhex:
                     dialog = YesNoDialog(self.master, "Binary characters in file", "View in Hex?")
                     self.open_hex(file) if dialog.result else None
@@ -332,7 +338,7 @@ class Editor:
                 return self.get_text
 
             # If the file is not opened, open it
-            extens = file.split(".")[-1]
+            extens = ".".join(file.suffixes)
             textbox = self.create_text_widget(self.nb)
             textframe = textbox.master
 
@@ -343,7 +349,7 @@ class Editor:
             textframe.icon = FileTreeIconSettings().get_icon(extens)
             textbox.controller = self.tabs[textframe] = Document(textframe, textbox, file)
             # noinspection PyTypeChecker
-            self.nb.add(textframe, text=os.path.basename(file), image=textframe.icon, compound="left")
+            self.nb.add(textframe, text=file.name, image=textframe.icon, compound="left")
             self.nb.select(textframe)
 
             textbox.focus_set()
@@ -372,7 +378,7 @@ class Editor:
             else:
                 logger.exception("Unknown error when opening file:")
 
-    def save_as(self, file: str = None) -> None:
+    def save_as(self, file: Path = None) -> None:
         """Save the document as a different name."""
         if self.tabs:
             if file:
@@ -385,8 +391,8 @@ class Editor:
                 return
 
             self.tabs[curr_tab].file_dir = file_dir
-            self.nb.tab(curr_tab, text=os.path.basename(file_dir))
-            with open(file_dir, "w") as f:
+            self.nb.tab(curr_tab, text=file_dir.name)
+            with file_dir.open("w") as f:
                 f.write(self.tabs[curr_tab].textbox.get(1.0, "end"))
             self.update_title()
             self.reload()
@@ -395,11 +401,12 @@ class Editor:
         """Save an *existing* file"""
         try:
             curr_tab = self.nb.get_tab
-            if not os.path.isfile(self.tabs[curr_tab].file_dir):
+            file_dir: Path = self.tabs[curr_tab].file_dir
+            if not file_dir.is_file():
                 self.save_as()
                 return
-            if os.access(self.tabs[curr_tab].file_dir, os.W_OK):
-                with open(self.tabs[curr_tab].file_dir, "w") as file:
+            if os.access(file_dir, os.W_OK):
+                with open(file_dir, "w") as file:
                     file.write(self.tabs[curr_tab].textbox.get(1.0, "end"))
                     file.truncate(file.tell() - 1)
                     logger.debug("Wrote file")
@@ -471,12 +478,10 @@ class Editor:
                     continue
                 cursor_pos = tab.textbox.index("insert")
                 file_list[tab.file_dir] = cursor_pos
-            file_list[self.tabs[self.nb.get_tab].file_dir] = self.get_text_editor.index(
-                "insert"
-            )  # Open the current file
+            file_list[self.tabs[self.nb.get_tab].file_dir] = self.get_text_editor.index("insert")
         self.projects.set_open_files(self.project, file_list)
 
-        with open("EditorStatus/window_status.json", "w") as f:
+        with WINDOW_STATUS.open("w") as f:
             status = {}
             self.master.update()
             geometry = self.master.winfo_geometry()

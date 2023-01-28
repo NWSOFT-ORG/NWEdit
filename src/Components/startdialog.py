@@ -1,6 +1,6 @@
-import os
 import sys
 import tkinter as tk
+from pathlib import Path
 from tkinter import font, ttk
 from typing import Callable, Dict
 
@@ -15,6 +15,7 @@ from src.Components.winframe import WinFrame
 from src.constants import logger, OSX
 from src.editor import Editor
 from src.project import ProjectView
+from src.SettingsParser.configfiles import DEFAULT_START, START
 from src.SettingsParser.general_settings import GeneralSettings
 from src.SettingsParser.menu import Menu
 from src.SettingsParser.project_settings import RecentProjects
@@ -48,6 +49,7 @@ class StartDialog:
         self.frame.geometry("710x580")
         self.frame.resizable(False, False)
         if OSX:
+            # noinspection PyProtectedMember
             self.frame.tk.call(
                 "tk::unsupported::MacWindowStyle", "style", self.frame._w, "floating", "closeBox"
             )
@@ -90,7 +92,7 @@ class StartDialog:
         )
 
     def open_project_path(self, path):
-        name = os.path.basename(path)
+        name = Path(path).name
         self.projects.add_project(name, path)
         self.open_project(name)
 
@@ -102,8 +104,10 @@ class StartDialog:
 
     @property
     def links(self) -> Dict[str, str]:
-        with open("Config/start.json") as f:
+        with DEFAULT_START.open() as f:
             links = json.load(f)
+        with START.open() as f:
+            links |= json.load(f)
         return links
 
     def create_links(self):
@@ -135,7 +139,7 @@ class NewProjectDialog(WinFrame):
         self.master: Tk_Win = master
         super().__init__(master, "New Project", icon=get_image("new"))
         # super().__init__(master)
-        self.directory_to_create = os.path.expanduser("~/")
+        self.directory_to_create = Path("~").expanduser()
         self.projects = RecentProjects(self.master)
 
         frame = ttk.Frame(self)
@@ -147,7 +151,7 @@ class NewProjectDialog(WinFrame):
         ttk.Label(frame, text="Directory: ").grid(row=1, column=0, sticky="e")
         self.directory = Entry(frame)
         self.directory.grid(row=1, column=1)
-        self.directory.insert("0", self.directory_to_create)
+        self.directory.insert("0", self.directory_to_create.as_posix())
 
         self.status = ttk.Label(frame, foreground="red", takefocus=False)
         self.status.grid(row=2, column=1, sticky="w")
@@ -160,7 +164,7 @@ class NewProjectDialog(WinFrame):
 
     def create(self):
         try:
-            if os.path.isdir(self.directory_to_create):
+            if self.directory_to_create.is_dir():
                 dialog = YesNoDialog(
                     self.master, "Are you sure to use this directory as the project base directory?",
                     "The directory exsists."
@@ -168,7 +172,7 @@ class NewProjectDialog(WinFrame):
                 if not dialog.result:
                     return
             else:
-                os.mkdir(self.directory_to_create)
+                self.directory_to_create.mkdir()
         except (OSError, PermissionError, FileExistsError) as error:
             ErrorInfoDialog(
                 self.master, f"{error.__name__}. Please double-check the directory to create it",
@@ -191,6 +195,6 @@ class NewProjectDialog(WinFrame):
         self.create_btn["state"] = "normal"
         self.status["text"] = ""
 
-        directory = os.path.join(directory, name)
+        directory = Path(directory) / name
         self.directory_to_create = directory
         self.title_text = f"New Project - {directory}"

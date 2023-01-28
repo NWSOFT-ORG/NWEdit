@@ -3,6 +3,7 @@ from typing import Any, Dict, Literal
 
 import json5rw as json
 
+from src.SettingsParser.configfiles import config_dir_from_name
 from src.SettingsParser.project_settings import RecentProjects
 from src.Utils.functions import shell_command
 from src.Utils.regex import is_braketed, replace_braketed
@@ -21,15 +22,16 @@ class InProjectConfig:
     @staticmethod
     def create_config(dir_name):
         """Populate directory"""
-        config_dir = f"{dir_name}/.NWEdit"
+        config_dir = config_dir_from_name(dir_name)
         if not os.path.isdir(config_dir):
-            os.mkdir(config_dir)
+            config_dir.mkdir()
         for item in ["Run", "Tests", "EditorStatus"]:
-            item_config_dir = f"{config_dir}/{item}"
-            if not os.path.isdir(item_config_dir):
-                os.mkdir(item_config_dir)
-            if not os.path.isfile(f"{item_config_dir}/settings.json"):
-                with open(f"{item_config_dir}/settings.json", "w") as f:
+            item_config_dir = config_dir / item
+            if not item_config_dir.is_dir():
+                item_config_dir.mkdir()
+            settings_json = (item_config_dir / "settings.json")
+            if not settings_json.is_file():
+                with settings_json.open("w") as f:
                     json.dump({}, f)
 
     def get_settings_file(self, item: Literal["Run", "Tests", "Lint", "EditorStatus"]):

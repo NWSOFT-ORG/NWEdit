@@ -3,7 +3,7 @@ import shutil
 import tkinter as tk
 from pathlib import Path
 from tkinter import font, ttk
-from typing import Union, Literal
+from typing import Literal
 
 import send2trash
 
@@ -11,9 +11,9 @@ from src.Components.commondialog import StringInputDialog
 from src.Components.fileinfodialog import FileInfoDialog
 from src.Components.newitem import NewItemDialog
 from src.Components.scrollbar import Scrollbar
+from src.constants import logger, OSX
 from src.SettingsParser.extension_settings import FileTreeIconSettings
 from src.SettingsParser.interval_settings import IntervalSettings
-from src.constants import logger, OSX
 
 
 class FileTree(ttk.Frame):
@@ -21,7 +21,7 @@ class FileTree(ttk.Frame):
     Treeview to select files
     """
 
-    def __init__(self, master=None, opencommand=None, path: os.PathLike = os.path.expanduser("~")):
+    def __init__(self, path: Path, master, opencommand=None):
         self.expanded = []
         self.temp_path = []
         self._style = ttk.Style()
@@ -77,10 +77,10 @@ class FileTree(ttk.Frame):
             send2trash.send2trash(path)  # Send to trash is a good idea if possible
         except (send2trash.TrashPermissionError, OSError):
             # Linux OSs might have problems with the trash bin
-            if os.path.isdir(path):
-                shutil.rmtree(path)
+            if path.is_dir():
+                path.rmdir()
             else:
-                os.remove(path)
+                path.unlink()
         self.refresh_tree(True)  # Reset to root path to avoid any problems
 
     def rename(self, item: str) -> None:
@@ -89,7 +89,7 @@ class FileTree(ttk.Frame):
         if not dialog.result:
             return
         try:
-            newdir = os.path.join(self.path, dialog.result)
+            newdir = self.path / dialog.result
             shutil.move(path, newdir)
         except (IsADirectoryError, FileExistsError):
             pass
@@ -117,18 +117,16 @@ class FileTree(ttk.Frame):
 
         self.temp_path = []
         self.get_parent(item)
-        path = f'{"/".join(reversed(self.temp_path))[1:]}/{item_text}'
-        if os.path.isfile(path):
-            return
-        self.path = path
+
+        path = Path(*list(reversed(self.temp_path))[1:], item_text)
+        if path.is_file():
+            return  # Don't open files, only open directories
         logger.debug(f"Opened tree item, path: {self.path}")
         tree.delete(*tree.get_children(item))
-        self.process_directory(item, path=self.path)
+        self.process_directory(path=self.path, parent=item)
 
-    def process_directory(
-            self, parent: str, showdironly: bool = False, path: str = ""
-    ) -> None:
-        if os.path.isfile(path):
+    def process_directory(self, path: Path, parent: str, showdironly: bool = False) -> None:
+        if path.is_file():
             return
         try:
             items = sorted(os.listdir(path))
@@ -139,13 +137,14 @@ class FileTree(ttk.Frame):
             self.tree.insert(parent, "end", text="Empty", tags=("empty",))
         last_dir_index = 0
         for p in items:
-            abspath = os.path.join(path, p)
-            isdir = os.path.isdir(abspath)
+            p = Path(p)
+            abspath = path / p
+            isdir = abspath.is_dir()
             if isdir:
                 oid = self.tree.insert(
                     parent,
                     last_dir_index,
-                    text=p,
+                    text=p.name,
                     tags=("subfolder",),
                     open=False,
                     image=self.icon_settings.folder_icon,
@@ -158,12 +157,12 @@ class FileTree(ttk.Frame):
             else:
                 if showdironly:
                     return
-                extension = p.split(".")
-                self.icons.append(self.icon_settings.get_icon(extension[-1]))
+                extension = p.suffix
+                self.icons.append(self.icon_settings.get_icon(extension))
                 self.tree.insert(
                     parent,
                     "end",
-                    text=p,
+                    text=p.name,
                     open=False,
                     image=self.icons[-1],
                     tags=("file",),
@@ -173,7 +172,7 @@ class FileTree(ttk.Frame):
         tree = self.tree
         item = tree.identify("item", event.x, event.y)
         name = self.get_path(item, True)
-        if os.path.isdir(name):
+        if name.is_dir():
             return
         if self.opencommand:
             self.opencommand(name)
@@ -189,15 +188,15 @@ class FileTree(ttk.Frame):
         if parent_text:
             self.get_parent(parent_iid)
 
-    def get_path(self, item: str, append_name: bool = False, expect_type: Literal["file", "dir"] = "file") -> str:
+    def get_path(self, item: str, append_name: bool = False, expect_type: Literal["file", "dir"] = "file") -> Path:
         self.temp_path = []
         self.get_parent(item)
         self.temp_path.reverse()
         self.temp_path.remove("")
         if append_name:
             self.temp_path.append(self.tree.item(item, "text"))
-        abspath = os.path.abspath(os.path.join(*self.temp_path))
-        if os.path.isfile(abspath) and expect_type == "dir":
+        abspath = Path(*self.temp_path).resolve()
+        if abspath.is_file() and expect_type == "dir":
             # If we're getting a file, but we're trying to get the directory, return its parent
             abspath = Path(abspath).parent
         return abspath
@@ -222,29 +221,29 @@ class FileTree(ttk.Frame):
     def refresh_tree(self, reset=False) -> None:
         self.tree.delete(*self.tree.get_children())
         if reset:
-            abspath = os.path.abspath(self.orig_path)
+            abspath = self.orig_path.parent
         else:
-            abspath = os.path.abspath(self.path)
+            abspath = self.path.parent
         self.root_node = self.tree.insert(
-            "", "end", text=abspath, open=True, tags=("root",)
+            "", "end", text=abspath.as_posix(), open=True, tags=("root",)
         )
-        self.process_directory(self.root_node, path=abspath)
+        self.process_directory(path=abspath, parent=self.root_node)
 
-    def set_path(self, new_path: Union[os.PathLike, str]):
+    def set_path(self, new_path: Path):
         self.tree.delete(*self.tree.get_children())
-        abspath = os.path.abspath(new_path)
+        abspath = new_path.resolve()
 
         self.path = abspath
         self.orig_path = abspath
 
         self.root_node = self.tree.insert(
-            "", "end", text=abspath, open=True, tags=("root",)
+            "", "end", text=abspath.as_posix(), open=True, tags=("root",)
         )
-        self.process_directory(self.root_node, path=abspath)
+        self.process_directory(path=abspath, parent=self.root_node)
 
     def generate_status(self):
         status = {
-            "expandedNodes": self.expanded,
+            "expandedNodes"     : self.expanded,
             "yScrollbarLocation": self.yscroll.get(),
             "xScrollbarLocation": self.xscroll.get(),
         }

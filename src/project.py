@@ -1,4 +1,5 @@
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
 from typing import Callable, Literal
 
@@ -8,6 +9,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageTk
 from src.Components.filedialog import FileOpenDialog
 from src.Components.scrollbar import Scrollbar
 from src.constants import OSX
+from src.SettingsParser.configfiles import FONT_FILES, RECENT_PROJECTS
 from src.SettingsParser.project_settings import RecentProjects
 from src.tktypes import Tk_Widget
 
@@ -33,7 +35,7 @@ def create_img_with_txt(text: Literal[""]):
             fill=COLORS[index % 8],
             outline=(255, 255, 255, 255)
         )
-        font = ImageFont.truetype("Images/Fonts/OpenSans-CondBold.ttf", 120)
+        font = ImageFont.truetype(str(FONT_FILES / "OpenSans-CondBold.ttf"), 120)
         img.text((20, 10), text, fill=(255, 255, 255, 255), font=font)
 
         index += 1
@@ -79,7 +81,7 @@ class ProjectList(ttk.Treeview):
     def insert_projects(self):
         y_loc = self.yview()[0]
         self.delete(*self.get_children())
-        with open("EditorStatus/recent_projects.json") as f:
+        with RECENT_PROJECTS.open() as f:
             config = json.load(f)
         if not isinstance(config, dict):
             return
@@ -110,7 +112,10 @@ class ProjectList(ttk.Treeview):
         self.insert_projects()
 
     def assign_icon(self, name):
-        FileOpenDialog(self.master, lambda file: self.settings.assign_icon(name, icon=file), action="Select")
+        FileOpenDialog(
+            Path("~").expanduser(), self.master, lambda file: self.settings.assign_icon(name, icon=file),
+            action="Select"
+        )
         self.insert_projects()
 
     def right_click(self, event: tk.Event):

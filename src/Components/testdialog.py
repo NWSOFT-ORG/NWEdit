@@ -1,5 +1,5 @@
-import os
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
 
 import json5rw as json
@@ -9,20 +9,18 @@ from src.Components.commondialog import StringInputDialog, YesNoDialog
 from src.Components.scrollbar import Scrollbar
 from src.Components.tktext import EnhancedTextFrame, TextOpts
 from src.constants import APPDIR
+from src.SettingsParser.configfiles import config_dir_from_name, SETTINGS_FILE, TESTS_FILE
 from src.SettingsParser.extension_settings import RunCommand
 from src.Utils.functions import is_valid_name, shell_command
 
-TESTS_FILE = ".NWEdit/Tests/tests.json"
-SETTINGS_FILE = ".NWEdit/Tests/settings.json"
-
 
 class TestDialog(ttk.Frame):
-    def __init__(self, master: ttk.Notebook, path):
+    def __init__(self, master: ttk.Notebook, path: Path):
         self.master = master
         super().__init__(master)
         self.pack(fill="both", expand=1)
         master.add(self, text="Unit testing")
-        self.path = path
+        self.path: Path = path
         self.tests_listbox = ttk.Treeview(self, show="tree")
         yscroll = Scrollbar(self, command=self.tests_listbox.yview)
         yscroll.pack(side="right", fill="y")
@@ -55,40 +53,40 @@ class TestDialog(ttk.Frame):
 
     def write_test(self):
         try:
-            if not os.path.isdir(os.path.join(self.path, ".NWEdit")):
-                os.mkdir(os.path.join(self.path, ".NWEdit"))
-            if not os.path.isdir(os.path.join(self.path, ".NWEdit", "Tests")):
-                os.mkdir(os.path.join(self.path, ".NWEdit", "Tests"))
+            config_dir = config_dir_from_name(self.path)
+            if not config_dir.is_dir():
+                config_dir.mkdir()
+            tests_dir = config_dir / "Tests"
+            if not tests_dir.is_dir():
+                tests_dir.mkdir()
         except OSError:
             pass
         try:
-            with open(os.path.join(self.path, TESTS_FILE), "w") as f:
+            with Path(self.path, TESTS_FILE).open("w") as f:
                 json.dump(self.method_list, f)
         except (AttributeError, FileNotFoundError):
             try:
-                with open(os.path.join(self.path, TESTS_FILE), "w") as f:
+                with Path(self.path, TESTS_FILE).open("w") as f:
                     json.dump({}, f)
             except FileNotFoundError:
                 pass
 
     def read_test(self) -> dict:
         try:
-            with open(os.path.join(self.path, TESTS_FILE)) as f:
+            with (self.path / TESTS_FILE).open() as f:
                 return json.load(f)
         except (ValueError, FileNotFoundError):
             return {}
 
     def write_settings(self):
-        try:
-            with open(os.path.join(self.path, SETTINGS_FILE), "w") as f:
-                json.dump(self.settings_list, f)
-        except AttributeError:
-            with open(os.path.join(self.path, SETTINGS_FILE), "w") as f:
-                json.dump({}, f)
+        settings_file = self.path / SETTINGS_FILE
+        with settings_file.open("w") as f:
+            json.dump(self.settings_list, f)
 
     def read_settings(self) -> dict:
+        settings_file = self.path / SETTINGS_FILE
         try:
-            with open(os.path.join(self.path, SETTINGS_FILE)) as f:
+            with settings_file.open() as f:
                 return json.load(f)
         except (ValueError, FileNotFoundError):
             return {"imports": "", "setup": "", "teardown": ""}
@@ -185,7 +183,7 @@ class TestMain(unittest.TestCase):
         res += """
 if __name__ == '__main__':
     unittest.main()"""
-        with open(os.path.join(self.path, "test.py"), "w") as f:
+        with (self.path / "test.py").open("w") as f:
             f.write(res)
             filename = f.name
 

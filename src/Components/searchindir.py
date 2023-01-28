@@ -1,6 +1,6 @@
-import os
 import threading
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
 
 from src.Components.scrollbar import Scrollbar
@@ -8,12 +8,11 @@ from src.Components.search import re_search
 from src.Components.tkentry import Entry
 
 
-def list_all(directory: str) -> list:
-    itemslist = os.listdir(directory)
+def list_all(directory: Path) -> list:
     files = []
-    for file in itemslist:
-        path = os.path.abspath(os.path.join(directory, file))
-        if os.path.isdir(path):
+    for file in directory.iterdir():
+        path = (directory / file).parent
+        if path.is_dir():
             files += list_all(path)
         else:
             files.append(path)
@@ -22,7 +21,7 @@ def list_all(directory: str) -> list:
 
 
 class SearchInDir(ttk.Frame):
-    def __init__(self, master: ttk.Notebook, path: str, opencommand: callable):
+    def __init__(self, master: ttk.Notebook, path: Path, opencommand: callable):
         super().__init__(master)
         self.pack(fill="both", expand=1)
         master.add(self, text="Search in Directory")
@@ -139,7 +138,7 @@ class SearchInDir(ttk.Frame):
             item = self.tree.identify("item", event.x, event.y)
             text = self.tree.item(item, "text")
 
-            if os.path.isfile(text):
+            if Path(text).is_file():
                 self.opencommand(text)
             else:
                 parent = self.tree.parent(item)

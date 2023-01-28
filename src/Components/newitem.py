@@ -1,5 +1,5 @@
-import os.path
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
 from typing import Dict, List
 
@@ -7,6 +7,7 @@ import json5rw as json
 
 from src.Components.tkentry import Entry
 from src.Components.winframe import WinFrame
+from src.SettingsParser.configfiles import DEFAULT_FILE_EXTENS, FILE_EXTENS
 from src.tktypes import Tk_Widget
 from src.Utils.functions import is_illegal_filename
 from src.Utils.images import get_image
@@ -15,9 +16,9 @@ from src.Utils.images import get_image
 class NewItemDialog(WinFrame):
     def __init__(self, treeview, master: Tk_Widget, opencommand):
         super().__init__(master, "New Item", icon=get_image("new"))
-        with open("Config/defaults/file-extens.json") as f:
+        with DEFAULT_FILE_EXTENS.open() as f:
             self.config: Dict[str, List[str]] = json.load(f)
-        with open("Config/file-extens.json") as f:
+        with FILE_EXTENS.open() as f:
             self.config |= json.load(f)
 
         frame = ttk.Frame(self)
@@ -48,9 +49,12 @@ class NewItemDialog(WinFrame):
         self.extension_status = ttk.Label(self.right_frame, foreground="red")
         self.extension_status.grid(row=1, column=2)
 
-        self.create_btn = ttk.Button(self.right_frame, text="Create",
-                                     command=lambda: self.create_file(
-                                         f"{self.name.get()}{'.' if self.extens.get() else ''}{self.extens.get()}"))
+        self.create_btn = ttk.Button(
+            self.right_frame, text="Create",
+            command=lambda: self.create_file(
+                f"{self.name.get()}{'.' if self.extens.get() else ''}{self.extens.get()}"
+            )
+        )
         self.create_btn.grid(row=2, column=2, sticky="e")
 
         self.extens_var.trace_add("write", self.on_extens_change)
@@ -62,8 +66,8 @@ class NewItemDialog(WinFrame):
     def create_file(self, file_name):
         tree: ttk.Treeview = self.filetree.tree
         directory = self.filetree.get_path(tree.focus(), append_name=True, expect_type="dir")
-        path = os.path.join(directory, file_name)
-        with open(path, "w") as f:
+        path = Path(directory, file_name)
+        with path.open("w") as f:
             f.write("")
         self.opencommand(path)
 

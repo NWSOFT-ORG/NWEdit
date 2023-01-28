@@ -4,6 +4,7 @@ from tkinter import font, ttk
 import json5rw as json
 
 from src.constants import OSX
+from src.SettingsParser.configfiles import GENERAL_SETTINGS
 from src.tktypes import Tk_Win
 from src.Utils.photoimage import IconImage
 
@@ -12,7 +13,7 @@ RADIUS = 27 if OSX else 0
 
 # Need these because importing settings is a circular import
 def get_theme():
-    with open("Config/general-settings.json") as f:
+    with GENERAL_SETTINGS.open() as f:
         settings = json.load(f)
         if not settings:
             return ""  # Default theme

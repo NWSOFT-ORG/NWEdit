@@ -1,8 +1,8 @@
 """A Hex Viewer to view non-text documents."""
 
 import codecs
-import os
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
 
 from src.Components.scrollbar import TextScrollbar
@@ -97,7 +97,7 @@ class HexView:
         self.textbox.config(state="disabled")
 
     def open(self, filename):
-        if filename and os.path.isfile(filename):
+        if filename and Path(filename).is_file():
             self.filename = filename
             self.show_block()
 

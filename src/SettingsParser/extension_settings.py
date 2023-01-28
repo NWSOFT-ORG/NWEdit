@@ -7,6 +7,8 @@ from PIL import Image, ImageTk
 from pygments import lexers
 from pygments.lexer import Lexer
 
+from src.SettingsParser.configfiles import CONFIG_FILES, DEFAULT_CONFIG_FILES, FILE_ICON_FILES
+
 
 class ExtensionSettings:
     """An inheratiable class"""
@@ -20,7 +22,7 @@ class ExtensionSettings:
 
     def load_config(self):
         all_settings = self.load_default_config()
-        with open(f"Config/{self.path}") as f:
+        with (CONFIG_FILES / self.path).open() as f:
             all_settings |= json.load(f)
 
         for key, value in all_settings.items():
@@ -28,7 +30,7 @@ class ExtensionSettings:
             self.items.append(value)
 
     def load_default_config(self):
-        with open(f"Config/defaults/{self.path}") as f:
+        with (DEFAULT_CONFIG_FILES / self.path).open() as f:
             all_settings = json.load(f)
         return all_settings
 
@@ -82,7 +84,7 @@ class FileTreeIconSettings:
     @property
     def folder_icon(self) -> ImageTk.PhotoImage:
         out = io.BytesIO()
-        image = pyvips.Image.new_from_file("Images/file-icons/folder.svg", access="sequential", scale=5)
+        image = pyvips.Image.new_from_file(FILE_ICON_FILES / "folder.svg", access="sequential", scale=5)
         out.write(image.write_to_buffer(".png"))
 
         img = Image.open(out)
@@ -90,9 +92,9 @@ class FileTreeIconSettings:
         return ImageTk.PhotoImage(img)
 
     def load_config(self):
-        with open(f"Config/defaults/{self.path}") as f:
+        with open(DEFAULT_CONFIG_FILES / self.path) as f:
             self.settings |= json.load(f)
-        with open(f"Config/{self.path}") as f:
+        with open(CONFIG_FILES / self.path) as f:
             self.settings |= json.load(f)
 
     def get_icon(self, extension: str) -> ImageTk.PhotoImage:
@@ -105,7 +107,7 @@ class FileTreeIconSettings:
             icon_name = "other"
         out = io.BytesIO()
 
-        image = pyvips.Image.new_from_file(f"Images/file-icons/{icon_name}.svg", access="sequential", scale=5)
+        image = pyvips.Image.new_from_file(FILE_ICON_FILES / f"{icon_name}.svg", access="sequential", scale=5)
         out.write(image.write_to_buffer(".png"))
 
         img = Image.open(out)

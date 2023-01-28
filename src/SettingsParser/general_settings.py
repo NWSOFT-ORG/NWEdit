@@ -2,6 +2,7 @@ from tkinter import font
 
 import json5rw as json
 
+from src.SettingsParser.configfiles import DEFAULT_GENERAL_SETTINGS, GENERAL_SETTINGS
 from src.tktypes import Tk_Widget
 from src.window import get_window
 
@@ -13,9 +14,9 @@ class GeneralSettings:
         if master is None:
             master = get_window()
         self.master = master
-        with open("Config/defaults/general-settings.json") as f:
+        with DEFAULT_GENERAL_SETTINGS.open() as f:
             self.settings = json.load(f)
-        with open("Config/general-settings.json") as f:
+        with GENERAL_SETTINGS.open() as f:
             self.settings |= json.load(f)
 
     def get_font(self):

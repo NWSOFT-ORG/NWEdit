@@ -8,6 +8,7 @@ from pathlib import Path
 from src.events import EventClass
 
 WINDOWS = bool(sys.platform.startswith("win"))
+# WINDOWS = True
 OSX = bool(sys.platform.startswith("darwin"))
 APPDIR = str(Path(__file__).parent)
 VERSION = "0.6-DEV"

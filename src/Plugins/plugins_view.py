@@ -3,14 +3,17 @@ from tkinter import ttk
 import json5rw as json
 
 from src.Components.winframe import WinFrame
+from src.SettingsParser.configfiles import DEFAULT_PLUGIN_DATA, PLUGIN_DATA
 from src.Utils.images import get_image
 
 
 class PluginView(WinFrame):
     def __init__(self, master):
         super().__init__(master, "Plugins", icon=get_image("info"))
-        with open("Config/plugin-data.json") as f:
+        with DEFAULT_PLUGIN_DATA.open() as f:
             self.settings = json.load(f)
+        with PLUGIN_DATA.open() as f:
+            self.settings |= json.load(f)
         self.plugins = ttk.Treeview(self, columns=("name", "desc"))
         self.plugins.heading("name", text="Name", anchor="w")
         self.plugins.heading("desc", text="Description", anchor="w")

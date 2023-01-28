@@ -1,4 +1,5 @@
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
 from typing import Callable, Union
 
@@ -12,6 +13,7 @@ from src.window import get_window
 class FileOpenDialog(FileTree):
     def __init__(
         self,
+        path,
         master: Union[None, tk.Misc] = None,
         opencommand: Callable = None,
         action: str = "Open",
@@ -36,7 +38,7 @@ class FileOpenDialog(FileTree):
         )
         self.set_path_btn.pack(side="right")
         self.entryframe.pack(fill="x")
-        super().__init__(master=self.win, opencommand=opencommand)
+        super().__init__(path=Path(path).resolve(), master=self.win, opencommand=opencommand)
         self.temp_path = []
 
     def open(self):
@@ -46,7 +48,7 @@ class FileOpenDialog(FileTree):
         if not self.opencommand:
             self.win.destroy()
             return
-        self.opencommand(f"{self.temp_path[0]}/{item_text}")
+        self.opencommand(Path(self.temp_path[0], item_text))
         self.master.destroy()
 
     def goto_path(self, _=None):
@@ -63,16 +65,17 @@ class FileOpenDialog(FileTree):
 
 class FileSaveAsDialog(FileOpenDialog):
     def __init__(self, master, savecommand: Callable):
-        super().__init__(master, savecommand, "Save")
+        super().__init__(Path("~").expanduser(), master, savecommand, "Save")
 
 
 class DirectoryOpenDialog(FileOpenDialog, FileTree):
     def __init__(self, master, opencommand):
         self.opencommand = opencommand
-        super().__init__(master, opencommand=opencommand)
+        super().__init__(path=Path("~").expanduser(), master=master, opencommand=opencommand)
 
-    def process_directory(self, parent, _: bool = False, path: str = ""):
-        super().process_directory(parent, False, path)
+    def process_directory(self, path: str, parent, showdironly: bool = False):
+        path = Path(path)
+        super().process_directory(path, parent, False)
 
     def open(self):
         if not self.tree.focus():

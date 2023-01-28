@@ -7,6 +7,7 @@ import json5rw as json
 
 from src.Components.tktext import EnhancedTextFrame
 from src.Components.winframe import WinFrame
+from src.SettingsParser.configfiles import GENERAL_SETTINGS
 from src.tktypes import Tk_Win
 from src.Utils.images import get_image
 from src.window import get_window
@@ -14,7 +15,7 @@ from src.window import get_window
 
 # Need these to prevent circular imports
 def get_pygments() -> str:
-    with open("Config/general-settings.json") as f:
+    with open(GENERAL_SETTINGS) as f:
         settings = json.load(f)
         if settings is None:
             return "default"  # Return the default theme
@@ -22,7 +23,7 @@ def get_pygments() -> str:
 
 
 def get_font() -> str:
-    with open("Config/general-settings.json") as f:
+    with open(GENERAL_SETTINGS) as f:
         settings = json.load(f)
         if settings is None:
             return "tkFixedFont"  # Return the default font

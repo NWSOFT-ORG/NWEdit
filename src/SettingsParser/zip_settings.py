@@ -40,4 +40,4 @@ class ZipSettings:
             pass
 
     def unzipsettings(self):
-        FileOpenDialog(self.master, self.__unzip_settings)
+        FileOpenDialog(Path("~").expanduser(), self.master, self.__unzip_settings)

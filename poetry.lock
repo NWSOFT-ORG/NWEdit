@@ -13,17 +13,17 @@ files = [
 
 [[package]]
 name = "art"
-version = "5.8"
+version = "6.1"
 description = "ASCII Art Library For Python"
 optional = false
-python-versions = ">=2.7"
+python-versions = ">=3.5"
 files = [
-    {file = "art-5.8-py2.py3-none-any.whl", hash = "sha256:cd77a9dcfe49dfb82f37a7b2401ae771fde6e155942b4e3dbc50a68c2bc7027c"},
-    {file = "art-5.8.tar.gz", hash = "sha256:83e383910e07eb7844a6618498708e0080ea842d584128ee6b0dc62d8b48cf36"},
+    {file = "art-6.1-py3-none-any.whl", hash = "sha256:159819c418001467f8d79616fa0814277deac97c8a363d1eb3e7c0a31526bfc3"},
+    {file = "art-6.1.tar.gz", hash = "sha256:6ab3031e3b7710039e73497b0e750cadfe04d4c1279ce3a123500dbafb9e1b64"},
 ]
 
 [package.extras]
-dev = ["bandit (>=1.5.1)", "codecov (>=2.0.15)", "coverage (>=4.1)", "pydocstyle (>=3.0.0)", "vulture (>=1.0)"]
+dev = ["bandit (>=1.5.1)", "coverage (>=4.1)", "pydocstyle (>=3.0.0)", "vulture (>=1.0)"]
 
 [[package]]
 name = "certifi"
@@ -729,4 +729,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "b8a59f6050a0dceb5a8f734f34db0db816567fe8d49e5a5d315e139e1b773aa1"
+content-hash = "fe8cdf6f5815a065e8d37776bfc930817ad27fa0c63128118987e231d0c3ef26"

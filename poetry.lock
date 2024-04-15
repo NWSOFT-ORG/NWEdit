@@ -662,18 +662,18 @@ testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (
 
 [[package]]
 name = "tkhtmlview"
-version = "0.1.1.post5"
+version = "0.2.0"
 description = "Display HTML with Tkinter"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "tkhtmlview-0.1.1.post5-py3-none-any.whl", hash = "sha256:1e84466ac703e93c72ce11f8600c1b0f9979595eb3e906482a36b181210141eb"},
-    {file = "tkhtmlview-0.1.1.post5.tar.gz", hash = "sha256:28ce4f9649e734da71bbd969733a7d3708f452854c4c5147b673937432b730e3"},
+    {file = "tkhtmlview-0.2.0-py3-none-any.whl", hash = "sha256:6d5acecb9d3c48c0e326969f6b8200b7f7082565b490f456de5f42eaffb2e601"},
+    {file = "tkhtmlview-0.2.0.tar.gz", hash = "sha256:2d0c0c11cc313ebf5a171986f1f7c7c28067d19df85f1c25022950fd49fcfdab"},
 ]
 
 [package.dependencies]
-Pillow = ">=9.2.0,<10.0.0"
-requests = ">=2.28.1,<3.0.0"
+Pillow = ">=9.4.0,<10.0.0"
+requests = ">=2.28.2,<3.0.0"
 
 [[package]]
 name = "tkterminal"

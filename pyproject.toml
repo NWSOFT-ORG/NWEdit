@@ -17,7 +17,7 @@ tkterminal = "^0.1.0"
 tkhtmlview = "^0.1.1.post5"
 mistune = "^2.0.4"
 json5rw = "^0.2.2"
-pyvips = "^2.2.1"
+pyvips = "^2.2.2"
 multipledispatch = "^0.6.0"
 
 [tool.poetry.group.dev.dependencies]

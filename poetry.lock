@@ -584,12 +584,12 @@ files = [
 
 [[package]]
 name = "pyvips"
-version = "2.2.1"
+version = "2.2.2"
 description = "binding for the libvips image processing library, API mode"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pyvips-2.2.1.tar.gz", hash = "sha256:b51dbb45b057a282925015d540c5597560993e2986df20a778646a6b37e7cbb5"},
+    {file = "pyvips-2.2.2.tar.gz", hash = "sha256:2aa169f2130e8f9d9b0d442fad10a70ff1c3d1bb6add099ce058987faa1f6829"},
 ]
 
 [package.dependencies]
@@ -598,7 +598,7 @@ pkgconfig = "*"
 
 [package.extras]
 doc = ["sphinx", "sphinx_rtd_theme"]
-test = ["cffi (>=1.0.0)", "pyperf", "pytest", "pytest-flake8", "pytest-runner"]
+test = ["cffi (>=1.0.0)", "pyperf", "pytest"]
 
 [[package]]
 name = "pywin32-ctypes"

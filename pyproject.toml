@@ -11,7 +11,7 @@ Pygments = "^2.17.2"
 PyTouchBar = "^0.2.0"
 Send2Trash = "^1.8.3"
 ttkthemes = "^3.2.2"
-pyobjc-core = { version = "^9.0", markers = "sys_platform == 'darwin'" }  # Have to keep a legacy version
+pyobjc-core = { version = "^10.2", markers = "sys_platform == 'darwin'" }  # Have to keep a legacy version
 pyobjc-framework-Cocoa = { version = "^9.0", markers = "sys_platform == 'darwin'" }
 tkterminal = "^0.1.0"
 tkhtmlview = "^0.2.0"

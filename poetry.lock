@@ -582,12 +582,12 @@ files = [
 
 [[package]]
 name = "pyvips"
-version = "2.2.2"
+version = "2.2.3"
 description = "binding for the libvips image processing library, API mode"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pyvips-2.2.2.tar.gz", hash = "sha256:2aa169f2130e8f9d9b0d442fad10a70ff1c3d1bb6add099ce058987faa1f6829"},
+    {file = "pyvips-2.2.3.tar.gz", hash = "sha256:43bceced0db492654c93008246a58a508e0373ae1621116b87b322f2ac72212f"},
 ]
 
 [package.dependencies]
@@ -731,4 +731,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "651e8c05872f0e5ee0b4afe8442b708cbded0a15b757fc6b7e937984fc4e3b87"
+content-hash = "82d08fcf7c4e1da1c9a40669f82dd9d368bac8fb257306e42dc6b59e06a6d601"

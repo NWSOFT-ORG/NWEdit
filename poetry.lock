@@ -530,22 +530,23 @@ files = [
 
 [[package]]
 name = "pyobjc-framework-cocoa"
-version = "10.2"
+version = "10.3"
 description = "Wrappers for the Cocoa frameworks on macOS"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pyobjc-framework-Cocoa-10.2.tar.gz", hash = "sha256:6383141379636b13855dca1b39c032752862b829f93a49d7ddb35046abfdc035"},
-    {file = "pyobjc_framework_Cocoa-10.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:f9227b4f271fda2250f5a88cbc686ff30ae02c0f923bb7854bb47972397496b2"},
-    {file = "pyobjc_framework_Cocoa-10.2-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:6a6042b7703bdc33b7491959c715c1e810a3f8c7a560c94b36e00ef321480797"},
-    {file = "pyobjc_framework_Cocoa-10.2-cp312-cp312-macosx_10_9_universal2.whl", hash = "sha256:18886d5013cd7dc7ecd6e0df5134c767569b5247fc10a5e293c72ee3937b217b"},
-    {file = "pyobjc_framework_Cocoa-10.2-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:1ecf01400ee698d2e0ff4c907bcf9608d9d710e97203fbb97b37d208507a9362"},
-    {file = "pyobjc_framework_Cocoa-10.2-cp38-cp38-macosx_11_0_universal2.whl", hash = "sha256:0def036a7b24e3ae37a244c77bec96b7c9c8384bf6bb4d33369f0a0c8807a70d"},
-    {file = "pyobjc_framework_Cocoa-10.2-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:5f47ecc393bc1019c4b47e8653207188df784ac006ad54d8c2eb528906ff7013"},
+    {file = "pyobjc_framework_Cocoa-10.3-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:745fcd99cc9ca1827a5b6fa2127d12023428f8ce2047afefc57b1e69f185750f"},
+    {file = "pyobjc_framework_Cocoa-10.3-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:116b79be8e9756047a9b6f90d2f08c0e640ff86fcea85ca553dbbb4b121b390f"},
+    {file = "pyobjc_framework_Cocoa-10.3-cp312-cp312-macosx_10_9_universal2.whl", hash = "sha256:08ccc260d3481ddf03784f7dcf2cc7a4e9d8f1ecdf727cb4f80cde7b88416c39"},
+    {file = "pyobjc_framework_Cocoa-10.3-cp313-cp313-macosx_10_9_universal2.whl", hash = "sha256:277f5e4d4fab0d431cb5f07fc161a3076cb365099977e748c6a255e94eaad137"},
+    {file = "pyobjc_framework_Cocoa-10.3-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:008e5ca144a378513ee5f8c5a9009e8b4401ec09edda3648b01f8d8b640b3152"},
+    {file = "pyobjc_framework_Cocoa-10.3-cp38-cp38-macosx_11_0_universal2.whl", hash = "sha256:3c3f9806aa04dc1cd08e18a98a97629f0d0581fa0d6a71e739934f02e8b1a8df"},
+    {file = "pyobjc_framework_Cocoa-10.3-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:fb89620f96d5d0d52a158faeab1b568bed6fa6d0c4f883198e60e60a14db1360"},
+    {file = "pyobjc_framework_cocoa-10.3.tar.gz", hash = "sha256:d39f90ffe04143911060c392e62b9514f14caaba119657d6e2b8b197af49e117"},
 ]
 
 [package.dependencies]
-pyobjc-core = ">=10.2"
+pyobjc-core = ">=10.3"
 
 [[package]]
 name = "pytest"
@@ -731,4 +732,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "f5c3ffd4ab08561f0eea1bd61a0a4f5aa5d7a6b3ecc3f468fdbe86003c002057"
+content-hash = "322dde0abbf299ac9308304f306105afaa10857cf950cef3cd30c6e5a6a3606c"

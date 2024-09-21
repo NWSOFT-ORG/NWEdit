@@ -592,13 +592,13 @@ dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments
 
 [[package]]
 name = "pytouchbar"
-version = "0.2.0"
+version = "0.2.1"
 description = "Use MacBook Pro's TouchBar in Python"
 optional = false
 python-versions = ">=3.2"
 files = [
-    {file = "PyTouchBar-0.2.0-py3-none-any.whl", hash = "sha256:5e12c9bd90724914dfc70f6ff60c4f394bfd54c0b6ea667a1394a9694c39821f"},
-    {file = "PyTouchBar-0.2.0.tar.gz", hash = "sha256:15bf522a2b3b8b09515f8b3640095336269c9a067b92517cc9e31dd71b228d65"},
+    {file = "PyTouchBar-0.2.1-py3-none-any.whl", hash = "sha256:cb5bcb4b974496cb6162279644d59fc0b77b481d3fe2044a3750c3a4453a8b72"},
+    {file = "pytouchbar-0.2.1.tar.gz", hash = "sha256:23bd85440a5864248de7ea1048b6c1458b595ed86aaecda3d7cca86028ccdd64"},
 ]
 
 [[package]]
@@ -751,4 +751,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "efd6b5514b679e1e1253162d468473b21a5b112ea648b72e1409129743906acc"
+content-hash = "65976186a89b8ee46ab959415e30df36c905b4b69e25a74613b3e6d6556b6db2"

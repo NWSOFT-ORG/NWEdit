@@ -8,7 +8,7 @@ python = ">=3.10,<3.12"
 art = "^6.2"
 Pillow = "^9.5.0"
 Pygments = "^2.18.0"
-PyTouchBar = "^0.2.0"
+PyTouchBar = "^0.2.1"
 Send2Trash = "^1.8.3"
 ttkthemes = "^3.2.2"
 pyobjc-core = { version = "^10.3", markers = "sys_platform == 'darwin'" }  # Have to keep a legacy version

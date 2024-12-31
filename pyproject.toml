@@ -15,7 +15,7 @@ pyobjc-core = { version = "^10.3", markers = "sys_platform == 'darwin'" }  # Hav
 pyobjc-framework-Cocoa = { version = "^10.3", markers = "sys_platform == 'darwin'" }
 tkterminal = "^0.1.0"
 tkhtmlview = "^0.2.0"
-mistune = "^3.0.2"
+mistune = "^3.1.0"
 json5rw = "^0.2.2"
 pyvips = "^2.2.3"
 multipledispatch = "^1.0.0"

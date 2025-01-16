@@ -526,20 +526,18 @@ setuptools = ">=42.0.0"
 
 [[package]]
 name = "pyobjc-core"
-version = "10.3.2"
+version = "11.0"
 description = "Python<->ObjC Interoperability Module"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pyobjc_core-10.3.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:acb40672d682851a5c7fd84e5041c4d069b62076168d72591abb5fcc871bb039"},
-    {file = "pyobjc_core-10.3.2-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:cea5e77659619ad93c782ca07644b6efe7d7ec6f59e46128843a0a87c1af511a"},
-    {file = "pyobjc_core-10.3.2-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:16644a92fb9661de841ba6115e5354db06a1d193a5e239046e840013c7b3874d"},
-    {file = "pyobjc_core-10.3.2-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:76b8b911d94501dac89821df349b1860bb770dce102a1a293f524b5b09dd9462"},
-    {file = "pyobjc_core-10.3.2-cp313-cp313t-macosx_10_13_universal2.whl", hash = "sha256:8c6288fdb210b64115760a4504efbc4daffdc390d309e9318eb0e3e3b78d2828"},
-    {file = "pyobjc_core-10.3.2-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:87901e9f7032f33eb4fa884e407bf2744d5a0791b379bfca783982a02be3f7fb"},
-    {file = "pyobjc_core-10.3.2-cp38-cp38-macosx_11_0_universal2.whl", hash = "sha256:636971ab48a4198ca129e149fe58ccf85a7b4a9b93d27f5ae920d88eb2655431"},
-    {file = "pyobjc_core-10.3.2-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:48e9ac3af42b2340dae709a8b894f5ef7e5132d8546adcd1797cffcc449dabdc"},
-    {file = "pyobjc_core-10.3.2.tar.gz", hash = "sha256:dbf1475d864ce594288ce03e94e3a98dc7f0e4639971eb1e312bdf6661c21e0e"},
+    {file = "pyobjc_core-11.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:10866b3a734d47caf48e456eea0d4815c2c9b21856157db5917b61dee06893a1"},
+    {file = "pyobjc_core-11.0-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:50675c0bb8696fe960a28466f9baf6943df2928a1fd85625d678fa2f428bd0bd"},
+    {file = "pyobjc_core-11.0-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:a03061d4955c62ddd7754224a80cdadfdf17b6b5f60df1d9169a3b1b02923f0b"},
+    {file = "pyobjc_core-11.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:c338c1deb7ab2e9436d4175d1127da2eeed4a1b564b3d83b9f3ae4844ba97e86"},
+    {file = "pyobjc_core-11.0-cp313-cp313t-macosx_10_13_universal2.whl", hash = "sha256:b4e9dc4296110f251a4033ff3f40320b35873ea7f876bd29a1c9705bb5e08c59"},
+    {file = "pyobjc_core-11.0-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:02406ece449d0f41b31e579e47ca77ced3eb57533df955281bfcecc99da74fba"},
+    {file = "pyobjc_core-11.0.tar.gz", hash = "sha256:63bced211cb8a8fb5c8ff46473603da30e51112861bd02c438fbbbc8578d9a70"},
 ]
 
 [[package]]
@@ -757,4 +755,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "7e9e2a5029d7437479a0d76de0b1aafa11e61330f5e89ed8a0b65e8bcc1a00d9"
+content-hash = "c36015ffc33d59cab3e1f1ffe8734f8514abf3cff91cf60174747a4a5a33bca8"

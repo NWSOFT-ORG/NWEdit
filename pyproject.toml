@@ -21,7 +21,7 @@ pyvips = "^2.2.3"
 multipledispatch = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
-pyinstaller = "^6.11"
+pyinstaller = "^6.12"
 pytest = "^8.3.4"
 isort = "^6.0.0"
 coverage = "^7.6.12"

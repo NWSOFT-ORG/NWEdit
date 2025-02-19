@@ -300,13 +300,13 @@ altgraph = ">=0.17"
 
 [[package]]
 name = "mistune"
-version = "3.1.1"
+version = "3.1.2"
 description = "A sane and fast Markdown parser with useful plugins and renderers"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mistune-3.1.1-py3-none-any.whl", hash = "sha256:02106ac2aa4f66e769debbfa028509a275069dcffce0dfa578edd7b991ee700a"},
-    {file = "mistune-3.1.1.tar.gz", hash = "sha256:e0740d635f515119f7d1feb6f9b192ee60f0cc649f80a8f944f905706a21654c"},
+    {file = "mistune-3.1.2-py3-none-any.whl", hash = "sha256:4b47731332315cdca99e0ded46fc0004001c1299ff773dfb48fbe1fd226de319"},
+    {file = "mistune-3.1.2.tar.gz", hash = "sha256:733bf018ba007e8b5f2d3a9eb624034f6ee26c4ea769a98ec533ee111d504dff"},
 ]
 
 [package.dependencies]
@@ -755,4 +755,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "5d7b8646c5ae238a6c243f0ec404fb59e10f3e03a8c81abc439d7275de380da6"
+content-hash = "73f5a58cbf35728e0fa2c8cc9d2528fd3cd695f68969e270f1eee92633ad801d"

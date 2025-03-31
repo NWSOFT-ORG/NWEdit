@@ -24,7 +24,7 @@ multipledispatch = "^1.0.0"
 pyinstaller = "^6.12"
 pytest = "^8.3.5"
 isort = "^6.0.1"
-coverage = "^7.7.1"
+coverage = "^7.8.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

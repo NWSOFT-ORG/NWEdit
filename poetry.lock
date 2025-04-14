@@ -14,14 +14,14 @@ files = [
 
 [[package]]
 name = "art"
-version = "6.4"
+version = "6.5"
 description = "ASCII Art Library For Python"
 optional = false
 python-versions = ">=3.6"
 groups = ["main"]
 files = [
-    {file = "art-6.4-py3-none-any.whl", hash = "sha256:4e58b6f0a0bb8574efb311eff24bdd28bf889c0c526ccbbb5410c644340a301c"},
-    {file = "art-6.4.tar.gz", hash = "sha256:417fea674bff8cea7ed058291ad1b81a6032dfce5152f28e629fa4a798a2c14c"},
+    {file = "art-6.5-py3-none-any.whl", hash = "sha256:70706408144c45c666caab690627d5c74aea7b6c7ce8cc968408ddeef8d84afd"},
+    {file = "art-6.5.tar.gz", hash = "sha256:a98d77b42c278697ec6cf4b5bdcdfd997f6b2425332da078d4e31e31377d1844"},
 ]
 
 [package.extras]
@@ -805,4 +805,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.12"
-content-hash = "b851a30a52804d246c08b92e381d29d327f1a0046f0df17811fe05d66b31fc59"
+content-hash = "77ccac9e629a87cca729793caf3c3b9a4e3eb7dccd35fb9ee4fe08f6b5f86557"

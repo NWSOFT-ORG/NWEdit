@@ -22,7 +22,7 @@ multipledispatch = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = "^6.16"
-pytest = "^8.4.2"
+pytest = "^9.0.0"
 isort = "^7.0.0"
 coverage = "^7.11.0"
 
